@@ -1,0 +1,36 @@
+{% extends "_ledger_shell.html" %}
+{% set record_count_key = 'ligase' %}
+
+{% block module_panels %}
+{% if weights %}
+<div class="panel">
+  <h3>Ranking weights</h3>
+  <p style="color:var(--muted);margin-top:0;font-size:0.85rem">
+    Read live from <code>config/thresholds.toml</code>. Every component is a
+    visible column in the table: there is no hidden scoring. The spec 9.3
+    enrichment test runs with <code>exploitation_status</code> and
+    <code>has_ligand</code> held out of these weights, otherwise it would be
+    circular.
+  </p>
+  <table class="grid-table">
+    <thead><tr><th>Component</th><th class="num">Weight</th></tr></thead>
+    <tbody>
+      {% for weight in weights %}
+        <tr><td>{{ weight.name }}</td><td class="num">{{ weight.value }}</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block module_viewer %}
+  {% with viewer_id='viewer-e3', role='e3', extra_class='viewer--tall',
+          empty_message='Pin a ligase to load its best structure. The top fpocket pocket renders as a surface mesh, any bound drug-like ligand is shown, and the pocket volume and score appear in the overlay.' %}
+    {% include "_viewer.html" %}
+  {% endwith %}
+  <div class="panel" id="ligase-detail" hidden>
+    <h3>Selected ligase</h3>
+    <table class="grid-table" id="ligase-detail-table"><tbody></tbody></table>
+  </div>
+{% endblock %}

@@ -130,3 +130,52 @@ repository. `data/validation/MANIFEST.md` is tracked, so the provenance, row
 counts and licences are all public even though the rows are not.
 
 **Reversal.** Narrow the `data/validation/*` patterns in `.gitignore`.
+
+---
+
+## D-007: the BioLiP2 artefact list is held out of CCD classification
+
+**Decision.** `pipeline/ccd_classes.classify()` does not take the BioLiP artefact
+list as an input, and takes no argument that would let a caller pass it.
+
+**Context.** Spec 9.1 scores BINMAN on whether it classes BioLiP2's artefact
+ligands as furniture rather than as glue candidates. The 463 codes were available
+and using them would have made that metric read 1.00.
+
+**Alternatives considered.** Seed the artefact codes into the furniture classes
+and report the metric anyway.
+
+**Reason.** A metric that measures a lookup measures nothing. Holding the list out
+keeps artefact precision a genuine test of an independent classifier, and the
+number it produces (0.927 on a held-out half) is informative precisely because it
+is not 1.00.
+
+**Reversal.** Pass the artefact codes into the seed sets in `ccd_classes.py`. Note
+that doing so invalidates the spec 9.1 artefact precision figure.
+
+---
+
+## D-008: references are resolved by Crossref search, never recalled
+
+**Decision.** `pipeline/references.py` holds a bibliographic query and a set of
+expected title words per reference, and takes the DOI from Crossref's search
+endpoint. No DOI is written by hand.
+
+**Context.** The first revision carried hand-written DOIs. Crossref showed that
+several resolved to unrelated works: the DEGRONOPEDIA DOI returned a Reactome
+paper, the DCAF15 DOI returned a Zika virus paper, the Open Targets DOI returned
+an unrelated gene-association resource, and one entry contained a placeholder
+string that was never a DOI at all. Each would have been published as a verified
+citation.
+
+**Alternatives considered.** Keep the hand-written DOIs and only check that they
+resolve. Drop any reference that cannot be verified.
+
+**Reason.** Checking that a DOI resolves does not check that it resolves to the
+right paper, which is the failure that actually occurred. Matching the returned
+title against expected words catches it. Conference abstracts and Faculty
+Opinions recommendations are filtered out because they carry the right words and
+the wrong work, and a journal article is preferred over a preprint.
+
+**Reversal.** Not advisable. If a reference must be pinned to a specific DOI, add
+it as a `doi_hint` cross-check rather than as the source of truth.

@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en-GB" data-theme-default>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}{{ page_title }}{% endblock %} · BINMAN</title>
+<meta name="description" content="BINMAN: an empirical atlas of bridging ligands, structural degrons, E3 ligase triage and degradability.">
+<link rel="icon" href="{{ url_for('static', filename='img/favicon.svg') }}" type="image/svg+xml">
+<link rel="apple-touch-icon" href="{{ url_for('static', filename='img/apple-touch-icon.png') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='vendor/tabulator/tabulator.min.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='vendor/molstar/molstar.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/binman.css') }}">
+<script>
+  /* Apply the stored theme before first paint so the page never flashes. */
+  (function () {
+    try {
+      var stored = localStorage.getItem('binman-theme');
+      if (stored === 'dark' || stored === 'light') {
+        document.documentElement.setAttribute('data-theme', stored);
+      }
+    } catch (e) { /* private mode: fall through to the media query */ }
+  })();
+</script>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header class="app-header">
+  <a class="brand" href="{{ url_for('ledger.index') }}">
+    <svg class="brand__mark" viewBox="0 0 32 32" aria-hidden="true">
+      <rect x="4" y="11" width="24" height="17" rx="1.5" fill="var(--accent)"/>
+      <rect x="2" y="7" width="28" height="4" rx="1" fill="var(--ink)"/>
+      <rect x="13" y="4" width="6" height="3" rx="1" fill="var(--ink)"/>
+      <path d="M11 15v9M16 15v9M21 15v9" stroke="var(--surface)" stroke-width="1.8" stroke-linecap="round"/>
+    </svg>
+    <span>
+      <span class="brand__name">BINMAN</span><br>
+      <span class="brand__sub">bridging ligands &amp; neosubstrates</span>
+    </span>
+  </a>
+
+  {% include "_triangle.html" %}
+
+  <nav class="app-nav" aria-label="Modules">
+    {% for module in modules %}
+      <a href="{{ url_for(module.endpoint) }}"
+         {% if active == module.slug %}aria-current="page"{% endif %}>{{ module.label }}</a>
+    {% endfor %}
+    {% for item in nav_extra %}
+      <a href="{{ url_for(item.endpoint) }}"
+         {% if active == item.endpoint.split('.')[0] %}aria-current="page"{% endif %}>{{ item.label }}</a>
+    {% endfor %}
+  </nav>
+
+  <div class="header-tools">
+    {% if not atlas_available %}
+      <span class="pill pill--warn">atlas not built</span>
+    {% endif %}
+    {% if lm_enabled %}
+      <span class="pill pill--glue" title="BINMAN-LM endpoint is configured">LM on</span>
+    {% endif %}
+    <button class="theme-toggle" type="button" id="theme-toggle"
+            aria-label="Switch between light and dark theme">◐</button>
+  </div>
+</header>
+
+<main id="main">
+{% block content %}{% endblock %}
+</main>
+
+<script src="{{ url_for('static', filename='vendor/d3/d3.min.js') }}"></script>
+<script src="{{ url_for('static', filename='vendor/tabulator/tabulator.min.js') }}"></script>
+<script src="{{ url_for('static', filename='vendor/molstar/molstar.js') }}"></script>
+<script src="{{ url_for('static', filename='js/selection.js') }}"></script>
+<script src="{{ url_for('static', filename='js/triangle.js') }}"></script>
+<script src="{{ url_for('static', filename='js/molstar-bridge.js') }}"></script>
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

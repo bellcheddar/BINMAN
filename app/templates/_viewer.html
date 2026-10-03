@@ -1,0 +1,21 @@
+{# One shared Mol* frame (spec 6.4). Every viewer gets a reset-camera control, a
+   representation toggle, a label toggle, a spin toggle, the identifier shown and
+   linked out, and a graceful empty state that says what to pin. #}
+<div class="viewer {{ extra_class | default('') }}" id="{{ viewer_id }}"
+     data-viewer-role="{{ role }}">
+  <div class="viewer__bar">
+    <button class="btn" type="button" data-action="reset" title="Reset camera">Reset</button>
+    <button class="btn" type="button" data-action="representation" title="Cartoon, surface, ball-and-stick">Repr</button>
+    <button class="btn" type="button" data-action="labels" title="Toggle labels">Labels</button>
+    <button class="btn" type="button" data-action="spin" title="Toggle spin">Spin</button>
+    {% if role == 'glue' %}
+      <button class="btn" type="button" data-action="interface" title="Toggle the buried surface">Interface</button>
+    {% endif %}
+    <span class="viewer__id mono" data-role="identifier">
+      <span class="pill">nothing pinned</span>
+    </span>
+  </div>
+  <div class="viewer__canvas" data-role="canvas"></div>
+  <div class="viewer__empty" data-role="empty">{{ empty_message }}</div>
+  <div class="viewer__overlay mono" data-role="overlay" hidden></div>
+</div>

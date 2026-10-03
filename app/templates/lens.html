@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="pane">
+  <div class="pane__head">
+    <h1>{{ page_title }}</h1>
+    <span class="meta" id="lens-count"></span>
+  </div>
+  <p style="max-width:62ch;color:var(--muted);margin-top:0">{{ page_blurb }}</p>
+
+  {% if node_count == 0 %}
+    <div class="notice">
+      <strong>The edge table is empty.</strong>
+      The lens graph is built from the bridge, degron and ligase tables in
+      stage 2.4, which has not run yet.
+    </div>
+  {% endif %}
+
+  <div class="panel" style="display:flex;gap:0.5rem;flex-wrap:wrap;align-items:flex-end">
+    <div class="field" style="margin:0">
+      <label for="lens-focus">Focus accession</label>
+      <input id="lens-focus" type="text" value="{{ focus }}" placeholder="e.g. Q96SW2">
+    </div>
+    <div class="field" style="margin:0">
+      <label for="lens-depth">Depth</label>
+      <select id="lens-depth">
+        <option value="1" {% if depth == '1' %}selected{% endif %}>1</option>
+        <option value="2" {% if depth == '2' %}selected{% endif %}>2</option>
+        <option value="3" {% if depth == '3' %}selected{% endif %}>3</option>
+      </select>
+    </div>
+    <div class="field" style="margin:0">
+      <label for="lens-lens">Lens</label>
+      <select id="lens-lens">
+        <option value="family">E3 family</option>
+        <option value="pocket">Pocket score</option>
+        <option value="exploitation">Exploitation status</option>
+        <option value="triage">Triage rank</option>
+      </select>
+    </div>
+    <button class="btn btn--accent" type="button" id="lens-load">Load</button>
+    <button class="btn" type="button" id="lens-expand">Expand</button>
+  </div>
+
+  <div class="lens">
+    <svg class="lens__canvas" id="lens-canvas" role="img"
+         aria-label="E3 ligase to substrate network"></svg>
+    <aside>
+      <div class="panel" id="lens-panel">
+        <h3>Selected node</h3>
+        <p class="stack__empty" id="lens-empty">
+          Click a node to pin it. The selection is shared with every module, so
+          pinning here filters the Glue Atlas table and fills a triangle corner.
+        </p>
+        <table class="grid-table" id="lens-detail" hidden><tbody></tbody></table>
+      </div>
+      {% with viewer_id='viewer-lens', role='lens',
+              empty_message='Click a node to load its representative structure.' %}
+        {% include "_viewer.html" %}
+      {% endwith %}
+    </aside>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  window.BINMAN = window.BINMAN || {};
+  window.BINMAN.lensFocus = {{ focus | tojson }};
+  window.BINMAN.lensDepth = {{ depth | tojson }};
+</script>
+<script src="{{ url_for('static', filename='js/lens.js') }}"></script>
+{% endblock %}

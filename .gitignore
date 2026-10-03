@@ -8,6 +8,8 @@ __pycache__/
 # large or regenerable data
 data/cache/
 data/interim/
+# stage manifests are regenerable and large (catalogue.jsonl is ~132 MB)
+data/manifests/*.jsonl
 data/atlas/*.sqlite
 data/atlas/*.duckdb
 data/afdb/

@@ -1,0 +1,43 @@
+{% extends "_ledger_shell.html" %}
+{% set record_count_key = 'bridge' %}
+
+{% block module_viewer %}
+  {% with viewer_id='viewer-glue', role='glue', extra_class='viewer--tall',
+          empty_message='Pin a bridge in the table to load its ternary complex. Two polymer chains render in distinct cartoon colours, the bridging ligand as ball-and-stick, and the interface residues as sticks coloured by the chain they belong to.' %}
+    {% include "_viewer.html" %}
+  {% endwith %}
+
+  <div class="panel" id="bridge-detail" hidden>
+    <h3>Selected bridge</h3>
+    <table class="grid-table" id="bridge-detail-table"><tbody></tbody></table>
+  </div>
+{% endblock %}
+
+{% block module_extra %}
+  <div class="panel" id="compare-panel" hidden>
+    <h2>Compare two ternaries</h2>
+    <p style="color:var(--muted);margin-top:0">
+      Linked cameras, superposed on the ligase chain, with a toggle to superpose
+      on the ligand instead. This is how you see whether two glues present the
+      same face.
+    </p>
+    <div class="split">
+      {% with viewer_id='viewer-compare-a', role='compare-a',
+              empty_message='Pin a bridge, then press Compare.' %}
+        {% include "_viewer.html" %}
+      {% endwith %}
+      {% with viewer_id='viewer-compare-b', role='compare-b',
+              empty_message='Pin a second bridge to compare against.' %}
+        {% include "_viewer.html" %}
+      {% endwith %}
+    </div>
+    <div style="margin-top:0.6rem;display:flex;gap:0.4rem;flex-wrap:wrap">
+      <button class="btn" type="button" id="superpose-ligase">Superpose on ligase</button>
+      <button class="btn" type="button" id="superpose-ligand">Superpose on ligand</button>
+      <button class="btn" type="button" id="link-cameras">Link cameras</button>
+    </div>
+  </div>
+  <button class="btn" type="button" id="compare-toggle" style="margin-top:0.6rem">
+    Compare two ternaries
+  </button>
+{% endblock %}

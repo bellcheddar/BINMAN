@@ -1,0 +1,69 @@
+{# The split-ledger shell every analysis module reuses (spec 6.3). #}
+{% extends "base.html" %}
+{% block content %}
+<div class="ledger">
+  {% include "_rail.html" %}
+
+  <section class="pane">
+    <div class="pane__head">
+      <h1>{{ page_title }}</h1>
+      <span class="meta" id="result-count"></span>
+    </div>
+    <p style="max-width:62ch;color:var(--muted);margin-top:0">{{ page_blurb }}</p>
+
+    {% if not atlas_available %}
+      <div class="notice">
+        <strong>The atlas has not been built yet.</strong>
+        Run the pipeline, then <code>pixi run python pipeline/build_atlas.py</code>.
+        Every page below renders its empty state rather than failing.
+      </div>
+    {% elif counts[record_count_key | default('bridge')] == 0 %}
+      <div class="notice">
+        <strong>This module has no rows yet.</strong>
+        The atlas exists but this stage has not run. See <code>PROGRESS.md</code>.
+      </div>
+    {% endif %}
+
+    {% if stats %}
+      <div class="stats">
+        {% for stat in stats %}
+          <div class="stat {% if stat.tone %}stat--{{ stat.tone }}{% endif %}">
+            <div class="stat__value">{{ stat.value | thousands }}</div>
+            <div class="stat__label">{{ stat.label }}</div>
+            {% if stat.note %}<div class="stat__label" style="text-transform:none">{{ stat.note }}</div>{% endif %}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    {% block module_panels %}{% endblock %}
+
+    <div class="split">
+      <div>
+        <div class="panel" style="padding:0">
+          <div id="ledger-table"></div>
+        </div>
+      </div>
+      <div>
+        {% block module_viewer %}{% endblock %}
+      </div>
+    </div>
+
+    {% block module_extra %}{% endblock %}
+  </section>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  window.BINMAN = window.BINMAN || {};
+  window.BINMAN.recordType = {{ record_type | tojson }};
+  window.BINMAN.schema = {{ schema | tojson }};
+  window.BINMAN.defaultColumns = {{ default_columns | tojson }};
+  window.BINMAN.defaultSort = {{ default_sort | tojson }};
+  window.BINMAN.atlasAvailable = {{ atlas_available | tojson }};
+  window.BINMAN.lmEnabled = {{ lm_enabled | tojson }};
+</script>
+<script src="{{ url_for('static', filename='js/ledger.js') }}"></script>
+{% block module_scripts %}{% endblock %}
+{% endblock %}

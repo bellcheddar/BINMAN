@@ -1,0 +1,267 @@
+/* The Lens Graph (spec 6.3).
+ *
+ * A D3 force-directed E3-to-substrate network where the four modules act as
+ * lenses: they recolour the same graph and change the side panel rather than
+ * showing a different graph. Pruned aggressively, defaulting to the pinned
+ * ligase's neighbourhood at depth 2, and never rendering more than the
+ * configured node cap without the user asking.
+ */
+(function (global) {
+  'use strict';
+
+  var B = global.BINMAN || {};
+  var Util = B.Util;
+  var Selection = B.Selection;
+
+  var state = { nodes: [], links: [], simulation: null, lens: 'family', viewer: null };
+
+  /* Categorical colours drawn from the Depot tokens, read off the live
+   * computed style so both themes work without a second palette. */
+  function token(name, fallback) {
+    var value = getComputedStyle(document.documentElement).getPropertyValue(name);
+    return (value || '').trim() || fallback;
+  }
+
+  function lensColour(node) {
+    var accent = token('--accent', '#D65B0A');
+    var muted = token('--muted', '#6A6F68');
+    var good = token('--good', '#2C6D60');
+    var warn = token('--warn', '#9A7B10');
+    var bad = token('--bad', '#A33A2A');
+
+    if (state.lens === 'pocket') {
+      if (node.pocket_score === null || node.pocket_score === undefined) { return muted; }
+      return node.pocket_score >= 0.5 ? good : node.pocket_score >= 0.2 ? warn : bad;
+    }
+    if (state.lens === 'exploitation') {
+      var map = {
+        'clinically validated': good,
+        'chemically validated': good,
+        'covalent handle only': warn,
+        'ligandable unproven': warn,
+        'orphan': bad
+      };
+      return map[node.exploitation_status] || muted;
+    }
+    if (state.lens === 'triage') {
+      if (!node.triage_rank) { return muted; }
+      return node.triage_rank <= 25 ? accent : node.triage_rank <= 100 ? warn : muted;
+    }
+    /* default: E3 family, with a stable hash so a family keeps its colour */
+    if (node.kind !== 'ligase' || !node.family) { return muted; }
+    var hash = 0;
+    for (var i = 0; i < node.family.length; i += 1) {
+      hash = (hash * 31 + node.family.charCodeAt(i)) % 360;
+    }
+    return 'hsl(' + hash + ' 45% 45%)';
+  }
+
+  function render() {
+    var svg = global.d3.select('#lens-canvas');
+    if (svg.empty()) { return; }
+    svg.selectAll('*').remove();
+
+    var element = document.getElementById('lens-canvas');
+    var width = element.clientWidth || 800;
+    var height = element.clientHeight || 560;
+    svg.attr('viewBox', '0 0 ' + width + ' ' + height);
+
+    if (!state.nodes.length) {
+      svg.append('text')
+        .attr('x', width / 2).attr('y', height / 2)
+        .attr('text-anchor', 'middle')
+        .attr('fill', token('--muted', '#6A6F68'))
+        .attr('font-family', token('--body', 'sans-serif'))
+        .text('No edges to show. Pin a ligase, or run stage 2.4 to build the network.');
+      return;
+    }
+
+    var container = svg.append('g');
+    svg.call(global.d3.zoom().scaleExtent([0.2, 6]).on('zoom', function (event) {
+      container.attr('transform', event.transform);
+    }));
+
+    var link = container.append('g').selectAll('line')
+      .data(state.links).enter().append('line')
+      .attr('class', 'link')
+      .attr('stroke-width', function (d) { return d.type === 'curated' ? 1.6 : 0.8; });
+
+    var node = container.append('g').selectAll('circle')
+      .data(state.nodes).enter().append('circle')
+      .attr('class', 'node')
+      .attr('r', function (d) { return d.kind === 'ligase' ? 7 : 4.5; })
+      .attr('fill', lensColour)
+      .attr('tabindex', 0)
+      .on('click', function (event, d) { pick(d); })
+      .on('keydown', function (event, d) {
+        if (event.key === 'Enter') { pick(d); }
+      });
+
+    node.append('title').text(function (d) {
+      return (d.gene || d.id) + (d.family ? ' · ' + d.family : '');
+    });
+
+    var label = container.append('g').selectAll('text')
+      .data(state.nodes.filter(function (d) { return d.kind === 'ligase'; }))
+      .enter().append('text')
+      .attr('class', 'node-label')
+      .attr('dy', -10)
+      .attr('text-anchor', 'middle')
+      .text(function (d) { return d.gene || d.id; });
+
+    state.simulation = global.d3.forceSimulation(state.nodes)
+      .force('link', global.d3.forceLink(state.links).id(function (d) { return d.id; })
+        .distance(60).strength(0.4))
+      .force('charge', global.d3.forceManyBody().strength(-120))
+      .force('centre', global.d3.forceCenter(width / 2, height / 2))
+      .force('collide', global.d3.forceCollide(10))
+      .on('tick', function () {
+        link.attr('x1', function (d) { return d.source.x; })
+          .attr('y1', function (d) { return d.source.y; })
+          .attr('x2', function (d) { return d.target.x; })
+          .attr('y2', function (d) { return d.target.y; });
+        node.attr('cx', function (d) { return d.x; }).attr('cy', function (d) { return d.y; });
+        label.attr('x', function (d) { return d.x; }).attr('y', function (d) { return d.y; });
+      });
+
+    node.call(global.d3.drag()
+      .on('start', function (event, d) {
+        if (!event.active) { state.simulation.alphaTarget(0.25).restart(); }
+        d.fx = d.x; d.fy = d.y;
+      })
+      .on('drag', function (event, d) { d.fx = event.x; d.fy = event.y; })
+      .on('end', function (event, d) {
+        if (!event.active) { state.simulation.alphaTarget(0); }
+        d.fx = null; d.fy = null;
+      }));
+
+    highlight();
+  }
+
+  function highlight() {
+    var selection = Selection.get();
+    global.d3.selectAll('#lens-canvas .node')
+      .classed('is-selected', function (d) {
+        return d.id === selection.e3 || d.id === selection.target;
+      });
+  }
+
+  function pick(node) {
+    /* Clicking a node sets the shared selection, which is what makes the lens
+     * graph a control rather than a picture. */
+    if (node.kind === 'ligase') {
+      Selection.set({ e3: node.id });
+    } else {
+      Selection.set({ target: node.id });
+    }
+    var table = document.getElementById('lens-detail');
+    var empty = document.getElementById('lens-empty');
+    if (!table) { return; }
+    var body = table.querySelector('tbody');
+    body.innerHTML = '';
+    [['Accession', node.id], ['Gene', node.gene], ['Kind', node.kind],
+     ['Family', node.family], ['Triage rank', node.triage_rank],
+     ['Pocket score', node.pocket_score], ['Exploitation', node.exploitation_status]]
+      .forEach(function (pair) {
+        if (pair[1] === null || pair[1] === undefined || pair[1] === '') { return; }
+        var tr = document.createElement('tr');
+        var th = document.createElement('td');
+        th.textContent = pair[0];
+        var td = document.createElement('td');
+        td.textContent = String(pair[1]);
+        tr.appendChild(th); tr.appendChild(td);
+        body.appendChild(tr);
+      });
+    table.hidden = false;
+    if (empty) { empty.hidden = true; }
+
+    if (state.viewer) {
+      B.applySelection(state.viewer, Selection.get(), function () {
+        return {
+          role: 'lens',
+          url: 'https://alphafold.ebi.ac.uk/files/AF-' + node.id + '-F1-model_v4.cif',
+          format: 'mmcif',
+          identifier: node.gene || node.id,
+          identifierHref: 'https://www.uniprot.org/uniprotkb/' + node.id
+        };
+      });
+    }
+  }
+
+  function load(focus, depth) {
+    var url = '/api/lens?focus=' + encodeURIComponent(focus || '') +
+      '&depth=' + encodeURIComponent(depth || 2);
+    return Util.get(url).then(function (result) {
+      var count = document.getElementById('lens-count');
+      if (!result.ok) {
+        if (count) { count.textContent = (result.data && result.data.note) || 'lens unavailable'; }
+        state.nodes = []; state.links = [];
+        render();
+        return;
+      }
+      state.nodes = result.data.nodes || [];
+      state.links = result.data.links || [];
+      if (count) {
+        count.textContent = Util.num(state.nodes.length) + ' nodes, ' +
+          Util.num(state.links.length) + ' edges' +
+          (result.data.truncated ? ' · pruned at ' + result.data.max_nodes : '');
+      }
+      render();
+    });
+  }
+
+  function init() {
+    if (typeof global.d3 === 'undefined') { return; }
+    var focusInput = document.getElementById('lens-focus');
+    var depthSelect = document.getElementById('lens-depth');
+    var lensSelect = document.getElementById('lens-lens');
+    var loadButton = document.getElementById('lens-load');
+    var expandButton = document.getElementById('lens-expand');
+
+    state.viewer = B.mountViewer(document.getElementById('viewer-lens'), { role: 'lens' });
+
+    if (loadButton) {
+      loadButton.addEventListener('click', function () {
+        load(focusInput ? focusInput.value.trim() : '', depthSelect ? depthSelect.value : 2);
+      });
+    }
+    if (expandButton) {
+      expandButton.addEventListener('click', function () {
+        if (depthSelect && Number(depthSelect.value) < 3) {
+          depthSelect.value = String(Number(depthSelect.value) + 1);
+        }
+        load(focusInput ? focusInput.value.trim() : '', depthSelect ? depthSelect.value : 3);
+      });
+    }
+    if (lensSelect) {
+      lensSelect.addEventListener('change', function () {
+        state.lens = lensSelect.value;
+        global.d3.selectAll('#lens-canvas .node').attr('fill', lensColour);
+      });
+    }
+
+    Selection.subscribe(function (selection, changed) {
+      highlight();
+      /* Default to the pinned ligase's neighbourhood (spec 6.3). */
+      if (changed && changed.indexOf('e3') > -1 && selection.e3 && focusInput
+          && focusInput.value.trim() !== selection.e3) {
+        focusInput.value = selection.e3;
+        load(selection.e3, depthSelect ? depthSelect.value : 2);
+      }
+    });
+
+    var initialFocus = B.lensFocus || Selection.value('e3') || '';
+    if (focusInput && initialFocus) { focusInput.value = initialFocus; }
+    load(initialFocus, B.lensDepth || 2);
+
+    global.addEventListener('resize', function () {
+      if (state.nodes.length) { render(); }
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+}(window));

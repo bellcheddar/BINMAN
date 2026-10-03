@@ -1,0 +1,33 @@
+{% extends "_ledger_shell.html" %}
+{% set record_count_key = 'degron' %}
+
+{% block module_panels %}
+<div class="notice">
+  <strong>This is a geometric filter, not a classifier.</strong>
+  The column is named <code>degron_geometry_score</code> because it is a rank
+  over hairpin geometry, not a calibrated probability of degradation. Read it
+  beside the specificity figure on the About tab.
+</div>
+{% endblock %}
+
+{% block module_viewer %}
+  {% with viewer_id='viewer-degron', role='degron', extra_class='viewer--tall',
+          empty_message='Pin a degron candidate to load its AlphaFold model. The cartoon is coloured by pLDDT on the standard four-band scale, the candidate hairpin is highlighted and the tip glycine renders as spheres.' %}
+    {% include "_viewer.html" %}
+  {% endwith %}
+  <div style="margin-top:0.5rem">
+    <button class="btn" type="button" id="zoom-hairpin">Zoom to hairpin</button>
+    <button class="btn" type="button" id="plddt-legend-toggle">pLDDT scale</button>
+  </div>
+  <div class="panel" id="plddt-legend" hidden>
+    <h3>AlphaFold pLDDT bands</h3>
+    <table class="grid-table">
+      <tbody>
+        <tr><td><span class="pill" style="background:#0053D6;color:#fff">90 to 100</span></td><td>very high</td></tr>
+        <tr><td><span class="pill" style="background:#65CBF3;color:#15171A">70 to 90</span></td><td>confident</td></tr>
+        <tr><td><span class="pill" style="background:#FFDB13;color:#15171A">50 to 70</span></td><td>low</td></tr>
+        <tr><td><span class="pill" style="background:#FF7D45;color:#15171A">below 50</span></td><td>very low</td></tr>
+      </tbody>
+    </table>
+  </div>
+{% endblock %}

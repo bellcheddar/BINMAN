@@ -1,0 +1,44 @@
+{% extends "_ledger_shell.html" %}
+{% set record_count_key = 'lysine' %}
+
+{% block module_panels %}
+<div class="panel">
+  <h3>Reach window</h3>
+  {% if window.get('fitted') %}
+    <table class="grid-table">
+      <tbody>
+        <tr><td>NZ relative SASA floor</td><td class="num">{{ window.min_nz_rel_sasa }}</td></tr>
+        <tr><td>Favourable Cβ–Cβ</td><td class="num">{{ window.favourable_cb_cb_min_a }} to {{ window.favourable_cb_cb_max_a }} Å</td></tr>
+        <tr><td>Marginal to</td><td class="num">{{ window.marginal_cb_cb_max_a }} Å</td></tr>
+        <tr><td>Held-out AUC</td><td class="num"><strong>{{ window.held_out_auc }}</strong></td></tr>
+        <tr><td>Dataset version</td><td>{{ window.dataset_version }}</td></tr>
+        <tr><td>Fitted on</td><td>{{ window.fit_date }}</td></tr>
+      </tbody>
+    </table>
+  {% else %}
+    <div class="notice notice--bad">
+      <strong>The reach window has not been fitted.</strong>
+      {{ window.get('fit_status', 'not yet fitted') }}. The starting values in
+      <code>config/thresholds.toml</code> carry no empirical standing and are
+      not used to produce a verdict, so no verdict column is shown until the fit
+      lands. This is deliberate: spec 5.4 forbids shipping the starting values.
+    </div>
+  {% endif %}
+</div>
+
+<div class="limits">
+  <strong>Honest limits of this metric.</strong>
+  Observed ubiquitylation sites come from native E3 biology, not from induced
+  ternary complexes, so the window is a proxy. Absence of a reported site is weak
+  evidence that a lysine is unusable, because detection is incomplete and
+  condition-dependent, and that biases the negative set. Read the AUC as a
+  measure of enrichment, not as a probability of degradability.
+</div>
+{% endblock %}
+
+{% block module_viewer %}
+  {% with viewer_id='viewer-degradability', role='degradability', extra_class='viewer--tall',
+          empty_message='Pin a target and a site to load its surface. Every lysine NZ renders as a sphere coloured by verdict, the site centroid is marked, and a measurement line runs from the selected lysine to the centroid with the distance in Å.' %}
+    {% include "_viewer.html" %}
+  {% endwith %}
+{% endblock %}
