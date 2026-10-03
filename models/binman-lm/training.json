@@ -1,15 +1,14 @@
 {
-  "generated_at": "2026-10-03T19:14:48+00:00",
+  "generated_at": "2026-10-03T21:40:16+00:00",
   "identity": {
     "base_model": "mlx-community/Qwen2.5-3B-Instruct-4bit",
     "quantisation": "4-bit",
     "adapter_rank": 16,
     "adapter_layers": 16,
     "fine_tune_type": "lora",
-    "fused": false,
+    "fused": true,
     "build_date": "2026-10-03",
-    "shipped_adapter": "models/binman-lm/adapters",
-    "serving": "mlx_lm.server --model <base> --adapter-path models/binman-lm/adapters"
+    "shipped_adapter": "models/binman-lm/adapters"
   },
   "hardware": {
     "chip": "Apple M2 Ultra",
@@ -32,104 +31,88 @@
       "description": "structured abstention naming exactly what is missing"
     }
   ],
+  "round": 4,
   "stage_1": {
     "iterations_requested": 1200,
     "batch_size": 4,
     "rank": 16,
     "layers": 16,
     "learning_rate": 1e-05,
-    "wall_clock_seconds": 821.3,
-    "train_examples": 5601,
-    "valid_examples": 666,
+    "wall_clock_seconds": 810.0,
+    "train_examples": 5536,
+    "valid_examples": 672,
     "exit_code": 0,
     "validation_losses": [
       {
         "iter": 1,
-        "loss": 2.448
+        "loss": 2.282
       },
       {
         "iter": 100,
-        "loss": 0.051
+        "loss": 0.055
       },
       {
         "iter": 200,
-        "loss": 0.023
+        "loss": 0.013
       },
       {
         "iter": 300,
-        "loss": 0.015
+        "loss": 0.117
       },
       {
         "iter": 400,
-        "loss": 0.003
+        "loss": 0.065
       },
       {
         "iter": 500,
-        "loss": 0.005
+        "loss": 0.008
       },
       {
         "iter": 600,
-        "loss": 0.018
+        "loss": 0.012
       },
       {
         "iter": 700,
-        "loss": 0.021
+        "loss": 0.024
       },
       {
         "iter": 800,
-        "loss": 0.003
+        "loss": 0.048
       },
       {
         "iter": 900,
-        "loss": 0.017
+        "loss": 0.043
       },
       {
         "iter": 1000,
-        "loss": 0.002
+        "loss": 0.059
       },
       {
         "iter": 1100,
-        "loss": 0.037
+        "loss": 0.006
       },
       {
         "iter": 1200,
-        "loss": 0.002
+        "loss": 0.003
       }
     ],
-    "final_train_loss": 0.002,
-    "best_validation_loss": 0.002,
-    "early_stopping_point": 1000,
+    "final_train_loss": 0.0,
+    "best_validation_loss": 0.003,
+    "early_stopping_point": 1200,
     "log": "data/interim/lm_stage1.log",
     "wandb_project": "binman-lm",
+    "wandb_run_name": "binman-qwen-2.5-3b-4bit-round04",
+    "wandb_group": "binman-qwen-2.5-3b-4bit-round04",
     "reported_to_wandb": true
   },
   "stage_2": {
-    "ran": true,
-    "steps": 150,
-    "beta": 0.1,
-    "epochs": 1,
-    "pairs": 600,
-    "wall_clock_seconds": 118.7,
-    "first_loss": 0.6930940747261047,
-    "final_loss": 0.6095183491706848,
-    "adapters": "models/binman-lm/adapters-dpo",
-    "wandb_project": "binman-lm",
-    "wandb_run_name": "binman-qwen-2.5-3b-4bit-round03",
-    "reported_to_wandb": true,
-    "implementation": "mlx-lm 0.32.0 ships no preference trainer, so this is the spec 3.7 mlx-examples DPO fallback, implemented against mlx-lm's LoRA machinery with cached reference log-probabilities.",
-    "generation_guard": {
-      "healthy": false,
-      "parsed": 1,
-      "n": 6,
-      "parse_rate": 0.167,
-      "reason": "only 1/6 probes parsed; sample output '{\"record_type\":\"ligase\",\"filters\":[{\"field\":\"pocket_score\",\"op\":\"gt\",\"value\":0.5}],\"sort\":'"
-    },
-    "shipped": false
+    "ran": false,
+    "reason": "skipped by request"
   },
   "fuse": {
-    "fused": false,
-    "path": "",
+    "fused": true,
+    "path": "models/binman-lm/fused",
     "adapter": "models/binman-lm/adapters",
-    "reason": "mlx-lm's fuse produced a model that does not carry the fine-tune: it parsed 0 of 10 held-out test questions and invented its own output schema, while the same adapter loaded against the base model parses 10 of 10. The fused artefact was deleted rather than shipped. BINMAN-LM serves as base model plus adapter, which mlx_lm.server supports directly."
+    "error": ""
   }
 }

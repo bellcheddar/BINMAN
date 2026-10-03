@@ -1,8 +1,10 @@
 {
-  "generated_at": "2026-10-03T18:37:40+00:00",
-  "candidates_harvested": 463,
+  "generated_at": "2026-10-03T22:07:49+00:00",
+  "candidates_harvested": 18,
+  "genuinely_interrogative": 18,
   "query_set_size": 15,
-  "externally_phrased": 12,
-  "project_phrased": 3,
-  "note": "Only the rows with a non-empty `original_sentence` test register mismatch. The rest carry the project's own phrasing and are flagged in `provenance`, because a query set that silently mixes the two would overstate the external number."
+  "externally_phrased": 0,
+  "project_phrased": 15,
+  "finding": "18 candidate sentences were harvested from open-access reviews, of which 18 are genuinely interrogative rather than declarative prose containing the word 'which'. Reading those, NONE asks a question BINMAN's schema can answer: they ask about linker composition, ubiquitin chain architecture, alternative splicing of CRBN, and whether a specific metabolite mediates teratogenicity. Review articles pose mechanistic questions, not database queries.\n\nSpec 3.6 assumed 12 to 15 answerable externally-phrased questions could be harvested. They could not. The spec 9.5 external set-equality metric is therefore reported as NOT COMPUTED rather than as a number measured on mis-paired rows.",
+  "external_metric_computable": false
 }

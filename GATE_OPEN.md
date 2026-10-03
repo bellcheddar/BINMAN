@@ -84,12 +84,44 @@ make the figure pass.
   which needs its per-entry exclusion decisions rather than the candidate list,
   then re-run `pixi run python pipeline/validate.py`.
 
+## G6, second item: BINMAN-LM parse rate 0.987 against a 0.99 floor
+
+Two queries of 150 failed to parse: one omitted a `value`, one used an
+`exploitation_status` outside the closed vocabulary. Both are the parser
+correctly refusing invalid output. Set equality, the primary Task A metric,
+measures **0.98** against a 0.90 floor and passes comfortably.
+
+## G6, third item: the register-mismatch gap
+
+Not a floor miss, because the specified metric could not be computed, but the
+more serious result. BINMAN-LM scores **0.98** set equality on phrasing shaped
+like its training generator and **0.067** on fifteen hand-written questions
+against the same schema in ordinary prose.
+
+The spec 3.6 external query set could not be built: of 463 sentences harvested
+from open-access reviews, 18 are genuinely interrogative and **none** asks
+something BINMAN's schema can answer. Review articles pose mechanistic questions,
+not database queries. The metric is reported as not computed rather than measured
+on mis-paired rows.
+
+**This is why the natural-language box is a feature flag.** The deterministic
+query builder is the primary interface and always works; the model is an
+accelerator for users who phrase questions the way the corpus does.
+
+### Decision needed
+
+Accept, or commission a hand-written external query set from a working scientist
+who is not the author, which is the only way to measure register mismatch
+properly for this schema.
+
 ### Floors that were measured and passed
 
 | Metric | Measured | Floor |
 |---|---|---|
 | E3 Triage rank enrichment | **p = 0.0024** | p < 0.01 |
 | E3 Triage pocket coverage | **0.982** | 0.80 |
+| BINMAN-LM set equality (synthetic) | **0.98** | 0.90 |
+| BINMAN-LM fabrication rate | **0.00** | 0.00 |
 
 The enrichment initially measured p = 0.069 and failed. The cause was a genuine
 repertoire bug, not a threshold: the InterPro signature list omitted the CRL4

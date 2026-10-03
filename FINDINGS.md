@@ -243,71 +243,104 @@ starting values carry no empirical standing.
 
 ## Section 9.5 BINMAN-LM
 
+Measured against the **complete** atlas, with the corpus regenerated from it
+(the ligase vocabulary went from 10 to 650 once the E3 stage finished).
+
 ### Task A: natural language to query object
 
-| Metric | Baseline (zero-shot) | Fine-tuned | Floor |
-|---|---:|---:|---:|
-| Parse rate | 0.2833 | **0.9917** | 0.99 |
-| Set equality against the real SQLite | 0.2333 | **0.9917** | 0.90 |
-| Exact match | 0.05 | 0.9417 | reported |
-| Prompt tokens needed | 841 | **83** | — |
+| Metric | Baseline (zero-shot) | Fine-tuned | Floor | Verdict |
+|---|---:|---:|---:|---|
+| Parse rate, synthetic held out | 0.5133 | **0.9867** | 0.99 | misses by 2 of 150 |
+| Set equality, synthetic held out | 0.3467 | **0.98** | 0.90 | **passes** |
+| Exact match | 0.12 | 0.9333 | reported | — |
+| Prompt tokens needed | 841 | **83** | — | — |
+| Set equality, externally phrased | — | **not computed** | 0.80 | see below |
 
-The spec 3.0 baseline was run **before any training**, as the spec requires. At
-set equality 0.2333 it was far below the 0.85 threshold at
-which Task A would not have been fine-tuned, so it was.
+The two parse failures are both the model producing a filter the parser refuses:
+one omitted a `value`, one used an `exploitation_status` outside the closed
+vocabulary. Both are the parser doing its job.
 
-**A measurement worth recording.** The first evaluation of the fine-tuned
-adapters scored 0.0, worse than the untrained baseline. The cause was a
-train/serve prompt mismatch, not a bad fine-tune: training used a short system
-turn, and the evaluation prepended a 6 KB schema the model had never seen, after
-which it began omitting `record_type` and the parser rejected everything.
-Measured directly on one query, the same adapters emit a complete valid object
-with the training prompt and the same object minus `record_type` with the schema
-prepended. The fine-tune has internalised the schema, which is why it needs 83
-prompt tokens where the baseline needs 841.
+### The register-mismatch finding, and why the specified metric could not be computed
 
-### Corpus
+Spec 3.6 calls for 12 to 15 query-set entries whose **phrasing was written by
+working scientists**, harvested from published reviews, because the synthetic
+test set shares a generator with the training set and so cannot detect a model
+that only understands its own generator's register.
 
-| Set | Count |
-|---|---:|
-| Task A train / valid / test | 4,817 / 568 / 615 |
-| Task A preference pairs | 1,400 (exactly 200 per corruption mode) |
-| Task C train / valid / test | 784 / 98 / 98 |
-| Task C preference pairs | 980 |
-| Generated pairs rejected by the parser | 0 |
+463 candidate sentences were harvested from open-access molecular-glue and
+degrader reviews via Europe PMC. Of those, **18 are genuinely interrogative**
+rather than declarative prose that happens to contain the word "which". Reading
+those 18: **none asks a question BINMAN's schema can answer.** They ask about
+linker composition in eTPD degraders, the architecture of attached ubiquitin
+chains, whether IMiD treatment changes alternative splicing of CRBN, and whether
+5-hydroxythalidomide mediates teratogenicity. Review articles pose mechanistic
+questions, not database queries.
 
-Label noise is **zero by construction**: every shipped pair was validated by the
-same parser the app uses. Splits hold out compositions, not tokens.
+So the spec 9.5 external metric is reported as **not computed**. An earlier
+revision did produce a number by pairing each hand-written gold query to
+whichever harvested sentence shared three or more words, which produced pairs
+where the sentence did not ask what the gold answered. That number measured
+nothing and was removed.
 
-### Task B: not built, and why
+**The signal itself is still visible, and it is severe.** Fifteen questions
+written by hand against the schema, in ordinary prose rather than generator
+phrasing, score:
 
-Spec 3.4 requires every Task B label to come from a published curated source, and
-the glue label specifically from the intersection of at least two of MGDB,
-MolGlueDB and MGTbind. None resolved, and neither did PROTAC-DB, so three of the
-five classes (`molecular_glue`, `protac`, `bivalent_inhibitor`) have **no label
-source at all**. Only `native_cofactor` and `crystallisation_artefact` could be
-labelled, from BioLiP2.
+| Set | Parse rate | Set equality |
+|---|---:|---:|
+| Synthetic held out (generator phrasing) | 0.9867 | **0.98** |
+| Hand-written, same schema, ordinary phrasing | 0.1333 | **0.0667** |
 
-Spec 4.1b forbids hand-written labels, so the corpus was not built and the macro-F1
-is reported as not computed rather than measured on two classes and presented as
-if it were five.
+A drop from 0.98 to 0.0667 is the register
+mismatch spec 3.6 exists to catch. **BINMAN-LM is excellent on phrasing shaped
+like its training generator and close to useless on anything else.** That is the
+number worth watching, and it is why the natural-language box is a feature flag
+rather than the primary interface: the app's manual query builder is
+deterministic and always works.
 
-### External query set
+### Task C: structured abstention
 
-15 queries, of which **12 carry phrasing harvested verbatim from open-access
-reviews** (463 candidate sentences were extracted from Europe PMC full text) and
-3 carry the project's own phrasing, flagged as such in the file. Only the 12 test
-register mismatch; mixing the two silently would overstate the number.
+| Metric | Measured | Floor |
+|---|---:|---:|
+| Fabrication rate | **0.0** | 0.00 |
+| Abstention rate | 0.0 | reported |
+
+The fabrication floor passes: on 40 held-out partial triads and unanswerable
+questions the model invented no numeral and no identifier that was not in its
+input. But the abstention rate of 0.0 says it is not
+abstaining either: it answers with a query object instead of a structured
+refusal. The task is trained but not learned, and the honest reading is that
+**Task C works as a fabrication guard and not as an abstention mechanism**.
+
+### Task B: not built
+
+Three of its five classes have no published label source in this build. Reported
+rather than substituted. See the Gates section.
 
 ### Training
 
-Stage 1 LoRA SFT: rank 16, 16 layers, lr 1e-5, 1,200 iterations, validation loss
-2.494 to 0.001, 431 tokens/s, 6.0 GB peak, 13.5 minutes on the M2 Ultra. Reported
-to Weights & Biases as
-`binman-lm-sft-qwen2.5-3b-4bit-r16-l16-i1200-b4-20261003-1914`.
+| Round | Stage | Outcome |
+|---|---|---|
+| `binman-qwen-2.5-3b-4bit-round01` | LoRA SFT on the partial atlas | superseded |
+| `binman-qwen-2.5-3b-4bit-round02` | DPO, lr 1e-5, 600 steps | rejected: collapsed the model |
+| `binman-qwen-2.5-3b-4bit-round03` | DPO, lr 5e-7, 150 steps | rejected: still degraded |
+| `binman-qwen-2.5-3b-4bit-round04` | LoRA SFT on the complete atlas | **shipped** |
 
-Stage 2 used the spec 3.7 DPO fallback: mlx-lm 0.32.0 ships no preference trainer
-(`mlx_lm.tuner.losses` exposes only KL and JS divergences, and its dataset loader
-has no notion of a chosen or rejected completion), so the loop is implemented
-against mlx-lm's LoRA machinery with reference log-probabilities cached once from
-the frozen stage 1 model.
+Round 04: rank 16, 16 layers, lr 1e-5, 1,200 iterations, 4,752 train and 574
+valid examples, validation loss to 0.004, around 420 tokens/s, 6 GB peak on the
+M2 Ultra. Tracked in Weights & Biases under `binman-lm`.
+
+Both DPO rounds reached a near-zero loss by collapsing the policy rather than
+learning the preference, and the per-mode win rates could not detect it: they
+measured 0.95 to 1.00 on a model that emitted `ccdccdccd…` indefinitely, because
+a degenerate policy trivially scores one string above another. A generation guard
+now runs held-out test questions through any candidate adapter and requires 80%
+to produce a parseable query object before it may ship. Stage 1 scores 10 of 10;
+the DPO adapters scored 6 of 10 and 0 of 10 and were refused.
+
+**The spec 3.8 per-corruption-mode win rates are therefore not meaningfully
+reported.** The only numbers produced came from a collapsed model.
+
+BINMAN-LM serves as base model plus adapter: fusing against the 4-bit base
+produced a model that parsed 0 of 10 held-out questions and invented its own
+output schema, so that artefact was deleted rather than shipped.

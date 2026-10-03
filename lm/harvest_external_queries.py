@@ -54,13 +54,21 @@ QUERIES = (
     'TITLE:"cereblon" AND OPEN_ACCESS:Y',
 )
 
-# A sentence that states something a researcher wants to find out.
+# A sentence that genuinely asks something, rather than one that merely contains
+# the word "which" as a relative pronoun. The first revision used a loose keyword
+# match and kept declarative prose such as "...expression levels vary across
+# tissues, which affect the degradation activity...", which is a statement.
 QUESTION_CUES = re.compile(
-    r"\b(which|how many|what fraction|whether|to what extent|how much|"
-    r"remains? (?:unclear|unknown|to be determined)|it is not known|"
-    r"an open question|remains? an open|we do not know|unanswered)\b",
+    r"^(which|what|how many|how much|whether|do |does |are |is |can )"
+    r"|\b(remains? (?:unclear|unknown|to be determined)|it is not known|"
+    r"an open question|remains? an open|we do not know|unanswered|"
+    r"yet to be determined)\b",
     re.I,
 )
+# Figure captions, table captions and section headers are not research questions
+# however they are worded.
+STRUCTURAL_PREFIX = re.compile(
+    r"^(figure|fig\.|table|others\s*:|box\s*\d|supplementary|scheme)", re.I)
 # Vocabulary that suggests BINMAN's schema could actually answer it.
 SCHEMA_CUES = re.compile(
     r"\b(ligase|ligases|E3|CRBN|cereblon|degron|glue|glues|ternary|"
@@ -84,6 +92,11 @@ def question_id(text: str) -> str:
 # Each entry maps a harvested, normalised question to the query object BINMAN
 # would need to answer it. The phrasing is NOT ours; the gold is. Validated by
 # the parser at load time, so a gold that drifts from the schema fails loudly.
+
+# Harvested sentences that a human confirmed ask exactly what a GOLD entry
+# answers, keyed by the GOLD question. **Empty** after reading the 463 harvested
+# candidates: see the note in `build()`.
+ANSWERABLE: dict[str, str] = {}
 
 GOLD: dict[str, dict] = {
     "which E3 ligases show tumour-restricted expression": {
@@ -218,11 +231,13 @@ def harvest(fetcher: Fetcher, per_query: int = 12) -> list[dict]:
             for raw_sentence in re.split(r"(?<=[.!?])\s+", text):
                 if not (40 < len(raw_sentence) < 320):
                     continue
-                if not QUESTION_CUES.search(raw_sentence):
-                    continue
-                if not SCHEMA_CUES.search(raw_sentence):
-                    continue
                 normalised = normalise(raw_sentence)
+                if not QUESTION_CUES.search(normalised):
+                    continue
+                if STRUCTURAL_PREFIX.match(normalised):
+                    continue
+                if not SCHEMA_CUES.search(normalised):
+                    continue
                 key = question_id(normalised)
                 if key in seen or len(normalised) < 30:
                     continue
@@ -248,66 +263,69 @@ def build(fetcher: Fetcher | None = None) -> dict:
                      f"sentences from open-access reviews, written to "
                      f"lm/corpus/external_candidates.jsonl for selection.")
 
-    # Match harvested sentences to the hand-written gold objects by keyword
-    # overlap, so a gold is only used when a real sentence actually asked it.
+    # **Pairing is deliberate, never keyword-matched.** The first revision paired
+    # a gold to whichever harvested sentence shared three or more words, which
+    # produced pairs where the sentence did not ask what the gold answered, and
+    # an external score that measured nothing.
+    #
+    # A gold is only attached to a harvested sentence when that sentence is
+    # listed in ANSWERABLE below, which means a human read it and confirmed it
+    # asks that question. Everything else is reported as project phrasing, which
+    # tests schema coverage but NOT register mismatch.
     rows: list[dict] = []
-    unmatched_gold: list[str] = []
+    by_id = {c["id"]: c for c in candidates}
+    interrogative = [
+        c for c in candidates
+        if QUESTION_CUES.search(c["normalised_query"])
+        and not STRUCTURAL_PREFIX.match(c["normalised_query"])
+    ]
+
     for question, gold in GOLD.items():
         try:
             validated = parse(gold).as_dict()
         except QueryError as exc:
             raise SystemExit(f"gold query for {question!r} is invalid: {exc}")
-
-        tokens = {w for w in re.findall(r"[a-z]{4,}", question.lower())}
-        best = None
-        best_overlap = 0
-        for candidate in candidates:
-            words = {w for w in re.findall(
-                r"[a-z]{4,}", candidate["normalised_query"].lower())}
-            overlap = len(tokens & words)
-            if overlap > best_overlap:
-                best_overlap, best = overlap, candidate
-
-        if best is not None and best_overlap >= 3:
-            rows.append({
-                "source_doi": best["source_doi"],
-                "source_pmcid": best["source_pmcid"],
-                "original_sentence": best["original_sentence"],
-                "normalised_query": best["normalised_query"],
-                "gold_object": validated,
-                "provenance": "harvested from an open-access review",
-                "keyword_overlap": best_overlap,
-            })
-        else:
-            unmatched_gold.append(question)
-            rows.append({
-                "source_doi": "",
-                "source_pmcid": "",
-                "original_sentence": "",
-                "normalised_query": question,
-                "gold_object": validated,
-                "provenance": (
-                    "no harvested sentence matched: the phrasing is the project's "
-                    "own, so this row does NOT test register mismatch and is "
-                    "flagged accordingly"
-                ),
-                "keyword_overlap": 0,
-            })
+        source = ANSWERABLE.get(question)
+        candidate = by_id.get(source) if source else None
+        rows.append({
+            "source_doi": candidate["source_doi"] if candidate else "",
+            "source_pmcid": candidate["source_pmcid"] if candidate else "",
+            "original_sentence": candidate["original_sentence"] if candidate else "",
+            "normalised_query": candidate["normalised_query"] if candidate else question,
+            "gold_object": validated,
+            "externally_phrased": bool(candidate),
+            "provenance": (
+                "harvested from an open-access review and paired by hand"
+                if candidate else
+                "the project's own phrasing: this row tests schema coverage, "
+                "NOT register mismatch, and is excluded from the external metric"
+            ),
+        })
 
     written = write_jsonl(OUTPUT, rows)
-    harvested = sum(1 for r in rows if r["keyword_overlap"] >= 3)
+    harvested = sum(1 for r in rows if r["externally_phrased"])
     report = {
         "generated_at": utcnow(),
         "candidates_harvested": len(candidates),
+        "genuinely_interrogative": len(interrogative),
         "query_set_size": written,
         "externally_phrased": harvested,
         "project_phrased": written - harvested,
-        "note": (
-            "Only the rows with a non-empty `original_sentence` test register "
-            "mismatch. The rest carry the project's own phrasing and are flagged "
-            "in `provenance`, because a query set that silently mixes the two "
-            "would overstate the external number."
+        "finding": (
+            f"{len(candidates)} candidate sentences were harvested from "
+            f"open-access reviews, of which {len(interrogative)} are genuinely "
+            "interrogative rather than declarative prose containing the word "
+            "'which'. Reading those, NONE asks a question BINMAN's schema can "
+            "answer: they ask about linker composition, ubiquitin chain "
+            "architecture, alternative splicing of CRBN, and whether a specific "
+            "metabolite mediates teratogenicity. Review articles pose mechanistic "
+            "questions, not database queries.\n\n"
+            "Spec 3.6 assumed 12 to 15 answerable externally-phrased questions "
+            "could be harvested. They could not. The spec 9.5 external "
+            "set-equality metric is therefore reported as NOT COMPUTED rather "
+            "than as a number measured on mis-paired rows."
         ),
+        "external_metric_computable": harvested >= 5,
     }
     (CORPUS / "external_report.json").write_text(json.dumps(report, indent=2) + "\n")
     Manifest(STAGE).record("build", status="ok", **{

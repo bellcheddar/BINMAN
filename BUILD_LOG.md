@@ -363,3 +363,29 @@ One line per meaningful event, timestamped UTC (spec Section 0 rule 5).
 | 2026-10-03T21:40:18+00:00 | 3.7 | Stage 1 LoRA SFT starting: 5,536 train / 672 valid examples, rank 16, 16 layers, lr 1e-05, batch 4, 1200 iterations. |
 | 2026-10-03T21:40:20+00:00 | 9 | Validation run against binman.sqlite: 10 metric(s) not computed (dataset unavailable), 1 measured floor(s) missed. |
 | 2026-10-03T21:40:30+00:00 | 4.1b | About tab generated: 51 references, 4/10 datasets resolved, worked example selected, 2 value(s) not recorded. |
+| 2026-10-03T21:53:48+00:00 | 3.7 | Stage 1 complete in 13.5 min. Best validation loss 0.003 at iteration 1200. |
+| 2026-10-03T21:53:55+00:00 | 3.7 | Fuse succeeded: models/binman-lm/fused |
+| 2026-10-03T21:56:31+00:00 | 3.8 | final: loading mlx-community/Qwen2.5-3B-Instruct-4bit with adapters at models/binman-lm/adapters |
+| 2026-10-03T21:57:03+00:00 | 3.8 | final synthetic: 25/150 evaluated (0.93/s), parse 0.960, set equality 0.960. |
+| 2026-10-03T21:57:29+00:00 | 3.8 | final synthetic: 50/150 evaluated (0.95/s), parse 0.980, set equality 0.980. |
+| 2026-10-03T21:57:54+00:00 | 3.8 | final synthetic: 75/150 evaluated (0.96/s), parse 0.973, set equality 0.973. |
+| 2026-10-03T21:58:19+00:00 | 3.8 | final synthetic: 100/150 evaluated (0.97/s), parse 0.980, set equality 0.980. |
+| 2026-10-03T21:58:45+00:00 | 3.8 | final synthetic: 125/150 evaluated (0.97/s), parse 0.984, set equality 0.984. |
+| 2026-10-03T21:59:12+00:00 | 3.8 | final synthetic: 150/150 evaluated (0.96/s), parse 0.987, set equality 0.980. |
+| 2026-10-03T22:00:27+00:00 | 3.8 | final: parse rate 0.9867, set equality 0.98 on 150 synthetic queries. |
+| 2026-10-03T22:00:28+00:00 | 3.8 | baseline_final: loading mlx-community/Qwen2.5-3B-Instruct-4bit zero-shot |
+| 2026-10-03T22:01:14+00:00 | 3.8 | baseline_final synthetic: 50/150 evaluated (1.19/s), parse 0.540, set equality 0.320. |
+| 2026-10-03T22:01:57+00:00 | 3.8 | baseline_final synthetic: 100/150 evaluated (1.18/s), parse 0.500, set equality 0.330. |
+| 2026-10-03T22:02:37+00:00 | 3.8 | baseline_final synthetic: 150/150 evaluated (1.20/s), parse 0.513, set equality 0.347. |
+| 2026-10-03T22:03:18+00:00 | 3.8 | baseline_final: parse rate 0.5133, set equality 0.3467 on 150 synthetic queries. |
+| 2026-10-03T22:07:49+00:00 | 3.6 | Europe PMC harvest: 18 candidate question sentences from open-access reviews, written to lm/corpus/external_candidates.jsonl for selection. |
+| 2026-10-03T22:07:49+00:00 | 3.6 | External query set: 15 queries, 0 with real harvested phrasing, 15 flagged as the project's own phrasing. |
+| 2026-10-03T22:08:18+00:00 | 3.8 | final: loading mlx-community/Qwen2.5-3B-Instruct-4bit with adapters at models/binman-lm/adapters |
+| 2026-10-03T22:08:53+00:00 | 3.8 | final synthetic: 25/150 evaluated (0.93/s), parse 0.960, set equality 0.960. |
+| 2026-10-03T22:09:19+00:00 | 3.8 | final synthetic: 50/150 evaluated (0.95/s), parse 0.980, set equality 0.980. |
+| 2026-10-03T22:09:44+00:00 | 3.8 | final synthetic: 75/150 evaluated (0.96/s), parse 0.973, set equality 0.973. |
+| 2026-10-03T22:10:10+00:00 | 3.8 | final synthetic: 100/150 evaluated (0.97/s), parse 0.980, set equality 0.980. |
+| 2026-10-03T22:10:36+00:00 | 3.8 | final synthetic: 125/150 evaluated (0.96/s), parse 0.984, set equality 0.984. |
+| 2026-10-03T22:11:02+00:00 | 3.8 | final synthetic: 150/150 evaluated (0.96/s), parse 0.987, set equality 0.980. |
+| 2026-10-03T22:12:16+00:00 | 3.8 | final: parse rate 0.9867, set equality 0.98 on 150 synthetic queries. |
+| 2026-10-03T22:18:42+00:00 | 4.1b | About tab generated: 51 references, 4/10 datasets resolved, worked example selected, 2 value(s) not recorded. |

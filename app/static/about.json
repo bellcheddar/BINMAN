@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-03T21:40:30+00:00",
+  "generated_at": "2026-10-03T22:18:42+00:00",
   "generator": "pipeline/build_about.py",
   "note": "Every value on this page is read from a build artefact. Nothing here is typed by hand, and a value that could not be read says 'not recorded' rather than showing a plausible guess.",
   "schematic_description": "The pipeline runs left to right in four stages. Two kinds of input enter on the left: the primary data sources (RCSB, AlphaFold DB, UniProt, InterPro), and separately the validation datasets that serve as ground truth, of which 4 of 10 resolved. Stage 1, acquisition, catalogued 52,821 entries into priority tiers using httpx and tenacity. Stage 2, geometry, analysed 52,586 entries with gemmi and FreeSASA and found 239,485 bridges, with 235 entries failing. Stage 3, scan and triage, used DSSP and fpocket to produce 21,717 degron candidates, 650 triaged ligases and 1,650 scored lysines. Stage 4 trains BINMAN-LM with mlx-lm, which does text work only and never emits a number. Four modules leave on the right: Glue Atlas, Degron Scan, E3 Triage and Degradability.",
@@ -76,8 +76,8 @@
       "failure_reasons": {}
     },
     "lm_eval": {
-      "total": 3,
-      "ok": 3,
+      "total": 5,
+      "ok": 5,
       "failed": 0,
       "failure_reasons": {}
     },
@@ -1291,10 +1291,9 @@
       "adapter_rank": 16,
       "adapter_layers": 16,
       "fine_tune_type": "lora",
-      "fused": false,
+      "fused": true,
       "build_date": "2026-10-03",
-      "shipped_adapter": "models/binman-lm/adapters",
-      "serving": "mlx_lm.server --model <base> --adapter-path models/binman-lm/adapters"
+      "shipped_adapter": "models/binman-lm/adapters"
     },
     "training": {},
     "tasks": [

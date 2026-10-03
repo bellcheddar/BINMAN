@@ -8,12 +8,13 @@ See `BUILD_LOG.md` for the timestamped event log.
 | | |
 |---|---|
 | Phases complete | 1, 2 and 3 built; 4 built and QC'd |
-| Atlas | 52,821 entries, 57,758 bridges, 650 ligases, 9,962 classified components |
-| Section 9 floors measured and passed | E3 enrichment p = 0.0024, pocket coverage 0.982, LM parse 0.992, LM set equality 0.992 |
-| Section 9 floors measured and missed | artefact precision 0.945 against 0.95 (Gate G6, diagnosed) |
+| Atlas | 52,821 entries, 239,485 bridges, 21,717 degrons, 650 ligases, 30,057 edges, 142.5 MB |
+| Section 9 floors measured and passed | E3 enrichment p = 0.0024, pocket coverage 0.982, LM set equality 0.98, LM fabrication rate 0.00 |
+| Section 9 floors measured and missed | artefact precision 0.945 against 0.95; LM parse rate 0.987 against 0.99 (both Gate G6, both diagnosed) |
 | Section 9 metrics not computed | 10, each with the dataset that is missing (Gate G7) |
 | QC | 24 screenshots, 0 console errors, 0 serious or critical axe violations |
 | Tests | 73 passing |
+| Trimmed structures | 3,839 files, 553 MB, inside the 2.5 GB budget |
 | Repository | public at github.com/bellcheddar/binman |
 
 ## Phase 1: Foundations and the Glue Atlas
@@ -26,16 +27,16 @@ See `BUILD_LOG.md` for the timestamped event log.
 | 1.0 Validation datasets | **partial** | 4 of 10 resolved. G7 open, non-blocking. |
 | 1.0 Smoke test and budget | **done** | 5.1 entries/s measured, 2.9 h projected against a 96 h budget. No G1. |
 | 1.1 Catalogue | **done** | 52,821 entries. Tier 1 902, tier 2 34,539, tier 3 17,380. |
-| 1.2 Download and prepare | **running** | ~62% of tier 1 to 3 analysed. |
-| 1.3 Geometry | **running** | 57,758 bridges so far. Resumable: a kill costs only the work in flight. |
+| 1.2 Download and prepare | **done** | 52,821 entries; 235 skipped by the work cap (D-017). |
+| 1.3 Geometry | **done** | 239,485 bridges, 23,054 with a glue-candidate ligand. |
 | 1.4 Classification | **done** | 9,962 components classified; furniture classified, not deleted. |
-| 1.5 Trimmed structures | pending | Runs once the geometry queue drains. |
+| 1.5 Trimmed structures | **done** | 3,839 files, wired into 18,508 bridge rows. |
 
 ## Phase 2: Degron Scan, E3 Triage and Degradability
 
 | Step | State | Notes |
 |---|---|---|
-| 2.1 Degron scan | **running** | ~40% of 20,431 human AFDB models. Thresholds calibrated (D-010) and the tip definition corrected (D-011); 3 of 5 documented degrons recovered. |
+| 2.1 Degron scan | **done** | 20,279 proteins scanned, 21,717 candidates over 8,983 proteins, 570 failed. Thresholds calibrated (D-010), tip definition corrected (D-011); 3 of 5 documented degrons recovered. |
 | 2.2 E3 triage | **done** | 650 ligases, 638 with a pocket score (0.982 coverage). Repertoire bug found and fixed (D-012). |
 | 2.3 Degradability | **done for geometry** | 1,650 lysines measured. **No verdicts**: the reach window is unfitted because the diGly data is unavailable, which is the spec-mandated behaviour. |
 | 2.4 Edge table | **done** | 16,235 edges. Curated E3 edges fill as the ligase table grows. |
@@ -52,8 +53,8 @@ See `BUILD_LOG.md` for the timestamped event log.
 | 3.4 Task B corpus | **not built** | 3 of 5 classes have no published label source. Reported, not substituted. |
 | 3.5 Task C corpus | **done** | 980 abstention pairs. |
 | 3.6 External query set | **done** | 15 queries, 12 with harvested phrasing, 3 flagged as the project's own. |
-| 3.7 Training | **stage 1 done, stage 2 running** | Stage 1 reported to W&B. Stage 2 is the spec's DPO fallback: mlx-lm ships no preference trainer. |
-| 3.8 Evaluation | **stage 1 done** | Parse 0.992, set equality 0.992, exact 0.942. Stage 2 evaluation pending. |
+| 3.7 Training | **done** | Round 04 ships (SFT on the complete atlas). Both DPO rounds rejected by the generation guard. |
+| 3.8 Evaluation | **done** | Synthetic set equality 0.98 (floor 0.90). External not computed: no answerable externally-phrased question survived the harvest. |
 | 3.9 Serving | **done** | `deploy/serve_lm.sh`. The app is fully functional with `BINMAN_LM_URL` unset. |
 
 ## Phase 4: App, QC and delivery
@@ -81,13 +82,17 @@ See `BUILD_LOG.md` for the timestamped event log.
 | G6 Science | **open** | no. Artefact precision 0.945 against 0.95, diagnosed. |
 | G7 Dataset access | **open** | no. 6 datasets need a manual download. |
 
-## What is still running
+## Nothing is still running
 
-- Glue Atlas geometry over the remaining tier 1 to 3 queue
-- Degron scan over the remaining human AFDB proteome
-- BINMAN-LM stage 2 preference tuning
+All four phases are complete. The final sequence ran in order: full geometry,
+full degron scan, trimmed structures, atlas rebuild, corpus regeneration against
+the complete atlas, retrain, final evaluation, validation, About regeneration,
+tests and QC.
 
-Each is resumable and manifest-backed. When they drain, the remaining steps are:
-rebuild the atlas, regenerate the LM corpus against the fuller vocabularies,
-re-run `pipeline/validate.py` against the shipped bundle, regenerate the About
-tab, and re-run QC.
+## What a reader should look at first
+
+1. `FINDINGS.md`, which states every number with its method and its n, and says
+   plainly which metrics could not be computed and why.
+2. `GATE_OPEN.md`, which carries the three open gates and the decision each needs.
+3. `DECISIONS.md`, 18 entries, each with the alternatives considered and how to
+   reverse it.

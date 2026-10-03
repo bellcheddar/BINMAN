@@ -203,6 +203,15 @@ def wandb_available() -> bool:
 def stage_one(iters: int, batch_size: int, model: str = BASE_MODEL,
               round_number: int | None = None) -> dict:
     counts = prepare_sft_data()
+
+    # mlx-lm names its W&B run `os.path.basename(log_dir)`, which is the adapter
+    # path, and that explicit argument overrides WANDB_NAME. So training writes
+    # into a directory named after the run, and the result is copied to the
+    # stable `adapters/` path afterwards. The run is then named correctly while
+    # it is live, rather than being renamed after the fact.
+    name = run_name(round_number) if round_number else "adapters"
+    work_dir = (MODELS / "runs" / name) if round_number else ADAPTERS
+    work_dir.mkdir(parents=True, exist_ok=True)
     ADAPTERS.mkdir(parents=True, exist_ok=True)
 
     command = [
@@ -215,7 +224,7 @@ def stage_one(iters: int, batch_size: int, model: str = BASE_MODEL,
         "--batch-size", str(batch_size),
         "--iters", str(iters),
         "--learning-rate", str(LEARNING_RATE),
-        "--adapter-path", str(ADAPTERS),
+        "--adapter-path", str(work_dir),
         "--steps-per-eval", "100",
         "--val-batches", "20",
         "--max-seq-length", "1024",
@@ -223,11 +232,9 @@ def stage_one(iters: int, batch_size: int, model: str = BASE_MODEL,
         "--steps-per-report", "10",
     ]
     environment = dict(os.environ)
-    name = ""
     group = f"{RUN_STEM}-round{round_number:02d}" if round_number else RUN_STEM
     if wandb_available():
         command += ["--report-to", "wandb", "--project-name", WANDB_PROJECT]
-        name = run_name(round_number)
         environment.update(wandb_env(
             name, group,
             notes=(f"Stage 1 LoRA SFT. Task A (query) and Task C (abstain) "
@@ -252,6 +259,12 @@ def stage_one(iters: int, batch_size: int, model: str = BASE_MODEL,
 
     text = log_path.read_text(errors="replace")
     losses = _parse_losses(text)
+
+    # Copy the trained adapter to the stable path everything else serves from.
+    if result.returncode == 0 and work_dir != ADAPTERS:
+        for item in work_dir.iterdir():
+            if item.is_file() and item.suffix in {".safetensors", ".json"}:
+                shutil.copy2(item, ADAPTERS / item.name)
     report = {
         "iterations_requested": iters,
         "batch_size": batch_size,

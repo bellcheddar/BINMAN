@@ -319,6 +319,10 @@ def load_query_set(path: Path, limit: int | None = None) -> list[dict]:
                     "gold": row["gold_object"],
                     "source_doi": row.get("source_doi"),
                     "original_sentence": row.get("original_sentence"),
+                    # Only a row whose phrasing came from a published review can
+                    # test register mismatch. A project-phrased row tests schema
+                    # coverage and must not be counted as external.
+                    "externally_phrased": bool(row.get("externally_phrased")),
                 })
     if limit is not None:
         samples = samples[:limit]
@@ -366,22 +370,50 @@ def run(model_path: str = BASE_MODEL, adapter_path: str | None = None,
             model, tokenizer, synthetic, connection, schema_text,
             f"{stage_label} synthetic")
 
-        if external:
+        # Split: only review-phrased rows test register mismatch.
+        review_phrased = [s for s in external if s.get("externally_phrased")]
+        project_phrased = [s for s in external if not s.get("externally_phrased")]
+
+        if len(review_phrased) >= 5:
             results["task_a_external"] = evaluate_task_a(
-                model, tokenizer, external, connection, schema_text,
+                model, tokenizer, review_phrased, connection, schema_text,
                 f"{stage_label} external")
-            # The gap between the two is the register-mismatch signal (spec 3.6).
             synthetic_score = results["task_a_synthetic"]["set_equality"]
             external_score = results["task_a_external"]["set_equality"]
             if synthetic_score is not None and external_score is not None:
+                # The gap is the register-mismatch signal (spec 3.6).
                 results["register_mismatch_gap"] = round(
                     synthetic_score - external_score, 4)
         else:
             results["task_a_external"] = {
                 "computed": False,
-                "reason": ("external_queries.jsonl has not been built. Run "
-                           "lm/harvest_external_queries.py (spec 3.6)."),
+                "n_review_phrased": len(review_phrased),
+                "reason": (
+                    "Not computable: no externally phrased query survived the "
+                    "harvest. 463 candidate sentences were pulled from "
+                    "open-access reviews and 18 are genuinely interrogative, but "
+                    "none asks a question BINMAN's schema can answer: they ask "
+                    "about linker composition, ubiquitin chain architecture, "
+                    "alternative splicing and metabolite-specific teratogenicity. "
+                    "Review articles pose mechanistic questions, not database "
+                    "queries. Reporting a number measured on project-phrased rows "
+                    "would claim a register-mismatch result the data does not "
+                    "support."
+                ),
             }
+            results["register_mismatch_gap"] = None
+
+        if project_phrased:
+            # Separately reported: this is schema coverage on phrasing the
+            # generator did not produce, which is useful but is NOT the spec 3.6
+            # external metric.
+            results["task_a_project_phrased"] = evaluate_task_a(
+                model, tokenizer, project_phrased, connection, schema_text,
+                f"{stage_label} project-phrased")
+            results["task_a_project_phrased"]["note"] = (
+                "Hand-written questions against the schema, not harvested "
+                "phrasing. Measures schema coverage, not register mismatch."
+            )
 
         if not skip_preference:
             pairs = []
