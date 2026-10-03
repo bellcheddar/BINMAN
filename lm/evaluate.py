@@ -120,13 +120,23 @@ TRAINED_SYSTEM = (
 )
 
 
+# Spec 3.7: the three tasks are distinguished by a task tag in the system turn.
+# Evaluating Task C under <task>query</task> asks the model to write a query and
+# then measures whether it refused, which is not a test of abstention.
+ABSTAIN_SYSTEM = (
+    "<task>abstain</task>\n"
+    "You state precisely what is missing when a question cannot be answered "
+    "from the atlas. Never fabricate a ligase, a PDB identifier or a number."
+)
+
+
 def generate_one(model, tokenizer, question: str, schema_text: str,
-                 max_tokens: int = 320) -> str:
+                 max_tokens: int = 320, system_override: str | None = None) -> str:
     from mlx_lm import generate
     from mlx_lm.sample_utils import make_sampler
 
     # An empty schema_text means "use the prompt the model was trained with".
-    system = (SYSTEM + schema_text) if schema_text else TRAINED_SYSTEM
+    system = system_override or ((SYSTEM + schema_text) if schema_text else TRAINED_SYSTEM)
     messages = [
         {"role": "system", "content": system},
         {"role": "user", "content": question},
@@ -277,7 +287,9 @@ def evaluate_abstention(model, tokenizer, samples: list[dict],
     abstained = 0
     for sample in samples:
         question = sample["messages"][1]["content"]
-        raw = generate_one(model, tokenizer, question, schema_text, max_tokens=220)
+        # Task C is prompted with its own task tag, as it was trained.
+        raw = generate_one(model, tokenizer, question, schema_text, max_tokens=220,
+                           system_override=ABSTAIN_SYSTEM)
         verdict = fabricates(question, raw)
         if verdict["fabricates"]:
             fabrications.append({"question": question, "raw": raw[:260],

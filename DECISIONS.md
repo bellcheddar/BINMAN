@@ -561,3 +561,68 @@ the single source of truth, and recomputes `novel_bridge` afterwards.
 
 **Reversal.** Remove the size guard in `ccd_classes.classify`, or drop the
 datasets from the registry.
+
+---
+
+## D-020: Task C was never broken; the evaluation was
+
+**Decision.** No Task C rebalance. The corpus and training are left as they are.
+
+**Context.** Task C measured an abstention rate of 0.00 with a fabrication rate of
+0.00, which read as "it never fabricates because it never refuses either, it just
+answers with a query object". The planned fix was to over-weight Task C in the
+interleaved SFT mix, which spec 3.5 explicitly suggests.
+
+**What it actually was.** Spec 3.7 distinguishes the three tasks by a task tag in
+the system turn. `evaluate_abstention` called the shared `generate_one`, which
+uses the **`<task>query</task>`** prompt. So the model was being told to write a
+query object and then measured on whether it refused. It did exactly what it was
+told.
+
+Prompted with `<task>abstain</task>`, the tag it was trained with, on the same
+held-out set:
+
+| Metric | Measured with `<task>query</task>` | Measured with `<task>abstain</task>` | Floor |
+|---|---:|---:|---:|
+| Abstention rate | 0.00 | **1.00** | reported |
+| Fabrication rate | 0.00 | **0.00** | 0.00 |
+
+Task C is the strongest part of BINMAN-LM. Given only a ligase pinned it replies
+`{"answerable":false,"missing":["glue","target"],...}` and names precisely what is
+absent.
+
+**The pattern worth noting.** This is the third defect of the same class in this
+build: the model evaluated under a prompt it was not trained with. The first cost
+a reported 0.0 on the whole of Task A (D-013), the second was the baseline
+comparison, and this one nearly triggered an unnecessary retrain. A model must be
+evaluated exactly as it is served, and the task tag is part of that.
+
+**Reversal.** Not applicable: nothing was changed except the evaluation, which is
+now correct.
+
+---
+
+## D-021: PROTAC-DB licence accepted by Marc
+
+**Decision.** Marc accepted the PROTAC-DB terms of use himself, on 2026-10-03,
+with the reasoning recorded here in his words: the model is not distributed, only
+used; the source will be referenced; and the work is not for profit.
+
+**Why this is recorded.** The PROTAC-DB agreement is a formal contract with the
+Hou Tingjun group at Zhejiang University. Clause 2.4 restricts both the raw data
+and any derivative to the user and their colleagues internally. Accepting it is a
+representation the person makes, not something an agent decides, so the decision
+and its reasoning belong in writing beside the data it governs.
+
+**What it binds the build to.**
+
+- BINMAN-LM weights are never distributed. They already never ship: the model is
+  served from the Studio and `deploy/rsync.sh` excludes `models/`.
+- The parsed derivative stays in `data/validation/`, which is gitignored, and
+  only computed metrics reach the atlas or the repository.
+- PROTAC-DB is cited in `references.bib` and appears in the About tab's reference
+  table with its licence stated.
+
+**Reversal.** Delete `data/validation/raw/protacdb_protacs.*` and the parsed
+derivative, and re-run `pipeline/acquire_validation.py`. Task B loses its `protac`
+and `bivalent_inhibitor` label sources and returns to not buildable.
