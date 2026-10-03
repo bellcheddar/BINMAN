@@ -292,6 +292,57 @@ def parse_molgluedb(raw: bytes, route: Route) -> list[dict]:
     } for r in reader]
 
 
+def parse_protacdb_xlsx(raw: bytes, route: Route) -> list[dict]:
+    """PROTAC-DB 3.0 compound sheet.
+
+    Supplies the `protac` class for LM Task B and the Glue Atlas exclusion set: a
+    PROTAC is bivalent by design, so a correct pipeline does not call one a glue.
+
+    Licence: internal use only, derivatives included (Hou group terms). Marc
+    accepted those terms himself, see DECISIONS.md D-021. The parsed derivative
+    stays in `data/validation/`, which is gitignored, and only computed metrics
+    reach the atlas or the repository.
+    """
+    import io as _io
+
+    import openpyxl
+
+    workbook = openpyxl.load_workbook(_io.BytesIO(raw), read_only=True, data_only=True)
+    sheet = workbook[workbook.sheetnames[0]]
+    stream = sheet.iter_rows(values_only=True)
+    header = [str(h or "").strip() for h in next(stream)]
+    index = {name: i for i, name in enumerate(header)}
+
+    def cell(row, name):
+        position = index.get(name)
+        if position is None or position >= len(row):
+            return ""
+        value = row[position]
+        return "" if value is None else str(value).strip()
+
+    rows = []
+    for record in stream:
+        if not record or not cell(record, "Compound ID"):
+            continue
+        pdb_raw = cell(record, "PDB")
+        pdbs = [
+            token.strip().upper()
+            for token in pdb_raw.replace(";", ",").split(",")
+            if PDB_ID.match(token.strip())
+        ]
+        rows.append({
+            "compound_id": cell(record, "Compound ID"),
+            "name": cell(record, "Name"),
+            "smiles": cell(record, "Smiles"),
+            "target": cell(record, "Target"),
+            "target_uniprot": cell(record, "Uniprot"),
+            "e3_ligase": cell(record, "E3 ligase"),
+            "pdb_id": pdbs[0] if pdbs else "",
+            "pdb_ids": ";".join(pdbs),
+        })
+    return rows
+
+
 def parse_generic_table(raw: bytes, route: Route) -> list[dict]:
     """A TSV or CSV with a header, read as-is. Used where the schema is unknown."""
     text = _text(raw, route)
@@ -480,21 +531,28 @@ def registry() -> list[Dataset]:
         ),
         Dataset(
             name="protacdb_protacs",
-            purpose="LM Task B confusable negative class and Glue Atlas exclusion set (spec 9.1, 3.4)",
-            licence="internal use only, redistribution prohibited (Hou group terms, 2024-09-29)",
+            purpose=("LM Task B `protac` and `bivalent_inhibitor` classes, and the "
+                     "Glue Atlas exclusion set: a PROTAC is bivalent by design, so "
+                     "a correct pipeline does not call one a glue"),
+            licence=("internal use only, derivatives included; redistribution "
+                     "prohibited (Hou group terms, 2024-09-29). Accepted by Marc, "
+                     "see DECISIONS.md D-021."),
             redistributable=False,
             citation="10.1093/nar/gkae768",
-            homepage="https://cadd.zju.edu.cn/protacdb/",
-            version_note="PROTAC-DB 3.0",
+            homepage="https://cadd.zju.edu.cn/protacdb/downloads",
+            version_note="PROTAC-DB 3.0, released 2026-06-06",
             manual_route=(
-                "The downloads page populates its table by JavaScript. Download the PROTAC SDF or XLSX from https://cadd.zju.edu.cn/protacdb/downloads by hand. Note the terms of use (2024-09-29) restrict the data to internal use: the parsed derivative must stay local and must never be bundled into the atlas."
+                "Downloading requires accepting a licence agreement in a modal, "
+                "which is a representation the person makes, so it is not "
+                "automated. Open https://cadd.zju.edu.cn/protacdb/downloads, click "
+                "protac.xlsx on the 'All' row, tick the agreement box in the modal, "
+                "download, and save to data/validation/raw/protac.xlsx."
             ),
-            routes=[
-                Route("https://cadd.zju.edu.cn/protacdb/api/download/protac", note="bulk export, if exposed"),
-                Route("https://cadd.zju.edu.cn/protacdb/downloads/protac.csv", note="static path, if exposed"),
-            ],
-            parser=parse_generic_table,
-            min_rows=500,
+            routes=[Route("file://data/validation/raw/protac.xlsx",
+                          note="placed by hand after accepting the licence", binary=True)],
+            parser=parse_protacdb_xlsx, min_rows=1000,
+            columns=("compound_id", "name", "smiles", "target", "target_uniprot",
+                     "e3_ligase", "pdb_id", "pdb_ids"),
         ),
         Dataset(
             name="degronopedia",

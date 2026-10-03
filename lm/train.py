@@ -156,10 +156,12 @@ def prepare_sft_data() -> dict:
     TRAIN_DATA.mkdir(parents=True, exist_ok=True)
     counts: dict[str, int] = {}
 
+    # All three tasks interleaved (spec 3.7). Task B joined once its labels
+    # became available: see DECISIONS.md D-022.
     for split, sources in (
-        ("train", ("task_a_train.jsonl", "task_c_train.jsonl")),
-        ("valid", ("task_a_valid.jsonl", "task_c_valid.jsonl")),
-        ("test", ("task_a_test.jsonl", "task_c_test.jsonl")),
+        ("train", ("task_a_train.jsonl", "task_b_train.jsonl", "task_c_train.jsonl")),
+        ("valid", ("task_a_valid.jsonl", "task_b_valid.jsonl", "task_c_valid.jsonl")),
+        ("test", ("task_a_test.jsonl", "task_b_test.jsonl", "task_c_test.jsonl")),
     ):
         rows: list[dict] = []
         for name in sources:

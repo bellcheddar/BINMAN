@@ -403,3 +403,25 @@ One line per meaningful event, timestamped UTC (spec Section 0 rule 5).
 | 2026-10-03T22:51:17+00:00 | 4.3 | Atlas built: 52,821 entries, 239,485 bridges (14,260 novel), 9,981 ligands, 21,717 degrons, 650 ligases, 1,650 lysines, 142.5 MB. |
 | 2026-10-03T22:51:18+00:00 | 9 | Validation run against binman.sqlite: 6 metric(s) not computed (dataset unavailable), 2 measured floor(s) missed. |
 | 2026-10-03T22:51:49+00:00 | 4.1b | About tab generated: 51 references, 8/11 datasets resolved, worked example selected, 2 value(s) not recorded. |
+| 2026-10-03T23:14:24+00:00 | 1.0 | Validation datasets: 9/11 resolved (biolip2_annotations, biolip2_artefacts, mgdb_glues, mgtbind_compounds, mgtbind_ternary, molgluedb_glues, protacdb_protacs, ubibrowser_literature_e3, ubibrowser_predicted_e3). Manifest at data/validation/MANIFEST.md. |
+| 2026-10-03T23:14:24+00:00 | gate | G7 opened: 2 validation dataset(s) could not be obtained automatically: degronopedia, protcid_interfaces. |
+| 2026-10-03T23:15:49+00:00 | 3.4 | Task B: resolving InChIKeys for 9,981 chemical components. |
+| 2026-10-03T23:16:05+00:00 | 3.4 | Task B: 9,585 components carry an InChIKey. |
+| 2026-10-03T23:16:13+00:00 | 3.4 | Task B label sources mapped onto the atlas: molecular_glue 130, protac 32, native_cofactor 842, crystallisation_artefact 345, held out as disagreements 123 |
+| 2026-10-03T23:16:14+00:00 | 3.4 | Task B corpus: 112 train / 24 valid / 16 test over 4 classes at 38 each, 123 disagreements held out. |
+| 2026-10-03T23:29:01+00:00 | 3.4 | Abstracts for protac: 146 fetched of 150 identifiers tried. |
+| 2026-10-03T23:30:46+00:00 | 3.4 | Abstracts for protac: 295 fetched of 300 identifiers tried. |
+| 2026-10-03T23:32:54+00:00 | 3.4 | Abstracts for protac: 445 fetched of 450 identifiers tried. |
+| 2026-10-03T23:34:41+00:00 | 3.4 | Abstracts for protac: 568 fetched of 600 identifiers tried. |
+| 2026-10-03T23:36:15+00:00 | 3.4 | Abstracts for protac: 713 fetched of 750 identifiers tried. |
+| 2026-10-03T23:36:26+00:00 | 3.4 | Abstracts for protac: 729 of 766 identifiers resolved. |
+| 2026-10-03T23:38:00+00:00 | 3.4 | Abstracts for molecular_glue: 145 fetched of 150 identifiers tried. |
+| 2026-10-03T23:39:37+00:00 | 3.4 | Abstracts for molecular_glue: 283 fetched of 300 identifiers tried. |
+| 2026-10-03T23:41:03+00:00 | 3.4 | Abstracts for molecular_glue: 427 fetched of 450 identifiers tried. |
+| 2026-10-03T23:41:53+00:00 | 3.4 | Abstracts for molecular_glue: 497 of 522 identifiers resolved. |
+| 2026-10-03T23:41:53+00:00 | 3.4 | Class abstracts: 1,214 unique, 6 dropped as ambiguous (cited by both a glue and a PROTAC database). |
+| 2026-10-03T23:44:54+00:00 | 3.4 | Task B: resolving InChIKeys for 9,981 chemical components. |
+| 2026-10-03T23:44:54+00:00 | 3.4 | Task B: 9,585 components carry an InChIKey. |
+| 2026-10-03T23:45:01+00:00 | 3.4 | Task B label sources mapped onto the atlas: molecular_glue 130, protac 32, native_cofactor 842, crystallisation_artefact 345, held out as disagreements 123 |
+| 2026-10-03T23:45:01+00:00 | 3.4 | Task B corpus: 15,664 train / 1,714 valid / 4,087 test over 4 classes, unbalanced, 1,214 abstract inputs, 123 disagreements held out. |
+| 2026-10-03T23:45:42+00:00 | 3.7 | Stage 1 LoRA SFT starting: 21,200 train / 2,386 valid examples, rank 16, 16 layers, lr 1e-05, batch 4, 1200 iterations. |

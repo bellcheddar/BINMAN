@@ -1,0 +1,44 @@
+{
+  "classes": [
+    "molecular_glue",
+    "protac",
+    "native_cofactor",
+    "crystallisation_artefact"
+  ],
+  "bivalent_inhibitor": "`bivalent_inhibitor` is NOT built. Spec 3.4 defines its label as two binding sites within ONE chain, taken from the pipeline's own geometry and cross-checked against the absence of a degrader annotation in all four databases. Stage 1.3 records bridges between two DISTINCT chains and the half-interfaces behind them, but it does not detect two spatially separate sites on a single chain, so the label cannot be derived from what the pipeline currently produces. Inventing it from ligand size or from PROTAC-DB membership would be this project's judgement rather than a published source, which spec 4.1b forbids. Task B therefore ships as a four-class problem and the macro-F1 is reported over four classes, stated plainly rather than presented as if it were five.",
+  "label_sources_mapped_to_ccds": {
+    "molecular_glue": 130,
+    "protac": 32,
+    "native_cofactor": 842,
+    "crystallisation_artefact": 345
+  },
+  "examples_available": {
+    "molecular_glue": 787,
+    "protac": 761,
+    "native_cofactor": 9771,
+    "crystallisation_artefact": 10146
+  },
+  "structural_examples": {
+    "molecular_glue": 296,
+    "protac": 38,
+    "native_cofactor": 9771,
+    "crystallisation_artefact": 10146
+  },
+  "abstract_examples": 1214,
+  "balanced": false,
+  "balancing_note": "Classes are NOT balanced. Spec 3.4 asks for balancing by sampling; Marc overrode it so that no real label is discarded (D-022). The imbalance is reported instead, as per-class precision, recall and F1 beside the macro figure.",
+  "class_distribution_train": {
+    "molecular_glue": 656,
+    "protac": 598,
+    "native_cofactor": 6389,
+    "crystallisation_artefact": 8021
+  },
+  "counts": {
+    "task_b_train": 15664,
+    "task_b_valid": 1714,
+    "task_b_test": 4087
+  },
+  "glue_disagreements_held_out": 123,
+  "split_rule": "Split by chemical component, so no CCD appears in both train and test.",
+  "label_rule": "Every label comes from a published curated source. The glue label requires agreement between at least two of MGDB, MolGlueDB and MGTbind."
+}

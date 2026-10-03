@@ -515,3 +515,76 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+
+
+# --------------------------------------------------------------------------- #
+# Task B: evidence-class triage (spec 3.8, 9.5)
+# --------------------------------------------------------------------------- #
+
+TRIAGE_SYSTEM_PREFIX = "<task>triage</task>"
+
+
+def evaluate_triage(model, tokenizer, samples: list[dict]) -> dict:
+    """Macro-F1 plus the full confusion matrix, and per-class precision/recall.
+
+    Per-class figures are reported beside the macro figure because the corpus is
+    deliberately unbalanced (D-022): a macro-F1 alone would hide which class the
+    model is actually failing on. Spec 9.5 also asks for the glue-against-PROTAC
+    cell to be called out, and it is returned explicitly.
+    """
+    from mlx_lm import generate
+    from mlx_lm.sample_utils import make_sampler
+
+    labels = sorted({s["label"] for s in samples})
+    matrix = {truth: {pred: 0 for pred in labels + ["unparseable"]} for truth in labels}
+
+    for sample in samples:
+        system = sample["messages"][0]["content"]
+        question = sample["messages"][1]["content"]
+        prompt = tokenizer.apply_chat_template(
+            [{"role": "system", "content": system},
+             {"role": "user", "content": question}],
+            add_generation_prompt=True, tokenize=False,
+        )
+        raw = generate(model, tokenizer, prompt=prompt, max_tokens=16,
+                       sampler=make_sampler(temp=0.0), verbose=False).strip()
+        # The task asks for a single class token; accept the first known label
+        # that appears, and call anything else unparseable rather than guessing.
+        predicted = next((l for l in labels if l in raw), "unparseable")
+        matrix[sample["label"]][predicted] += 1
+
+    per_class = {}
+    f1s = []
+    for label in labels:
+        tp = matrix[label][label]
+        fn = sum(v for k, v in matrix[label].items() if k != label)
+        fp = sum(matrix[other][label] for other in labels if other != label)
+        precision = tp / (tp + fp) if (tp + fp) else 0.0
+        recall = tp / (tp + fn) if (tp + fn) else 0.0
+        f1 = (2 * precision * recall / (precision + recall)) if (precision + recall) else 0.0
+        per_class[label] = {
+            "precision": round(precision, 4), "recall": round(recall, 4),
+            "f1": round(f1, 4), "support": tp + fn,
+        }
+        f1s.append(f1)
+
+    total = sum(sum(row.values()) for row in matrix.values())
+    correct = sum(matrix[l][l] for l in labels)
+    return {
+        "n": total,
+        "classes": labels,
+        "macro_f1": round(sum(f1s) / len(f1s), 4) if f1s else None,
+        "accuracy": round(correct / total, 4) if total else None,
+        "per_class": per_class,
+        "confusion_matrix": matrix,
+        "glue_vs_protac": {
+            "glue_called_protac": matrix.get("molecular_glue", {}).get("protac", 0),
+            "protac_called_glue": matrix.get("protac", {}).get("molecular_glue", 0),
+            "note": ("Spec 9.5 calls this cell out explicitly: PROTAC against glue "
+                     "is the confusion that matters, because a PROTAC is bivalent "
+                     "by design and a glue is not."),
+        },
+        "unbalanced": True,
+        "note": ("The corpus is deliberately unbalanced (D-022), so per-class "
+                 "figures carry the meaning and the macro-F1 is a summary of them."),
+    }

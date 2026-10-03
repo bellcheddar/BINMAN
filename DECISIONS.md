@@ -626,3 +626,74 @@ and its reasoning belong in writing beside the data it governs.
 **Reversal.** Delete `data/validation/raw/protacdb_protacs.*` and the parsed
 derivative, and re-run `pipeline/acquire_validation.py`. Task B loses its `protac`
 and `bivalent_inhibitor` label sources and returns to not buildable.
+
+---
+
+## D-022: Task B classes are not balanced; every unique label is kept
+
+**Decision.** Marc's instruction: "don't pin to the smallest, treat them all as
+unique data." Spec 3.4 asks for the classes to be balanced by sampling, and that
+is overridden here.
+
+**Context.** Balancing by sampling pins every class to the smallest. The smallest
+was `protac` at 38 structural examples, because PROTACs are large and floppy and
+almost none are crystallised: 15,502 in PROTAC-DB, 57 with any PDB entry, 32
+whose chemical component reaches the atlas. Balancing would have produced a
+152-example corpus and discarded roughly 20,000 real curated labels.
+
+**What was done instead.** Two things, together:
+
+1. **Abstract inputs**, which spec 3.4 already allows ("entry title plus ligand
+   list, **or a Europe PMC abstract**"). 1,214 abstracts were harvested from the
+   curated databases' own cited references, each inheriting the class of the
+   database that cited it, so the label still comes from a published source.
+   This lifted `protac` from 38 to 598 and `molecular_glue` from 296 to 656: the
+   two starved classes, and exactly the ones abstracts can reach.
+2. **No class balancing.** Every unique example is kept.
+
+| Class | Structural | With abstracts | In training |
+|---|---:|---:|---:|
+| crystallisation_artefact | 10,146 | 10,146 | 8,021 |
+| native_cofactor | 9,771 | 9,771 | 6,389 |
+| molecular_glue | 296 | 787 | 656 |
+| protac | 38 | 761 | 598 |
+
+The residual imbalance is about 13 to 1, not the 250 to 1 it would have been
+without the abstracts.
+
+**How the imbalance is handled honestly.** It is reported rather than corrected:
+`evaluate_triage` returns **per-class precision, recall, F1 and support**, the
+full confusion matrix, and the glue-against-PROTAC cell called out as spec 9.5
+requires. A macro-F1 on its own would hide which class is failing, so it is
+reported as a summary of the per-class figures and never alone.
+
+**Splits.** Grouped by chemical component for structural rows and by article for
+abstract rows, so neither a component nor a paper appears on both sides.
+
+**Reversal.** Set a `target_per_class` and restore the sampling block in
+`lm/build_task_b.py`.
+
+---
+
+## D-023: ProtCID publishes no bulk interface data
+
+**Decision.** Spec 9.1 packing specificity stays **not computed**, and the reason
+is now specific rather than "the download failed".
+
+**Context.** ProtCID's own navigation offers Home, Search, Browse, Statistics,
+Help and About. There is no download page: the only bulk files on the site belong
+to PDBfam (`PDBfam.txt.gz`, `ChainPfamArch.txt.gz`, the unassigned-sequence
+lists), which are Pfam domain assignments per PDB chain, not the interface
+clusters. The interface classification that distinguishes a biological interface
+from crystal packing is reachable only by browsing or searching one Pfam pair at
+a time.
+
+**Alternatives considered.** Scrape the browse interface for the 17,536 entries
+that carry a bridge.
+
+**Reason.** That is thousands of requests against an academic server for a
+metric that is one of several, and the site offers no bulk route by design. The
+honest outcome is to say the resource does not publish what the metric needs.
+
+**Reversal.** If ProtCID publishes a bulk interface table, add it to the registry
+with a direct route; the parser slot already exists.

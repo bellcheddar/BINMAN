@@ -1,10 +1,10 @@
 # Gate G7 open
 
-Opened at 2026-10-03T22:48:11+00:00.
+Opened at 2026-10-03T23:14:24+00:00.
 
 ## What is needed
 
-3 validation dataset(s) could not be obtained automatically: degronopedia, protacdb_protacs, protcid_interfaces.
+2 validation dataset(s) could not be obtained automatically: degronopedia, protcid_interfaces.
 
 Each publishes through a JavaScript front end with no documented bulk-export endpoint, or sits behind registration. Spec 4.1b forbids substituting a hand-written control, so the metrics that depend on these are reported as not computed.
 
@@ -20,7 +20,7 @@ pixi run python pipeline/acquire_validation.py --refresh
 
 ## Already done
 
-8 dataset(s) resolved and parsed: biolip2_annotations, biolip2_artefacts, mgdb_glues, mgtbind_compounds, mgtbind_ternary, molgluedb_glues, ubibrowser_literature_e3, ubibrowser_predicted_e3. Row counts, licences and retrieval timestamps are recorded in data/validation/MANIFEST.md.
+9 dataset(s) resolved and parsed: biolip2_annotations, biolip2_artefacts, mgdb_glues, mgtbind_compounds, mgtbind_ternary, molgluedb_glues, protacdb_protacs, ubibrowser_literature_e3, ubibrowser_predicted_e3. Row counts, licences and retrieval timestamps are recorded in data/validation/MANIFEST.md.
 
 ## What happens next
 
