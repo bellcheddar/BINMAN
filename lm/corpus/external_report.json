@@ -1,0 +1,8 @@
+{
+  "generated_at": "2026-10-03T18:37:40+00:00",
+  "candidates_harvested": 463,
+  "query_set_size": 15,
+  "externally_phrased": 12,
+  "project_phrased": 3,
+  "note": "Only the rows with a non-empty `original_sentence` test register mismatch. The rest carry the project's own phrasing and are flagged in `provenance`, because a query set that silently mixes the two would overstate the external number."
+}

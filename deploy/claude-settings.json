@@ -1,0 +1,31 @@
+{
+  "_note": [
+    "The spec 12.1 permission set. Copy to .claude/settings.json to install.",
+    "The build could not write it directly: changing the agent's own permissions",
+    "is blocked as self-modification (DECISIONS.md D-004).",
+    "git push and gh repo create are ALLOWED here, unlike the spec's original",
+    "deny list, because Marc authorised Gate G4 at build start (D-001)."
+  ],
+  "permissions": {
+    "allow": [
+      "Edit", "Write", "Read", "Glob", "Grep", "WebFetch", "WebSearch",
+      "Bash(pixi:*)", "Bash(uv:*)", "Bash(python:*)", "Bash(python3:*)", "Bash(pytest:*)",
+      "Bash(caffeinate:*)", "Bash(git init:*)", "Bash(git add:*)", "Bash(git commit:*)",
+      "Bash(git status:*)", "Bash(git diff:*)", "Bash(git log:*)",
+      "Bash(git push:*)", "Bash(git remote:*)", "Bash(git branch:*)",
+      "Bash(gh repo create:*)", "Bash(gh repo view:*)",
+      "Bash(curl:*)", "Bash(wget:*)", "Bash(brew install:*)", "Bash(brew list:*)",
+      "Bash(sysctl:*)", "Bash(system_profiler:*)", "Bash(df:*)", "Bash(osascript:*)",
+      "Bash(tar:*)", "Bash(gzip:*)", "Bash(gunzip:*)", "Bash(mkdir:*)", "Bash(ls:*)",
+      "Bash(mv:*)", "Bash(cp:*)", "Bash(gunicorn:*)", "Bash(flask:*)",
+      "Bash(sqlite3:*)", "Bash(duckdb:*)", "Bash(npx playwright test:*)",
+      "Bash(mkdssp:*)", "Bash(fpocket:*)", "Bash(java:*)", "Bash(obabel:*)",
+      "Bash(freesasa:*)", "Bash(mlx_lm.lora:*)", "Bash(mlx_lm.server:*)",
+      "Bash(mlx_lm.generate:*)", "Bash(mlx_lm.fuse:*)", "Bash(huggingface-cli:*)"
+    ],
+    "deny": [
+      "Bash(ssh:*)", "Bash(scp:*)", "Bash(rsync:*)", "Bash(sudo:*)",
+      "Bash(rm -rf /:*)", "Bash(rm -rf ~:*)", "Bash(playwright install:*)"
+    ]
+  }
+}

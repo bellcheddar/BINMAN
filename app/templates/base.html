@@ -6,7 +6,12 @@
 <title>{% block title %}{{ page_title }}{% endblock %} · BINMAN</title>
 <meta name="description" content="BINMAN: an empirical atlas of bridging ligands, structural degrons, E3 ligase triage and degradability.">
 <link rel="icon" href="{{ url_for('static', filename='img/favicon.svg') }}" type="image/svg+xml">
+<link rel="icon" href="{{ url_for('static', filename='img/favicon-32.png') }}" sizes="32x32" type="image/png">
+<link rel="icon" href="{{ url_for('static', filename='img/favicon-16.png') }}" sizes="16x16" type="image/png">
+<link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
 <link rel="apple-touch-icon" href="{{ url_for('static', filename='img/apple-touch-icon.png') }}">
+<meta name="theme-color" content="#E9EAE5" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#131512" media="(prefers-color-scheme: dark)">
 <link rel="stylesheet" href="{{ url_for('static', filename='vendor/tabulator/tabulator.min.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='vendor/molstar/molstar.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/binman.css') }}">

@@ -145,3 +145,31 @@ One line per meaningful event, timestamped UTC (spec Section 0 rule 5).
 | 2026-10-03T18:17:13+00:00 | 4.3 | Atlas built: 52,821 entries, 16,179 bridges (novel set not determinable: no curated glue database resolved (G7)), 9,952 ligands, 12 degrons, 10 ligases, 1,650 lysines, 60.4 MB. |
 | 2026-10-03T18:17:13+00:00 | 9 | Validation run against binman.sqlite: 16 metric(s) not computed (dataset unavailable), 0 measured floor(s) missed. |
 | 2026-10-03T18:17:30+00:00 | 2.1 | 503/20,431 scanned, 547 candidates, 18 failed, 1.7/s, ~3.3 h remaining. |
+| 2026-10-03T18:20:42+00:00 | 1.3 | 17,352/52,681 entries, 17,640 bridges, 0 failed, 9.6 entries/s, ~1.0 h remaining. |
+| 2026-10-03T18:21:34+00:00 | 2.2 | 200/625 ligases processed. Notes: {'fpocket': 184, 'open_targets': 184, 'open_targets_no_expression': 5, 'structure_download_failed:FileNotFoundError': 6, 'no_ensembl_gene_id': 1}. |
+| 2026-10-03T18:22:30+00:00 | 2.1 | 1,017/20,431 scanned, 1,092 candidates, 37 failed, 1.7/s, ~3.2 h remaining. |
+| 2026-10-03T18:22:46+00:00 | 3.2 | Corpus grounding: 28 numeric field ranges read from the atlas, vocabularies {'ccd_id': 4000, 'ccd_class': 11, 'ligase_gene': 10, 'ligase_acc': 10, 'ligase_family': 2, 'verdict': 0, 'evidence_class': 0, 'motif_family': 1, 'method': 15}. |
+| 2026-10-03T18:22:46+00:00 | 3.2 | Task A generated 6,000 pairs, 6,000 validated by the app parser, 0 rejected and dropped (the corpus therefore has zero label noise by construction). |
+| 2026-10-03T18:22:46+00:00 | 3.2 | Corpus written: Task A 4,837/550/613, 1,400 preference pairs across 7 modes, Task C 784 train. Task B buildable: False. |
+| 2026-10-03T18:23:26+00:00 | 3.2 | Corpus grounding: 28 numeric field ranges read from the atlas, vocabularies {'ccd_id': 4000, 'ccd_class': 11, 'ligase_gene': 10, 'ligase_acc': 10, 'ligase_family': 2, 'verdict': 0, 'evidence_class': 0, 'motif_family': 1, 'method': 15}. |
+| 2026-10-03T18:23:26+00:00 | 3.2 | Task A generated 6,000 pairs, 6,000 validated by the app parser, 0 rejected and dropped (the corpus therefore has zero label noise by construction). |
+| 2026-10-03T18:23:26+00:00 | 3.2 | Corpus written: Task A 4,817/568/615, 1,400 preference pairs across 7 modes, Task C 784 train. Task B buildable: False. |
+| 2026-10-03T18:25:42+00:00 | 1.3 | 19,087/52,681 entries, 19,761 bridges, 0 failed, 9.1 entries/s, ~1.0 h remaining. |
+| 2026-10-03T18:26:52+00:00 | 2.2 | 250/625 ligases processed. Notes: {'fpocket': 234, 'open_targets': 234, 'open_targets_no_expression': 5, 'structure_download_failed:FileNotFoundError': 6, 'no_ensembl_gene_id': 1}. |
+| 2026-10-03T18:27:30+00:00 | 2.1 | 1,533/20,431 scanned, 1,727 candidates, 57 failed, 1.7/s, ~3.1 h remaining. |
+| 2026-10-03T18:30:42+00:00 | 1.3 | 20,571/52,681 entries, 23,057 bridges, 0 failed, 8.6 entries/s, ~1.0 h remaining. |
+| 2026-10-03T18:32:13+00:00 | 2.2 | 300/625 ligases processed. Notes: {'fpocket': 283, 'open_targets': 283, 'open_targets_no_expression': 5, 'structure_download_failed:FileNotFoundError': 7, 'no_ensembl_gene_id': 2}. |
+| 2026-10-03T18:32:30+00:00 | 2.1 | 2,044/20,431 scanned, 2,237 candidates, 75 failed, 1.7/s, ~3.0 h remaining. |
+| 2026-10-03T18:32:34+00:00 | 3.0 | baseline: loading mlx-community/Qwen2.5-3B-Instruct-4bit zero-shot |
+| 2026-10-03T18:34:28+00:00 | 3.0 | baseline: parse rate 0.2833, set equality 0.2333 on 60 synthetic queries. |
+| 2026-10-03T18:34:49+00:00 | 2.2 | 350/625 ligases processed. Notes: {'fpocket': 333, 'open_targets': 332, 'open_targets_no_expression': 5, 'structure_download_failed:FileNotFoundError': 7, 'no_ensembl_gene_id': 3}. |
+| 2026-10-03T18:35:42+00:00 | 1.3 | 22,734/52,681 entries, 28,284 bridges, 0 failed, 8.4 entries/s, ~1.0 h remaining. |
+| 2026-10-03T18:37:31+00:00 | 2.1 | 2,550/20,431 scanned, 2,829 candidates, 105 failed, 1.7/s, ~2.9 h remaining. |
+| 2026-10-03T18:37:40+00:00 | 3.6 | Europe PMC harvest: 463 candidate question sentences from open-access reviews, written to lm/corpus/external_candidates.jsonl for selection. |
+| 2026-10-03T18:37:40+00:00 | 3.6 | External query set: 15 queries, 12 with real harvested phrasing, 3 flagged as the project's own phrasing. |
+| 2026-10-03T18:38:08+00:00 | 2.2 | 400/625 ligases processed. Notes: {'fpocket': 382, 'open_targets': 382, 'open_targets_no_expression': 5, 'structure_download_failed:FileNotFoundError': 8, 'no_ensembl_gene_id': 3}. |
+| 2026-10-03T18:40:11+00:00 | 3.7 | Stage 1 LoRA SFT starting: 5,601 train / 666 valid examples, rank 16, 16 layers, lr 1e-05, batch 4, 1200 iterations. |
+| 2026-10-03T18:40:42+00:00 | 1.3 | 24,447/52,681 entries, 32,915 bridges, 0 failed, 8.1 entries/s, ~1.0 h remaining. |
+| 2026-10-03T18:41:33+00:00 | 2.2 | 450/625 ligases processed. Notes: {'fpocket': 432, 'open_targets': 431, 'open_targets_no_expression': 5, 'structure_download_failed:FileNotFoundError': 8, 'no_ensembl_gene_id': 4}. |
+| 2026-10-03T18:42:31+00:00 | 2.1 | 3,060/20,431 scanned, 3,502 candidates, 130 failed, 1.7/s, ~2.8 h remaining. |
+| 2026-10-03T18:44:23+00:00 | 2.2 | 500/625 ligases processed. Notes: {'fpocket': 482, 'open_targets': 479, 'open_targets_no_expression': 7, 'structure_download_failed:FileNotFoundError': 8, 'no_ensembl_gene_id': 4}. |

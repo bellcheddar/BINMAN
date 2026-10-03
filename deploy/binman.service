@@ -1,0 +1,36 @@
+# BINMAN gunicorn service. Copy to /etc/systemd/system/binman.service.
+[Unit]
+Description=BINMAN atlas (Flask via gunicorn)
+After=network.target
+
+[Service]
+Type=notify
+User=binman
+Group=binman
+WorkingDirectory=/srv/binman
+Environment="BINMAN_DB=/srv/binman/data/atlas/binman.sqlite"
+# Leave BINMAN_LM_URL unset unless the Studio endpoint is reachable. The app is
+# fully functional without it: only the natural-language box disappears.
+# Environment="BINMAN_LM_URL=http://studio.local:8081"
+Environment="PYTHONUNBUFFERED=1"
+ExecStart=/srv/binman/.venv/bin/gunicorn \
+  --workers 3 \
+  --threads 2 \
+  --bind 127.0.0.1:8080 \
+  --timeout 60 \
+  --access-logfile - \
+  --error-logfile - \
+  "app:create_app()"
+Restart=on-failure
+RestartSec=5
+
+# The atlas is read-only at serve time, so the service needs no write access.
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+NoNewPrivileges=yes
+ReadOnlyPaths=/srv/binman
+RuntimeDirectory=binman
+
+[Install]
+WantedBy=multi-user.target

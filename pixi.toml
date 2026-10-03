@@ -44,6 +44,9 @@ scikit-learn = "*"
 httpx = "*"
 tenacity = "*"
 
+# the app, so one pytest run covers both the pipeline and the serving layer
+flask = "*"
+
 # misc
 tomli-w = "*"
 tqdm = "*"
