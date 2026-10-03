@@ -262,6 +262,55 @@ _BRIDGE_INSERT = (
 )
 
 
+def recompute_novel(connection: sqlite3.Connection) -> int:
+    """Recompute `novel_bridge` from the resynced classes (spec 9.1).
+
+    A novel bridge passes every filter, carries a glue-candidate ligand, is not
+    symmetry mediated, and appears in none of the curated glue databases, is not
+    in PROTAC-DB and is not a BioLiP2 artefact.
+    """
+    curated, excluded = _curated_identifiers()
+    artefacts = _biolip_artefact_codes()
+    if not curated:
+        connection.execute("UPDATE bridge SET novel_bridge = 0")
+        return 0
+    connection.execute("UPDATE bridge SET novel_bridge = 0")
+    placeholders_c = ",".join("?" for _ in curated) or "''"
+    placeholders_x = ",".join("?" for _ in excluded) or "''"
+    placeholders_a = ",".join("?" for _ in artefacts) or "''"
+    connection.execute(
+        "UPDATE bridge SET novel_bridge = 1 "
+        "WHERE status = 'ok' AND ccd_class = 'glue_candidate' "
+        "  AND symmetry_mediated = 0 "
+        f"  AND pdb_id NOT IN ({placeholders_c}) "
+        f"  AND pdb_id NOT IN ({placeholders_x}) "
+        f"  AND ccd_id NOT IN ({placeholders_a})",
+        tuple(sorted(curated)) + tuple(sorted(excluded)) + tuple(sorted(artefacts)),
+    )
+    return int(connection.execute(
+        "SELECT COUNT(*) FROM bridge WHERE novel_bridge = 1").fetchone()[0])
+
+
+def resync_bridge_classes(connection: sqlite3.Connection) -> int:
+    """Re-derive `bridge.ccd_class` from the ligand table.
+
+    The geometry worker stamps a class onto each bridge row as it goes, so the
+    interim file carries whatever the rules said at the time. The ligand table is
+    the single source of truth for classification, and the rules change more
+    often than the geometry does, so the bridge rows are resynced here rather
+    than left to drift. Without this a classification fix silently does nothing
+    to the Glue Atlas.
+    """
+    connection.execute(
+        "UPDATE bridge SET ccd_class = ("
+        "  SELECT l.ccd_class FROM ligand l WHERE l.ccd_id = bridge.ccd_id"
+        ") WHERE EXISTS (SELECT 1 FROM ligand l WHERE l.ccd_id = bridge.ccd_id)"
+    )
+    return int(connection.execute(
+        "SELECT COUNT(*) FROM bridge b JOIN ligand l ON l.ccd_id = b.ccd_id "
+        "WHERE b.ccd_class = l.ccd_class").fetchone()[0])
+
+
 def attach_structure_files(connection: sqlite3.Connection) -> int:
     """Point every bridge row at its trimmed viewer structure (stage 1.5).
 
@@ -358,6 +407,10 @@ def build(fresh: bool = True) -> dict:
         counts["novel_bridge_determinable"] = novel_determinable
         counts["entry_failed"] = load_failed_entries(connection)
         counts["bridges_with_structure"] = attach_structure_files(connection)
+        counts["bridge_class_resynced"] = resync_bridge_classes(connection)
+        # novel_bridge depends on ccd_class, so it is recomputed after the
+        # resync rather than taken from the class the geometry worker stamped on.
+        counts["novel_bridge"] = recompute_novel(connection)
         counts["degron"] = load_table_from_jsonl(
             connection, "degron", INTERIM / "degrons.jsonl",
             ("uniprot_acc", "afdb_id", "gene", "start_res", "end_res", "tip_res",

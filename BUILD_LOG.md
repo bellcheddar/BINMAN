@@ -389,3 +389,17 @@ One line per meaningful event, timestamped UTC (spec Section 0 rule 5).
 | 2026-10-03T22:11:02+00:00 | 3.8 | final synthetic: 150/150 evaluated (0.96/s), parse 0.987, set equality 0.980. |
 | 2026-10-03T22:12:16+00:00 | 3.8 | final: parse rate 0.9867, set equality 0.98 on 150 synthetic queries. |
 | 2026-10-03T22:18:42+00:00 | 4.1b | About tab generated: 51 references, 4/10 datasets resolved, worked example selected, 2 value(s) not recorded. |
+| 2026-10-03T22:47:46+00:00 | 1.0 | Validation datasets: 5/11 resolved (biolip2_annotations, biolip2_artefacts, mgtbind_compounds, ubibrowser_literature_e3, ubibrowser_predicted_e3). Manifest at data/validation/MANIFEST.md. |
+| 2026-10-03T22:47:46+00:00 | gate | G7 opened: 6 validation dataset(s) could not be obtained automatically: degronopedia, mgdb_glues, mgtbind_ternary, molgluedb_glues, |
+| 2026-10-03T22:48:11+00:00 | 1.0 | Validation datasets: 8/11 resolved (biolip2_annotations, biolip2_artefacts, mgdb_glues, mgtbind_compounds, mgtbind_ternary, molgluedb_glues, ubibrowser_literature_e3, ubibrowser_predicted_e3). Manifest at data/validation/MANIFEST.md. |
+| 2026-10-03T22:48:11+00:00 | gate | G7 opened: 3 validation dataset(s) could not be obtained automatically: degronopedia, protacdb_protacs, protcid_interfaces. |
+| 2026-10-03T22:48:39+00:00 | 4.3 | Atlas built: 52,821 entries, 239,485 bridges (13,243 novel), 9,981 ligands, 21,717 degrons, 650 ligases, 1,650 lysines, 142.5 MB. |
+| 2026-10-03T22:48:39+00:00 | 9 | Validation run against binman.sqlite: 1 metric(s) not computed (dataset unavailable), 2 measured floor(s) missed. |
+| 2026-10-03T22:49:52+00:00 | 1.4 | Reclassified 9,981 chemical components. 539 changed class: {'buffer -> glue_candidate': 417, 'cryoprotectant -> glue_candidate': 103, 'glue_candidate -> sugar': 5, 'buffer -> peptide_like': 4, 'buffer -> detergent': 4, 'glue_candidate -> cofactor': 3} |
+| 2026-10-03T22:50:13+00:00 | 4.3 | Atlas built: 52,821 entries, 239,485 bridges (13,243 novel), 9,981 ligands, 21,717 degrons, 650 ligases, 1,650 lysines, 142.5 MB. |
+| 2026-10-03T22:50:13+00:00 | 9 | Validation run against binman.sqlite: 6 metric(s) not computed (dataset unavailable), 2 measured floor(s) missed. |
+| 2026-10-03T22:50:44+00:00 | 4.3 | Atlas built: 52,821 entries, 239,485 bridges (13,243 novel), 9,981 ligands, 21,717 degrons, 650 ligases, 1,650 lysines, 142.5 MB. |
+| 2026-10-03T22:50:44+00:00 | 9 | Validation run against binman.sqlite: 1 metric(s) not computed (dataset unavailable), 2 measured floor(s) missed. |
+| 2026-10-03T22:51:17+00:00 | 4.3 | Atlas built: 52,821 entries, 239,485 bridges (14,260 novel), 9,981 ligands, 21,717 degrons, 650 ligases, 1,650 lysines, 142.5 MB. |
+| 2026-10-03T22:51:18+00:00 | 9 | Validation run against binman.sqlite: 6 metric(s) not computed (dataset unavailable), 2 measured floor(s) missed. |
+| 2026-10-03T22:51:49+00:00 | 4.1b | About tab generated: 51 references, 8/11 datasets resolved, worked example selected, 2 value(s) not recorded. |

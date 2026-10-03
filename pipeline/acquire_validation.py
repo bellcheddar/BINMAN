@@ -40,6 +40,7 @@ from pipeline.common import (  # noqa: E402
 RAW = VALIDATION / "raw"
 PARSED = VALIDATION
 STAGE = "validation_acquire"
+PDB_ID = re.compile(r"^[1-9][A-Za-z0-9]{3}$")
 
 # Retention cut for the UbiBrowser predicted network. See DECISIONS.md D-005.
 PREDICTED_PVALUE_CUT = 0.01
@@ -220,6 +221,77 @@ def parse_ubibrowser_predicted(raw: bytes, route: Route) -> list[dict]:
     return rows
 
 
+def parse_mgtbind_complexes(raw: bytes, route: Route) -> list[dict]:
+    """MGTbind ternary complexes: the only curated source that carries PDB ids.
+
+    This is the Glue Atlas recall positive set. Each row names the molecular
+    glue, both partner proteins with their UniProt accessions and chain ids, and
+    the deposited entry when one exists.
+    """
+    reader = csv.DictReader(io.StringIO(_text(raw, route)))
+    rows = []
+    for record in reader:
+        pdb_id = (record.get("pdb_id") or "").strip().upper()
+        rows.append({
+            "complex_id": (record.get("id") or "").strip(),
+            "compound_id": (record.get("compound_id") or "").strip(),
+            "pdb_id": pdb_id if PDB_ID.match(pdb_id) else "",
+            "protein_a": (record.get("protein_a_uniprot_id") or "").strip(),
+            "protein_b": (record.get("protein_b_uniprot_id") or "").strip(),
+            "chain_a": (record.get("protein_a_chain_id") or "").strip(),
+            "chain_b": (record.get("protein_b_chain_id") or "").strip(),
+            "annotation": (record.get("mg_structural_annotation") or "").strip(),
+            "method": (record.get("structure_determination_method") or "").strip(),
+        })
+    return rows
+
+
+def parse_mgtbind_compounds(raw: bytes, route: Route) -> list[dict]:
+    reader = csv.DictReader(io.StringIO(_text(raw, route)))
+    return [{
+        "compound_id": (r.get("id") or "").strip(),
+        "name": (r.get("name") or "").strip(),
+        "type": (r.get("type") or "").strip(),
+        "smiles": (r.get("canonical_smiles") or "").strip(),
+        "inchikey": (r.get("inchi_key") or "").strip().upper(),
+    } for r in reader]
+
+
+def parse_mgdb_compounds(raw: bytes, route: Route) -> list[dict]:
+    """MGDB compounds. The file carries a stray single-field first line before
+    the real header, so it is skipped explicitly rather than by sniffing."""
+    handle = io.StringIO(_text(raw, route))
+    reader = csv.reader(handle)
+    first = next(reader, None)
+    if first is not None and len(first) > 2:
+        handle.seek(0)                     # no stray line after all
+    header = next(csv.reader(handle)) if first is not None and len(first) <= 2 else first
+    dict_reader = csv.DictReader(handle, fieldnames=header)
+    rows = []
+    for record in dict_reader:
+        rows.append({
+            "compound_id": (record.get("ID") or "").strip(),
+            "name": (record.get("Name") or "").strip(),
+            "function": (record.get("Function") or "").strip(),
+            "type": (record.get("Type") or "").strip(),
+            "inchikey": (record.get("InChI Key") or "").strip().upper(),
+            "smiles": (record.get("Smiles") or "").strip(),
+        })
+    return [r for r in rows if r["compound_id"]]
+
+
+def parse_molgluedb(raw: bytes, route: Route) -> list[dict]:
+    reader = csv.DictReader(io.StringIO(_text(raw, route)))
+    return [{
+        "compound_id": (r.get("DATAID") or "").strip(),
+        "name": (r.get("Name") or "").strip(),
+        "smiles": (r.get("SMILES") or "").strip(),
+        "inchikey": (r.get("StdInChIKey") or "").strip().upper(),
+        "mode_of_action": (r.get("ModeOfAction") or "").strip(),
+        "primary_target": (r.get("PrimaryTarget") or "").strip(),
+    } for r in reader]
+
+
 def parse_generic_table(raw: bytes, route: Route) -> list[dict]:
     """A TSV or CSV with a header, read as-is. Used where the schema is unknown."""
     text = _text(raw, route)
@@ -335,60 +407,76 @@ def registry() -> list[Dataset]:
         ),
         Dataset(
             name="mgdb_glues",
-            purpose="Glue Atlas recall, curated set 1 of 3 (spec 9.1)",
-            licence="open access, terms not stated for bulk reuse",
+            purpose="Glue Atlas recall set 1 of 3; LM Task B `molecular_glue` labels",
+            licence="open access; no redistribution terms stated",
             redistributable=False,
             citation="10.1093/nar/gkaf1131",
             homepage="http://mgdb.idruglab.cn/",
-            version_note="NAR 2026 54(D1) D1488 release",
+            version_note="v1.0, 2025.06 release",
             manual_route=(
-                "Bulk export is stated as planned future work in the paper, not yet live. Verified: the Europe PMC supplementary archive for PMC12807674 holds only two TIFF figures and an 8 MB `Supplementary Data.docx`, with no machine-readable glue table. Obtain by browsing http://mgdb.idruglab.cn/ and exporting the compound table from the web interface, or by contacting the authors for the 7396-compound set."
+                "The download page builds the CSV client-side and hands it over as a "
+                "blob, so there is no static URL to fetch. Open "
+                "http://mgdb.idruglab.cn/#/download and click the download icon on "
+                "the 'MG Compound' row (there is no licence gate), then save it as "
+                "data/validation/raw/mgdb_compounds.csv and re-run this stage."
             ),
-            routes=[
-                Route("http://mgdb.idruglab.cn/download/all", note="bulk export, if exposed"),
-                Route("http://mgdb.idruglab.cn/api/download", note="API bulk export, if exposed"),
-                Route("http://mgdb.idruglab.cn/api/glue/list", note="listing API, if exposed"),
-            ],
-            parser=parse_json_records,
-            min_rows=100,
+            routes=[Route("file://data/validation/raw/mgdb_compounds.csv",
+                          note="placed by hand from the MGDB download page")],
+            parser=parse_mgdb_compounds, min_rows=1000,
+            columns=("compound_id", "name", "function", "type", "inchikey", "smiles"),
         ),
         Dataset(
             name="molgluedb_glues",
-            purpose="Glue Atlas recall, curated set 2 of 3 (spec 9.1)",
-            licence="free and open access, terms not stated for bulk reuse",
+            purpose="Glue Atlas recall set 2 of 3; LM Task B `molecular_glue` labels",
+            licence="free and open access; no redistribution terms stated",
             redistributable=False,
             citation="10.1093/nar/gkaf811",
-            homepage="https://www.molgluedb.com/",
-            version_note="NAR 2025 advance article gkaf811",
+            homepage="https://www.molgluedb.com/download",
+            version_note="full dataset, 2025-07 update",
             manual_route=(
-                "JavaScript front end with no documented bulk-export endpoint. Browse https://www.molgluedb.com/ and export the compound table, or request it from the authors."
+                "Served as a blob from a JavaScript control rather than a static "
+                "URL. Open https://www.molgluedb.com/download and press Download "
+                "(no licence gate), then extract MolGlueDB_full.csv from the "
+                "tar.gz to data/validation/raw/molgluedb_full.csv and re-run."
             ),
-            routes=[
-                Route("https://www.molgluedb.com/api/download", note="bulk export, if exposed"),
-                Route("https://www.molgluedb.com/api/glue/all", note="listing API, if exposed"),
-                Route("https://www.molgluedb.com/attachment/download/molgluedb.csv",
-                      note="attachment path, if exposed"),
-            ],
-            parser=parse_json_records,
-            min_rows=100,
+            routes=[Route("file://data/validation/raw/molgluedb_full.csv",
+                          note="placed by hand from the MolGlueDB download page")],
+            parser=parse_molgluedb, min_rows=500,
+            columns=("compound_id", "name", "smiles", "inchikey",
+                     "mode_of_action", "primary_target"),
         ),
         Dataset(
             name="mgtbind_ternary",
-            purpose="Glue Atlas recall set 3 of 3 and ternary partner assignment (spec 9.1)",
-            licence="not determined",
+            purpose=("Glue Atlas recall set 3 of 3 and the ONLY curated source "
+                     "carrying PDB entries, so it supplies the recall positive "
+                     "set, the misses list and the novel-bridge determination"),
+            licence="open access; no redistribution terms stated",
             redistributable=False,
-            citation="not yet verified",
-            homepage="http://mgtbind.idruglab.cn/",
-            version_note="NAR 2026 54(D1) D1500 release",
-            manual_route=(
-                "No bulk-export endpoint responded and the host returns 404 for the paths tried. Check the NAR 2026 54(D1) D1500 article for the current URL, which may differ from the idruglab host."
-            ),
+            citation="10.1093/nar/gkaf1013",
+            homepage="https://mgtbind.pkumdl.cn/download",
+            version_note="web release, pinned by retrieval date",
             routes=[
-                Route("http://mgtbind.idruglab.cn/api/download", note="bulk export, if exposed"),
-                Route("http://mgtbind.idruglab.cn/download/all", note="bulk export, if exposed"),
+                Route("https://mgtbind.pkumdl.cn/static/download/complexes.csv",
+                      note="ternary complexes with pdb_id, both partners and chains"),
             ],
-            parser=parse_json_records,
-            min_rows=50,
+            parser=parse_mgtbind_complexes, min_rows=1000,
+            columns=("complex_id", "compound_id", "pdb_id", "protein_a", "protein_b",
+                     "chain_a", "chain_b", "annotation", "method"),
+        ),
+        Dataset(
+            name="mgtbind_compounds",
+            purpose="LM Task B `molecular_glue` labels, with InChIKeys for CCD matching",
+            licence="open access; no redistribution terms stated",
+            redistributable=False,
+            citation="10.1093/nar/gkaf1013",
+            homepage="https://mgtbind.pkumdl.cn/download",
+            version_note="web release, pinned by retrieval date",
+            routes=[
+                Route("https://mgtbind.pkumdl.cn/static/download/compounds.csv",
+                      note="curated molecular glue compounds"),
+            ],
+            parser=parse_mgtbind_compounds, min_rows=1000,
+            columns=("compound_id", "name", "type", "smiles", "inchikey"),
         ),
         Dataset(
             name="protacdb_protacs",
@@ -464,7 +552,20 @@ def acquire(dataset: Dataset, fetcher: Fetcher, manifest: Manifest,
     for route in dataset.routes:
         attempt = {"url": route.url, "note": route.note}
         try:
-            raw = fetcher.fetch_bytes(route.url)
+            if route.url.startswith("file://"):
+                # A dataset whose site serves its download as a client-side blob
+                # cannot be fetched by URL. Placing the file by hand is a real
+                # route, not a failure, so it is treated as one.
+                local = Path(route.url[len("file://"):])
+                if not local.is_absolute():
+                    local = VALIDATION.parent.parent / local
+                if not local.exists():
+                    attempt["outcome"] = "awaiting_manual_download"
+                    attempts.append(attempt)
+                    continue
+                raw = local.read_bytes()
+            else:
+                raw = fetcher.fetch_bytes(route.url)
         except Exception as exc:  # noqa: BLE001
             attempt["outcome"] = f"fetch_failed:{type(exc).__name__}: {exc}"[:200]
             attempts.append(attempt)

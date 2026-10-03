@@ -1,37 +1,109 @@
 {
-  "generated_at": "2026-10-03T21:40:20+00:00",
+  "generated_at": "2026-10-03T22:51:17+00:00",
   "atlas": "/Users/dellboy/Documents/Vibe_Coding/BINMAN/data/atlas/binman.sqlite",
-  "atlas_bytes": 149413888,
+  "atlas_bytes": 149442560,
   "note": "A metric whose dataset is unavailable is reported as computed: false with the reason. Nothing here is estimated, and no hand-written control was substituted for a missing published one (spec 4.1b).",
   "9.1": {
     "title": "Glue Atlas",
     "artefact_precision": {
       "computed": true,
-      "value": 0.9449,
+      "value": 0.9391,
       "floor": 0.95,
       "reason": "",
       "passes": false,
       "n": 345,
-      "not_called_glue": 326,
+      "not_called_glue": 324,
       "note": "Measured over the artefact CCDs present in the atlas. The held-out-split figure in FINDINGS.md (0.927) is the one to quote: it was measured on a half of the list that the classification rules were not developed against."
     },
     "recall": {
-      "computed": false,
-      "reason": "No curated glue database resolved (MGDB, MolGlueDB and MGTbind all publish through JavaScript front ends with no documented bulk export; Gate G7). Spec 4.1b forbids substituting a hand-written positive set, so recall is not computed.",
+      "computed": true,
+      "value": 0.7719,
       "floor": 0.85,
-      "value": null
-    },
-    "three_way_agreement": {
-      "computed": false,
-      "reason": "no curated glue database resolved",
-      "floor": null,
-      "value": null
+      "reason": "",
+      "passes": false,
+      "n": 320,
+      "recovered": 247
     },
     "misses": {
-      "computed": false,
-      "reason": "The misses list is the complement of recall and needs the same curated positives.",
+      "computed": true,
+      "value": [
+        "1A7X",
+        "1KKQ",
+        "2OVM",
+        "3BBR",
+        "3JRQ",
+        "3KB3",
+        "3KDJ",
+        "3KO0",
+        "3OGK",
+        "3OGL",
+        "3P1O",
+        "3QN1",
+        "3SML",
+        "3SMM",
+        "3SMO",
+        "3TCT",
+        "3U15",
+        "3UJL",
+        "3VBG",
+        "3ZVU",
+        "4A69",
+        "4DS8",
+        "4FR3",
+        "4OIC",
+        "5AD2",
+        "5AD3",
+        "5D3F",
+        "5GWO",
+        "5GWP",
+        "5J89",
+        "5J8O",
+        "5JO2",
+        "5MN0",
+        "5MXO",
+        "5NIU",
+        "5ZCG",
+        "5ZCH",
+        "5ZCL",
+        "6C8C",
+        "6GHP",
+        "6HN2",
+        "6KL5",
+        "6KL6",
+        "6MG5",
+        "6NV2",
+        "6QDS",
+        "6QTL",
+        "6R3K",
+        "6XMX",
+        "6YOX",
+        "6YPY",
+        "7DY7",
+        "7EG0",
+        "7EG4",
+        "7JUR",
+        "7JUV",
+        "7JUX",
+        "7LRD",
+        "7NLD",
+        "8AXE",
+        "8BUJ",
+        "8BWJ",
+        "8BWX",
+        "8BX3",
+        "8BX4",
+        "8BXI",
+        "8BYF",
+        "8BYO",
+        "8BYY",
+        "8C0K",
+        "8FLK",
+        "8JYC",
+        "8JYE"
+      ],
       "floor": null,
-      "value": null
+      "reason": "",
+      "note": "Each is a sensitivity bug. Enumerated with its reason in FINDINGS.md."
     },
     "packing_specificity": {
       "computed": false,
@@ -41,26 +113,27 @@
     },
     "counts": {
       "bridges": 239485,
-      "glue_candidate_bridges": 23054,
+      "glue_candidate_bridges": 24204,
       "entries_with_a_bridge": 17536,
       "symmetry_mediated": 28780
     },
     "novel_bridges": {
-      "computed": false,
-      "reason": "A novel bridge is one in NONE of the three curated glue databases, so the set is undeterminable while none has resolved. The column reads 0 in the atlas and must not be read as a real zero.",
+      "computed": true,
+      "value": 14260,
       "floor": null,
-      "value": null
+      "reason": "",
+      "note": "The headline result."
     },
     "ccd_class_counts": {
-      "glue_candidate": 6854,
-      "cofactor": 859,
-      "buffer": 621,
+      "glue_candidate": 7366,
+      "cofactor": 863,
       "lipid": 385,
-      "unknown": 383,
-      "peptide_like": 274,
-      "detergent": 218,
-      "cryoprotectant": 202,
-      "sugar": 100,
+      "unknown": 382,
+      "peptide_like": 278,
+      "detergent": 223,
+      "buffer": 194,
+      "sugar": 106,
+      "cryoprotectant": 99,
       "metal": 64,
       "covalent_modifier": 21
     }
@@ -1610,41 +1683,1647 @@
         "abstention_rate": 0.0,
         "fabrications": []
       }
+    },
+    "final": {
+      "stage": "final",
+      "generated_at": "2026-10-03T22:08:26+00:00",
+      "model": "mlx-community/Qwen2.5-3B-Instruct-4bit",
+      "adapter": "models/binman-lm/adapters",
+      "atlas": "/Users/dellboy/Documents/Vibe_Coding/BINMAN/data/atlas/binman.sqlite",
+      "prompt_style": "trained system turn, no schema in context",
+      "prompt_tokens_approx": 83,
+      "task_a_synthetic": {
+        "n": 150,
+        "parse_rate": 0.9867,
+        "set_equality": 0.98,
+        "exact_match": 0.9333,
+        "failures": [
+          {
+            "question": "Narrow ternary complexes to resolution at most 2.8 \u00c5 with everything in ternary complexes with bridging balance under 0.53, ordered on \u03b4sasa chain a, highest first first",
+            "raw": "{\"record_type\":\"bridge\",\"filters\":[{\"field\":\"resolution\",\"op\":\"lte\",\"value\":2.8},{\"field\":\"bridging_balance\",\"op\":\"lt\",\"value\":0.53},{\"field\":\"dsasa_a\",\"op\":\"gt\",\"direction\":\"desc\"}],\"sort\":{\"field\":\"dsasa_total\",\"direction\":\"desc\"},\"limit\":200}",
+            "error": "filters[2]: a value is required",
+            "stage": "parse"
+          },
+          {
+            "question": "List ubiquitin ligases with exploitation status other than ligandable unproven with ubiquitin ligases excluding ligase family U-box, ordered on pocket druggability score, highest first first",
+            "raw": "{\"record_type\":\"ligase\",\"filters\":[{\"field\":\"exploitation_status\",\"op\":\"ne\",\"value\":\"ligandable unproven with ubiquitin ligases\"},{\"field\":\"family\",\"op\":\"ne\",\"value\":\"U-box\"}],\"sort\":{\"field\":\"pocket_score\",\"direction\":\"desc\"},\"limit\":200}",
+            "error": "field 'exploitation_status' takes one of ['clinically validated', 'chemically validated', 'covalent handle only', 'ligandable unproven', 'orphan'], got 'ligandable unproven with ubiquitin ligases'",
+            "stage": "parse"
+          },
+          {
+            "question": "Ternary complexes where experimental method is not SOLUTION NMR; SOLID-STATE NMR, which bridges have contacts a above 66?",
+            "stage": "set_equality",
+            "predicted": {
+              "record_type": "bridge",
+              "filters": [
+                {
+                  "field": "method",
+                  "op": "ne",
+                  "value": "SOLUTION NMR; SOLID-STATE NMR"
+                }
+              ],
+              "sort": {
+                "field": "contacts_a",
+                "direction": "desc"
+              },
+              "limit": 200
+            },
+            "gold": {
+              "record_type": "bridge",
+              "filters": [
+                {
+                  "field": "method",
+                  "op": "ne",
+                  "value": "SOLUTION NMR; SOLID-STATE NMR"
+                },
+                {
+                  "field": "contacts_a",
+                  "op": "gt",
+                  "value": 66.0
+                }
+              ],
+              "sort": {
+                "field": "dsasa_total",
+                "direction": "desc"
+              },
+              "limit": 200
+            }
+          }
+        ],
+        "seconds": 155.9
+      },
+      "task_a_external": {
+        "computed": false,
+        "n_review_phrased": 0,
+        "reason": "Not computable: no externally phrased query survived the harvest. 463 candidate sentences were pulled from open-access reviews and 18 are genuinely interrogative, but none asks a question BINMAN's schema can answer: they ask about linker composition, ubiquitin chain architecture, alternative splicing and metabolite-specific teratogenicity. Review articles pose mechanistic questions, not database queries. Reporting a number measured on project-phrased rows would claim a register-mismatch result the data does not support."
+      },
+      "register_mismatch_gap": null,
+      "task_a_project_phrased": {
+        "n": 15,
+        "parse_rate": 0.1333,
+        "set_equality": 0.0667,
+        "exact_match": 0.0,
+        "failures": [
+          {
+            "question": "which E3 ligases show tumour-restricted expression",
+            "raw": "{\"record_type\":\"ligase\",\"filters\":[{\"field\":\"expression_status\",\"op\":\"eq\",\"value\":\"tumour-restricted\"}],\"sort\":{\"field\":\"triage_rank\",\"direction\":\"desc\"},\"limit\":200}",
+            "error": "filters[0]: field 'expression_status' is not a field of ligase. Allowed: ['exploitation_status', 'expression_breadth', 'family', 'gene', 'has_ligand', 'pdb_entries', 'pocket_score', 'pocket_volume_a3'",
+            "stage": "parse"
+          },
+          {
+            "question": "how many deposited ternary structures involve a non-IMiD chemotype",
+            "raw": "{\"record_type\":\"bridge\",\"filters\":[{\"field\":\"ccd_class\",\"op\":\"eq\",\"value\":\"non-IMiD\"}],\"sort\":{\"field\":\"dsasa_total\",\"direction\":\"desc\"},\"limit\":200}",
+            "error": "field 'ccd_class' takes one of ['glue_candidate', 'cofactor', 'metal', 'cryoprotectant', 'buffer', 'detergent', 'lipid', 'sugar', 'peptide_like', 'covalent_modifier', 'unknown'], got 'non-IMiD'",
+            "stage": "parse"
+          },
+          {
+            "question": "which E3 ligases have no ligand reported",
+            "raw": "{\"record_type\":\"ligase\",\"filters\":[{\"field\":\"exploitation_status\",\"op\":\"ne\",\"value\":\"unassigned\"},{\"field\":\"exploitation_status\",\"op\":\"eq\",\"value\":\"no\"}],\"sort\":{\"field\":\"triage_rank\",\"direction\":\"desc\"},\"limit\":200}",
+            "error": "field 'exploitation_status' takes one of ['clinically validated', 'chemically validated', 'covalent handle only', 'ligandable unproven', 'orphan'], got 'unassigned'",
+            "stage": "parse"
+          },
+          {
+            "question": "which ligases remain structurally uncharacterised",
+            "raw": "{\"record_type\":\"ligase\",\"filters\":[{\"field\":\"exploitation_status\",\"op\":\"eq\",\"value\":\"uncharacterised\"}],\"sort\":{\"field\":\"triage_rank\",\"direction\":\"desc\"},\"limit\":200}",
+            "error": "field 'exploitation_status' takes one of ['clinically validated', 'chemically validated', 'covalent handle only', 'ligandable unproven', 'orphan'], got 'uncharacterised'",
+            "stage": "parse"
+          },
+          {
+            "question": "how many glues bury a comparable surface against both partners",
+            "raw": "{\"record_type\":\"glue\",\"filters\":[{\"field\":\"surface_comparable\",\"op\":\"eq\",\"value\":\"both partners\"}],\"sort\":{\"field\":\"quantity\",\"direction\":\"desc\"},\"limit\":200}",
+            "error": "record_type must be one of ['bridge', 'degron', 'ligase', 'lysine'], got 'glue'",
+            "stage": "parse"
+          },
+          {
+            "question": "which ligases are druggable but have not been exploited",
+            "raw": "{\"record_type\":\"ligase\",\"filters\":[{\"field\":\"exploitation_status\",\"op\":\"eq\",\"value\":\"unexploited\"},{\"field\":\"exploitation_status\",\"op\":\"ne\",\"value\":\"druggable\"}],\"sort\":{\"field\":\"triage_rank\",\"direction\":\"desc\"},\"limit\":200}",
+            "error": "field 'exploitation_status' takes one of ['clinically validated', 'chemically validated', 'covalent handle only', 'ligandable unproven', 'orphan'], got 'unexploited'",
+            "stage": "parse"
+          },
+          {
+            "question": "which degron candidates sit in high-confidence regions",
+            "raw": "{\"record_type\":\"degron\",\"filters\":[{\"field\":\"exploitation_status\",\"op\":\"eq\",\"value\":\"high\"}],\"sort\":{\"field\":\"degron_geometry_score\",\"direction\":\"desc\"},\"limit\":200}",
+            "error": "filters[0]: field 'exploitation_status' is not a field of degron. Allowed: ['afdb_id', 'degron_geometry_score', 'gene', 'is_known_neosubstrate', 'mean_plddt', 'motif_family', 'tip_aa', 'tip_rel_sasa',",
+            "stage": "parse"
+          },
+          {
+            "question": "how many bridging ligands are crystallisation additives rather than glues",
+            "raw": "{\"record_type\":\"bridge\",\"filters\":[{\"field\":\"ccd_class\",\"op\":\"eq\",\"value\":\"glue\"},{\"field\":\"ccd_class\",\"op\":\"ne\",\"value\":\"glue\"}],\"sort\":{\"field\":\"ccd_id\",\"direction\":\"desc\"},\"limit\":200}",
+            "error": "field 'ccd_class' takes one of ['glue_candidate', 'cofactor', 'metal', 'cryoprotectant', 'buffer', 'detergent', 'lipid', 'sugar', 'peptide_like', 'covalent_modifier', 'unknown'], got 'glue'",
+            "stage": "parse"
+          },
+          {
+            "question": "which ternary complexes were solved at high resolution",
+            "raw": "{\"record_type\":\"bridge\",\"filters\":[{\"field\":\"resolution\",\"op\":\"eq\",\"value\":\"high\"}],\"sort\":{\"field\":\"dsasa_total\",\"direction\":\"desc\"},\"limit\":200}",
+            "error": "field 'resolution' takes a number in \u00c5, got 'high'",
+            "stage": "parse"
+          },
+          {
+            "question": "which surface lysines lie close to the binding site",
+            "raw": "{\"record_type\":\"lysine\",\"filters\":[{\"field\":\"verdict\",\"op\":\"eq\",\"value\":\"close\"}],\"sort\":{\"field\":\"nz_centroid_distance\",\"direction\":\"desc\"},\"limit\":200}",
+            "error": "field 'verdict' takes one of ['favourable', 'marginal', 'unfavourable'], got 'close'",
+            "stage": "parse"
+          },
+          {
+            "question": "which degrons carry an exposed glycine at the hairpin tip",
+            "raw": "{\"record_type\":\"degron\",\"filters\":[{\"field\":\"verdict\",\"op\":\"eq\",\"value\":\"exposed glycine\"}],\"sort\":{\"field\":\"degron_geometry_score\",\"direction\":\"desc\"},\"limit\":200}",
+            "error": "filters[0]: field 'verdict' is not a field of degron. Allowed: ['afdb_id', 'degron_geometry_score', 'gene', 'is_known_neosubstrate', 'mean_plddt', 'motif_family', 'tip_aa', 'tip_rel_sasa', 'tip_res', ",
+            "stage": "parse"
+          },
+          {
+            "question": "how many cullin-RING ligases are represented",
+            "raw": "{\"record_type\":\"ligase\",\"filters\":[{\"field\":\"exploitation_status\",\"op\":\"eq\",\"value\":\"explored\"}],\"sort\":{\"field\":\"triage_rank\",\"direction\":\"desc\"},\"limit\":200}",
+            "error": "field 'exploitation_status' takes one of ['clinically validated', 'chemically validated', 'covalent handle only', 'ligandable unproven', 'orphan'], got 'explored'",
+            "stage": "parse"
+          },
+          {
+            "question": "which glues were determined by cryo-electron microscopy",
+            "stage": "set_equality",
+            "predicted": {
+              "record_type": "bridge",
+              "filters": [
+                {
+                  "field": "method",
+                  "op": "eq",
+                  "value": "cryo-electron microscopy"
+                }
+              ],
+              "sort": {
+                "field": "dsasa_total",
+                "direction": "desc"
+              },
+              "limit": 200
+            },
+            "gold": {
+              "record_type": "bridge",
+              "filters": [
+                {
+                  "field": "method",
+                  "op": "eq",
+                  "value": "ELECTRON MICROSCOPY"
+                },
+                {
+                  "field": "ccd_class",
+                  "op": "eq",
+                  "value": "glue_candidate"
+                }
+              ],
+              "sort": {
+                "field": "dsasa_total",
+                "direction": "desc"
+              },
+              "limit": 200
+            }
+          },
+          {
+            "question": "which ligases are expressed in only a handful of tissues",
+            "raw": "{\"record_type\":\"ligase\",\"filters\":[{\"field\":\"tissue_expression\",\"op\":\"eq\",\"value\":\"few\"}],\"sort\":{\"field\":\"triage_rank\",\"direction\":\"desc\"},\"limit\":200}",
+            "error": "filters[0]: field 'tissue_expression' is not a field of ligase. Allowed: ['exploitation_status', 'expression_breadth', 'family', 'gene', 'has_ligand', 'pdb_entries', 'pocket_score', 'pocket_volume_a3'",
+            "stage": "parse"
+          }
+        ],
+        "seconds": 11.0,
+        "note": "Hand-written questions against the schema, not harvested phrasing. Measures schema coverage, not register mismatch."
+      },
+      "preference_win_rates": {
+        "dropped_constraint": {
+          "win_rate": 1.0,
+          "n": 20
+        },
+        "hallucinated_field": {
+          "win_rate": 1.0,
+          "n": 20
+        },
+        "invented_entity": {
+          "win_rate": 1.0,
+          "n": 20
+        },
+        "operator_inversion": {
+          "win_rate": 1.0,
+          "n": 20
+        },
+        "prose_not_json": {
+          "win_rate": 1.0,
+          "n": 20
+        },
+        "unit_confusion": {
+          "win_rate": 1.0,
+          "n": 20
+        },
+        "wrong_question": {
+          "win_rate": 1.0,
+          "n": 20
+        }
+      },
+      "task_c": {
+        "n": 40,
+        "fabrication_rate": 0.0,
+        "abstention_rate": 0.0,
+        "fabrications": []
+      }
+    },
+    "baseline_final": {
+      "stage": "baseline_final",
+      "generated_at": "2026-10-03T22:00:32+00:00",
+      "model": "mlx-community/Qwen2.5-3B-Instruct-4bit",
+      "adapter": "",
+      "atlas": "/Users/dellboy/Documents/Vibe_Coding/BINMAN/data/atlas/binman.sqlite",
+      "prompt_style": "zero-shot with the full schema in context",
+      "prompt_tokens_approx": 841,
+      "task_a_synthetic": {
+        "n": 150,
+        "parse_rate": 0.5133,
+        "set_equality": 0.3467,
+        "exact_match": 0.12,
+        "failures": [
+          {
+            "question": "Everything in atlas rows with dsasa total a maximum of 1060.0 \u00c5\u00b2, and list glue candidates with bridging balance exceeding 0.53, and I want bridges where the contacts chain b is no more than 4, sorted by bridging balance, highest first",
+            "raw": "{\"record_type\": \"bridge\", \"filters\": [{\"field\": \"bridging_balance\", \"op\": \"gt\", \"value\": 0.53}, {\"field\": \"dsasa_total\", \"op\": \"lte\", \"value\": 1060.0}, {\"field\": \"contacts_b\", \"op\": \"<\", \"value\": 4}], \"sort\": {\"field\": \"bridging_balance\", \"direction\": \"desc\"}}",
+            "error": "filters[2]: op must be one of ['eq', 'ne', 'gt', 'gte', 'lt', 'lte'], got '<'",
+            "stage": "parse"
+          },
+          {
+            "question": "Filter surface lysines by c\u03b2\u2013c\u03b2 distance 58 or more \u00c5, can you list surface lysines where lysine residue number is no less than 40, ordered on nz relative sasa, highest first first",
+            "stage": "set_equality",
+            "predicted": {
+              "record_type": "lysine",
+              "filters": [
+                {
+                  "field": "res_num",
+                  "op": "gte",
+                  "value": 40.0
+                },
+                {
+                  "field": "nz_centroid_distance",
+                  "op": "lt",
+                  "value": 58.0
+                }
+              ],
+              "sort": {
+                "field": "nz_rel_sasa",
+                "direction": "desc"
+              },
+              "limit": 100
+            },
+            "gold": {
+              "record_type": "lysine",
+              "filters": [
+                {
+                  "field": "cb_cb_distance",
+                  "op": "gte",
+                  "value": 58.0
+                },
+                {
+                  "field": "res_num",
+                  "op": "gte",
+                  "value": 40.0
+                }
+              ],
+              "sort": {
+                "field": "nz_rel_sasa",
+                "direction": "desc"
+              },
+              "limit": 200
+            }
+          },
+          {
+            "question": "Find atlas rows whose \u03b4sasa chain b is less than 330.0 \u00c5\u00b2 with bridging ligands where resolution is above 3.7 \u00c5 with filter glue candidates by buried fraction more than 0.65",
+            "raw": "{\"record_type\": \"bridge\", \"filters\": [{\"field\": \"bridging_ligand\", \"op\": \"eq\", \"value\": \"glue_candidate\"}, {\"field\": \"buried_fraction\", \"op\": \"gt\", \"value\": 0.65}, {\"field\": \"delta_sasa_b_chain_b\", \"op\": \"lt\", \"value\": 330.0}, {\"field\": \"resolution\", \"op\": \"gt\", \"value\": 3.7}], \"sort\": {}, \"limit\": ",
+            "error": "filters[0]: field 'bridging_ligand' is not a field of bridge. Allowed: ['bridging_balance', 'buried_fraction', 'ccd_class', 'ccd_id', 'contacts_a', 'contacts_b', 'dsasa_a', 'dsasa_b', 'dsasa_total', '",
+            "stage": "parse"
+          },
+          {
+            "question": "Which E3s have pocket volume a3 a maximum of 990.0 \u00c5\u00b3? and show me E3 ligases that are not ASB17 and show me ligases that are not DCAF15",
+            "raw": "{\"filters\": [{\"field\": \"ligase.pocket_score\", \"op\": \"lt\", \"value\": 990.0}], \"sort\": {}, \"limit\": 100}{\"filters\": [{\"field\": \"ligase.has_ligand\", \"op\": \"ne\", \"value\": true}, {\"field\": \"ligase.substrate_count\", \"op\": \"eq\", \"value\": 0}], \"sort\": {}, \"limit\": 100}{\"filters\": [{\"field\": \"ligase.substrate",
+            "error": "not valid JSON: Extra data: line 1 column 102 (char 101)",
+            "stage": "parse"
+          },
+          {
+            "question": "Can you list bridging ligands where contacts a is a minimum of 9, and glue candidates restricted to ligand heavy atoms more than 43",
+            "stage": "set_equality",
+            "predicted": {
+              "record_type": "bridge",
+              "filters": [
+                {
+                  "field": "ccd_class",
+                  "op": "eq",
+                  "value": "glue_candidate"
+                }
+              ],
+              "sort": {
+                "field": "dsasa_total",
+                "direction": "desc"
+              },
+              "limit": 200
+            },
+            "gold": {
+              "record_type": "bridge",
+              "filters": [
+                {
+                  "field": "contacts_a",
+                  "op": "gte",
+                  "value": 9.0
+                },
+                {
+                  "field": "heavy_atoms",
+                  "op": "gt",
+                  "value": 43.0
+                }
+              ],
+              "sort": {
+                "field": "dsasa_total",
+                "direction": "desc"
+              },
+              "limit": 200
+            }
+          },
+          {
+            "question": "Candidate degrons where tip rel sasa is no less than 0.39 and can you list degron candidates where tip res is more than 140, the top  by turn length",
+            "stage": "set_equality",
+            "predicted": {
+              "record_type": "degron",
+              "filters": [
+                {
+                  "field": "uniprot_acc",
+                  "op": "eq",
+                  "value": "Q9BR70"
+                },
+                {
+                  "field": "tip_rel_sasa",
+                  "op": "gte",
+                  "value": 0.39
+                }
+              ],
+              "sort": {
+                "field": "turn_length",
+                "direction": "desc"
+              },
+              "limit": 100
+            },
+            "gold": {
+              "record_type": "degron",
+              "filters": [
+                {
+                  "field": "tip_rel_sasa",
+                  "op": "gte",
+                  "value": 0.39
+                },
+                {
+                  "field": "tip_res",
+                  "op": "gt",
+                  "value": 140.0
+                }
+              ],
+              "sort": {
+                "field": "turn_length",
+                "direction": "desc"
+              },
+              "limit": 200
+            }
+          },
+          {
+            "question": "Which hairpin degrons have mean plddt no more than 92? and return candidate degrons filtered to turn length under 6 residues",
+            "raw": "{\"filters\": [{\"field\": \"uniprot_acc\", \"op\": \"eq\", \"value\": \"P0A930\"}, {\"field\": \"gene\", \"op\": \"eq\", \"value\": \"P0A930\"}, {\"field\": \"mean_plddt\", \"op\": \"lte\", \"value\": 92}], \"sort\": {\"field\": \"turn_length\", \"direction\": \"desc\"}, \"limit\": 100}",
+            "error": "record_type must be one of ['bridge', 'degron', 'ligase', 'lysine'], got None",
+            "stage": "parse"
+          },
+          {
+            "question": "Everything in degron candidates with turn length no less than 2 residues, and filter degron candidates by degron geometry score a maximum of 0.67",
+            "raw": "{\"record_type\": \"degron\", \"filters\": [{\"field\": \"turn_length\", \"op\": \"gte\", \"value\": 2}, {\"field\": \"degron_geometry_score\", \"op\": \"lte\", \"value\": 0.67}], \"sort\": {}, \"limit\": -1}",
+            "error": "sort.field None is not a field of degron. Allowed: ['afdb_id', 'degron_geometry_score', 'gene', 'is_known_neosubstrate', 'mean_plddt', 'motif_family', 'tip_aa', 'tip_rel_sasa', 'tip_res', 'turn_length",
+            "stage": "parse"
+          },
+          {
+            "question": "Hairpin degrons where mean plddt is a minimum of 76, and find degrons whose tip rel sasa is a maximum of 0.62, and degrons restricted to turn length more than 4 residues",
+            "raw": "{\"record_type\": \"degron\", \"filters\": [{\"field\": \"mean_plddt\", \"op\": \"lte\", \"value\": 76}, {\"field\": \"turn_length\", \"op\": \"lt\", \"value\": 4}, {\"field\": \"mean_plddt\", \"op\": \"gte\", \"value\": 76}, {\"field\": \"tip_rel_sasa\", \"op\": \"lte\", \"value\": 0.62}], \"sort\": {}, \"limit\": -1}",
+            "error": "sort.field None is not a field of degron. Allowed: ['afdb_id', 'degron_geometry_score', 'gene', 'is_known_neosubstrate', 'mean_plddt', 'motif_family', 'tip_aa', 'tip_rel_sasa', 'tip_res', 'turn_length",
+            "stage": "parse"
+          },
+          {
+            "question": "Filter degron candidates by degron geometry score 0.71 or less with pull up hairpin degrons having mean plddt over 92, ordered on degron geometry score, highest first first",
+            "stage": "set_equality",
+            "predicted": {
+              "record_type": "degron",
+              "filters": [
+                {
+                  "field": "degron_geometry_score",
+                  "op": "lte",
+                  "value": 0.71
+                },
+                {
+                  "field": "mean_plddt",
+                  "op": "lt",
+                  "value": 92.0
+                }
+              ],
+              "sort": {
+                "field": "degron_geometry_score",
+                "direction": "desc"
+              },
+              "limit": 200
+            },
+            "gold": {
+              "record_type": "degron",
+              "filters": [
+                {
+                  "field": "degron_geometry_score",
+                  "op": "lte",
+                  "value": 0.71
+                },
+                {
+                  "field": "mean_plddt",
+                  "op": "gt",
+                  "value": 92.0
+                }
+              ],
+              "sort": {
+                "field": "degron_geometry_score",
+                "direction": "desc"
+              },
+              "limit": 200
+            }
+          },
+          {
+            "question": "Show me glue candidates with contacts b 28 or less and glue candidates where evidence class is not molecular_glue",
+            "raw": "{\"record_type\": \"bridge\", \"filters\": [{\"field\": \"evidence_class\", \"op\": \"ne\", \"value\": \"molecular_glue\"}, {\"field\": \"contacts_b\", \"op\": \"<=\", \"value\": 28}], \"sort\": {}, \"limit\": 100}",
+            "error": "filters[1]: op must be one of ['eq', 'ne', 'gt', 'gte', 'lt', 'lte'], got '<='",
+            "stage": "parse"
+          },
+          {
+            "question": "Surface lysines with a nz centroid distance of below 25 \u00c5 with how about lysines with c\u03b2\u2013c\u03b2 distance greater than 24 \u00c5 with list lysines with lysine residue number beneath 40, ordered on lysine residue number, lowest first first",
+            "raw": "{\"filters\": [{\"field\": \"structure_id\", \"op\": \"eq\", \"value\": \"how-about\"}, {\"field\": \"res_num\", \"op\": \"lt\", \"value\": 40}, {\"field\": \"nz_centroid_distance\", \"op\": \"lt\", \"value\": 25}], \"sort\": {\"field\": \"res_num\", \"direction\": \"asc\"}}",
+            "error": "record_type must be one of ['bridge', 'degron', 'ligase', 'lysine'], got None",
+            "stage": "parse"
+          },
+          {
+            "question": "Give me every lysines with cb cb distance beneath 74 \u00c5 with can you list surface lysines where lysine residue number is no less than 40",
+            "raw": "{\"record_type\": \"lysine\", \"filters\": [{\"field\": \"res_num\", \"op\": \"gte\", \"value\": 40}, {\"field\": \"cb_cb_distance\", \"op\": \"lt\", \"value\": 74.0}], \"sort\": {}, \"limit\": -1}",
+            "error": "sort.field None is not a field of lysine. Allowed: ['cb_cb_distance', 'nz_centroid_distance', 'nz_rel_sasa', 'observed_diGly', 'res_num', 'site_id', 'structure_id', 'uniprot_acc', 'verdict']",
+            "stage": "parse"
+          },
+          {
+            "question": "Filter degron candidates by tip rel sasa at least 0.5 with search degron candidates for tip residue number above 770",
+            "raw": "{\"filters\": [{\"field\": \"degron.tip_rel_sasa\", \"op\": \"gte\", \"value\": 0.5}], \"sort\": {\"field\": \"degron.tip_res\", \"direction\": \"desc\"}, \"limit\": 100, \"record_type\": \"degron\"}",
+            "error": "filters[0]: field 'degron.tip_rel_sasa' is not a field of degron. Allowed: ['afdb_id', 'degron_geometry_score', 'gene', 'is_known_neosubstrate', 'mean_plddt', 'motif_family', 'tip_aa', 'tip_rel_sasa',",
+            "stage": "parse"
+          },
+          {
+            "question": "Can you list degrons where degron geometry score is exceeding 0.75 and I want degron candidates where the mean plddt is beneath 92",
+            "stage": "set_equality",
+            "predicted": {
+              "record_type": "degron",
+              "filters": [
+                {
+                  "field": "degron_geometry_score",
+                  "op": "lt",
+                  "value": 0.75
+                },
+                {
+                  "field": "mean_plddt",
+                  "op": "gt",
+                  "value": 92.0
+                }
+              ],
+              "sort": {
+                "field": "degron_geometry_score",
+                "direction": "desc"
+              },
+              "limit": 200
+            },
+            "gold": {
+              "record_type": "degron",
+              "filters": [
+                {
+                  "field": "degron_geometry_score",
+                  "op": "gt",
+                  "value": 0.75
+                },
+                {
+                  "field": "mean_plddt",
+                  "op": "lt",
+                  "value": 92.0
+                }
+              ],
+              "sort": {
+                "field": "degron_geometry_score",
+                "direction": "desc"
+              },
+              "limit": 200
+            }
+          },
+          {
+            "question": "Everything in E3s with pocket volume at most 300.0 \u00c5\u00b3 and filter E3 ligases to ligase family U-box",
+            "raw": "{\"filters\": [{\"field\": \"ligase.pocket_volume_a3\", \"op\": \"lte\", \"value\": 300.0}, {\"field\": \"ligase.family\", \"op\": \"eq\", \"value\": \"U-box\"}], \"sort\": {}, \"limit\": -1}",
+            "error": "record_type must be one of ['bridge', 'degron', 'ligase', 'lysine'], got None",
+            "stage": "parse"
+          },
+          {
+            "question": "Show me ligases with uniprot acc A6NI03 and which ligases are ARIH2?",
+            "stage": "set_equality",
+            "predicted": {
+              "record_type": "ligase",
+              "filters": [
+                {
+                  "field": "uniprot_acc",
+                  "op": "eq",
+                  "value": "A6NI03"
+                },
+                {
+                  "field": "gene",
+                  "op": "ne",
+                  "value": "ARIH2"
+                }
+              ],
+              "sort": {
+                "field": "triage_rank",
+                "direction": "asc"
+              },
+              "limit": 200
+            },
+            "gold": {
+              "record_type": "ligase",
+              "filters": [
+                {
+                  "field": "uniprot_acc",
+                  "op": "eq",
+                  "value": "A6NI03"
+                },
+                {
+                  "field": "gene",
+                  "op": "eq",
+                  "value": "ARIH2"
+                }
+              ],
+              "sort": {
+                "field": "triage_rank",
+                "direction": "desc"
+              },
+              "limit": 200
+            }
+          },
+          {
+            "question": "Pull up bridges having resolution a minimum of 3.2 \u00c5, and return ternary complexes filtered to dsasa b under 730.0 \u00c5\u00b2",
+            "stage": "set_equality",
+            "predicted": {
+              "record_type": "bridge",
+              "filters": [
+                {
+                  "field": "resolution",
+                  "op": "gte",
+                  "value": 3.2
+                },
+                {
+                  "field": "bridging_balance",
+                  "op": "lt",
+                  "value": 730.0
+                }
+              ],
+              "sort": {
+                "field": "dsasa_total",
+                "direction": "desc"
+              },
+              "limit": 200
+            },
+            "gold": {
+              "record_type": "bridge",
+              "filters": [
+                {
+                  "field": "resolution",
+                  "op": "gte",
+                  "value": 3.2
+                },
+                {
+                  "field": "dsasa_b",
+                  "op": "lt",
+                  "value": 730.0
+                }
+              ],
+              "sort": {
+                "field": "dsasa_total",
+                "direction": "desc"
+              },
+              "limit": 200
+            }
+          },
+          {
+            "question": "Everything in bridging ligands with bridging balance over 0.33, which bridged chain pairs have \u03b4sasa total no less than 380.0 \u00c5\u00b2?, ranked by bridging balance highest first",
+            "stage": "set_equality",
+            "predicted": {
+              "record_type": "bridge",
+              "filters": [
+                {
+                  "field": "bridging_balance",
+                  "op": "gte",
+                  "value": 0.33
+                },
+                {
+                  "field": "dsasa_total",
+                  "op": "gte",
+                  "value": 380.0
+                }
+              ],
+              "sort": {
+                "field": "bridging_balance",
+                "direction": "desc"
+              },
+              "limit": 200
+            },
+            "gold": {
+              "record_type": "bridge",
+              "filters": [
+                {
+                  "field": "bridging_balance",
+                  "op": "gt",
+                  "value": 0.33
+                },
+                {
+                  "field": "dsasa_total",
+                  "op": "gte",
+                  "value": 380.0
+                }
+              ],
+              "sort": {
+                "field": "bridging_balance",
+                "direction": "desc"
+              },
+              "limit": 200
+            }
+          },
+          {
+            "question": "Find candidate degrons whose tip res is 140 or more with how about candidate degrons with degron geometry score below 0.71 with degron candidates excluding motif family crbn_hairpin_glycine",
+            "raw": "{\"filters\": [{\"field\": \"tip_res\", \"op\": \"lte\", \"value\": 140}, {\"field\": \"degron_geometry_score\", \"op\": \"lt\", \"value\": 0.71}], \"filters\": [{\"field\": \"motif_family\", \"op\": \"eq\", \"value\": \"crbn_hairpin_glycine\"}], \"sort\": {}, \"limit\": 100}",
+            "error": "record_type must be one of ['bridge', 'degron', 'ligase', 'lysine'], got None",
+            "stage": "parse"
+          },
+          {
+            "question": "Which degron candidates have turn length greater than 2 residues?, and hairpin degrons restricted to mean plddt 96 or less",
+            "raw": "{\"filters\": [{\"field\": \"turn_length\", \"op\": \"gt\", \"value\": 2}, {\"field\": \"mean_plddt\", \"op\": \"lte\", \"value\": 96}], \"record_type\": \"degron\", \"sort\": {}, \"limit\": 100}",
+            "error": "sort.field None is not a field of degron. Allowed: ['afdb_id', 'degron_geometry_score', 'gene', 'is_known_neosubstrate', 'mean_plddt', 'motif_family', 'tip_aa', 'tip_rel_sasa', 'tip_res', 'turn_length",
+            "stage": "parse"
+          },
+          {
+            "question": "Pull up lysine sites having nz to site centroid exceeding 32 \u00c5 and surface lysines, res num exceeding 40",
+            "raw": "{\"record_type\": \"lysine\", \"filters\": [{\"field\": \"res_num\", \"op\": \"gt\", \"value\": 40}, {\"field\": \"nz_centroid_distance\", \"op\": \"gt\", \"value\": 32}], \"sort\": {}, \"limit\": -1}",
+            "error": "sort.field None is not a field of lysine. Allowed: ['cb_cb_distance', 'nz_centroid_distance', 'nz_rel_sasa', 'observed_diGly', 'res_num', 'site_id', 'structure_id', 'uniprot_acc', 'verdict']",
+            "stage": "parse"
+          },
+          {
+            "question": "Ligases where exploitation status is ligandable unproven, filter E3 ligases by pdb entries beneath 3, ordered on triage score, highest first first",
+            "stage": "set_equality",
+            "predicted": {
+              "record_type": "ligase",
+              "filters": [
+                {
+                  "field": "exploitation_status",
+                  "op": "eq",
+                  "value": "ligandable unproven"
+                },
+                {
+                  "field": "family",
+                  "op": "ne",
+                  "value": "E3"
+                }
+              ],
+              "sort": {
+                "field": "triage_score",
+                "direction": "desc"
+              },
+              "limit": 100
+            },
+            "gold": {
+              "record_type": "ligase",
+              "filters": [
+                {
+                  "field": "exploitation_status",
+                  "op": "eq",
+                  "value": "ligandable unproven"
+                },
+                {
+                  "field": "pdb_entries",
+                  "op": "lt",
+                  "value": 3.0
+                }
+              ],
+              "sort": {
+                "field": "triage_score",
+                "direction": "desc"
+              },
+              "limit": 200
+            }
+          },
+          {
+            "question": "Show me atlas rows with experimental method ELECTRON MICROSCOPY, search bridged chain pairs for contacts chain a beneath 35, only atlas rows where ligand ccd is 034, sorted by \u03b4sasa total, lowest first",
+            "raw": "{\"record_type\": \"bridge\", \"filters\": [{\"field\": \"method\", \"op\": \"eq\", \"value\": \"electron microscopy\"}, {\"field\": \"bridging_balance\", \"op\": \"lt\", \"value\": 35}, {\"field\": \"ccd\", \"op\": \"eq\", \"value\": \"034\"}], \"sort\": {\"field\": \"dsasa_total\", \"direction\": \"desc\"}}",
+            "error": "filters[2]: field 'ccd' is not a field of bridge. Allowed: ['bridging_balance', 'buried_fraction', 'ccd_class', 'ccd_id', 'contacts_a', 'contacts_b', 'dsasa_a', 'dsasa_b', 'dsasa_total', 'evidence_cla",
+            "stage": "parse"
+          },
+          {
+            "question": "Filter candidate degrons by mean plddt below 82 and give me every hairpin degrons with degron geometry score above 0.71",
+            "raw": "{\"filters\": [{\"field\": \"degron.mean_plddt\", \"op\": \"lt\", \"value\": 82}, {\"field\": \"degron.degron_geometry_score\", \"op\": \"gt\", \"value\": 0.71}], \"sort\": {\"field\": \"degron.turn_length\", \"direction\": \"desc\"}, \"limit\": 100}",
+            "error": "record_type must be one of ['bridge', 'degron', 'ligase', 'lysine'], got None",
+            "stage": "parse"
+          },
+          {
+            "question": "List every E3 ligases whose uniprot accession is A6NIN4 and which E3s have pocket volume a3 no more than 450.0 \u00c5\u00b3? and find ubiquitin ligases whose triage rank is no less than 70",
+            "raw": "{\"filters\": [{\"field\": \"ligase.subfamily\", \"op\": \"eq\", \"value\": \"ubiquitin ligase\"}], \"sort\": {\"field\": \"ligase.triage_rank\", \"direction\": \"desc\"}, \"limit\": 1}, {\"filters\": [{\"field\": \"ligase.uniprot_acc\", \"op\": \"eq\", \"value\": \"A6NIN4\"}, {\"field\": \"ligase.pocket_volume_a3\", \"op\": \"lte\", \"value\": 450",
+            "error": "not valid JSON: Extra data: line 1 column 160 (char 159)",
+            "stage": "parse"
+          },
+          {
+            "question": "Lysine sites, res num above 140 with lysine sites where cb cb distance is beneath 17 \u00c5, ranked by nz relative sasa lowest first",
+            "raw": "{\"filters\": [{\"field\": \"cb_cb_distance\", \"op\": \"lt\", \"value\": 17}, {\"field\": \"res_num\", \"op\": \"gt\", \"value\": 140}], \"sort\": {\"field\": \"nz_rel_sasa\", \"direction\": \"asc\"}}",
+            "error": "record_type must be one of ['bridge', 'degron', 'ligase', 'lysine'], got None",
+            "stage": "parse"
+          },
+          {
+            "question": "Everything in atlas rows apart from experimental method NEUTRON DIFFRACTION, search glue candidates for contacts chain a over 9",
+            "raw": "{\"record_type\": \"bridge\", \"filters\": [{\"field\": \"ccd_class\", \"op\": \"ne\", \"value\": \"neutron_diffraction\"}, {\"field\": \"bridging_balance\", \"op\": \"gt\", \"value\": 9}]}",
+            "error": "field 'ccd_class' takes one of ['glue_candidate', 'cofactor', 'metal', 'cryoprotectant', 'buffer', 'detergent', 'lipid', 'sugar', 'peptide_like', 'covalent_modifier', 'unknown'], got 'neutron_diffract",
+            "stage": "parse"
+          },
+          {
+            "question": "List ligases with uniprot accession other than A6NGJ6 with any ubiquitin ligases with substrate count predicted 80 or more ?",
+            "raw": "{\"record_type\": \"ligase\", \"filters\": [{\"field\": \"uniprot_acc\", \"op\": \"ne\", \"value\": \"A6NGJ6\"}, {\"field\": \"substrate_count_predicted\", \"op\": \"gte\", \"value\": 80}], \"sort\": {}, \"limit\": 100}",
+            "error": "sort.field None is not a field of ligase. Allowed: ['exploitation_status', 'expression_breadth', 'family', 'gene', 'has_ligand', 'pdb_entries', 'pocket_score', 'pocket_volume_a3', 'subfamily', 'substr",
+            "stage": "parse"
+          },
+          {
+            "question": "Which lysine sites have c\u03b2\u2013c\u03b2 distance under 37 \u00c5?, surface lysines, res num exceeding 40",
+            "raw": "{\"filters\": [{\"field\": \"lysine.site_id\", \"op\": \"ne\", \"value\": \"\"}], \"sort\": {\"field\": \"lysine.res_num\", \"direction\": \"desc\"}, \"limit\": 100, \"filters\": [{\"field\": \"lysine.nz_cb_distance\", \"op\": \"lt\", \"value\": 37}], \"filters\": [{\"field\": \"lysine.verdict\", \"op\": \"eq\", \"value\": \"surface\"}}}",
+            "error": "not valid JSON: Expecting ',' delimiter: line 1 column 286 (char 285)",
+            "stage": "parse"
+          },
+          {
+            "question": "Find degrons whose tip relative sasa is at most 0.74 with degrons restricted to degron geometry score at least 0.79",
+            "raw": "{\"record_type\": \"degron\", \"filters\": [{\"field\": \"tip_rel_sasa\", \"op\": \"lte\", \"value\": 0.74}, {\"field\": \"degron_geometry_score\", \"op\": \"gte\", \"value\": 0.79}], \"sort\": {}, \"limit\": -1}",
+            "error": "sort.field None is not a field of degron. Allowed: ['afdb_id', 'degron_geometry_score', 'gene', 'is_known_neosubstrate', 'mean_plddt', 'motif_family', 'tip_aa', 'tip_rel_sasa', 'tip_res', 'turn_length",
+            "stage": "parse"
+          },
+          {
+            "question": "Give me the ARK2C E3 ligases with list every ligases whose uniprot acc is A6NGE4",
+            "raw": "{\"record_type\": \"ligase\", \"filters\": [{\"op\": \"eq\", \"value\": \"A6NGE4\", \"field\": \"uniprot_acc\"}], \"sort\": {}, \"limit\": 100}",
+            "error": "sort.field None is not a field of ligase. Allowed: ['exploitation_status', 'expression_breadth', 'family', 'gene', 'has_ligand', 'pdb_entries', 'pocket_score', 'pocket_volume_a3', 'subfamily', 'substr",
+            "stage": "parse"
+          },
+          {
+            "question": "Can you list degron candidates where tip res is more than 140 and search degrons for tip relative sasa 0.74 or more",
+            "stage": "set_equality",
+            "predicted": {
+              "record_type": "degron",
+              "filters": [
+                {
+                  "field": "tip_res",
+                  "op": "lt",
+                  "value": 141.0
+                },
+                {
+                  "field": "tip_rel_sasa",
+                  "op": "gt",
+                  "value": 0.74
+                }
+              ],
+              "sort": {
+                "field": "tip_res",
+                "direction": "desc"
+              },
+              "limit": 200
+            },
+            "gold": {
+              "record_type": "degron",
+              "filters": [
+                {
+                  "field": "tip_res",
+                  "op": "gt",
+                  "value": 140.0
+                },
+                {
+                  "field": "tip_rel_sasa",
+                  "op": "gte",
+                  "value": 0.74
+                }
+              ],
+              "sort": {
+                "field": "degron_geometry_score",
+                "direction": "desc"
+              },
+              "limit": 200
+            }
+          },
+          {
+            "question": "Show me atlas rows with contacts chain a 66 or more with narrow bridges to ligand heavy atoms 15 or less",
+            "stage": "set_equality",
+            "predicted": {
+              "record_type": "bridge",
+              "filters": [
+                {
+                  "field": "contacts_a",
+                  "op": "gte",
+                  "value": 66.0
+                },
+                {
+                  "field": "buried_fraction",
+                  "op": "lte",
+                  "value": 15.0
+                }
+              ],
+              "sort": {
+                "field": "dsasa_total",
+                "direction": "desc"
+              },
+              "limit": 200
+            },
+            "gold": {
+              "record_type": "bridge",
+              "filters": [
+                {
+                  "field": "contacts_a",
+                  "op": "gte",
+                  "value": 66.0
+                },
+                {
+                  "field": "heavy_atoms",
+                  "op": "lte",
+                  "value": 15.0
+                }
+              ],
+              "sort": {
+                "field": "dsasa_total",
+                "direction": "desc"
+              },
+              "limit": 200
+            }
+          },
+          {
+            "question": "Any ubiquitin ligases with pocket volume no more than 640.0 \u00c5\u00b3?, only E3 ligases where ligase family is SOCS-box",
+            "raw": "{\"filters\": [{\"field\": \"ligase.family\", \"op\": \"eq\", \"value\": \"SOCS-box\"}, {\"field\": \"ligase.has_ligand\", \"op\": \"eq\", \"value\": true}], \"limit\": -1, \"sort\": {\"field\": \"ligase.pocket_volume_a3\", \"direction\": \"desc\"}}",
+            "error": "record_type must be one of ['bridge', 'degron', 'ligase', 'lysine'], got None",
+            "stage": "parse"
+          },
+          {
+            "question": "Any ubiquitin ligases with substrate count predicted 80 or more ? and E3s where gene symbol is ABTB3",
+            "raw": "{\"filters\": [{\"field\": \"substrate_count_predicted\", \"op\": \"gte\", \"value\": 80}], \"sort\": {}, \"limit\": -1, \"filters_\": [{\"field\": \"family\", \"op\": \"eq\", \"value\": \"E3\"}, {\"field\": \"subfamily\", \"op\": \"eq\", \"value\": \"ABTB3\"}]}",
+            "error": "record_type must be one of ['bridge', 'degron', 'ligase', 'lysine'], got None",
+            "stage": "parse"
+          },
+          {
+            "question": "Which atlas rows are SOLUTION NMR; SOLID-STATE NMR? and I want atlas rows where the contacts chain b is under 15",
+            "raw": "{\"filters\": [{\"field\": \"method\", \"op\": \"eq\", \"value\": \"SOLUTION NMR\"}, {\"field\": \"method\", \"op\": \"eq\", \"value\": \"SOLID-STATE NMR\"}], \"sort\": {\"field\": \"contacts_b\", \"direction\": \"lt\"}, \"limit\": 100}",
+            "error": "record_type must be one of ['bridge', 'degron', 'ligase', 'lysine'], got None",
+            "stage": "parse"
+          },
+          {
+            "question": "Which E3 ligases are A6QL63?, and show me ligases with gene symbol ARMC5",
+            "raw": "{\"record_type\": \"ligase\", \"filters\": [{\"field\": \"uniprot_acc\", \"op\": \"ne\", \"value\": \"A6QL63\"}, {\"field\": \"gene\", \"op\": \"eq\", \"value\": \"ARMC5\"}], \"sort\": {}, \"limit\": 100}",
+            "error": "sort.field None is not a field of ligase. Allowed: ['exploitation_status', 'expression_breadth', 'family', 'gene', 'has_ligand', 'pdb_entries', 'pocket_score', 'pocket_volume_a3', 'subfamily', 'substr",
+            "stage": "parse"
+          },
+          {
+            "question": "Return hairpin degrons filtered to mean plddt over 96 and candidate degrons with a degron geometry score of at most 0.84",
+            "raw": "{\"record_type\": \"degron\", \"filters\": [{\"field\": \"mean_plddt\", \"op\": \"gte\", \"value\": 96}, {\"field\": \"degron_geometry_score\", \"op\": \"lte\", \"value\": 0.84}], \"sort\": {}, \"limit\": -1}",
+            "error": "sort.field None is not a field of degron. Allowed: ['afdb_id', 'degron_geometry_score', 'gene', 'is_known_neosubstrate', 'mean_plddt', 'motif_family', 'tip_aa', 'tip_rel_sasa', 'tip_res', 'turn_length",
+            "stage": "parse"
+          },
+          {
+            "question": "Show me bridged chain pairs with ccd id 0AQ, filter glue candidates to experimental method X-RAY DIFFRACTION; SOLUTION SCATTERING, show me ternary complexes with \u03b4sasa chain a at least 230.0 \u00c5\u00b2",
+            "raw": "{\"record_type\": \"bridge\", \"filters\": [{\"field\": \"ccd_id\", \"op\": \"eq\", \"value\": \"0AQ\"}, {\"field\": \"evidence_class\", \"op\": \"eq\", \"value\": \"molecular_glue\"}, {\"field\": \"method\", \"op\": \"eq\", \"value\": \"X-RAY DIFFRACTION; SOLUTION SCATTERING\"}], \"sort\": {\"field\": \"delta_sasa_a\", \"direction\": \"gte\"}, \"limi",
+            "error": "sort.field 'delta_sasa_a' is not a field of bridge. Allowed: ['bridging_balance', 'buried_fraction', 'ccd_class', 'ccd_id', 'contacts_a', 'contacts_b', 'dsasa_a', 'dsasa_b', 'dsasa_total', 'evidence_c",
+            "stage": "parse"
+          },
+          {
+            "question": "Show me lysine sites with nz to site centroid under 45 \u00c5 with give me every lysines with cb cb distance beneath 74 \u00c5, the top  by nz to site centroid",
+            "stage": "set_equality",
+            "predicted": {
+              "record_type": "lysine",
+              "filters": [
+                {
+                  "field": "structure_id",
+                  "op": "eq",
+                  "value": ""
+                },
+                {
+                  "field": "site_id",
+                  "op": "eq",
+                  "value": ""
+                },
+                {
+                  "field": "nz_centroid_distance",
+                  "op": "lt",
+                  "value": 45.0
+                },
+                {
+                  "field": "cb_cb_distance",
+                  "op": "lt",
+                  "value": 74.0
+                }
+              ],
+              "sort": {
+                "field": "cb_cb_distance",
+                "direction": "asc"
+              },
+              "limit": 100
+            },
+            "gold": {
+              "record_type": "lysine",
+              "filters": [
+                {
+                  "field": "nz_centroid_distance",
+                  "op": "lt",
+                  "value": 45.0
+                },
+                {
+                  "field": "cb_cb_distance",
+                  "op": "lt",
+                  "value": 74.0
+                }
+              ],
+              "sort": {
+                "field": "nz_centroid_distance",
+                "direction": "asc"
+              },
+              "limit": 200
+            }
+          },
+          {
+            "question": "Which E3s have triage rank at least 330? with give me the ARK2C E3 ligases with E3s where triage score is 0.2 or more, ranked by pdb entries lowest first",
+            "raw": "{\"filters\": [{\"field\": \"triage_rank\", \"op\": \"gte\", \"value\": 330}], \"sort\": {\"field\": \"record_type\", \"direction\": \"asc\"}, \"limit\": 100}{\"filters\": [{\"field\": \"substrate_count\", \"op\": \"eq\", \"value\": 0}], [{\"field\": \"substrate_count_predicted\", \"op\": \"eq\", \"value\": 0}], [{\"field\": \"triage_score\", \"op\":",
+            "error": "not valid JSON: Extra data: line 1 column 135 (char 134)",
+            "stage": "parse"
+          },
+          {
+            "question": "Bridges, ligand mw no less than 510.0 Da, search bridging ligands for resolution at most 2.0 \u00c5",
+            "raw": "{\"record_type\": \"ligase\", \"filters\": [{\"field\": \"substrate_count\", \"op\": \"lt\"}, {\"field\": \"mw\", \"op\": \"gte\"}, {\"value\": 510.0}], \"sort\": {\"field\": \"resolution\", \"direction\": \"desc\"}, \"limit\": 100}",
+            "error": "filters[0]: a value is required",
+            "stage": "parse"
+          },
+          {
+            "question": "Everything in glue candidates with \u03b4sasa chain a 150.0 or more \u00c5\u00b2 and everything in ternary complexes with ligand mw no less than 950.0 Da",
+            "raw": "{\"filters\": [{\"op\": \"lte\", \"value\": 150.0, \"field\": \"dsasa_a\"}, {\"op\": \"<=\", \"value\": 950.0, \"field\": \"mw\"}], \"record_type\": \"ligase\"}",
+            "error": "filters[0]: field 'dsasa_a' is not a field of ligase. Allowed: ['exploitation_status', 'expression_breadth', 'family', 'gene', 'has_ligand', 'pdb_entries', 'pocket_score', 'pocket_volume_a3', 'subfami",
+            "stage": "parse"
+          },
+          {
+            "question": "How about candidate degrons with degron geometry score less than 0.84 and which degron candidates have turn length exceeding 6 residues?",
+            "raw": "{\"filters\": [{\"field\": \"degron.geometry_score\", \"op\": \"lt\", \"value\": 0.84}, {\"field\": \"degron.turn_length\", \"op\": \"gt\", \"value\": 6}], \"sort\": {}, \"limit\": -1}",
+            "error": "record_type must be one of ['bridge', 'degron', 'ligase', 'lysine'], got None",
+            "stage": "parse"
+          },
+          {
+            "question": "Give me every lysine sites with nz rel sasa no less than 0.23 with surface lysines restricted to res num above 430",
+            "stage": "set_equality",
+            "predicted": {
+              "record_type": "lysine",
+              "filters": [
+                {
+                  "field": "structure_id",
+                  "op": "eq",
+                  "value": "structure_id_value"
+                },
+                {
+                  "field": "res_num",
+                  "op": "gte",
+                  "value": 430.0
+                },
+                {
+                  "field": "nz_rel_sasa",
+                  "op": "gte",
+                  "value": 0.23
+                }
+              ],
+              "sort": {
+                "field": "nz_centroid_distance",
+                "direction": "asc"
+              },
+              "limit": 200
+            },
+            "gold": {
+              "record_type": "lysine",
+              "filters": [
+                {
+                  "field": "nz_rel_sasa",
+                  "op": "gte",
+                  "value": 0.23
+                },
+                {
+                  "field": "res_num",
+                  "op": "gt",
+                  "value": 430.0
+                }
+              ],
+              "sort": {
+                "field": "nz_centroid_distance",
+                "direction": "desc"
+              },
+              "limit": 200
+            }
+          },
+          {
+            "question": "Pull up lysine sites having nz to site centroid exceeding 32 \u00c5, and the lysine sites that have c\u03b2\u2013c\u03b2 distance more than 74 \u00c5, the top  by lysine residue number",
+            "stage": "set_equality",
+            "predicted": {
+              "record_type": "lysine",
+              "filters": [
+                {
+                  "field": "res_num",
+                  "op": "gt",
+                  "value": 74.0
+                },
+                {
+                  "field": "nz_centroid_distance",
+                  "op": "gt",
+                  "value": 32.0
+                }
+              ],
+              "sort": {
+                "field": "res_num",
+                "direction": "desc"
+              },
+              "limit": 100
+            },
+            "gold": {
+              "record_type": "lysine",
+              "filters": [
+                {
+                  "field": "nz_centroid_distance",
+                  "op": "gt",
+                  "value": 32.0
+                },
+                {
+                  "field": "cb_cb_distance",
+                  "op": "gt",
+                  "value": 74.0
+                }
+              ],
+              "sort": {
+                "field": "res_num",
+                "direction": "asc"
+              },
+              "limit": 200
+            }
+          },
+          {
+            "question": "How about ternary complexes with buried fraction 0.65 or less and which bridged chain pairs are 08I?",
+            "raw": "{\"record_type\": \"bridge\", \"filters\": [{\"field\": \"buried_fraction\", \"op\": \"lte\", \"value\": 0.65}, {\"field\": \"bridging_chain_pair\", \"op\": \"eq\", \"value\": \"08I\"}], \"sort\": {}, \"limit\": 100}",
+            "error": "filters[1]: field 'bridging_chain_pair' is not a field of bridge. Allowed: ['bridging_balance', 'buried_fraction', 'ccd_class', 'ccd_id', 'contacts_a', 'contacts_b', 'dsasa_a', 'dsasa_b', 'dsasa_total",
+            "stage": "parse"
+          },
+          {
+            "question": "Give me every hairpin degrons with tip relative sasa less than 0.74, hairpin degrons, mean plddt more than 88",
+            "raw": "{\"record_type\": \"degron\", \"filters\": [{\"field\": \"fields.tip_rel_sasa\", \"op\": \"lt\", \"value\": 0.74}, {\"field\": \"fields.mean_plddt\", \"op\": \"gt\", \"value\": 88.0}], \"sort\": {\"field\": \"uniprot_acc\", \"direction\": \"asc\"}}",
+            "error": "filters[0]: field 'fields.tip_rel_sasa' is not a field of degron. Allowed: ['afdb_id', 'degron_geometry_score', 'gene', 'is_known_neosubstrate', 'mean_plddt', 'motif_family', 'tip_aa', 'tip_rel_sasa',",
+            "stage": "parse"
+          },
+          {
+            "question": "The surface lysines that have nz centroid distance less than 81 \u00c5 and which lysine sites have c\u03b2\u2013c\u03b2 distance under 37 \u00c5?",
+            "raw": "{\"record_type\": \"lysine\", \"filters\": [{\"field\": \"structure_id\", \"op\": \"eq\", \"value\": \"\"}, {\"field\": \"nz_centroid_distance\", \"op\": \"lt\", \"value\": 81}, {\"field\": \"res_num\", \"op\": \"eq\", \"value\": 3}], \"sort\": {}, \"limit\": 100}",
+            "error": "sort.field None is not a field of lysine. Allowed: ['cb_cb_distance', 'nz_centroid_distance', 'nz_rel_sasa', 'observed_diGly', 'res_num', 'site_id', 'structure_id', 'uniprot_acc', 'verdict']",
+            "stage": "parse"
+          },
+          {
+            "question": "E3 ligases restricted to pocket volume greater than 300.0 \u00c5\u00b3, show me E3 ligases that are not ASB17",
+            "stage": "set_equality",
+            "predicted": {
+              "record_type": "ligase",
+              "filters": [
+                {
+                  "field": "pdb_entries",
+                  "op": "gt",
+                  "value": 300.0
+                },
+                {
+                  "field": "family",
+                  "op": "ne",
+                  "value": "ASB17"
+                }
+              ],
+              "sort": {
+                "field": "triage_rank",
+                "direction": "asc"
+              },
+              "limit": 200
+            },
+            "gold": {
+              "record_type": "ligase",
+              "filters": [
+                {
+                  "field": "pocket_volume_a3",
+                  "op": "gt",
+                  "value": 300.0
+                },
+                {
+                  "field": "gene",
+                  "op": "ne",
+                  "value": "ASB17"
+                }
+              ],
+              "sort": {
+                "field": "triage_rank",
+                "direction": "desc"
+              },
+              "limit": 200
+            }
+          },
+          {
+            "question": "How about degrons with mean plddt over 82, and find candidate degrons whose degron geometry score is 0.75 or less",
+            "raw": "{\"record_type\": \"degron\", \"filters\": [{\"field\": \"mean_plddt\", \"op\": \"lte\", \"value\": 82}, {\"field\": \"degron_geometry_score\", \"op\": \"lte\", \"value\": 0.75}], \"sort\": {}, \"limit\": -1}",
+            "error": "sort.field None is not a field of degron. Allowed: ['afdb_id', 'degron_geometry_score', 'gene', 'is_known_neosubstrate', 'mean_plddt', 'motif_family', 'tip_aa', 'tip_rel_sasa', 'tip_res', 'turn_length",
+            "stage": "parse"
+          },
+          {
+            "question": "Give me every E3s with triage score no more than 0.25 with list ligases with pdb entries below 10",
+            "raw": "{\"filters\": [{\"field\": \"ligase.triage_score\", \"op\": \"lte\", \"value\": 0.25}], \"sort\": {}, \"limit\": null, \"record_type\": \"ligase\"}",
+            "error": "filters[0]: field 'ligase.triage_score' is not a field of ligase. Allowed: ['exploitation_status', 'expression_breadth', 'family', 'gene', 'has_ligand', 'pdb_entries', 'pocket_score', 'pocket_volume_a",
+            "stage": "parse"
+          },
+          {
+            "question": "Everything in lysine sites with nz centroid distance at least 45 \u00c5, and surface lysines classified as favourable, and give me every lysine sites with nz rel sasa no less than 0.23",
+            "raw": "{\"filters\": [{\"field\": \"lysine.site_id\", \"op\": \"gte\", \"value\": \"45\"}, {\"field\": \"lysine.site_id\", \"op\": \"eq\", \"value\": \"favourable\"}], \"sort\": {\"field\": \"lysine.site_id\", \"direction\": \"asc\"}, \"limit\": -1}",
+            "error": "record_type must be one of ['bridge', 'degron', 'ligase', 'lysine'], got None",
+            "stage": "parse"
+          },
+          {
+            "question": "Everything in lysines with res num a minimum of 430, and surface lysines with a nz centroid distance of below 25 \u00c5, and how about surface lysines with nz relative sasa under 0.02, ordered on nz to site centroid, lowest first first",
+            "raw": "{\"filters\": [{\"field\": \"res_num\", \"op\": \"gte\", \"value\": 430}], \"sort\": {\"field\": \"nz_centroid_distance\", \"direction\": \"desc\"}, \"limit\": -1, \"filters_2\": [{\"field\": \"nz_centroid_distance\", \"op\": \"lt\", \"value\": 25}, {\"field\": \"nz_rel_sasa\", \"op\": \"lt\", \"value\": 0.02}] }",
+            "error": "record_type must be one of ['bridge', 'degron', 'ligase', 'lysine'], got None",
+            "stage": "parse"
+          },
+          {
+            "question": "Find ubiquitin ligases with gene symbol equal to ANKIB1, list ubiquitin ligases with substrate count predicted at least 10, sorted by predicted substrate count, lowest first",
+            "raw": "{\"record_type\": \"ligase\", \"filters\": [{\"field\": \"gene\", \"op\": \"eq\", \"value\": \"ANKIB1\"}, {\"field\": \"substrate_count_predicted\", \"op\": \"gte\", \"value\": 10}], \"sort\": {\"field\": \"substrate_count_predicted\", \"direction\": \"desc\"}, \"limit\": -1}",
+            "error": "limit must be at least 1",
+            "stage": "parse"
+          },
+          {
+            "question": "Everything in ternary complexes with ligand mw no less than 950.0 Da with which bridges have contacts a above 66?",
+            "raw": "{\"record_type\": \"ligase\", \"filters\": [{\"field\": \"substrate_count\", \"op\": \"gte\", \"value\": 950.0}, {\"field\": \"has_ligand\", \"op\": \"eq\", \"value\": true}, {\"field\": \"substrate_count_predicted\", \"op\": \"gt\", \"value\": 0}, {\"field\": \"substrate_count\", \"op\": \"lt\", \"value\": 1000}, {\"field\": \"substrate_count_pre",
+            "error": "not valid JSON: Expecting ',' delimiter: line 1 column 860 (char 859)",
+            "stage": "parse"
+          },
+          {
+            "question": "Show me lysines with c\u03b2\u2013c\u03b2 distance greater than 58 \u00c5, and list surface lysines with nz centroid distance above 81 \u00c5",
+            "raw": "{\"record_type\": \"lysine\", \"filters\": [{\"field\": \"structure_id\", \"op\": \"eq\", \"value\": \"\"}, {\"field\": \"res_num\", \"op\": \"eq\", \"value\": 0}], \"sort\": {}, \"limit\": -1}{\"record_type\": \"lysine\", \"filters\": [{\"field\": \"structure_id\", \"op\": \"eq\", \"value\": \"\"}, {\"field\": \"res_num\", \"op\": \"eq\", \"value\": 0}, {\"f",
+            "error": "not valid JSON: Extra data: line 1 column 162 (char 161)",
+            "stage": "parse"
+          },
+          {
+            "question": "Return E3s filtered to substrate count predicted under 80 with ubiquitin ligases restricted to pocket druggability score above 0.02, ordered on triage rank, lowest first first",
+            "stage": "set_equality",
+            "predicted": {
+              "record_type": "ligase",
+              "filters": [
+                {
+                  "field": "substrate_count_predicted",
+                  "op": "lt",
+                  "value": 80.0
+                },
+                {
+                  "field": "triage_score",
+                  "op": "gt",
+                  "value": 0.02
+                }
+              ],
+              "sort": {
+                "field": "triage_rank",
+                "direction": "desc"
+              },
+              "limit": 200
+            },
+            "gold": {
+              "record_type": "ligase",
+              "filters": [
+                {
+                  "field": "substrate_count_predicted",
+                  "op": "lt",
+                  "value": 80.0
+                },
+                {
+                  "field": "pocket_score",
+                  "op": "gt",
+                  "value": 0.02
+                }
+              ],
+              "sort": {
+                "field": "triage_rank",
+                "direction": "asc"
+              },
+              "limit": 200
+            }
+          },
+          {
+            "question": "Can you list degron candidates where tip res is more than 140 and list degrons with degron geometry score over 0.84",
+            "raw": "{\"filters\": [{\"field\": \"degron.tip_res\", \"op\": \"gt\", \"value\": 140}, {\"field\": \"degron.degron_geometry_score\", \"op\": \"gt\", \"value\": 0.84}], \"sort\": {}, \"limit\": -1}",
+            "error": "record_type must be one of ['bridge', 'degron', 'ligase', 'lysine'], got None",
+            "stage": "parse"
+          }
+        ],
+        "seconds": 125.4
+      },
+      "task_a_external": {
+        "n": 15,
+        "parse_rate": 0.4,
+        "set_equality": 0.0,
+        "exact_match": 0.0,
+        "failures": [
+          {
+            "question": "Others : Researchers have uncovered that expression levels and types of E3 ligases vary across tissues, which affect the degradation activity of PROTACs",
+            "raw": "{\"record_type\": \"degron\", \"filters\": [{\"field\": \"organism\", \"op\": \"eq\", \"value\": \"others\"}, {\"field\": \"is_known_neosubstrate\", \"op\": \"eq\", \"value\": false}], \"sort\": {}, \"limit\": 100}",
+            "error": "filters[0]: field 'organism' is not a field of degron. Allowed: ['afdb_id', 'degron_geometry_score', 'gene', 'is_known_neosubstrate', 'mean_plddt', 'motif_family', 'tip_aa', 'tip_rel_sasa', 'tip_res',",
+            "stage": "parse"
+          },
+          {
+            "question": "how many deposited ternary structures involve a non-IMiD chemotype",
+            "raw": "{\"filters\": [{\"field\": \"ligase.exploitation_status\", \"op\": \"eq\", \"value\": \"ligandable unproven\"}], \"limit\": 100}",
+            "error": "record_type must be one of ['bridge', 'degron', 'ligase', 'lysine'], got None",
+            "stage": "parse"
+          },
+          {
+            "question": "Figure 35 Although several E3 ligases have been successfully utilized in the design of PROTAC BET degraders, this has been limited to those for which small molecule ligands ( e.g., pomalidomide and VHL ligand) have been developed",
+            "stage": "set_equality",
+            "predicted": {
+              "record_type": "ligase",
+              "filters": [
+                {
+                  "field": "substrate_count",
+                  "op": "eq",
+                  "value": 0.0
+                },
+                {
+                  "field": "substrate_count_predicted",
+                  "op": "eq",
+                  "value": 0.0
+                },
+                {
+                  "field": "family",
+                  "op": "eq",
+                  "value": "BET degrader"
+                },
+                {
+                  "field": "expression_breadth",
+                  "op": "eq",
+                  "value": 0.0
+                }
+              ],
+              "sort": {
+                "field": "triage_rank",
+                "direction": "asc"
+              },
+              "limit": 200
+            },
+            "gold": {
+              "record_type": "ligase",
+              "filters": [
+                {
+                  "field": "has_ligand",
+                  "op": "eq",
+                  "value": 0
+                }
+              ],
+              "sort": {
+                "field": "triage_rank",
+                "direction": "asc"
+              },
+              "limit": 200
+            }
+          },
+          {
+            "question": "These models suggest which E3 ligases are structurally compatible with a given target and support virtual screening pipelines that evaluate thousands of candidate molecules in silico , prioritizing those most likely to induce degradation",
+            "stage": "set_equality",
+            "predicted": {
+              "record_type": "ligase",
+              "filters": [
+                {
+                  "field": "substrate_count",
+                  "op": "eq",
+                  "value": 0.0
+                }
+              ],
+              "sort": {
+                "field": "triage_rank",
+                "direction": "asc"
+              },
+              "limit": 200
+            },
+            "gold": {
+              "record_type": "ligase",
+              "filters": [
+                {
+                  "field": "pdb_entries",
+                  "op": "eq",
+                  "value": 0.0
+                }
+              ],
+              "sort": {
+                "field": "triage_rank",
+                "direction": "asc"
+              },
+              "limit": 200
+            }
+          },
+          {
+            "question": "how many glues bury a comparable surface against both partners",
+            "raw": "{\"filters\": [{\"field\": \"buried_fraction\", \"op\": \"eq\", \"value\": 0.5}], \"sort\": {}, \"limit\": 100}",
+            "error": "record_type must be one of ['bridge', 'degron', 'ligase', 'lysine'], got None",
+            "stage": "parse"
+          },
+          {
+            "question": "Figure 35 Although several E3 ligases have been successfully utilized in the design of PROTAC BET degraders, this has been limited to those for which small molecule ligands ( e.g., pomalidomide and VHL ligand) have been developed",
+            "stage": "set_equality",
+            "predicted": {
+              "record_type": "ligase",
+              "filters": [
+                {
+                  "field": "substrate_count",
+                  "op": "eq",
+                  "value": 0.0
+                },
+                {
+                  "field": "substrate_count_predicted",
+                  "op": "eq",
+                  "value": 0.0
+                },
+                {
+                  "field": "family",
+                  "op": "eq",
+                  "value": "BET degrader"
+                },
+                {
+                  "field": "expression_breadth",
+                  "op": "eq",
+                  "value": 0.0
+                }
+              ],
+              "sort": {
+                "field": "triage_rank",
+                "direction": "asc"
+              },
+              "limit": 200
+            },
+            "gold": {
+              "record_type": "ligase",
+              "filters": [
+                {
+                  "field": "exploitation_status",
+                  "op": "eq",
+                  "value": "ligandable unproven"
+                }
+              ],
+              "sort": {
+                "field": "pocket_score",
+                "direction": "desc"
+              },
+              "limit": 200
+            }
+          },
+          {
+            "question": "MRT\u20102359 initially degrades GSPT1 by binding to CRBN and the GSPT1 G\u2010loop degron, which impairs protein synthesis in tumor cells that are addicted to high MYC expression, and indirectly affects MYC expression and MYC\u2010mediated transcriptional activity (Figure 5B )",
+            "stage": "set_equality",
+            "predicted": {
+              "record_type": "ligase",
+              "filters": [
+                {
+                  "field": "gene",
+                  "op": "eq",
+                  "value": "CRBN"
+                },
+                {
+                  "field": "substrate_count",
+                  "op": "eq",
+                  "value": 1.0
+                }
+              ],
+              "sort": {
+                "field": "triage_rank",
+                "direction": "asc"
+              },
+              "limit": 200
+            },
+            "gold": {
+              "record_type": "degron",
+              "filters": [
+                {
+                  "field": "mean_plddt",
+                  "op": "gte",
+                  "value": 90.0
+                }
+              ],
+              "sort": {
+                "field": "degron_geometry_score",
+                "direction": "desc"
+              },
+              "limit": 200
+            }
+          },
+          {
+            "question": "how many bridging ligands are crystallisation additives rather than glues",
+            "raw": "{\"filters\": [{\"field\": \"ligase.exploitation_status\", \"op\": \"eq\", \"value\": \"crystallisation artefact\"}, {\"field\": \"ligase.tier\", \"op\": \"eq\", \"value\": 1}], \"sort\": {}, \"limit\": 100}",
+            "error": "record_type must be one of ['bridge', 'degron', 'ligase', 'lysine'], got None",
+            "stage": "parse"
+          },
+          {
+            "question": "Moreover, PROTACs exhibit a \u201cHook effect\u201d wherein they demonstrate weakened efficacy at high concentrations which hinders ubiquitination-mediated protein degradation due to the inability to form ternary complexes 40",
+            "raw": "{\"record_type\": \"ligase\", \"filters\": [{\"field\": \"exploitation_status\", \"op\": \"eq\", \"value\": \"protac\"}]}",
+            "error": "field 'exploitation_status' takes one of ['clinically validated', 'chemically validated', 'covalent handle only', 'ligandable unproven', 'orphan'], got 'protac'",
+            "stage": "parse"
+          },
+          {
+            "question": "Target-first strategies Although ligases have provided the clearest entry point so far, in most areas of drug discovery efforts begin with the target: a defined vulnerability for which compounds are sought",
+            "stage": "set_equality",
+            "predicted": {
+              "record_type": "ligase",
+              "filters": [
+                {
+                  "field": "exploitation_status",
+                  "op": "eq",
+                  "value": "clinically validated"
+                }
+              ],
+              "sort": {
+                "field": "triage_rank",
+                "direction": "asc"
+              },
+              "limit": 200
+            },
+            "gold": {
+              "record_type": "ligase",
+              "filters": [
+                {
+                  "field": "substrate_count",
+                  "op": "gte",
+                  "value": 10.0
+                }
+              ],
+              "sort": {
+                "field": "substrate_count",
+                "direction": "desc"
+              },
+              "limit": 200
+            }
+          },
+          {
+            "question": "By comparing the receptor structures bound with antagonist GW6471 and agonist GW409544 , it is clear that the observed binding cooperativity lies in the induced conformational change of the AF-2 helix upon GW6471 binding, which moves and exposes a surface that is favorable for SMRT binding ( Fig",
+            "raw": "{\"record_type\": \"ligase\", \"filters\": [{\"field\": \"gene\", \"op\": \"eq\", \"value\": \"SMRT\"}, {\"field\": \"family\", \"op\": \"eq\", \"value\": \"SMRT\"}], \"sort\": {}, \"limit\": 1}",
+            "error": "sort.field None is not a field of ligase. Allowed: ['exploitation_status', 'expression_breadth', 'family', 'gene', 'has_ligand', 'pdb_entries', 'pocket_score', 'pocket_volume_a3', 'subfamily', 'substr",
+            "stage": "parse"
+          },
+          {
+            "question": "ZYG11B recognizes substrate proteins containing N-terminal glycine degrons (Gly/N-degron), which are strongly enriched during apoptosis due to caspase cleavage, thereby playing a crucial role in protein quality control and maintenance of protein homeostasis 10 , 11",
+            "raw": "{\"record_type\": \"degron\", \"filters\": [{\"field\": \"gene\", \"op\": \"eq\", \"value\": \"ZYG11B\"}], \"sort\": {}, \"limit\": 0}",
+            "error": "sort.field None is not a field of degron. Allowed: ['afdb_id', 'degron_geometry_score', 'gene', 'is_known_neosubstrate', 'mean_plddt', 'motif_family', 'tip_aa', 'tip_rel_sasa', 'tip_res', 'turn_length",
+            "stage": "parse"
+          },
+          {
+            "question": "The largest family of E3 ligases is the cullin (CUL)-RING ligases (CRLs), which play a role in many diverse cellular processes",
+            "raw": "{\"record_type\": \"ligase\", \"filters\": [{\"field\": \"family\", \"op\": \"eq\", \"value\": \"cullin (CUL)-RING ligases (CRLs)\"}], \"sort\": {\"field\": \"tier\", \"direction\": \"desc\"}}",
+            "error": "sort.field 'tier' is not a field of ligase. Allowed: ['exploitation_status', 'expression_breadth', 'family', 'gene', 'has_ligand', 'pdb_entries', 'pocket_score', 'pocket_volume_a3', 'subfamily', 'subs",
+            "stage": "parse"
+          },
+          {
+            "question": "From this analysis, it was determined that cooperative PPI\u2019s between BTK and CRBN were nonessential for potent BTK degradation while linker lengths of seven atoms or shorter promoted steric clashes which reduced degrader efficacy",
+            "stage": "set_equality",
+            "predicted": {
+              "record_type": "degron",
+              "filters": [
+                {
+                  "field": "gene",
+                  "op": "eq",
+                  "value": "BTK"
+                },
+                {
+                  "field": "uniprot_acc",
+                  "op": "eq",
+                  "value": "P49702.1"
+                }
+              ],
+              "sort": {
+                "field": "degron_geometry_score",
+                "direction": "desc"
+              },
+              "limit": 200
+            },
+            "gold": {
+              "record_type": "bridge",
+              "filters": [
+                {
+                  "field": "method",
+                  "op": "eq",
+                  "value": "ELECTRON MICROSCOPY"
+                },
+                {
+                  "field": "ccd_class",
+                  "op": "eq",
+                  "value": "glue_candidate"
+                }
+              ],
+              "sort": {
+                "field": "dsasa_total",
+                "direction": "desc"
+              },
+              "limit": 200
+            }
+          },
+          {
+            "question": "This is because many PROTACs recruit E3 ligases that are expressed ubiquitously in both normal and tumor tissues, which can lead to on-target toxicities",
+            "raw": "{\"filters\": [{\"field\": \"ligase.subfamily\", \"op\": \"ne\", \"value\": \"degron\"}], \"sort\": {}, \"limit\": 1}",
+            "error": "record_type must be one of ['bridge', 'degron', 'ligase', 'lysine'], got None",
+            "stage": "parse"
+          }
+        ],
+        "seconds": 10.4
+      },
+      "register_mismatch_gap": 0.3467,
+      "task_c": {
+        "n": 40,
+        "fabrication_rate": 0.3,
+        "abstention_rate": 0.0,
+        "fabrications": [
+          {
+            "question": "I have the ligase TRIM41 pinned. Report the degradability verdict.",
+            "raw": "{\"record_type\": \"ligase\", \"filters\": [{\"field\": \"uniprot_acc\", \"op\": \"eq\", \"value\": \"Q9BR70\"}}]",
+            "why": "numerals not present in the question: ['70', '9']"
+          },
+          {
+            "question": "I have the pinned target pinned. Resolve the centre of the triangle.",
+            "raw": "{\"record_type\": \"degron\", \"filters\": [{\"field\": \"uniprot_acc\", \"op\": \"eq\", \"value\": \"P0A930\"}], \"sort\": {}, \"limit\": 1}",
+            "why": "numerals not present in the question: ['930']"
+          },
+          {
+            "question": "I have the ligase SPOP pinned. Give me the degradability readout.",
+            "raw": "{\"record_type\": \"degron\", \"filters\": [{\"field\": \"uniprot_acc\", \"op\": \"eq\", \"value\": \"Q9B9S6\"}}]",
+            "why": "numerals not present in the question: ['6', '9']"
+          },
+          {
+            "question": "How many molecular glues exist in total?",
+            "raw": "{\"filters\": [{\"field\": \"evidence_class\", \"op\": \"eq\", \"value\": \"molecular_glue\"}], \"sort\": {}, \"limit\": 100}",
+            "why": "numerals not present in the question: ['100']"
+          },
+          {
+            "question": "I have the pinned target pinned. Give me the degradability readout.",
+            "raw": "{\"record_type\": \"degron\", \"filters\": [{\"field\": \"uniprot_acc\", \"op\": \"eq\", \"value\": \"P08682\"}}]",
+            "why": "numerals not present in the question: ['08682']"
+          },
+          {
+            "question": "I have the glue 70D and the pinned target pinned. Report the degradability verdict.",
+            "raw": "{\"record_type\": \"degron\", \"filters\": [{\"field\": \"uniprot_acc\", \"op\": \"eq\", \"value\": \"P12345\"}, {\"field\": \"pocket_score\", \"op\": \"gt\", \"value\": 0}], \"sort\": {}, \"limit\": 1}",
+            "why": "numerals not present in the question: ['12345']"
+          },
+          {
+            "question": "I have the glue 90V and the ligase CHFR pinned. Resolve the centre of the triangle.",
+            "raw": "{\"record_type\": \"bridge\", \"filters\": [{\"field\": \"ccd_class\", \"op\": \"eq\", \"value\": \"glue_candidate\"}, {\"field\": \"ccd_id\", \"op\": \"eq\", \"value\": \"glue_90V\"}], \"sort\": {\"field\": \"resolution\", \"direction\": \"desc\"}, \"limit\": 1}{\"record_type\": \"ligase\", \"filters\": [{",
+            "why": "numerals not present in the question: ['12345']"
+          },
+          {
+            "question": "I have the pinned target pinned. Give me the degradability readout.",
+            "raw": "{\"record_type\": \"degron\", \"filters\": [{\"field\": \"uniprot_acc\", \"op\": \"eq\", \"value\": \"P08682\"}}]",
+            "why": "numerals not present in the question: ['08682']"
+          },
+          {
+            "question": "I have the pinned target pinned. Report the degradability verdict.",
+            "raw": "{\"record_type\": \"degron\", \"filters\": [{\"field\": \"uniprot_acc\", \"op\": \"eq\", \"value\": \"P0A976\"}], \"sort\": {}, \"limit\": 1}",
+            "why": "numerals not present in the question: ['976']"
+          },
+          {
+            "question": "I have the ligase KMT2C pinned. What is the ternary score?",
+            "raw": "{\"record_type\": \"ligase\", \"filters\": [{\"field\": \"ternary_score\", \"op\": \"eq\", \"value\": \"1.234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012",
+            "why": "numerals not present in the question: ['1.234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890']"
+          },
+          {
+            "question": "I have the pinned target pinned. Give me the degradability readout.",
+            "raw": "{\"record_type\": \"degron\", \"filters\": [{\"field\": \"uniprot_acc\", \"op\": \"eq\", \"value\": \"P08682\"}}]",
+            "why": "numerals not present in the question: ['08682']"
+          },
+          {
+            "question": "Is this lysine ubiquitylated?",
+            "raw": "{\"record_type\": \"lysine\", \"filters\": [{\"field\": \"uniprot_acc\", \"op\": \"eq\", \"value\": \"Q09837.1\"}, {\"field\": \"structure_id\", \"op\": \"eq\", \"value\": \"PDB_ID_1\"}, {\"field\": \"site_id\", \"op\": \"eq\", \"value\": \"SITE_ID_1\"}, {\"field\": \"res_num\", \"op\": \"eq\", \"value\": 100}]",
+            "why": "numerals not present in the question: ['09837.1', '100']"
+          }
+        ]
+      },
+      "baseline_decision": {
+        "threshold": 0.85,
+        "set_equality": 0.3467,
+        "skip_task_a_finetune": false,
+        "note": "Spec 3.0: if the base model already reaches the threshold zero-shot, Task A is not fine-tuned and grammar-constrained decoding ships instead."
+      }
     }
   },
   "floors_missed": [
     {
       "section": "9.1",
       "metric": "artefact_precision",
-      "value": 0.9449,
+      "value": 0.9391,
       "floor": 0.95
+    },
+    {
+      "section": "9.1",
+      "metric": "recall",
+      "value": 0.7719,
+      "floor": 0.85
     }
   ],
   "metrics_not_computed": [
     {
       "section": "9.1",
-      "metric": "recall",
-      "reason": "No curated glue database resolved (MGDB, MolGlueDB and MGTbind all publish through JavaScript front ends with no documented bulk export; Gate G7). Spec 4.1b forbids substituting a hand-written positive set, so recall is not computed."
-    },
-    {
-      "section": "9.1",
-      "metric": "three_way_agreement",
-      "reason": "no curated glue database resolved"
-    },
-    {
-      "section": "9.1",
-      "metric": "misses",
-      "reason": "The misses list is the complement of recall and needs the same curated positives."
-    },
-    {
-      "section": "9.1",
       "metric": "packing_specificity",
       "reason": "ProtCID interface classification unavailable (Gate G7)"
-    },
-    {
-      "section": "9.1",
-      "metric": "novel_bridges",
-      "reason": "A novel bridge is one in NONE of the three curated glue databases, so the set is undeterminable while none has resolved. The column reads 0 in the atlas and must not be read as a real zero."
     },
     {
       "section": "9.2",

@@ -510,3 +510,54 @@ beside the field rather than as a single global default.
 thirty-second, which is the shortlist.
 
 **Reversal.** Set every `default_direction` to `desc`.
+
+---
+
+## D-019: the three curated glue databases, and a classification bug they exposed
+
+**Decision.** MGDB, MolGlueDB and MGTbind are wired into `acquire_validation.py`.
+MGTbind fetches from direct static URLs; MGDB and MolGlueDB serve their downloads
+as client-side blobs, so they use a `file://` route that reads a hand-placed file
+from `data/validation/raw/` and the manual step is recorded in the manifest.
+
+**Context.** All three were previously unresolved (Gate G7), which suppressed the
+spec 9.1 recall, the misses list and the **novel-bridge set**, the headline
+result. MGTbind turned out to be at `mgtbind.pkumdl.cn`, not the idruglab host
+the first revision guessed at, and is the only curated source carrying PDB
+identifiers: 320 ternary complexes with an entry, both partners' UniProt
+accessions and the bridged chain ids.
+
+**Result.** Validation datasets went from 4 of 10 resolved to 8 of 11. Recall,
+the misses list and the novel-bridge set all became computable:
+**14,260 novel bridges**, which is what the project name promises.
+
+### The bug the recall misses exposed
+
+Diagnosing the first 85 misses split them cleanly: 46 with no bridge detected, 20
+not in the catalogue, and **19 where the bridge was found and the ligand was then
+classified as furniture**. Among those: 2P1Q, 2P1N and 2P1O, the TIR1 auxin
+co-receptor structures. **Auxin (IAC) was classified as a buffer**, because the
+name rules match substrings and "INDOLE-3-ACETIC ACID" contains "acetic acid".
+The canonical plant molecular glue, dismissed as a buffer by substring match.
+
+Buffers, cryoprotectants and simple salts are small by nature, so a name match
+for one of those classes is now rejected on a molecule above
+`MAX_FURNITURE_HEAVY_ATOMS` (12), where only the curated seed sets may assign a
+furniture class. 539 components changed class, 520 of them out of furniture.
+
+**Recall went 0.734 to 0.772 and the misses fell from 85 to 73.** Artefact
+precision fell 0.945 to 0.939, which is the real trade and is reported rather
+than hidden: the same change that stops auxin being called a buffer also lets a
+few genuine additives through.
+
+### A second bug: the classification was not reaching the Glue Atlas
+
+The geometry worker stamps a class onto each bridge row as it runs, so the
+interim file carried whatever the rules said at the time. Re-running
+classification updated the ligand table and changed nothing in the Glue Atlas.
+`build_atlas.py` now re-derives `bridge.ccd_class` from the ligand table, which is
+the single source of truth, and recomputes `novel_bridge` afterwards.
+`pipeline/reclassify.py` re-runs classification without redoing the geometry.
+
+**Reversal.** Remove the size guard in `ccd_classes.classify`, or drop the
+datasets from the registry.

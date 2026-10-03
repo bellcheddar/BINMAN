@@ -198,6 +198,11 @@ SEED_SETS: tuple[tuple[str, set[str]], ...] = (
     ("covalent_modifier", COVALENT_MODIFIER),
 )
 
+# Classes whose members are small by nature. A name match for one of these on a
+# molecule larger than this is rejected: see the guard in `classify`.
+SIZE_GUARDED_CLASSES = frozenset({"buffer", "cryoprotectant"})
+MAX_FURNITURE_HEAVY_ATOMS = 12
+
 FURNITURE_CLASSES = frozenset(
     {"cryoprotectant", "buffer", "detergent", "metal", "sugar", "covalent_modifier"}
 )
@@ -313,10 +318,21 @@ def classify(
             ccd_class, reason = structural
             return result(ccd_class, f"structure:{reason}")
 
-    # 4. name keywords
+    # 4. name keywords.
+    #
+    # Guarded by size. A buffer, a cryoprotectant and a simple salt are all
+    # small, and the name patterns are substrings: "indole-3-acetic acid"
+    # contains "acetic acid", which classified auxin, the canonical plant
+    # molecular glue, as a buffer and made 2P1Q a recall miss. A molecule far
+    # larger than the buffer it is named after is not that buffer, so above the
+    # size guard only the curated seed sets may assign a furniture class.
     for pattern, ccd_class in NAME_RULES:
-        if re.search(pattern, lowered):
-            return result(ccd_class, f"name_rule:{ccd_class}")
+        if not re.search(pattern, lowered):
+            continue
+        if ccd_class in SIZE_GUARDED_CLASSES and heavy_atoms is not None \
+                and heavy_atoms > MAX_FURNITURE_HEAVY_ATOMS:
+            continue
+        return result(ccd_class, f"name_rule:{ccd_class}")
 
     # 5. chemical dictionary type
     if upper_type in PEPTIDE_LIKE_TYPES:
