@@ -250,3 +250,33 @@ One line per meaningful event, timestamped UTC (spec Section 0 rule 5).
 | 2026-10-03T19:33:15+00:00 | 3.7 | Stage 2: step 80, mean loss over the last 20 steps 0.1228. |
 | 2026-10-03T19:33:32+00:00 | 3.7 | Stage 2: step 100, mean loss over the last 20 steps 0.0354. |
 | 2026-10-03T19:33:44+00:00 | 3.7 | Stage 2: step 120, mean loss over the last 20 steps 0.0046. |
+| 2026-10-03T19:33:58+00:00 | 3.7 | Stage 2: step 140, mean loss over the last 20 steps 0.0357. |
+| 2026-10-03T19:34:12+00:00 | 3.7 | Stage 2: step 160, mean loss over the last 20 steps 0.0048. |
+| 2026-10-03T19:34:24+00:00 | 3.7 | Stage 2: step 180, mean loss over the last 20 steps 0.0098. |
+| 2026-10-03T19:34:37+00:00 | 3.7 | Stage 2: step 200, mean loss over the last 20 steps 0.0337. |
+| 2026-10-03T19:34:49+00:00 | 3.7 | Stage 2: step 220, mean loss over the last 20 steps 0.4838. |
+| 2026-10-03T19:35:02+00:00 | 3.7 | Stage 2: step 240, mean loss over the last 20 steps 0.2023. |
+| 2026-10-03T19:35:15+00:00 | 3.7 | Stage 2: step 260, mean loss over the last 20 steps 0.2340. |
+| 2026-10-03T19:35:29+00:00 | 3.7 | Stage 2: step 280, mean loss over the last 20 steps 0.2038. |
+| 2026-10-03T19:35:42+00:00 | 3.7 | Stage 2: step 300, mean loss over the last 20 steps 0.0140. |
+| 2026-10-03T19:35:46+00:00 | 1.3 | 32,749/52,681 entries, 121,634 bridges, 0 failed, 5.2 entries/s, ~1.1 h remaining. |
+| 2026-10-03T19:35:56+00:00 | 3.7 | Stage 2: step 320, mean loss over the last 20 steps 0.0072. |
+| 2026-10-03T19:36:06+00:00 | 3.7 | Stage 2: step 340, mean loss over the last 20 steps 0.0246. |
+| 2026-10-03T19:36:20+00:00 | 3.7 | Stage 2: step 360, mean loss over the last 20 steps 0.0721. |
+| 2026-10-03T19:36:31+00:00 | 3.7 | Stage 2: step 380, mean loss over the last 20 steps 0.0199. |
+| 2026-10-03T19:36:43+00:00 | 3.7 | Stage 2: step 400, mean loss over the last 20 steps 0.0116. |
+| 2026-10-03T19:36:56+00:00 | 3.7 | Stage 2: step 420, mean loss over the last 20 steps 0.1641. |
+| 2026-10-03T19:37:10+00:00 | 3.7 | Stage 2: step 440, mean loss over the last 20 steps 0.0022. |
+| 2026-10-03T19:37:23+00:00 | 3.7 | Stage 2: step 460, mean loss over the last 20 steps 0.0010. |
+| 2026-10-03T19:37:33+00:00 | 2.1 | 8,492/20,431 scanned, 9,382 candidates, 334 failed, 1.7/s, ~2.0 h remaining. |
+| 2026-10-03T19:37:36+00:00 | 3.7 | Stage 2: step 480, mean loss over the last 20 steps 0.0042. |
+| 2026-10-03T19:37:49+00:00 | 3.7 | Stage 2: step 500, mean loss over the last 20 steps 0.0110. |
+| 2026-10-03T19:38:01+00:00 | 3.7 | Stage 2: step 520, mean loss over the last 20 steps 0.0030. |
+| 2026-10-03T19:38:14+00:00 | 3.7 | Stage 2: step 540, mean loss over the last 20 steps 0.0044. |
+| 2026-10-03T19:38:25+00:00 | 3.7 | Stage 2: step 560, mean loss over the last 20 steps 0.0017. |
+| 2026-10-03T19:38:36+00:00 | 3.7 | Stage 2: step 580, mean loss over the last 20 steps 0.0014. |
+| 2026-10-03T19:38:51+00:00 | 3.7 | Stage 2: step 600, mean loss over the last 20 steps 0.0016. |
+| 2026-10-03T19:38:52+00:00 | 3.7 | Stage 2 DPO complete: 600 steps in 7.1 min, adapters saved to models/binman-lm/adapters-dpo. |
+| 2026-10-03T19:39:04+00:00 | 3.7 | Fuse succeeded: models/binman-lm/fused |
+| 2026-10-03T19:40:46+00:00 | 1.3 | 32,821/52,681 entries, 128,339 bridges, 0 failed, 5.0 entries/s, ~1.1 h remaining. |
+| 2026-10-03T19:42:33+00:00 | 2.1 | 8,975/20,431 scanned, 9,844 candidates, 352 failed, 1.7/s, ~1.9 h remaining. |

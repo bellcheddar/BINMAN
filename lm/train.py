@@ -22,6 +22,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import math
 import shutil
 import subprocess
@@ -53,18 +54,61 @@ BASE_MODEL = "mlx-community/Qwen2.5-3B-Instruct-4bit"
 WANDB_PROJECT = os.environ.get("BINMAN_WANDB_PROJECT", "binman-lm")
 
 
-def run_name(stage: str, **parts) -> str:
-    """A descriptive W&B run name.
+# Run naming follows the convention used across Marc's other W&B projects:
+#
+#     {project}-{model}-{ver}-{parameters}-round{NN}
+#
+#     faffabout-llama-3.1-8b-8bit-round01
+#     chatmcd-qwen3-8b-round02
+#     binman-qwen-2.5-3b-4bit-round01
+#
+# The round number always ticks up: it is read from the runs already in the
+# project rather than from a local counter, so it stays correct across machines
+# and after a clone.
+WANDB_RUN_ENTITY = os.environ.get("BINMAN_WANDB_ENTITY", "")
+MODEL_SLUG = "qwen-2.5-3b-4bit"
+RUN_STEM = f"binman-{MODEL_SLUG}"
 
-    mlx-lm names its run after the adapter directory, which makes every run in
-    the project show up as "adapters". The name here says which stage it is,
-    which base model, and the hyperparameters that distinguish one run from
-    another, so the project list is readable without opening anything.
+ROUND_PATTERN = re.compile(r"-round(\d+)$")
+
+
+def next_round(stem: str = RUN_STEM) -> int:
+    """The next round number for this project, read from W&B.
+
+    Falls back to a local counter file when W&B cannot be reached, so an offline
+    run still increments rather than colliding on round01.
     """
-    base = BASE_MODEL.rsplit("/", 1)[-1].replace("-Instruct", "").lower()
-    suffix = "-".join(f"{k}{v}" for k, v in parts.items())
-    stamp = time.strftime("%Y%m%d-%H%M")
-    return f"binman-lm-{stage}-{base}-{suffix}-{stamp}"
+    highest = 0
+    try:
+        import wandb
+
+        api = wandb.Api()
+        entity = WANDB_RUN_ENTITY or api.default_entity
+        for run in api.runs(f"{entity}/{WANDB_PROJECT}", per_page=100):
+            match = ROUND_PATTERN.search(run.name or "")
+            if match:
+                highest = max(highest, int(match.group(1)))
+    except Exception:  # noqa: BLE001 - offline or unauthenticated is not fatal
+        counter = ROOT / "models" / "binman-lm" / ".round"
+        try:
+            highest = int(counter.read_text().strip())
+        except (OSError, ValueError):
+            highest = 0
+
+    nxt = highest + 1
+    counter = ROOT / "models" / "binman-lm" / ".round"
+    try:
+        counter.parent.mkdir(parents=True, exist_ok=True)
+        counter.write_text(str(nxt))
+    except OSError:
+        pass
+    return nxt
+
+
+def run_name(round_number: int | None = None, stem: str = RUN_STEM) -> str:
+    """`binman-qwen-2.5-3b-4bit-roundNN`, matching the other projects."""
+    number = round_number if round_number is not None else next_round(stem)
+    return f"{stem}-round{number:02d}"
 
 
 def wandb_env(name: str, group: str, notes: str, tags: list[str]) -> dict:
@@ -152,7 +196,8 @@ def wandb_available() -> bool:
         return False
 
 
-def stage_one(iters: int, batch_size: int, model: str = BASE_MODEL) -> dict:
+def stage_one(iters: int, batch_size: int, model: str = BASE_MODEL,
+              round_number: int | None = None) -> dict:
     counts = prepare_sft_data()
     ADAPTERS.mkdir(parents=True, exist_ok=True)
 
@@ -175,10 +220,10 @@ def stage_one(iters: int, batch_size: int, model: str = BASE_MODEL) -> dict:
     ]
     environment = dict(os.environ)
     name = ""
-    group = f"binman-lm-{time.strftime('%Y%m%d')}"
+    group = f"{RUN_STEM}-round{round_number:02d}" if round_number else RUN_STEM
     if wandb_available():
         command += ["--report-to", "wandb", "--project-name", WANDB_PROJECT]
-        name = run_name("sft", r=LORA_RANK, l=LORA_LAYERS, i=iters, b=batch_size)
+        name = run_name(round_number)
         environment.update(wandb_env(
             name, group,
             notes=(f"Stage 1 LoRA SFT. Task A (query) and Task C (abstain) "
@@ -288,7 +333,8 @@ def _sequence_logprob(model, tokenizer, prompt: str, completion: str):
     return picked[0, start:].mean()
 
 
-def stage_two(batch_size: int, epochs: int = 1, limit: int | None = None) -> dict:
+def stage_two(batch_size: int, epochs: int = 1, limit: int | None = None,
+              round_number: int | None = None, group: str = "") -> dict:
     """DPO against the stage 1 adapter (spec 3.7, fallback rung 2).
 
     Returns a report. Where anything in the loop fails the caller ships stage 1
@@ -390,10 +436,10 @@ def stage_two(batch_size: int, epochs: int = 1, limit: int | None = None) -> dic
 
             run = wandb.init(
                 project=WANDB_PROJECT, job_type="dpo",
-                name=run_name("dpo", beta=DPO_BETA, pairs=len(reference)),
-                group=f"binman-lm-{time.strftime('%Y%m%d')}",
+                name=run_name(round_number),
+                group=group or RUN_STEM,
                 tags=["stage2-dpo", "preference", f"beta{DPO_BETA}",
-                      "qwen2.5-3b-4bit"],
+                      MODEL_SLUG],
                 notes=("Stage 2 preference tuning on the corruption pairs. "
                        "mlx-lm 0.32 ships no preference trainer, so this is the "
                        "spec 3.7 DPO fallback with cached reference logprobs."),
@@ -537,7 +583,12 @@ def run(iters: int | None = None, skip_stage_two: bool = False,
         ],
     }
 
-    report["stage_1"] = stage_one(iters, batch_size)
+    # One round number per stage, both ticking up, grouped under the stage 1
+    # round so a two-stage training shows as one experiment.
+    sft_round = next_round() if wandb_available() else None
+    group = f"{RUN_STEM}-round{sft_round:02d}" if sft_round else RUN_STEM
+    report["round"] = sft_round
+    report["stage_1"] = stage_one(iters, batch_size, round_number=sft_round)
     if report["stage_1"]["exit_code"] != 0:
         report["stage_2"] = {"ran": False, "reason": "stage 1 failed"}
         report["fuse"] = {"fused": False, "reason": "stage 1 failed"}
@@ -548,7 +599,9 @@ def run(iters: int | None = None, skip_stage_two: bool = False,
         report["stage_2"] = {"ran": False, "reason": "skipped by request"}
     else:
         try:
-            report["stage_2"] = stage_two(batch_size=1, limit=dpo_limit)
+            dpo_round = next_round() if wandb_available() else None
+            report["stage_2"] = stage_two(batch_size=1, limit=dpo_limit,
+                                          round_number=dpo_round, group=group)
         except Exception as exc:  # noqa: BLE001
             # Third rung of the ladder: ship stage 1 alone and log it.
             report["stage_2"] = {
