@@ -1,0 +1,748 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>BINMAN Design Concepts</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;800&family=IBM+Plex+Mono:wght@400;500;600&family=Spline+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout concept: a municipal sorting-depot sheet — stencilled headings, a concrete ground,
+   hazard-amber wayfinding, and one live demo bay that re-skins under five navigation idioms. */
+:root{
+  --bg:#E9EAE5;
+  --surface:#F7F7F4;
+  --surface-2:#DFE1DA;
+  --ink:#15171A;
+  --muted:#6A6F68;
+  --line:#C9CBC3;
+  --accent:#D65B0A;
+  --accent-soft:#F6E3D3;
+  --good:#2C6D60;
+  --warn:#9A7B10;
+  --bad:#A33A2A;
+  --display:'Archivo','Helvetica Neue',Arial,sans-serif;
+  --body:'Spline Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --data:'IBM Plex Mono',ui-monospace,'SF Mono',Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#131512;--surface:#1C1F1B;--surface-2:#252923;--ink:#E7E9E2;--muted:#8D938A;
+    --line:#2F342D;--accent:#FF8A33;--accent-soft:#3A2415;--good:#5CBCA3;--warn:#D4AC3A;--bad:#E07A62;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#131512;--surface:#1C1F1B;--surface-2:#252923;--ink:#E7E9E2;--muted:#8D938A;
+  --line:#2F342D;--accent:#FF8A33;--accent-soft:#3A2415;--good:#5CBCA3;--warn:#D4AC3A;--bad:#E07A62;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);line-height:1.5;margin:0}
+.wrap{max-width:1080px;margin:0 auto;padding-inline:20px;padding-block:28px 64px}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0}
+.eyebrow{font-family:var(--data);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.rule{height:1px;background:var(--line);border:0;margin:0}
+
+/* ---------- masthead ---------- */
+.mast{display:flex;flex-wrap:wrap;gap:20px;align-items:flex-end;justify-content:space-between;
+  border-top:4px solid var(--accent);padding-top:16px}
+.lockup h1{font-size:clamp(40px,9vw,68px);font-weight:800;letter-spacing:-.025em;line-height:.92}
+.lockup h1 span{color:var(--accent)}
+#expansion{font-family:var(--data);font-size:12.5px;color:var(--muted);margin-top:8px;min-height:2.6em;max-width:46ch}
+#expansion b{color:var(--ink);font-weight:600}
+.mast-note{font-size:13.5px;color:var(--muted);max-width:30ch}
+.themebtn{font-family:var(--data);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;
+  background:transparent;color:var(--muted);border:1px solid var(--line);border-radius:2px;padding:6px 10px;cursor:pointer}
+.themebtn:hover{color:var(--ink);border-color:var(--accent)}
+
+section{margin-top:52px}
+.sechead{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:6px}
+.sechead h2{font-size:22px;font-weight:600;letter-spacing:-.01em}
+.secsub{font-size:14px;color:var(--muted);max-width:70ch;margin:0 0 20px}
+
+/* ---------- backronyms ---------- */
+.bk-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(248px,1fr));gap:10px}
+.bk{text-align:left;background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--line);
+  border-radius:2px;padding:13px 14px;cursor:pointer;font:inherit;color:inherit;transition:border-color .15s,background .15s}
+.bk:hover{border-left-color:var(--accent)}
+.bk[aria-pressed="true"]{border-left-color:var(--accent);background:var(--accent-soft)}
+.bk .letters{font-family:var(--data);font-size:13px;line-height:1.45}
+.bk .letters b{color:var(--accent);font-weight:600}
+.bk .why{font-size:12.5px;color:var(--muted);margin-top:7px}
+.bk .pick{font-family:var(--data);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}
+
+/* ---------- concept chooser ---------- */
+.chooser{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px;margin-bottom:22px}
+.cbtn{text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:2px;padding:12px 13px;
+  cursor:pointer;font:inherit;color:inherit;display:flex;flex-direction:column;gap:6px;min-width:0;transition:.15s}
+.cbtn:hover{border-color:var(--accent)}
+.cbtn[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.cbtn[aria-pressed="true"] .cnum,.cbtn[aria-pressed="true"] .ctag{color:var(--accent)}
+.cnum{font-family:var(--data);font-size:10px;letter-spacing:.12em;color:var(--muted)}
+.cname{font-family:var(--display);font-weight:600;font-size:15.5px;letter-spacing:-.01em}
+.ctag{font-size:12px;color:var(--muted)}
+.cbtn[aria-pressed="true"] .ctag{color:var(--bg);opacity:.75}
+
+.readout{display:grid;grid-template-columns:1.15fr 1fr;gap:14px;margin-bottom:16px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:2px;padding:15px 16px;min-width:0}
+.panel h3{font-size:14px;font-weight:600;margin-bottom:7px}
+.panel p{font-size:13.5px;margin:0;color:var(--muted)}
+.panel p+p{margin-top:9px}
+.panel strong{color:var(--ink);font-weight:600}
+.pros{list-style:none;padding:0;margin:0;font-size:13px}
+.pros li{display:flex;gap:9px;padding:5px 0;border-bottom:1px solid var(--line)}
+.pros li:last-child{border-bottom:0}
+.pros .k{font-family:var(--data);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);
+  flex:0 0 52px;padding-top:2px}
+.pros .up{color:var(--good)}.pros .dn{color:var(--bad)}
+
+/* ---------- demo bay ---------- */
+.bay{border:1px solid var(--line);border-radius:2px;background:var(--surface);overflow:hidden}
+.baybar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;
+  padding:9px 14px;background:var(--surface-2);border-bottom:1px solid var(--line)}
+.baybar .eyebrow{color:var(--ink)}
+.sel{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.chip{font-family:var(--data);font-size:11px;background:var(--accent-soft);color:var(--ink);
+  border:1px solid var(--accent);border-radius:2px;padding:2px 6px;display:inline-flex;gap:6px;align-items:center}
+.chip b{font-weight:600;color:var(--accent)}
+.chip button{background:none;border:0;color:var(--muted);cursor:pointer;font:inherit;line-height:1;padding:0}
+.chip button:hover{color:var(--bad)}
+.selnone{font-family:var(--data);font-size:11px;color:var(--muted)}
+
+.demo{display:flex;min-height:430px}
+.nav{flex:0 0 auto}
+.stage{flex:1 1 auto;min-width:0;padding:16px;display:flex;flex-direction:column;gap:12px}
+.stagehead{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
+.stagehead h4{font-family:var(--display);font-size:15px;font-weight:600;margin:0}
+.matchnote{font-family:var(--data);font-size:10.5px;color:var(--muted)}
+.matchnote b{color:var(--accent);font-weight:600}
+.rows{display:flex;flex-direction:column;gap:6px;overflow-y:auto;max-height:330px;padding-right:2px}
+
+.row{display:grid;gap:4px 12px;text-align:left;background:var(--bg);border:1px solid var(--line);border-radius:2px;
+  padding:9px 11px;cursor:pointer;font:inherit;color:inherit;transition:.12s;min-width:0}
+.row:hover{border-color:var(--accent)}
+.row.on{border-color:var(--accent);background:var(--accent-soft)}
+.row.off{opacity:.34}
+.row .t{font-weight:600;font-size:13.5px}
+.row .s{font-size:12px;color:var(--muted)}
+.row .m{font-family:var(--data);font-size:11px;font-variant-numeric:tabular-nums;color:var(--muted)}
+.row .m b{color:var(--ink);font-weight:600}
+
+table{width:100%;border-collapse:collapse;font-family:var(--data);font-size:11.5px;font-variant-numeric:tabular-nums}
+.tscroll{overflow-x:auto}
+th{text-align:left;font-weight:500;color:var(--muted);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;
+  padding:6px 9px;border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:7px 9px;border-bottom:1px solid var(--line);white-space:nowrap}
+tr.pick{cursor:pointer}
+tr.pick:hover td{background:var(--surface-2)}
+tr.on td{background:var(--accent-soft)}
+tr.off{opacity:.34}
+.bar{display:inline-block;height:7px;background:var(--accent);vertical-align:middle;border-radius:1px}
+.bartrack{display:inline-block;width:52px;height:7px;background:var(--surface-2);border-radius:1px;vertical-align:middle}
+
+/* nav idiom: belt */
+.demo[data-c="belt"]{flex-direction:column}
+.belt{display:flex;align-items:stretch;gap:0;border-bottom:1px solid var(--line);position:relative;overflow-x:auto}
+.belt::after{content:"";position:absolute;left:0;right:0;bottom:0;height:3px;
+  background:repeating-linear-gradient(90deg,var(--line) 0 10px,transparent 10px 20px)}
+.station{flex:1 1 0;min-width:150px;background:transparent;border:0;border-right:1px solid var(--line);
+  padding:13px 14px 16px;cursor:pointer;font:inherit;color:inherit;text-align:left;position:relative}
+.station:last-child{border-right:0}
+.station .sn{font-family:var(--data);font-size:9.5px;letter-spacing:.12em;color:var(--muted)}
+.station .st{font-family:var(--display);font-weight:600;font-size:13.5px;margin-top:3px}
+.station .sc{font-family:var(--data);font-size:10.5px;color:var(--muted);margin-top:3px}
+.station[aria-selected="true"]{background:var(--accent-soft)}
+.station[aria-selected="true"] .st{color:var(--accent)}
+.station[aria-selected="true"]::after{content:"";position:absolute;left:0;right:0;bottom:0;height:3px;background:var(--accent);z-index:1}
+
+/* nav idiom: ledger rail */
+.rail{flex:0 0 184px;border-right:1px solid var(--line);background:var(--surface-2);padding:12px;
+  display:flex;flex-direction:column;gap:4px}
+.rail button{text-align:left;background:transparent;border:0;border-left:3px solid transparent;padding:8px 10px;
+  cursor:pointer;font:inherit;color:var(--muted);font-size:13px;border-radius:2px}
+.rail button[aria-selected="true"]{color:var(--ink);border-left-color:var(--accent);background:var(--surface);font-weight:600}
+.stack{margin-top:14px;border-top:1px solid var(--line);padding-top:11px}
+.stack .eyebrow{display:block;margin-bottom:7px}
+.stack .q{font-family:var(--data);font-size:11px;color:var(--ink);padding:4px 0;border-bottom:1px dotted var(--line)}
+.stack .q span{color:var(--muted)}
+
+/* nav idiom: triangle */
+.tri{flex:0 0 268px;border-right:1px solid var(--line);padding:14px;display:flex;flex-direction:column;gap:8px}
+.tri svg{width:100%;height:auto;max-width:100%}
+.tri .vn{cursor:pointer}
+.tri .vn circle{transition:.15s}
+.tri .vn text{font-family:var(--data);font-size:9px;fill:var(--ink)}
+.trihint{font-size:12px;color:var(--muted)}
+
+/* nav idiom: pinboard */
+.demo[data-c="board"]{flex-direction:column}
+.boardtabs{display:flex;gap:8px;flex-wrap:wrap;padding:12px 14px;border-bottom:1px solid var(--line)}
+.boardtabs button{background:var(--bg);border:1px solid var(--line);border-radius:2px;padding:7px 12px;cursor:pointer;
+  font:inherit;font-size:13px;color:var(--muted)}
+.boardtabs button[aria-selected="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink);font-weight:600}
+.tray{border-top:1px solid var(--line);background:var(--surface-2);padding:10px 14px;display:flex;gap:9px;
+  align-items:center;flex-wrap:wrap}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(176px,1fr));gap:9px;overflow-y:auto;max-height:300px}
+.cards .row{display:flex;flex-direction:column;gap:5px}
+
+/* nav idiom: lens graph */
+.demo[data-c="lens"]{flex-direction:column}
+.lensbar{display:flex;gap:7px;flex-wrap:wrap;padding:11px 14px;border-bottom:1px solid var(--line)}
+.lensbar button{background:transparent;border:1px solid var(--line);border-radius:14px;padding:5px 13px;cursor:pointer;
+  font:inherit;font-size:12.5px;color:var(--muted)}
+.lensbar button[aria-selected="true"]{border-color:var(--accent);color:var(--accent);background:var(--accent-soft);font-weight:600}
+.lenssplit{display:grid;grid-template-columns:1fr 1fr;min-width:0}
+.graphpane{border-right:1px solid var(--line);padding:12px;min-width:0}
+.graphpane svg{width:100%;height:auto}
+.gnode{cursor:pointer}
+.gnode text{font-family:var(--data);font-size:7.5px;fill:var(--ink)}
+
+.foot{font-size:12px;color:var(--muted);margin-top:10px;font-family:var(--data)}
+
+/* ---------- matrix ---------- */
+.matrix{overflow-x:auto;border:1px solid var(--line);border-radius:2px;background:var(--surface)}
+.matrix table{font-size:12px}
+.matrix td:first-child,.matrix th:first-child{font-family:var(--body);font-weight:600;white-space:normal;min-width:130px}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px;vertical-align:baseline}
+.d3{background:var(--good)}.d2{background:var(--warn)}.d1{background:var(--bad)}
+
+.verdict{background:var(--ink);color:var(--bg);border-radius:2px;padding:20px 22px;margin-top:22px}
+.verdict h3{font-size:17px;font-weight:600;margin-bottom:9px;color:var(--bg)}
+.verdict p{font-size:14px;margin:0 0 10px;opacity:.86;max-width:72ch}
+.verdict p:last-child{margin-bottom:0}
+.verdict b{color:var(--accent);font-weight:600;opacity:1}
+
+@media (max-width:860px){
+  .readout{grid-template-columns:1fr}
+  .demo{flex-direction:column}
+  .rail,.tri{flex:1 1 auto;border-right:0;border-bottom:1px solid var(--line)}
+  .rail{flex-direction:row;flex-wrap:wrap;align-items:flex-start}
+  .stack{width:100%;margin-top:4px}
+  .lenssplit{grid-template-columns:1fr}
+  .graphpane{border-right:0;border-bottom:1px solid var(--line)}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+</style>
+
+<div class="wrap">
+
+<header class="mast">
+  <div class="lockup">
+    <div class="eyebrow">Concept sheet · 03 Oct 2026</div>
+    <h1>BIN<span>MAN</span></h1>
+    <div id="expansion">Pick an expansion below.</div>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:10px;align-items:flex-end">
+    <button class="themebtn" id="theme">Theme</button>
+    <p class="mast-note">Mining structural and sequence databases for molecular glues, neosubstrates and degradable targets.</p>
+  </div>
+</header>
+
+<section>
+  <div class="sechead"><span class="eyebrow">01</span><h2>Backronym</h2></div>
+  <p class="secsub">Click one to set it as the working expansion. It updates the masthead so you can see how it reads under the wordmark.</p>
+  <div class="bk-grid" id="bkgrid"></div>
+</section>
+
+<section>
+  <div class="sechead"><span class="eyebrow">02</span><h2>Five navigation idioms</h2></div>
+  <p class="secsub">All five carry the same four modules and the same shared selection. What differs is how a selection travels between them. Pick a concept, then click rows inside the bay — the selection chips at the top stay live and every other module filters against them.</p>
+
+  <div class="chooser" id="chooser"></div>
+
+  <div class="readout">
+    <div class="panel">
+      <h3 id="cTitle"></h3>
+      <p id="cDesc"></p>
+      <p id="cMech"></p>
+    </div>
+    <div class="panel">
+      <h3>Trade-offs</h3>
+      <ul class="pros" id="cPros"></ul>
+    </div>
+  </div>
+
+  <div class="bay">
+    <div class="baybar">
+      <span class="eyebrow">Live selection</span>
+      <div class="sel" id="selbar"></div>
+    </div>
+    <div class="demo" id="demo"></div>
+  </div>
+  <p class="foot">Sample records are illustrative — real values come from PDB interface analysis, AFDB geometry and Open Targets.</p>
+</section>
+
+<section>
+  <div class="sechead"><span class="eyebrow">03</span><h2>Side by side</h2></div>
+  <p class="secsub">Scored against what this app actually has to do: carry one hypothesis through four modules without the user losing their place.</p>
+  <div class="matrix tscroll">
+    <table id="matrix"></table>
+  </div>
+
+  <div class="verdict">
+    <h3>Where I'd put my money</h3>
+    <p>Build <b>Split Ledger</b> as the skeleton. It is the only idiom that survives a hundred rows per module, and the accumulating query stack is itself the audit trail — you can screenshot it into a slide and someone can reproduce the shortlist.</p>
+    <p>Then borrow one move from <b>Ternary Triangle</b>: a small persistent glyph in the header showing which of the three corners (glue, E3, target) are pinned. It costs one SVG and it is the single clearest answer to "what am I currently looking at".</p>
+    <p>Keep <b>Lens Graph</b> on the roadmap as a view rather than a layout. Graphs are the right picture for E3–substrate networks, but they are a terrible place to read a lysine distance table.</p>
+  </div>
+</section>
+
+</div>
+
+<script>
+(function(){
+"use strict";
+
+/* ---------------- data ---------------- */
+var E3S=[
+ {id:"CRBN",  name:"Cereblon",  fam:"CRL4", pocket:.94, structs:214, expr:"Ubiquitous", status:"Clinically validated"},
+ {id:"VHL",   name:"von Hippel-Lindau", fam:"CRL2", pocket:.91, structs:168, expr:"Ubiquitous", status:"Clinically validated"},
+ {id:"DCAF15",name:"DCAF15",    fam:"CRL4", pocket:.62, structs:14,  expr:"Broad",      status:"Chemically validated"},
+ {id:"DDB1",  name:"DDB1 adaptor",fam:"CRL4",pocket:.67, structs:96,  expr:"Ubiquitous", status:"Chemically validated"},
+ {id:"KEAP1", name:"KEAP1",     fam:"CRL3", pocket:.78, structs:131, expr:"Broad",      status:"Ligandable, unproven"},
+ {id:"DCAF16",name:"DCAF16",    fam:"CRL4", pocket:.48, structs:4,   expr:"Broad",      status:"Covalent handle only"},
+ {id:"RNF114",name:"RNF114",    fam:"RING", pocket:.41, structs:3,   expr:"Restricted", status:"Covalent handle only"},
+ {id:"FBXO22",name:"FBXO22",    fam:"SCF",  pocket:.33, structs:1,   expr:"Tumour-enriched", status:"Orphan"}
+];
+
+var CASES=[
+ {glue:"Lenalidomide", cls:"IMiD",          e3:"CRBN",   target:"IKZF1",    dsasa:412, alpha:6.1, mode:"Ternary (PDB)"},
+ {glue:"CC-885",       cls:"IMiD analogue", e3:"CRBN",   target:"GSPT1",    dsasa:498, alpha:11.4,mode:"Ternary (PDB)"},
+ {glue:"Pomalidomide", cls:"IMiD",          e3:"CRBN",   target:"SALL4",    dsasa:386, alpha:4.3, mode:"Ternary (PDB)"},
+ {glue:"Lenalidomide", cls:"IMiD",          e3:"CRBN",   target:"CK1a",     dsasa:357, alpha:3.2, mode:"Ternary (PDB)"},
+ {glue:"Indisulam",    cls:"Aryl sulfonamide",e3:"DCAF15",target:"RBM39",   dsasa:441, alpha:7.8, mode:"Ternary (PDB)"},
+ {glue:"CR8",          cls:"CDK inhibitor", e3:"DDB1",   target:"Cyclin K", dsasa:519, alpha:9.6, mode:"Ternary (PDB)"},
+ {glue:"Auxin (IAA)",  cls:"Plant hormone", e3:"TIR1",   target:"Aux/IAA7", dsasa:304, alpha:5.5, mode:"Ternary (PDB)"},
+ {glue:"Rapamycin",    cls:"Macrocycle",    e3:"n/a",    target:"mTOR FRB", dsasa:472, alpha:12.0,mode:"Ternary (PDB)"},
+ {glue:"BI-3802",      cls:"Polymeriser",   e3:"SIAH1",  target:"BCL6",     dsasa:268, alpha:2.1, mode:"Polymerisation"},
+ {glue:"Unassigned 14",cls:"Candidate",     e3:"KEAP1",  target:"PGAM5",    dsasa:331, alpha:1.9, mode:"Mined, unvalidated"},
+ {glue:"Unassigned 27",cls:"Candidate",     e3:"DCAF16", target:"BRD4 BD1", dsasa:289, alpha:1.4, mode:"Mined, unvalidated"},
+ {glue:"Unassigned 31",cls:"Candidate",     e3:"FBXO22", target:"PRMT5",    dsasa:358, alpha:2.6, mode:"Mined, unvalidated"}
+];
+
+var DEGRONS=[
+ {target:"IKZF1",   motif:"C2H2 β-hairpin, Gly at tip",  plddt:91, exposed:"0.62", hits:"Known neosubstrate"},
+ {target:"GSPT1",   motif:"Helical degron, Gly540",            plddt:88, exposed:"0.57", hits:"Known neosubstrate"},
+ {target:"SALL4",   motif:"C2H2 β-hairpin, Gly416",       plddt:86, exposed:"0.64", hits:"Known neosubstrate"},
+ {target:"CK1a",    motif:"β-hairpin, Gly40",             plddt:93, exposed:"0.49", hits:"Known neosubstrate"},
+ {target:"RBM39",   motif:"RRM2 surface patch",                plddt:94, exposed:"0.55", hits:"Known neosubstrate"},
+ {target:"Cyclin K",motif:"N-terminal helix – DDB1 face",  plddt:89, exposed:"0.60", hits:"Known neosubstrate"},
+ {target:"BRD4 BD1",motif:"ZA-loop hairpin, Gly-adjacent",     plddt:95, exposed:"0.41", hits:"Predicted — untested"},
+ {target:"PRMT5",   motif:"TIM-barrel loop, Gly310",           plddt:90, exposed:"0.38", hits:"Predicted — untested"},
+ {target:"PGAM5",   motif:"Dimer-interface hairpin",           plddt:82, exposed:"0.52", hits:"Predicted — untested"}
+];
+
+var LYS={
+ "IKZF1":   [["K121","0.58","11.4","Favourable"],["K140","0.31","19.8","Marginal"],["K158","0.66","8.9","Favourable"]],
+ "GSPT1":   [["K541","0.61","9.2","Favourable"],["K573","0.44","15.1","Favourable"],["K612","0.22","27.4","Poor"]],
+ "SALL4":   [["K418","0.55","12.0","Favourable"],["K433","0.38","17.6","Marginal"]],
+ "CK1a":    [["K38","0.49","10.3","Favourable"],["K75","0.27","22.9","Poor"]],
+ "RBM39":   [["K242","0.57","10.8","Favourable"],["K270","0.41","16.2","Marginal"],["K288","0.63","13.5","Favourable"]],
+ "Cyclin K":[["K62","0.60","9.9","Favourable"],["K94","0.35","18.4","Marginal"]],
+ "BRD4 BD1":[["K91","0.29","24.7","Poor"],["K141","0.33","21.2","Poor"]],
+ "PRMT5":   [["K314","0.46","14.9","Favourable"],["K392","0.24","29.1","Poor"]],
+ "PGAM5":   [["K108","0.52","12.7","Favourable"],["K137","0.30","20.5","Marginal"]],
+ "Aux/IAA7":[["K31","0.64","8.1","Favourable"]],
+ "mTOR FRB":[["K2095","0.37","18.9","Marginal"]],
+ "BCL6":    [["K379","0.55","11.9","Favourable"],["K404","0.28","25.3","Poor"]]
+};
+
+var MODULES=[
+ {id:"atlas", n:"01", t:"Glue Atlas",     sub:"Ligands bridging two chains in deposited structures"},
+ {id:"degron",n:"02", t:"Degron Scan",    sub:"Structural degron motifs across the predicted proteome"},
+ {id:"e3",    n:"03", t:"E3 Triage",      sub:"Ligase ligandability, coverage and selectivity"},
+ {id:"degrad",n:"04", t:"Degradability",  sub:"Lysine geometry for the selected target"}
+];
+
+var BACKRONYMS=[
+ {b:"Binding",   i:"INterface", m:"Mining",  a:"for Actionable", n:"Neosubstrates",
+  why:"Accurate and unforced. Says what the thing does without pretending to be clever.", pick:true},
+ {b:"Bridged",   i:"INterface", m:"Miner",   a:"for Adaptors and", n:"Neodegrons",
+  why:"Leans on the bridging geometry — the honest definition of a glue."},
+ {b:"Bifunctional", i:"INterface", m:"Mapping", a:"", n:"ANalytics",
+  why:"Covers PROTACs as well as glues, at the cost of a slightly strained MAN."},
+ {b:"Binary",    i:"INterface", m:"Mining",  a:"of Assembled", n:"Neosubstrates",
+  why:"Binary = two chains, one ligand. Precise, but 'binary' reads computational first."},
+ {b:"Buried",    i:"INterface", m:"Metrics", a:"for Adhesives and", n:"Neodegrons",
+  why:"ΔSASA is the primary filter, so naming the metric is defensible. Slightly dry."},
+ {b:"Blind-spot",i:"INventory", m:"of Molecular", a:"Adhesives and", n:"Neosubstrates",
+  why:"The provocative one. Fits the 'nobody labelled these' thesis, bends the M."}
+];
+
+var CONCEPTS=[
+ {id:"belt", name:"Sorting Line",
+  tag:"Modules as stations on a conveyor",
+  desc:"The four modules sit left to right as stations on a belt, in pipeline order. A candidate enters at the Glue Atlas and physically moves right as it survives each filter. The station strip never scrolls away.",
+  mech:"<strong>Cross-tab mechanic:</strong> the selection is a parcel. Each station shows how many records are still on the belt after upstream filters, so the attrition is visible at a glance.",
+  pros:[["read","up","Pipeline order is obvious to anyone, including a non-specialist reviewer"],
+        ["read","up","Attrition counts per station make the funnel self-documenting"],
+        ["cost","dn","Enforces a linear order the science does not always have"],
+        ["cost","dn","Station strip eats vertical space on a laptop"]]},
+ {id:"ledger", name:"Split Ledger",
+  tag:"Query stack beside a dense table",
+  desc:"A terminal-style workspace. A narrow left rail holds the four modules; underneath it, every filter you apply stacks up as a readable line of provenance. The right pane is a dense, sortable table.",
+  mech:"<strong>Cross-tab mechanic:</strong> filters accumulate in one shared stack rather than per tab. Switching module re-runs the whole stack against the new record type, so nothing is silently dropped.",
+  pros:[["read","up","Highest information density — scales to thousands of rows"],
+        ["read","up","The query stack is a reproducible record you can paste into a methods section"],
+        ["cost","dn","Looks like a bioinformatics tool, which it is — no help to a casual visitor"],
+        ["cost","dn","Needs real keyboard navigation to feel fast"]]},
+ {id:"tri", name:"Ternary Triangle",
+  tag:"Glue, E3 and target as three corners",
+  desc:"The organising object is the ternary complex itself. Three vertices — glue, ligase, target — are the first three modules; the centre of the triangle is the degradability score that only resolves when all three are pinned.",
+  mech:"<strong>Cross-tab mechanic:</strong> the triangle is the state display. Filled vertices show what is pinned, edges light when a real structural link exists, and the centre fills in only for complete triads.",
+  pros:[["read","up","The one idiom where the current state needs no explaining"],
+        ["read","up","Incomplete triads are visually obvious, which is the whole point of the app"],
+        ["cost","dn","Only accommodates three primary axes; a fifth module has nowhere to go"],
+        ["cost","dn","The geometry is charming once and then has to earn its space"]]},
+ {id:"board", name:"Pin Tray",
+  tag:"Cards you pin to a persistent tray",
+  desc:"Everything is a card. Browsing is tactile, and anything interesting gets pinned to a tray along the bottom that persists across all four modules — a shortlist you build while you explore.",
+  mech:"<strong>Cross-tab mechanic:</strong> the tray is the shared state and also the export. Pinning an E3 in one module filters the others; the tray contents are what the CSV button writes out.",
+  pros:[["read","up","Best on a phone or a tablet in a meeting"],
+        ["read","up","Shortlist-building is the real user job, and this makes it the primary verb"],
+        ["cost","dn","Cards waste space once you pass about forty records"],
+        ["cost","dn","Comparing numbers across cards is harder than across table rows"]]},
+ {id:"lens", name:"Lens Graph",
+  tag:"One network, four lenses over it",
+  desc:"There is no tab switching in the usual sense. A single E3–glue–substrate network stays on screen and the four modules act as lenses that recolour it and change what the side panel lists.",
+  mech:"<strong>Cross-tab mechanic:</strong> there is no cross-tab problem to solve — the graph is the shared state. Clicking a node is simultaneously a selection in all four modules.",
+  pros:[["read","up","Network structure is the actual shape of E3–substrate biology"],
+        ["read","up","Nothing to synchronise, so no stale-filter bugs"],
+        ["cost","dn","Hairballs fast; needs aggressive pruning past a few hundred nodes"],
+        ["cost","dn","A graph is a poor container for a numeric table like lysine geometry"]]}
+];
+
+/* ---------------- state ---------------- */
+var state={concept:"ledger", mod:"atlas", sel:{e3:null,target:null,glue:null}, bk:0};
+var $=function(s){return document.querySelector(s)};
+var esc=function(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")};
+
+/* ---------------- backronyms ---------------- */
+function renderBk(){
+  $("#bkgrid").innerHTML=BACKRONYMS.map(function(x,i){
+    var line="<b>B</b>"+esc(x.b.slice(1))+" <b>IN</b>"+esc(x.i.slice(2))+" <b>M</b>"+esc(x.m.slice(1))+
+      (x.a?" "+esc(x.a).replace(/\bA/,"<b>A</b>"):" ")+" <b>N</b>"+esc(x.n.slice(1));
+    if(x.n.indexOf("AN")===0) line="<b>B</b>"+esc(x.b.slice(1))+" <b>IN</b>"+esc(x.i.slice(2))+" <b>M</b>"+esc(x.m.slice(1))+" <b>AN</b>"+esc(x.n.slice(2));
+    return '<button class="bk" aria-pressed="'+(i===state.bk)+'" data-i="'+i+'">'+
+      (x.pick?'<div class="pick">Recommended</div>':'')+
+      '<div class="letters">'+line+'</div><div class="why">'+esc(x.why)+'</div></button>';
+  }).join("");
+  var x=BACKRONYMS[state.bk];
+  $("#expansion").innerHTML=esc([x.b,x.i,x.m,x.a,x.n].filter(Boolean).join(" "))
+    .replace(/^(.)/,"<b>$1</b>");
+}
+$("#bkgrid").addEventListener("click",function(e){
+  var b=e.target.closest(".bk"); if(!b)return; state.bk=+b.dataset.i; renderBk();
+});
+
+/* ---------------- concept chooser ---------------- */
+function renderChooser(){
+  $("#chooser").innerHTML=CONCEPTS.map(function(c,i){
+    return '<button class="cbtn" aria-pressed="'+(c.id===state.concept)+'" data-id="'+c.id+'">'+
+      '<span class="cnum">CONCEPT 0'+(i+1)+'</span><span class="cname">'+esc(c.name)+'</span>'+
+      '<span class="ctag">'+esc(c.tag)+'</span></button>';
+  }).join("");
+  var c=cur();
+  $("#cTitle").textContent=c.name;
+  $("#cDesc").textContent=c.desc;
+  $("#cMech").innerHTML=c.mech;
+  $("#cPros").innerHTML=c.pros.map(function(p){
+    return '<li><span class="k">'+esc(p[0])+'</span><span class="'+p[1]+'">'+(p[1]==="up"?"+":"−")+'</span><span>'+esc(p[2])+'</span></li>';
+  }).join("");
+}
+function cur(){for(var i=0;i<CONCEPTS.length;i++)if(CONCEPTS[i].id===state.concept)return CONCEPTS[i];}
+$("#chooser").addEventListener("click",function(e){
+  var b=e.target.closest(".cbtn"); if(!b)return;
+  state.concept=b.dataset.id; if(state.concept==="tri"&&state.mod==="degrad"){} renderChooser(); renderDemo();
+});
+
+/* ---------------- selection ---------------- */
+function setSel(k,v){ state.sel[k]=(state.sel[k]===v?null:v); renderDemo(); }
+function pickCase(c){
+  state.sel.glue=c.glue; state.sel.e3=(c.e3==="n/a"?null:c.e3); state.sel.target=c.target; renderDemo();
+}
+function renderSel(){
+  var s=state.sel, parts=[];
+  if(s.glue)  parts.push(['glue','Glue',s.glue]);
+  if(s.e3)    parts.push(['e3','E3',s.e3]);
+  if(s.target)parts.push(['target','Target',s.target]);
+  $("#selbar").innerHTML = parts.length
+    ? parts.map(function(p){return '<span class="chip"><b>'+p[1]+'</b> '+esc(p[2])+' <button data-k="'+p[0]+'" aria-label="Clear '+p[1]+'">×</button></span>'}).join("")
+    : '<span class="selnone">Nothing pinned — click any row below</span>';
+}
+$("#selbar").addEventListener("click",function(e){
+  var b=e.target.closest("button[data-k]"); if(!b)return; state.sel[b.dataset.k]=null; renderDemo();
+});
+
+/* ---------------- matching ---------------- */
+function matchCase(c){
+  var s=state.sel;
+  if(s.e3&&c.e3!==s.e3)return false;
+  if(s.target&&c.target!==s.target)return false;
+  if(s.glue&&c.glue!==s.glue)return false;
+  return true;
+}
+function matchDegron(d){
+  var s=state.sel;
+  if(s.target&&d.target!==s.target)return false;
+  if(s.e3){ var ok=CASES.some(function(c){return c.e3===s.e3&&c.target===d.target}); if(!ok)return false; }
+  return true;
+}
+function matchE3(e){
+  var s=state.sel;
+  if(s.e3&&e.id!==s.e3)return false;
+  if(s.target){ var ok=CASES.some(function(c){return c.target===s.target&&c.e3===e.id}); if(!ok)return false; }
+  if(s.glue){ var ok2=CASES.some(function(c){return c.glue===s.glue&&c.e3===e.id}); if(!ok2)return false; }
+  return true;
+}
+function anyFilter(){return !!(state.sel.e3||state.sel.target||state.sel.glue)}
+
+/* ---------------- module bodies ---------------- */
+function bodyAtlas(mode){
+  var rows=CASES.map(function(c,i){
+    var on=matchCase(c), cls=anyFilter()?(on?"on":"off"):"";
+    var isPicked=(state.sel.glue===c.glue&&state.sel.target===c.target);
+    if(mode==="table"){
+      return '<tr class="pick '+(isPicked?"on":(anyFilter()&&!on?"off":""))+'" data-case="'+i+'">'+
+        '<td>'+esc(c.glue)+'</td><td>'+esc(c.cls)+'</td><td>'+esc(c.e3)+'</td><td>'+esc(c.target)+'</td>'+
+        '<td>'+c.dsasa+'</td><td>'+c.alpha.toFixed(1)+'</td><td>'+esc(c.mode)+'</td></tr>';
+    }
+    return '<button class="row '+(isPicked?"on":cls)+'" data-case="'+i+'">'+
+      '<span class="t">'+esc(c.glue)+' · '+esc(c.e3)+' → '+esc(c.target)+'</span>'+
+      '<span class="s">'+esc(c.cls)+' · '+esc(c.mode)+'</span>'+
+      '<span class="m">ΔSASA <b>'+c.dsasa+' Å²</b> · α <b>'+c.alpha.toFixed(1)+'</b></span></button>';
+  });
+  if(mode==="table"){
+    return '<div class="tscroll"><table><thead><tr><th>Ligand</th><th>Class</th><th>E3</th><th>Target</th>'+
+      '<th>ΔSASA Å²</th><th>α</th><th>Evidence</th></tr></thead><tbody>'+rows.join("")+'</tbody></table></div>';
+  }
+  return '<div class="'+(mode==="cards"?"cards":"rows")+'">'+rows.join("")+'</div>';
+}
+function bodyDegron(mode){
+  var rows=DEGRONS.map(function(d,i){
+    var on=matchDegron(d), cls=anyFilter()?(on?"on":"off"):"";
+    var isPicked=(state.sel.target===d.target);
+    if(mode==="table"){
+      return '<tr class="pick '+(isPicked?"on":(anyFilter()&&!on?"off":""))+'" data-target="'+esc(d.target)+'">'+
+        '<td>'+esc(d.target)+'</td><td>'+esc(d.motif)+'</td><td>'+d.plddt+'</td><td>'+d.exposed+'</td><td>'+esc(d.hits)+'</td></tr>';
+    }
+    return '<button class="row '+(isPicked?"on":cls)+'" data-target="'+esc(d.target)+'">'+
+      '<span class="t">'+esc(d.target)+'</span><span class="s">'+esc(d.motif)+'</span>'+
+      '<span class="m">pLDDT <b>'+d.plddt+'</b> · exposed <b>'+d.exposed+'</b> · '+esc(d.hits)+'</span></button>';
+  });
+  if(mode==="table"){
+    return '<div class="tscroll"><table><thead><tr><th>Target</th><th>Structural degron</th><th>pLDDT</th>'+
+      '<th>Rel. SASA</th><th>Status</th></tr></thead><tbody>'+rows.join("")+'</tbody></table></div>';
+  }
+  return '<div class="'+(mode==="cards"?"cards":"rows")+'">'+rows.join("")+'</div>';
+}
+function bodyE3(mode){
+  var rows=E3S.map(function(e){
+    var on=matchE3(e), cls=anyFilter()?(on?"on":"off"):"";
+    var isPicked=(state.sel.e3===e.id);
+    var w=Math.round(e.pocket*52);
+    if(mode==="table"){
+      return '<tr class="pick '+(isPicked?"on":(anyFilter()&&!on?"off":""))+'" data-e3="'+esc(e.id)+'">'+
+        '<td>'+esc(e.id)+'</td><td>'+esc(e.fam)+'</td>'+
+        '<td><span class="bartrack"><span class="bar" style="width:'+w+'px"></span></span> '+e.pocket.toFixed(2)+'</td>'+
+        '<td>'+e.structs+'</td><td>'+esc(e.expr)+'</td><td>'+esc(e.status)+'</td></tr>';
+    }
+    return '<button class="row '+(isPicked?"on":cls)+'" data-e3="'+esc(e.id)+'">'+
+      '<span class="t">'+esc(e.id)+' · '+esc(e.fam)+'</span><span class="s">'+esc(e.status)+' · '+esc(e.expr)+'</span>'+
+      '<span class="m">pocket <b>'+e.pocket.toFixed(2)+'</b> · structures <b>'+e.structs+'</b></span></button>';
+  });
+  if(mode==="table"){
+    return '<div class="tscroll"><table><thead><tr><th>Ligase</th><th>Family</th><th>Pocket score</th>'+
+      '<th>PDB entries</th><th>Expression</th><th>Status</th></tr></thead><tbody>'+rows.join("")+'</tbody></table></div>';
+  }
+  return '<div class="'+(mode==="cards"?"cards":"rows")+'">'+rows.join("")+'</div>';
+}
+function bodyDegrad(){
+  var t=state.sel.target;
+  if(!t||!LYS[t]){
+    return '<div class="rows"><div class="row" style="cursor:default;border-style:dashed">'+
+      '<span class="t">No target pinned</span>'+
+      '<span class="s">Pin a target in Glue Atlas or Degron Scan and its surface lysines resolve here.</span>'+
+      '<span class="m">Scored on relative SASA and Cβ–Cβ distance from the ligand site to each lysine.</span></div></div>';
+  }
+  var rows=LYS[t].map(function(l){
+    var tone=l[3]==="Favourable"?"d3":(l[3]==="Marginal"?"d2":"d1");
+    return '<tr><td>'+esc(l[0])+'</td><td>'+l[1]+'</td><td>'+l[2]+'</td>'+
+      '<td><span class="dot '+tone+'"></span>'+esc(l[3])+'</td></tr>';
+  }).join("");
+  var fav=LYS[t].filter(function(l){return l[3]==="Favourable"}).length;
+  return '<div class="tscroll"><table><thead><tr><th>Lysine</th><th>Rel. SASA</th>'+
+    '<th>Cβ–Cβ to site (Å)</th><th>Ubiquitin-transfer geometry</th></tr></thead><tbody>'+rows+'</tbody></table></div>'+
+    '<p class="foot">'+esc(t)+': '+fav+' of '+LYS[t].length+' surface lysines sit within modelled transfer range of the pinned site.</p>';
+}
+
+function body(mode){
+  if(state.mod==="atlas") return bodyAtlas(mode);
+  if(state.mod==="degron")return bodyDegron(mode);
+  if(state.mod==="e3")    return bodyE3(mode);
+  return bodyDegrad();
+}
+function counts(id){
+  if(id==="atlas") return [CASES.filter(matchCase).length, CASES.length];
+  if(id==="degron")return [DEGRONS.filter(matchDegron).length, DEGRONS.length];
+  if(id==="e3")    return [E3S.filter(matchE3).length, E3S.length];
+  var t=state.sel.target; return [t&&LYS[t]?LYS[t].length:0, t&&LYS[t]?LYS[t].length:0];
+}
+function modInfo(id){for(var i=0;i<MODULES.length;i++)if(MODULES[i].id===id)return MODULES[i];}
+
+function stageHead(){
+  var m=modInfo(state.mod), c=counts(state.mod);
+  var note = state.mod==="degrad"
+    ? (state.sel.target? esc(state.sel.target)+' · '+c[0]+' lysines' : 'awaiting a target')
+    : '<b>'+c[0]+'</b> of '+c[1]+' records pass the pinned filters';
+  return '<div class="stagehead"><h4>'+esc(m.t)+'</h4><span class="matchnote">'+note+'</span></div>'+
+         '<p class="matchnote" style="margin:-6px 0 0">'+esc(m.sub)+'</p>';
+}
+
+/* ---------------- concept shells ---------------- */
+function shellBelt(){
+  var stations=MODULES.map(function(m,i){
+    var c=counts(m.id);
+    var sc = m.id==="degrad" ? (state.sel.target? c[0]+' lysines':'needs a target') : c[0]+' / '+c[1]+' on belt';
+    return '<button class="station" role="tab" aria-selected="'+(m.id===state.mod)+'" data-mod="'+m.id+'">'+
+      '<span class="sn">STATION '+m.n+'</span><span class="st">'+esc(m.t)+'</span><span class="sc">'+esc(sc)+'</span></button>';
+  }).join("");
+  return '<div class="belt" role="tablist">'+stations+'</div><div class="stage">'+stageHead()+body("list")+'</div>';
+}
+function shellLedger(){
+  var rail=MODULES.map(function(m){
+    return '<button role="tab" aria-selected="'+(m.id===state.mod)+'" data-mod="'+m.id+'">'+m.n+' &nbsp;'+esc(m.t)+'</button>';
+  }).join("");
+  var s=state.sel, q=[];
+  q.push('<div class="q">SELECT * FROM <span>'+esc(state.mod)+'</span></div>');
+  if(s.glue)  q.push('<div class="q">WHERE glue = <span>'+esc(s.glue)+'</span></div>');
+  if(s.e3)    q.push('<div class="q">AND e3 = <span>'+esc(s.e3)+'</span></div>');
+  if(s.target)q.push('<div class="q">AND target = <span>'+esc(s.target)+'</span></div>');
+  if(!anyFilter()) q.push('<div class="q"><span>no filters applied</span></div>');
+  return '<div class="rail" role="tablist">'+rail+
+    '<div class="stack"><span class="eyebrow">Query stack</span>'+q.join("")+'</div></div>'+
+    '<div class="stage">'+stageHead()+body("table")+'</div>';
+}
+function shellTri(){
+  var s=state.sel;
+  var V=[{x:120,y:26,lab:"GLUE",mod:"atlas",on:!!s.glue},
+         {x:26,y:188,lab:"E3",mod:"e3",on:!!s.e3},
+         {x:214,y:188,lab:"TARGET",mod:"degron",on:!!s.target}];
+  var full=(s.glue&&s.e3&&s.target);
+  var edges='<path d="M120 26 L26 188 L214 188 Z" fill="none" stroke="var(--line)" stroke-width="1.5"/>';
+  if(s.glue&&s.e3)   edges+='<line x1="120" y1="26" x2="26" y2="188" stroke="var(--accent)" stroke-width="2.5"/>';
+  if(s.glue&&s.target)edges+='<line x1="120" y1="26" x2="214" y2="188" stroke="var(--accent)" stroke-width="2.5"/>';
+  if(s.e3&&s.target) edges+='<line x1="26" y1="188" x2="214" y2="188" stroke="var(--accent)" stroke-width="2.5"/>';
+  var centre='<g class="vn" data-mod="degrad"><circle cx="120" cy="134" r="27" fill="'+(full?"var(--accent)":"var(--surface-2)")+
+    '" stroke="'+(state.mod==="degrad"?"var(--accent)":"var(--line)")+'" stroke-width="2"/>'+
+    '<text x="120" y="131" text-anchor="middle" fill="'+(full?"var(--bg)":"var(--muted)")+'">SCORE</text>'+
+    '<text x="120" y="143" text-anchor="middle" fill="'+(full?"var(--bg)":"var(--muted)")+'">'+(full?"ready":"—")+'</text></g>';
+  var nodes=V.map(function(v){
+    var lab = v.mod==="atlas"?(s.glue||"glue") : v.mod==="e3"?(s.e3||"ligase") : (s.target||"target");
+    return '<g class="vn" data-mod="'+v.mod+'">'+
+      '<circle cx="'+v.x+'" cy="'+v.y+'" r="21" fill="'+(v.on?"var(--accent-soft)":"var(--surface-2)")+
+      '" stroke="'+(state.mod===v.mod?"var(--accent)":"var(--line)")+'" stroke-width="2"/>'+
+      '<text x="'+v.x+'" y="'+(v.y+3)+'" text-anchor="middle">'+esc(v.lab)+'</text>'+
+      '<text x="'+v.x+'" y="'+(v.y<100?v.y-27:v.y+34)+'" text-anchor="middle" fill="var(--muted)">'+esc(String(lab).slice(0,14))+'</text></g>';
+  }).join("");
+  return '<div class="tri"><svg viewBox="0 0 240 230" role="tablist" aria-label="Ternary complex navigator">'+
+    edges+centre+nodes+'</svg><p class="trihint">'+
+    (full?'All three corners pinned — the centre resolves a degradability score.'
+         :'Pin a glue, a ligase and a target; the centre resolves only for a complete triad.')+
+    '</p></div><div class="stage">'+stageHead()+body("list")+'</div>';
+}
+function shellBoard(){
+  var tabs=MODULES.map(function(m){
+    return '<button role="tab" aria-selected="'+(m.id===state.mod)+'" data-mod="'+m.id+'">'+esc(m.t)+'</button>';
+  }).join("");
+  var s=state.sel, pins=[];
+  if(s.glue)pins.push(s.glue); if(s.e3)pins.push(s.e3); if(s.target)pins.push(s.target);
+  var tray = pins.length
+    ? '<span class="eyebrow">Tray</span>'+pins.map(function(p){return '<span class="chip">'+esc(p)+'</span>'}).join("")+
+      '<span class="selnone">→ '+pins.length+' item'+(pins.length>1?"s":"")+' would export as CSV</span>'
+    : '<span class="eyebrow">Tray</span><span class="selnone">Empty — pin a card to start a shortlist</span>';
+  return '<div class="boardtabs" role="tablist">'+tabs+'</div><div class="stage">'+stageHead()+
+    body(state.mod==="degrad"?"table":"cards")+'</div><div class="tray">'+tray+'</div>';
+}
+function shellLens(){
+  var lenses=MODULES.map(function(m){
+    return '<button role="tab" aria-selected="'+(m.id===state.mod)+'" data-mod="'+m.id+'">'+esc(m.t)+'</button>';
+  }).join("");
+  var e3nodes=[["CRBN",56,40],["DCAF15",56,96],["DDB1",56,152],["KEAP1",56,208]];
+  var tnodes=[["IKZF1",214,30],["GSPT1",214,66],["CK1a",214,102],["RBM39",214,138],["Cyclin K",214,174],["PGAM5",214,210]];
+  var links=[["CRBN","IKZF1"],["CRBN","GSPT1"],["CRBN","CK1a"],["DCAF15","RBM39"],["DDB1","Cyclin K"],["KEAP1","PGAM5"]];
+  var pos={}; e3nodes.concat(tnodes).forEach(function(n){pos[n[0]]=[n[1],n[2]]});
+  var s=state.sel;
+  var lines=links.map(function(l){
+    var a=pos[l[0]],b=pos[l[1]];
+    var hot=(s.e3===l[0]||s.target===l[1]);
+    return '<line x1="'+a[0]+'" y1="'+a[1]+'" x2="'+b[0]+'" y2="'+b[1]+'" stroke="'+(hot?"var(--accent)":"var(--line)")+
+      '" stroke-width="'+(hot?2:1)+'"/>';
+  }).join("");
+  function nd(n,kind){
+    var on=(kind==="e3"?s.e3===n[0]:s.target===n[0]);
+    return '<g class="gnode" data-'+kind+'="'+esc(n[0])+'">'+
+      '<circle cx="'+n[1]+'" cy="'+n[2]+'" r="'+(on?9:6)+'" fill="'+(on?"var(--accent)":"var(--surface-2)")+
+      '" stroke="var(--line)" stroke-width="1"/>'+
+      '<text x="'+(kind==="e3"?n[1]-12:n[1]+12)+'" y="'+(n[2]+3)+'" text-anchor="'+(kind==="e3"?"end":"start")+'">'+esc(n[0])+'</text></g>';
+  }
+  var svg='<svg viewBox="0 0 270 240" aria-label="E3 to substrate network">'+lines+
+    e3nodes.map(function(n){return nd(n,"e3")}).join("")+
+    tnodes.map(function(n){return nd(n,"target")}).join("")+'</svg>';
+  return '<div class="lensbar" role="tablist">'+lenses+'</div><div class="lenssplit">'+
+    '<div class="graphpane">'+svg+'<p class="trihint">Click a node — it pins in all four lenses at once.</p></div>'+
+    '<div class="stage">'+stageHead()+body(state.mod==="degrad"?"table":"list")+'</div></div>';
+}
+
+var SHELLS={belt:shellBelt,ledger:shellLedger,tri:shellTri,board:shellBoard,lens:shellLens};
+
+function renderDemo(){
+  renderSel();
+  var d=$("#demo");
+  d.setAttribute("data-c",state.concept);
+  d.innerHTML=SHELLS[state.concept]();
+}
+
+$("#demo").addEventListener("click",function(e){
+  var m=e.target.closest("[data-mod]");
+  if(m){ state.mod=m.dataset.mod; renderDemo(); return; }
+  var c=e.target.closest("[data-case]");
+  if(c){ pickCase(CASES[+c.dataset.case]); return; }
+  var t=e.target.closest("[data-target]");
+  if(t){ setSel("target",t.dataset.target); return; }
+  var g=e.target.closest("[data-e3]");
+  if(g){ setSel("e3",g.dataset.e3); return; }
+});
+
+/* ---------------- matrix ---------------- */
+var CRIT=[
+ ["Scales past 500 rows",      {belt:2,ledger:3,tri:1,board:1,lens:2}],
+ ["Current state is obvious",  {belt:3,ledger:2,tri:3,board:3,lens:2}],
+ ["Works on a phone",          {belt:2,ledger:1,tri:2,board:3,lens:1}],
+ ["Reproducible / auditable",  {belt:2,ledger:3,tri:1,board:2,lens:1}],
+ ["Build cost (3 = cheapest)", {belt:3,ledger:3,tri:2,board:2,lens:1}],
+ ["Survives a fifth module",   {belt:2,ledger:3,tri:1,board:3,lens:3}]
+];
+function renderMatrix(){
+  var head='<thead><tr><th>Criterion</th>'+CONCEPTS.map(function(c){return '<th>'+esc(c.name)+'</th>'}).join("")+'</tr></thead>';
+  var body=CRIT.map(function(r){
+    return '<tr><td>'+esc(r[0])+'</td>'+CONCEPTS.map(function(c){
+      var v=r[1][c.id];
+      return '<td><span class="dot d'+v+'"></span>'+(v===3?"Strong":v===2?"Fair":"Weak")+'</td>';
+    }).join("")+'</tr>';
+  }).join("");
+  $("#matrix").innerHTML=head+'<tbody>'+body+'</tbody>';
+}
+
+/* ---------------- theme ---------------- */
+$("#theme").addEventListener("click",function(){
+  var r=document.documentElement, c=r.getAttribute("data-theme");
+  var dark=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches;
+  var now=c?c:(dark?"dark":"light");
+  r.setAttribute("data-theme", now==="dark"?"light":"dark");
+});
+
+renderBk(); renderChooser(); renderDemo(); renderMatrix();
+})();
+</script>
+
+</body></html>

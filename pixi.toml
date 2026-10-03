@@ -1,0 +1,71 @@
+# BINMAN compute environment (spec 3.1).
+# osx-arm64 only. Fallbacks for anything conda-forge lacks are installed via pip
+# in the [pypi-dependencies] table and recorded in DECISIONS.md.
+
+[workspace]
+name = "binman"
+version = "0.1.0"
+description = "Blind-spot INventory of Molecular Adhesives and Neosubstrates"
+channels = ["conda-forge", "bioconda"]
+platforms = ["osx-arm64"]
+
+[system-requirements]
+# pixi otherwise solves against a macos=13.0 minimum platform, which excludes
+# the fpocket builds. See DECISIONS.md D-002.
+macos = "14.5"
+
+[dependencies]
+python = "3.11.*"
+pip = "*"
+
+# structure handling
+gemmi = "*"
+biotite = "*"
+biopython = "*"
+
+# surface and secondary structure
+freesasa = "*"
+dssp = "*"        # provides mkdssp
+
+# chemistry
+rdkit = "*"
+openbabel = "*"
+fpocket = "*"     # pocket detection, P2Rank is the documented fallback
+
+# analytical store
+duckdb = "*"
+pyarrow = "*"
+pandas = "*"
+numpy = "*"
+scipy = "*"
+scikit-learn = "*"
+
+# polite IO
+httpx = "*"
+tenacity = "*"
+
+# misc
+tomli-w = "*"
+tqdm = "*"
+matplotlib = "*"
+pytest = "*"
+lxml = "*"
+
+[pypi-dependencies]
+# conda-forge lags or lacks osx-arm64 builds for these
+plip = "*"
+pydssp = "*"
+mlx = "*"
+mlx-lm = "*"
+
+[activation.env]
+# plip and pydssp both pull an OpenMP runtime that collides with the one
+# numpy/torch already loaded. Documented in DECISIONS.md D-003.
+KMP_DUPLICATE_LIB_OK = "TRUE"
+PYTORCH_ENABLE_MPS_FALLBACK = "1"
+TOKENIZERS_PARALLELISM = "false"
+
+[tasks]
+hwprobe = "python tools/hwprobe.py"
+smoke = "python tools/smoke_test.py"
+test = "pytest -q tests"

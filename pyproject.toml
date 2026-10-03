@@ -1,0 +1,27 @@
+# BINMAN app environment (spec 3.2). Flask only: no React, Vue, npm or webpack.
+# Front-end libraries are vendored and pinned under app/static/vendor/.
+
+[project]
+name = "binman-app"
+version = "0.1.0"
+description = "BINMAN: interactive atlas of bridging ligands, structural degrons, E3 ligase triage and degradability"
+requires-python = ">=3.11"
+dependencies = [
+  "flask>=3.0",
+  "jinja2>=3.1",
+  "gunicorn>=22.0",
+  "httpx>=0.27",
+]
+
+[project.optional-dependencies]
+qc = [
+  "pytest>=8.0",
+  "playwright>=1.47",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.uv]
+package = false

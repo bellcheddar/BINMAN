@@ -1,0 +1,91 @@
+# BINMAN thresholds (spec Section 5).
+#
+# Every cutoff used anywhere in the pipeline lives here. No Python file in this
+# project may contain a scientific threshold as a literal. Values marked
+# "starting point only" have no empirical standing and are overwritten by a fit
+# (see [degradability.reach_window]).
+
+[bridging]
+# spec 5.1: a non-polymer entity bridges chains A and B when all of these hold.
+min_dsasa_per_chain_a2       = 25.0   # buried area against each chain, Angstrom^2
+min_heavy_atom_contacts      = 3      # heavy-atom contacts under the cutoff below
+contact_cutoff_a             = 4.0    # Angstrom
+min_ligand_heavy_atoms       = 10     # ~150 Da, waived for prior glue_candidate CCDs
+sasa_probe_radius_a          = 1.4
+sasa_algorithm               = "LeeRichards"
+default_assembly_id          = "1"
+# A balance near 1.0 is the signature of a genuine glue. Near 0 is a ligand
+# bound to one chain that happens to graze another.
+glue_balance_floor           = 0.30   # below this, reported but not headline
+glue_balance_strong          = 0.50   # used by the worked-example selector (6.6.4)
+
+[degron]
+# spec 5.2: beta-hairpin with an exposed glycine at the tip.
+min_strand_length            = 3      # residues per antiparallel strand
+max_turn_length              = 5      # residues in the connecting turn
+tip_glycine_offsets          = [-1, 0, 1]   # tip or tip +/- 1 must be glycine
+min_mean_plddt               = 70.0   # over the tip region
+min_tip_rel_sasa             = 0.40   # Tien et al. maximum accessibility reference
+# Composite score weights (pLDDT, exposure, hairpin regularity). Transparent by
+# design: every component is a visible column in the UI.
+weight_plddt                 = 0.35
+weight_exposure              = 0.40
+weight_regularity            = 0.25
+
+[e3_triage]
+# spec 5.3: transparent weighted sum. Every component is a visible column.
+weight_pocket_score          = 0.30
+weight_pocket_volume         = 0.10
+weight_structural_coverage   = 0.15
+weight_expression_selectivity = 0.20
+weight_substrate_count       = 0.15
+weight_family_novelty        = 0.10
+# spec 9.3: the enrichment test must run with these held out of the weights,
+# otherwise it is circular.
+validation_held_out_fields   = ["exploitation_status", "has_ligand"]
+pocket_volume_reference_a3   = 1000.0  # normaliser, not a cutoff
+expression_breadth_tissue_tpm = 1.0    # a tissue counts as expressing above this
+
+[degradability.reach_window]
+# spec 5.4 step 4: THESE ARE A STARTING POINT FOR THE OPTIMISER ONLY.
+# They carry no empirical standing and must not survive into a shipped config
+# unless the protein-level-split fit independently lands on them. The fitter
+# overwrites this whole table and records the provenance fields below.
+fitted                       = false
+fit_status                   = "not yet fitted"
+min_nz_rel_sasa              = 0.35
+favourable_cb_cb_min_a       = 5.0
+favourable_cb_cb_max_a       = 18.0
+marginal_cb_cb_max_a         = 24.0
+dataset_version              = "not recorded"
+fit_date                     = "not recorded"
+held_out_auc                 = 0.0
+held_out_auc_floor           = 0.65   # spec 9.4 floor, not a fitted value
+
+[validation]
+# spec Section 9 floors. A metric below its floor triggers one documented
+# adjustment, then Gate G6.
+glue_recall_floor            = 0.85
+glue_artefact_precision_floor = 0.95
+glue_packing_specificity_floor = 0.90
+degron_sensitivity_floor     = 0.70
+degron_specificity_floor     = 0.60
+e3_enrichment_p_max          = 0.01
+e3_substrate_spearman_floor  = 0.50
+e3_pocket_coverage_floor     = 0.80
+degradability_auc_floor      = 0.65
+lm_parse_rate_floor          = 0.99
+lm_set_equality_synthetic_floor = 0.90
+lm_set_equality_external_floor  = 0.80
+lm_triage_macro_f1_floor     = 0.85
+lm_corruption_mode_floor     = 0.80
+lm_fabrication_rate_max      = 0.00
+lm_baseline_skip_finetune_at = 0.85   # spec 3.0: do not fine-tune Task A above this
+
+[atlas]
+# spec 6.5 budgets.
+max_bundle_gb                = 2.5
+max_entity_json_kb           = 150
+structure_trim_radius_a      = 8.0    # neighbourhood kept around chains of interest
+lens_graph_max_nodes         = 400
+lens_graph_default_depth     = 2

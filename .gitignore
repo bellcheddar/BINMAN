@@ -1,0 +1,39 @@
+# environments
+.pixi/
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# large or regenerable data
+data/cache/
+data/interim/
+data/atlas/*.sqlite
+data/atlas/*.duckdb
+data/afdb/
+app/static/structures/*.cif.gz
+app/static/structures/*.bcif
+
+# third-party validation datasets: never redistributed (spec 4.1b licence rule).
+# Only MANIFEST.md and computed metrics are tracked. Parsed derivatives stay local
+# even where the source licence would permit redistribution, so that the rule is
+# enforced by one pattern rather than by remembering which source allows what.
+data/validation/raw/
+data/validation/*.tsv
+data/validation/*.csv
+data/validation/*.jsonl
+data/validation/*.txt
+data/validation/*.gz
+
+# model weights: never committed, never shipped to the droplet (spec 3.9)
+models/binman-lm/adapters/*
+models/binman-lm/fused/*
+!models/binman-lm/adapters/.gitkeep
+!models/binman-lm/fused/.gitkeep
+
+# QC output
+qc/screenshots/
+qc/reports/
+
+# macOS
+.DS_Store

@@ -1,0 +1,51 @@
+{
+  "_generated_at": "2026-10-03T16:40:55+00:00",
+  "host": {
+    "chip": "Apple M2 Ultra",
+    "gpu_chipset": "Apple M2 Ultra",
+    "gpu_cores": 60,
+    "machine": "arm64",
+    "os": "Darwin 27.0.0",
+    "python": "3.11.16",
+    "python_executable": "/Users/dellboy/Documents/Vibe_Coding/BINMAN/.pixi/envs/default/bin/python",
+    "hostname": "Marcs-Mac-Studio.local"
+  },
+  "cpu": {
+    "performance_cores": 16,
+    "efficiency_cores": 8,
+    "physical_cores": 24,
+    "logical_cores": 24
+  },
+  "memory": {
+    "total_bytes": 137438953472,
+    "total_gb": 128.0
+  },
+  "disk": {
+    "path": "/Users/dellboy/Documents/Vibe_Coding/BINMAN",
+    "total_gb": 3721.9,
+    "used_gb": 2208.2,
+    "free_gb": 1513.7
+  },
+  "mps": {
+    "installed": true,
+    "version": "2.14.1",
+    "available": true,
+    "built": true
+  },
+  "mlx": {
+    "installed": true,
+    "version": "0.32.3",
+    "default_device": "Device(gpu, 0)",
+    "smoke_test": true
+  },
+  "tools": {
+    "gemmi": "0.7.5",
+    "freesasa": "2.2.1",
+    "biotite": "1.6.0",
+    "rdkit": "2026.03.6",
+    "mkdssp": "mkdssp version 4.6.1",
+    "fpocket": "***** POCKET HUNTING BEGINS *****",
+    "obabel": "Open Babel 3.2.1 -- Jul 11 2026 -- 19:54:53",
+    "java": "present"
+  }
+}
