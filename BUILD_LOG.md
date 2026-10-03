@@ -313,3 +313,18 @@ One line per meaningful event, timestamped UTC (spec Section 0 rule 5).
 | 2026-10-03T20:15:47+00:00 | 1.3 | 33,728/52,681 entries, 194,443 bridges, 0 failed, 3.9 entries/s, ~1.4 h remaining. |
 | 2026-10-03T20:17:39+00:00 | 2.1 | 12,386/20,431 scanned, 13,291 candidates, 433 failed, 1.6/s, ~1.4 h remaining. |
 | 2026-10-03T20:20:47+00:00 | 1.3 | 33,921/52,681 entries, 211,806 bridges, 0 failed, 3.8 entries/s, ~1.4 h remaining. |
+| 2026-10-03T20:22:39+00:00 | 2.1 | 12,879/20,431 scanned, 13,900 candidates, 441 failed, 1.6/s, ~1.3 h remaining. |
+| 2026-10-03T20:25:48+00:00 | 1.3 | 34,050/52,681 entries, 215,853 bridges, 0 failed, 3.7 entries/s, ~1.4 h remaining. |
+| 2026-10-03T20:27:39+00:00 | 2.1 | 13,351/20,431 scanned, 14,389 candidates, 451 failed, 1.6/s, ~1.2 h remaining. |
+| 2026-10-03T20:30:48+00:00 | 1.3 | 34,158/52,681 entries, 216,818 bridges, 0 failed, 3.6 entries/s, ~1.4 h remaining. |
+| 2026-10-03T20:32:40+00:00 | 2.1 | 13,819/20,431 scanned, 14,945 candidates, 464 failed, 1.6/s, ~1.1 h remaining. |
+| 2026-10-03T20:35:49+00:00 | 1.3 | 34,277/52,681 entries, 217,766 bridges, 0 failed, 3.5 entries/s, ~1.5 h remaining. |
+| 2026-10-03T20:37:40+00:00 | 2.1 | 14,291/20,431 scanned, 15,516 candidates, 470 failed, 1.6/s, ~1.0 h remaining. |
+| 2026-10-03T20:40:49+00:00 | 1.3 | 34,532/52,681 entries, 219,045 bridges, 0 failed, 3.4 entries/s, ~1.5 h remaining. |
+| 2026-10-03T20:42:41+00:00 | 2.1 | 14,780/20,431 scanned, 16,025 candidates, 476 failed, 1.6/s, ~1.0 h remaining. |
+| 2026-10-03T20:45:50+00:00 | 1.3 | 34,897/52,681 entries, 226,358 bridges, 0 failed, 3.3 entries/s, ~1.5 h remaining. |
+| 2026-10-03T20:47:41+00:00 | 2.1 | 15,266/20,431 scanned, 16,780 candidates, 488 failed, 1.6/s, ~0.9 h remaining. |
+| 2026-10-03T20:50:57+00:00 | 1.3 | 35,065/52,681 entries, 229,698 bridges, 0 failed, 3.2 entries/s, ~1.5 h remaining. |
+| 2026-10-03T20:52:42+00:00 | 2.1 | 15,750/20,431 scanned, 17,419 candidates, 496 failed, 1.6/s, ~0.8 h remaining. |
+| 2026-10-03T20:56:00+00:00 | 1.3 | 35,204/52,681 entries, 230,703 bridges, 0 failed, 3.2 entries/s, ~1.5 h remaining. |
+| 2026-10-03T20:57:42+00:00 | 2.1 | 16,228/20,431 scanned, 18,009 candidates, 502 failed, 1.6/s, ~0.7 h remaining. |

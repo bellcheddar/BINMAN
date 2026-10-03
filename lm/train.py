@@ -449,8 +449,11 @@ def stage_two(batch_size: int, epochs: int = 1, limit: int | None = None,
                        "spec 3.7 DPO fallback with cached reference logprobs."),
                 config={"beta": DPO_BETA, "pairs": len(reference),
                         "batch_size": batch_size, "epochs": epochs,
-                        "learning_rate": LEARNING_RATE, "base_model": BASE_MODEL,
-                        "stage": "2-preference"},
+                        # The DPO stage has its own, much gentler rate; logging
+                        # the SFT rate here would misreport what actually ran.
+                        "learning_rate": DPO_LEARNING_RATE,
+                        "max_steps": DPO_MAX_STEPS,
+                        "base_model": BASE_MODEL, "stage": "2-preference"},
                 reinit=True,
             )
         except Exception as exc:  # noqa: BLE001

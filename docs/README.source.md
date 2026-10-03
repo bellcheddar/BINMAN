@@ -2,11 +2,12 @@
 
 **Blind-spot INventory of Molecular Adhesives and Neosubstrates**
 
-Nature has been depositing molecular glues in the PDB for thirty years without
-labelling them as such. BINMAN is the inventory: an empirical atlas of every
-non-polymer entity that buries meaningful surface against two or more distinct
-polymer chains at once, with the crystallisation furniture classified rather
-than quietly deleted.
+Molecular glues have been sitting in the PDB for thirty years, deposited by
+crystallographers who were solving something else and had no reason to label the
+ligand as one. BINMAN is the inventory: an empirical atlas of every non-polymer
+entity that buries meaningful surface against two or more distinct polymer
+chains at once, with the crystallisation furniture classified rather than quietly
+deleted.
 
 Around that atlas sit three more modules that answer the questions a degrader
 programme actually fails on, and one small language model that does the text
@@ -51,6 +52,85 @@ that a genuine CRBN neosubstrate glue is **strongly asymmetric** (bridging
 balance 0.33 to 0.36, against 0.88 for rapamycin). An intuitive symmetry
 threshold would have rejected exactly the class the project exists to find.
 That is in `FINDINGS.md` with the numbers.
+
+## BINMAN-LM: training strategy
+
+The model does three text jobs and no arithmetic. Every number in BINMAN is
+computed deterministically in Python and passed to the interface; the model's
+only numeric output is a filter threshold the user then sees in the query stack.
+
+**Base model.** `Qwen2.5-3B-Instruct`, 4-bit, through `mlx-lm` on an M2 Ultra.
+3B is deliberate: the tasks are structured translation against a closed schema,
+not open-ended reasoning, and a small model that fits comfortably in unified
+memory can be retrained in minutes rather than hours.
+
+**The baseline runs first, and it decides whether to train at all.** Zero-shot
+with the full schema in context, the base model reached set equality 0.233 and a
+parse rate of 0.283, well under the 0.85 threshold at which fine-tuning would
+have been skipped in favour of grammar-constrained decoding. So it was trained.
+
+### Rounds
+
+Runs are tracked in Weights & Biases under `binman-lm`, named to the convention
+used across the other projects.
+
+| Round | Stage | Outcome |
+|---|---|---|
+| `binman-qwen-2.5-3b-4bit-round01` | LoRA SFT, rank 16, 16 layers, lr 1e-5, 1200 iterations | **Shipped.** Validation loss 2.494 to 0.001. |
+| `binman-qwen-2.5-3b-4bit-round02` | DPO, beta 0.1, lr 1e-5, 600 steps | Rejected: collapsed the model. |
+| `binman-qwen-2.5-3b-4bit-round03` | DPO, beta 0.1, lr 5e-7, 150 steps | Rejected: still degraded. |
+
+Round 01 is what serves. It turned parse rate 0.283 into **0.992** and set
+equality 0.233 into **0.992**, and it internalised the schema well enough that
+inference needs 83 prompt tokens where the baseline needed 841.
+
+### Why DPO was attempted
+
+Supervised fine-tuning only ever shows the model correct answers, so it learns
+the shape of a right answer but never the boundary between a right one and a
+plausible wrong one. Direct Preference Optimisation trains on pairs: the same
+question with a correct query object and a deliberately corrupted one, teaching
+the model to prefer the first. BINMAN's pairs cover seven corruption modes, 200
+each, generated rather than curated:
+
+| Mode | The corruption | What it teaches |
+|---|---|---|
+| `hallucinated_field` | a plausible field that does not exist | stay inside the schema |
+| `operator_inversion` | `gt` becomes `lt` | above against below |
+| `unit_confusion` | ΔSASA quoted in Å rather than Å² | domain units are not interchangeable |
+| `dropped_constraint` | three clauses in, two out | completeness |
+| `invented_entity` | a ligase not in the vocabulary | closed-world discipline |
+| `wrong_question` | valid JSON, different intent | semantic fidelity |
+| `prose_not_json` | a chatty explanation | format discipline |
+
+### Why it did not ship
+
+Both DPO attempts reached a near-zero loss by collapsing the policy rather than
+learning the preference. The first emitted `ccdccdccd…` indefinitely.
+
+The instructive part is that **the metric could not see it**: per-mode preference
+win rates measured 0.95 to 1.00 on the collapsed model, because a degenerate
+policy trivially assigns a higher likelihood to one string than another. The
+adapter would have shipped on those numbers.
+
+So a generation guard now runs held-out test questions through any candidate
+adapter and requires 80% to produce a query object the real parser accepts,
+before it is allowed to ship. Stage 1 scores 10 of 10; the DPO adapters scored 6
+of 10 and 0 of 10 and were refused. Stage 1 already clears every floor it is
+measured against, so the preference stage was an improvement on an
+already-passing model rather than a requirement.
+
+`mlx-lm` 0.32 ships no preference trainer at all, so the DPO loop is this
+project's own code against its LoRA machinery, with reference log-probabilities
+cached once from the frozen stage 1 model.
+
+### Serving
+
+BINMAN-LM serves as base model plus adapter, not as a fused model: fusing against
+the 4-bit base produced a model that parsed 0 of 10 held-out questions and
+invented its own output schema, so the artefact was deleted rather than shipped.
+The endpoint is a feature flag. With `BINMAN_LM_URL` unset the natural-language
+box is hidden and nothing else changes.
 
 ## Repository layout
 

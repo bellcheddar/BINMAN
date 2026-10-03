@@ -1,16 +1,80 @@
 {
   "README.md": {
     "repo": "binman",
-    "emoji": "🗑️",
+    "emoji": "\ud83d\uddd1\ufe0f",
     "title": "BINMAN",
-    "tagline": "Nature has been depositing molecular glues for thirty years without labelling them. This is the inventory.",
+    "tagline": "Molecular glues have been sitting in the PDB for thirty years, deposited without being labelled as such. This is the inventory.",
     "why": "Why it matters: a molecular glue is just a small molecule that happens to bury surface against two protein chains at once, and the PDB is full of them sitting unlabelled next to the cryoprotectants. BINMAN mines them out by geometry rather than by annotation, classifies the crystallisation furniture instead of deleting it so the counts reconcile, and refuses to report a number it cannot derive from published data. It is useful for: finding chemotypes that already bridge two proteins, triaging which E3 ligases are worth a ligand campaign, and asking at nomination whether a target even has a usable lysine.",
     "badges": [
-      ["python", "3.11", "3776AB", "python"],
-      ["environment", "pixi%20%2B%20uv", "1e73be", ""],
-      ["structures", "52821%20entries", "2C6D60", ""],
-      ["validation", "published%20datasets%20only", "D65B0A", ""],
-      ["licence", "code%20reusable", "6A6F68", ""]
+      [
+        "python",
+        "3.11",
+        "3776AB",
+        "python"
+      ],
+      [
+        "environment",
+        "pixi%20%2B%20uv",
+        "1e73be",
+        ""
+      ],
+      [
+        "structures",
+        "52821%20entries",
+        "2C6D60",
+        ""
+      ],
+      [
+        "validation",
+        "published%20datasets%20only",
+        "D65B0A",
+        ""
+      ],
+      [
+        "licence",
+        "code%20reusable",
+        "6A6F68",
+        ""
+      ]
+    ]
+  },
+  "README.source.md": {
+    "repo": "binman",
+    "emoji": "\ud83d\uddd1\ufe0f",
+    "title": "BINMAN",
+    "tagline": "Molecular glues have been sitting in the PDB for thirty years, deposited without being labelled as such. This is the inventory.",
+    "why": "Why it matters: a molecular glue is just a small molecule that happens to bury surface against two protein chains at once, and the PDB is full of them sitting unlabelled next to the cryoprotectants. BINMAN mines them out by geometry rather than by annotation, classifies the crystallisation furniture instead of deleting it so the counts reconcile, and refuses to report a number it cannot derive from published data. It is useful for: finding chemotypes that already bridge two proteins, triaging which E3 ligases are worth a ligand campaign, and asking at nomination whether a target even has a usable lysine.",
+    "badges": [
+      [
+        "python",
+        "3.11",
+        "3776AB",
+        "python"
+      ],
+      [
+        "environment",
+        "pixi%20%2B%20uv",
+        "1e73be",
+        ""
+      ],
+      [
+        "structures",
+        "52821%20entries",
+        "2C6D60",
+        ""
+      ],
+      [
+        "validation",
+        "published%20datasets%20only",
+        "D65B0A",
+        ""
+      ],
+      [
+        "licence",
+        "code%20reusable",
+        "6A6F68",
+        ""
+      ]
     ]
   }
 }
