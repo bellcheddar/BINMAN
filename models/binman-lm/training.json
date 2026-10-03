@@ -1,0 +1,62 @@
+{
+  "generated_at": "2026-10-03T18:40:10+00:00",
+  "identity": {
+    "base_model": "mlx-community/Qwen2.5-3B-Instruct-4bit",
+    "quantisation": "4-bit",
+    "adapter_rank": 16,
+    "adapter_layers": 16,
+    "fine_tune_type": "lora",
+    "fused": true,
+    "build_date": "2026-10-03",
+    "shipped_adapter": "models/binman-lm/adapters"
+  },
+  "hardware": {
+    "chip": "Apple M2 Ultra",
+    "gpu_cores": 60,
+    "memory_gb": 128.0,
+    "mlx_version": "0.32.3"
+  },
+  "tasks": [
+    {
+      "tag": "<task>query</task>",
+      "description": "natural language to a BINMAN query object"
+    },
+    {
+      "tag": "<task>triage</task>",
+      "description": "evidence-class triage",
+      "status": "NOT TRAINED: three of five classes have no published label source in this build (see lm/corpus/corpus_report.json)"
+    },
+    {
+      "tag": "<task>abstain</task>",
+      "description": "structured abstention naming exactly what is missing"
+    }
+  ],
+  "stage_1": {
+    "iterations_requested": 1200,
+    "batch_size": 4,
+    "rank": 16,
+    "layers": 16,
+    "learning_rate": 1e-05,
+    "wall_clock_seconds": 831.8,
+    "train_examples": 5601,
+    "valid_examples": 666,
+    "exit_code": 0,
+    "validation_losses": [],
+    "final_train_loss": null,
+    "best_validation_loss": null,
+    "early_stopping_point": null,
+    "log": "data/interim/lm_stage1.log"
+  },
+  "stage_2": {
+    "ran": false,
+    "steps_completed": 0,
+    "reason": "AttributeError: module 'mlx.nn.losses' has no attribute 'log_sigmoid'",
+    "history": []
+  },
+  "fuse": {
+    "fused": true,
+    "path": "models/binman-lm/fused",
+    "adapter": "models/binman-lm/adapters",
+    "error": ""
+  }
+}

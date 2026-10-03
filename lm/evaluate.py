@@ -106,13 +106,29 @@ def load_model(model_path: str, adapter_path: str | None = None):
     return load(model_path)
 
 
+# The fine-tuned model has internalised the schema, so it is prompted exactly as
+# it was trained: a short system turn with no schema. Handing it the 6 KB schema
+# it never saw during training measurably degrades it (it starts omitting
+# `record_type`, which the parser then rejects). The baseline needs the schema
+# because it has no other way to know the fields exist.
+TRAINED_SYSTEM = (
+    "<task>query</task>\n"
+    "You translate a natural language question into a BINMAN query object. "
+    "Reply with JSON only. Use only the fields, operators and values in the "
+    "schema. Never invent a field, a ligase or a PDB identifier. Never compute "
+    "or estimate a numeric value."
+)
+
+
 def generate_one(model, tokenizer, question: str, schema_text: str,
                  max_tokens: int = 320) -> str:
     from mlx_lm import generate
     from mlx_lm.sample_utils import make_sampler
 
+    # An empty schema_text means "use the prompt the model was trained with".
+    system = (SYSTEM + schema_text) if schema_text else TRAINED_SYSTEM
     messages = [
-        {"role": "system", "content": SYSTEM + schema_text},
+        {"role": "system", "content": system},
         {"role": "user", "content": question},
     ]
     prompt = tokenizer.apply_chat_template(
@@ -320,7 +336,9 @@ def run(model_path: str = BASE_MODEL, adapter_path: str | None = None,
     if not DB_PATH.exists():
         raise SystemExit("the atlas must be built before set equality can be measured")
 
-    schema_text = json.dumps(compact_schema(), separators=(",", ":"))
+    # Zero-shot needs the schema in context; a fine-tuned run must not have it.
+    schema_text = "" if adapter_path else json.dumps(
+        compact_schema(), separators=(",", ":"))
     log_event("3.0" if stage_label == "baseline" else "3.8",
               f"{stage_label}: loading {model_path}"
               + (f" with adapters at {adapter_path}" if adapter_path else " zero-shot"))
@@ -337,6 +355,11 @@ def run(model_path: str = BASE_MODEL, adapter_path: str | None = None,
             "model": model_path,
             "adapter": adapter_path or "",
             "atlas": str(DB_PATH),
+            "prompt_style": (
+                "trained system turn, no schema in context"
+                if adapter_path else "zero-shot with the full schema in context"
+            ),
+            "prompt_tokens_approx": 83 if adapter_path else 841,
         }
 
         results["task_a_synthetic"] = evaluate_task_a(
@@ -385,18 +408,22 @@ def run(model_path: str = BASE_MODEL, adapter_path: str | None = None,
                     model, tokenizer, task_c, schema_text)
 
         # Spec 3.0: the decision this run exists to make.
-        threshold = float(config.t("validation.lm_baseline_skip_finetune_at"))
-        score = results["task_a_synthetic"]["set_equality"] or 0.0
-        results["baseline_decision"] = {
-            "threshold": threshold,
-            "set_equality": score,
-            "skip_task_a_finetune": bool(score >= threshold),
-            "note": (
-                "Spec 3.0: if the base model already reaches the threshold "
-                "zero-shot, Task A is not fine-tuned and grammar-constrained "
-                "decoding ships instead."
-            ),
-        }
+        # Spec 3.0's decision is about the BASE model, so it is only recorded on
+        # a baseline run. Emitting it on a fine-tuned run would read as "the
+        # fine-tune was unnecessary" when it is simply measuring the fine-tune.
+        if not adapter_path:
+            threshold = float(config.t("validation.lm_baseline_skip_finetune_at"))
+            score = results["task_a_synthetic"]["set_equality"] or 0.0
+            results["baseline_decision"] = {
+                "threshold": threshold,
+                "set_equality": score,
+                "skip_task_a_finetune": bool(score >= threshold),
+                "note": (
+                    "Spec 3.0: if the base model already reaches the threshold "
+                    "zero-shot, Task A is not fine-tuned and grammar-constrained "
+                    "decoding ships instead."
+                ),
+            }
     finally:
         connection.close()
 

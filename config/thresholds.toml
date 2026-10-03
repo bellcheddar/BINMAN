@@ -141,6 +141,22 @@ SOCS-box  = "IPR001496"
 U-box     = "IPR003613"
 Cullin    = "IPR001373"
 APC-C     = "IPR024991"
+# CRL4 substrate receptors. Spec 5.3 names "DCAF" among the cullin-RING
+# adaptors, and omitting it left CRBN, VHL, DCAF15 and DCAF16 out of the
+# repertoire altogether: the exact ligases the project exists to study. These
+# signatures were read from each protein's own UniProt InterPro cross-references
+# rather than recalled.
+CULT      = "IPR034750"   # cereblon family; CRBN carries this and no RING/BTB signature
+VHL-box   = "IPR022772"   # von Hippel-Lindau tumour suppressor b/a domain
+DCAF15    = "IPR038914"
+DCAF16    = "IPR028216"
+
+[e3_triage.name_families]
+# Some substrate-receptor families have no single distinguishing InterPro
+# signature: a DCAF is a WD40 protein, and WD40 alone would pull in hundreds of
+# unrelated proteins. UniProt's own recommended-name annotation is the precise
+# rule, so it is used directly.
+DCAF = "DDB1- and CUL4-associated factor"
 
 [e3_triage.exploitation]
 # Literature-derived status for `exploitation_status` only. Spec 9.3 requires

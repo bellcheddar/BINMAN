@@ -279,3 +279,96 @@ FINDINGS.md).
 
 **Reversal.** Restore the apex-based tip in `find_hairpins`. Recovery of documented
 degrons falls back to 1 of 5.
+
+---
+
+## D-012: the E3 repertoire was missing the CRL4 substrate receptors
+
+**Decision.** Add the CULT, VHL-box, DCAF15 and DCAF16 InterPro signatures, plus a
+name-based DCAF family rule, to `config/thresholds.toml`.
+
+**Context.** The spec 5.3 family list names "Cullin-RING adaptors: F-box, DCAF,
+SOCS, BTB", and the first implementation covered RING, HECT, RBR, F-box, BTB,
+SOCS, U-box, Cullin and APC/C. It had no DCAF signature. The consequence was
+severe and only surfaced through the Section 9.3 validation: **CRBN and VHL were
+absent from the E3 repertoire entirely**, along with DCAF15 and DCAF16. Those are
+the ligases targeted protein degradation is actually built on, and the module
+exists to triage them.
+
+The spec 9.3 enrichment test measured p = 0.069 and failed its p < 0.01 floor,
+because the "validated" group contained 12 chemically validated ligases and not a
+single clinically validated one: both clinically validated entries were missing
+from the repertoire.
+
+**Alternatives considered.** Add a generic WD40 signature for the DCAF family,
+which would have pulled in several hundred unrelated WD40 proteins. Hand-pick the
+known degrader ligases by accession.
+
+**Reason.** The signatures were read from each protein's own UniProt InterPro
+cross-references rather than recalled, so they are the proteins' real
+annotations. The DCAF family has no single distinguishing InterPro signature (a
+DCAF is a WD40 protein), so UniProt's own recommended-name annotation,
+"DDB1- and CUL4-associated factor", is used instead: a precise published rule
+rather than a hand-picked list.
+
+**Result.** The repertoire went from 625 to 650 ligases. The enrichment test now
+measures **p = 0.0024** and passes. DCAF15 ranks first, VHL fifth, DCAF16 sixth
+and CRBN thirty-second, with `exploitation_status` and `has_ligand` held out of
+the score, so the ranking was not told which ligases are validated.
+
+**Reversal.** Remove the added signatures and the `[e3_triage.name_families]`
+table. Note that this removes CRBN and VHL from the atlas.
+
+---
+
+## D-013: each model is evaluated with the prompt it was trained on
+
+**Decision.** `lm/evaluate.py` sends the full schema in the system turn only for
+the zero-shot baseline. A run with an adapter uses the short system turn the
+adapter was fine-tuned with.
+
+**Context.** The first evaluation of the fine-tuned adapters scored parse rate
+0.0 and set equality 0.0, worse than the untrained baseline. The cause was a
+train/serve mismatch, not a bad fine-tune: training used a short system turn with
+no schema, and the evaluation prepended a 6 KB schema the model had never seen.
+With the unfamiliar prefix it began omitting `record_type`, which the parser then
+rejected. Measured directly on one query: with the training prompt it emits a
+complete, valid object; with the schema prepended it emits the same object minus
+`record_type`.
+
+**Alternatives considered.** Retrain with the schema in the system turn, which
+would cost about 760 extra prompt tokens on every training example and every
+inference.
+
+**Reason.** The fine-tune has internalised the schema, which is the point of
+doing it: the model needs 83 prompt tokens where the baseline needs 841. Feeding
+it a schema it does not need is both slower and measurably worse.
+
+**Result.** Parse rate 0.283 to **0.992**, set equality 0.233 to **0.992**, exact
+match to 0.942.
+
+**Reversal.** Remove the `adapter_path` condition on `schema_text` in
+`lm/evaluate.py`.
+
+---
+
+## D-014: training runs report to Weights & Biases
+
+**Decision.** Stage 1 passes `--report-to wandb --project-name binman-lm` to
+mlx-lm, and the stage 2 DPO loop, which is this project's own code, logs its loss
+curve to the same project itself.
+
+**Context.** Marc asked for training runs to be pushed to W&B. mlx-lm supports it
+natively; the DPO loop does not go through mlx-lm's trainer and so had to be
+instrumented separately.
+
+**Reason.** Both stages belong in the same project or the record of a run is
+half missing.
+
+**Safety.** `wandb_available()` checks for a credential in `WANDB_API_KEY` or
+`~/.netrc` before enabling reporting, because an uncredentialed run blocks on an
+interactive login prompt, which would hang an unattended build. With no
+credential, training proceeds unreported.
+
+**Reversal.** Set `BINMAN_WANDB_PROJECT` to change the project, or remove the
+`--report-to` arguments to disable it.

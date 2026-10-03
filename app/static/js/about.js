@@ -11,10 +11,43 @@
     return cell.getValue() ? Util.pill('yes', 'good') : Util.pill('no', 'warn');
   }
 
+  /* Same Tabulator 6.3.1 ARIA defect as the ledger: see app/static/js/ledger.js. */
+  function fixAria(table, holderId) {
+    table.on('tableBuilt', function () {
+      var holder = document.getElementById(holderId);
+      if (!holder) { return; }
+      var contents = holder.querySelector('.tabulator-header-contents');
+      if (contents) { contents.setAttribute('role', 'row'); }
+      var headers = holder.querySelector('.tabulator-headers');
+      if (headers) { headers.setAttribute('role', 'presentation'); }
+      // The scrollable tableholder is a focusable div sitting directly inside
+      // role="grid", which is not an allowed child. role="presentation" is
+      // ignored on a focusable element, so the holder becomes the row group and
+      // the table inside it becomes presentational, which leaves the structure
+      // grid > rowgroup > row > gridcell as ARIA requires.
+      var tableholder = holder.querySelector('.tabulator-tableholder');
+      if (tableholder) {
+        tableholder.setAttribute('role', 'rowgroup');
+        tableholder.setAttribute('aria-label', 'Table rows');
+      }
+      var innerTable = holder.querySelector('.tabulator-table');
+      if (innerTable) { innerTable.setAttribute('role', 'presentation'); }
+      // Tabulator renders header filters as bare inputs with no label.
+      holder.querySelectorAll('.tabulator-header-filter input').forEach(function (input) {
+        if (input.getAttribute('aria-label')) { return; }
+        var column = input.closest('.tabulator-col');
+        var title = column ? column.querySelector('.tabulator-col-title') : null;
+        var name = title ? title.textContent.trim() : 'column';
+        input.setAttribute('aria-label', 'Filter by ' + name);
+        input.setAttribute('title', 'Filter by ' + name);
+      });
+    });
+  }
+
   function initDatasetTable() {
     var holder = document.getElementById('dataset-table');
     if (!holder || typeof global.Tabulator === 'undefined') { return; }
-    new global.Tabulator(holder, {
+    fixAria(new global.Tabulator(holder, {
       data: about.datasets || [],
       layout: 'fitColumns',
       height: '340px',
@@ -39,13 +72,13 @@
         { title: 'Retrieved', field: 'retrieved', width: 170 },
         { title: 'Used for', field: 'purpose', widthGrow: 3 }
       ]
-    });
+    }), 'dataset-table');
   }
 
   function initReferenceTable() {
     var holder = document.getElementById('reference-table');
     if (!holder || typeof global.Tabulator === 'undefined') { return; }
-    new global.Tabulator(holder, {
+    fixAria(new global.Tabulator(holder, {
       data: about.references || [],
       layout: 'fitColumns',
       height: '560px',
@@ -95,7 +128,7 @@
               '" target="_blank" rel="noopener noreferrer">repo</a>';
           } }
       ]
-    });
+    }), 'reference-table');
   }
 
   function initBibtex() {

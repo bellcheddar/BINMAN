@@ -1,22 +1,6 @@
-# 🗑️ BINMAN
-
-> **Nature has been depositing molecular glues for thirty years without labelling them. This is the inventory.**
-
-![python](https://img.shields.io/badge/python-3.11-3776AB?logo=python&logoColor=white) ![environment](https://img.shields.io/badge/environment-pixi%20%2B%20uv-1e73be) ![structures](https://img.shields.io/badge/structures-52821%20entries-2C6D60) ![validation](https://img.shields.io/badge/validation-published%20datasets%20only-D65B0A) ![licence](https://img.shields.io/badge/licence-code%20reusable-6A6F68) ![author](https://img.shields.io/badge/author-Marc%20C.%20Deller,%20D.Phil.-1C244B)
-
-<table>
-<tr>
-<td>🌐 <b>Website</b></td><td><a href="https://marcdeller.com" target="_blank" rel="noopener noreferrer">marcdeller.com</a></td>
-<td>✉️ <b>Contact</b></td><td><a href="mailto:marc@marcdeller.com">marc@marcdeller.com</a></td>
-<td>🐙 <b>GitHub</b></td><td><a href="https://github.com/bellcheddar/binman" target="_blank" rel="noopener noreferrer">bellcheddar/binman</a></td>
-</tr>
-</table>
-
----
+# BINMAN
 
 **Blind-spot INventory of Molecular Adhesives and Neosubstrates**
-
-Why it matters: a molecular glue is just a small molecule that happens to bury surface against two protein chains at once, and the PDB is full of them sitting unlabelled next to the cryoprotectants. BINMAN mines them out by geometry rather than by annotation, classifies the crystallisation furniture instead of deleting it so the counts reconcile, and refuses to report a number it cannot derive from published data. It is useful for: finding chemotypes that already bridge two proteins, triaging which E3 ligases are worth a ligand campaign, and asking at nomination whether a target even has a usable lysine.
 
 Nature has been depositing molecular glues in the PDB for thirty years without
 labelling them as such. BINMAN is the inventory: an empirical atlas of every
@@ -86,7 +70,7 @@ Two things live in config and nowhere else: **hardware settings** come from
 and **every scientific threshold** comes from `config/thresholds.toml`, so no
 cutoff is a literal in Python.
 
-## ▶️ Running it
+## Running it
 
 ```bash
 pixi install                              # compute environment, osx-arm64
@@ -97,7 +81,7 @@ pixi run python pipeline/acquire_validation.py
 The compute environment needs macOS 14.5 or newer, because every available
 `fpocket` build requires it.
 
-## 📄 Licence and reuse
+## Licence and reuse
 
 The code in this repository is available for reuse. The data is not ours to
 give: BINMAN reads ten third-party databases, several of which restrict
@@ -106,8 +90,21 @@ atlas. Only computed metrics leave the build machine. If you reuse the atlas,
 read `data/validation/MANIFEST.md` first and cite the underlying resources
 separately.
 
-## 👤 Author
+## Author
 
 **Marc C. Deller, D.Phil.**
 Structural biologist and drug discovery scientist
 [marcdeller.com](https://marcdeller.com) · [marc@marcdeller.com](mailto:marc@marcdeller.com)
+
+<!--
+This is the crude source that tools/readme_forge.py polishes into the repository
+README.md (house standard, spec 4.6). Edit this file, then run:
+
+    pixi run python tools/readme_forge.py docs/README.source.md
+    cp docs/README.source.polished.md README.md
+
+The forge adds the branded header, the badge row, the contact table and the
+author footer, and rewrites GitHub links to this repository. Its palette is the
+marcdeller.com site palette, not the app's Depot palette, which applies only to
+the running interface.
+-->

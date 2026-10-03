@@ -473,10 +473,10 @@ def workflow_svg(stages: dict, atlas: dict, datasets: list[dict]) -> tuple[str, 
             "title": "1 · Acquisition",
             "software": "httpx, tenacity",
             "lines": [
-                f"{catalogue.get('total', 0):,} entries catalogued",
-                f"tier 1 {catalogue.get('tiers', {}).get('1', 0):,} · "
-                f"tier 2 {catalogue.get('tiers', {}).get('2', 0):,} · "
-                f"tier 3 {catalogue.get('tiers', {}).get('3', 0):,}",
+                f"{catalogue.get('total', 0):,} entries",
+                f"tier 1  {catalogue.get('tiers', {}).get('1', 0):,}",
+                f"tier 2  {catalogue.get('tiers', {}).get('2', 0):,}",
+                f"tier 3  {catalogue.get('tiers', {}).get('3', 0):,}",
             ],
             "failed": 0,
         },
@@ -513,14 +513,15 @@ def workflow_svg(stages: dict, atlas: dict, datasets: list[dict]) -> tuple[str, 
         },
     ]
 
-    width, height = 1000, 440
+    width, height = 1060, 460
     box_w, box_h, gap = 186, 150, 30
     left_margin = 136
     top = 112
 
     parts = [
         f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {width} {height}" '
-        f'class="schematic" role="img" aria-labelledby="wf-title wf-desc">',
+        f'class="schematic" preserveAspectRatio="xMidYMid meet" '
+        f'role="img" aria-labelledby="wf-title wf-desc">',
         '<title id="wf-title">BINMAN pipeline schematic</title>',
         '<desc id="wf-desc">Described in the text below the figure.</desc>',
         '<style>'
@@ -544,13 +545,13 @@ def workflow_svg(stages: dict, atlas: dict, datasets: list[dict]) -> tuple[str, 
         f'<rect class="wf-box" x="12" y="{top}" width="108" height="58" rx="2"/>'
         f'<text class="wf-t" x="22" y="{top + 22}">Sources</text>'
         f'<text class="wf-s" x="22" y="{top + 38}">RCSB, AFDB,</text>'
-        f'<text class="wf-s" x="22" y="{top + 50}">UniProt, InterPro</text>'
+        f'<text class="wf-s" x="22" y="{top + 50}">UniProt</text>'
     )
     parts.append(
         f'<rect class="wf-ds" x="12" y="{top + 76}" width="108" height="58" rx="2"/>'
         f'<text class="wf-t" x="22" y="{top + 98}">Ground truth</text>'
         f'<text class="wf-s" x="22" y="{top + 114}">{resolved} of {len(datasets)}</text>'
-        f'<text class="wf-s" x="22" y="{top + 126}">datasets resolved</text>'
+        f'<text class="wf-s" x="22" y="{top + 126}">resolved</text>'
     )
 
     for index, column in enumerate(columns):
@@ -588,7 +589,7 @@ def workflow_svg(stages: dict, atlas: dict, datasets: list[dict]) -> tuple[str, 
     )
 
     # Modules leaving on the right.
-    out_x = left_margin + 4 * (box_w + gap)
+    out_x = left_margin + 3 * (box_w + gap) + box_w + gap + 10
     parts.append(f'<text class="wf-head" x="{out_x}" y="{top - 24}">Modules</text>')
     for index, label in enumerate(("Glue Atlas", "Degron Scan", "E3 Triage", "Degradability")):
         y = top + index * 34
@@ -596,8 +597,11 @@ def workflow_svg(stages: dict, atlas: dict, datasets: list[dict]) -> tuple[str, 
             f'<rect class="wf-box" x="{out_x}" y="{y}" width="124" height="26" rx="2"/>'
             f'<text class="wf-n" x="{out_x + 10}" y="{y + 18}">{label}</text>'
         )
+    # The arrow into the module column starts at the last stage box, not at a
+    # notional gap beyond it, which previously ran off the canvas.
+    last_box_right = left_margin + 3 * (box_w + gap) + box_w
     parts.append(
-        f'<path class="wf-arrow" d="M{out_x - gap + 6},{top + box_h / 2} '
+        f'<path class="wf-arrow" d="M{last_box_right},{top + box_h / 2} '
         f'L{out_x - 6},{top + box_h / 2}" marker-end="url(#wf-tip)"/>'
     )
     parts.append('</svg>')

@@ -115,6 +115,19 @@ def parse_record(record: dict, family: str) -> Ligase:
     )
 
 
+def fetch_name_family(phrase: str, fetcher: Fetcher) -> list[dict]:
+    """Reviewed human proteins whose recommended name contains a phrase."""
+    query = (f'(organism_id:9606) AND (reviewed:true) AND '
+             f'(protein_name:"{phrase}")')
+    payload = fetcher.fetch_json(
+        UNIPROT_STREAM,
+        params={"query": query, "fields": FIELDS, "format": "json",
+                "compressed": "false"},
+        key=f"uniprot_name_{phrase.replace(' ', '_')[:60]}",
+    )
+    return payload.get("results", []) or []
+
+
 def build_repertoire(config: Config, fetcher: Fetcher) -> dict[str, Ligase]:
     families = config.t("e3_triage.families")
     ubl = fetch_ubl_accessions(fetcher)
@@ -139,6 +152,26 @@ def build_repertoire(config: Config, fetcher: Fetcher) -> dict[str, Ligase]:
                 extra.add(family)
                 existing.subfamily = ",".join(sorted(extra))
         log_event("2.2", f"InterPro {ipr} ({family}): {len(records):,} human reviewed proteins.")
+
+    # Families identified by UniProt's own name annotation rather than by a
+    # distinguishing InterPro signature (spec 5.3 names DCAF, which has none).
+    try:
+        name_families = config.t("e3_triage.name_families")
+    except Exception:  # noqa: BLE001
+        name_families = {}
+    for family, phrase in name_families.items():
+        records = fetch_name_family(phrase, fetcher)
+        per_family[family] = len(records)
+        for record in records:
+            ligase = parse_record(record, family)
+            existing = repertoire.get(ligase.uniprot_acc)
+            if existing is None:
+                repertoire[ligase.uniprot_acc] = ligase
+            else:
+                extra = {s for s in existing.subfamily.split(",") if s}
+                extra.add(family)
+                existing.subfamily = ",".join(sorted(extra))
+        log_event("2.2", f'UniProt name "{phrase}" ({family}): {len(records):,} proteins.')
 
     for accession, ligase in repertoire.items():
         ligase.has_ubl_keyword = accession in ubl

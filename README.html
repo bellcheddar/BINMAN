@@ -1,0 +1,113 @@
+<h1>🗑️ BINMAN</h1>
+<blockquote>
+<p><strong>Nature has been depositing molecular glues for thirty years without labelling them. This is the inventory.</strong></p>
+</blockquote>
+<p><img alt="python" src="https://img.shields.io/badge/python-3.11-3776AB?logo=python&amp;logoColor=white"> <img alt="environment" src="https://img.shields.io/badge/environment-pixi%20%2B%20uv-1e73be"> <img alt="structures" src="https://img.shields.io/badge/structures-52821%20entries-2C6D60"> <img alt="validation" src="https://img.shields.io/badge/validation-published%20datasets%20only-D65B0A"> <img alt="licence" src="https://img.shields.io/badge/licence-code%20reusable-6A6F68"> <img alt="author" src="https://img.shields.io/badge/author-Marc%20C.%20Deller,%20D.Phil.-1C244B"></p>
+<table class="emd-info-table">
+<tr>
+<td>🌐 <b>Website</b></td><td><a href="https://marcdeller.com" target="_blank" rel="noopener noreferrer">marcdeller.com</a></td>
+<td>✉️ <b>Contact</b></td><td><a href="mailto:marc@marcdeller.com">marc@marcdeller.com</a></td>
+<td>🐙 <b>GitHub</b></td><td><a href="https://github.com/bellcheddar/binman" target="_blank" rel="noopener noreferrer">bellcheddar/binman</a></td>
+</tr>
+</table>
+
+<hr>
+<p><strong>Blind-spot INventory of Molecular Adhesives and Neosubstrates</strong></p>
+<p>Why it matters: a molecular glue is just a small molecule that happens to bury surface against two protein chains at once, and the PDB is full of them sitting unlabelled next to the cryoprotectants. BINMAN mines them out by geometry rather than by annotation, classifies the crystallisation furniture instead of deleting it so the counts reconcile, and refuses to report a number it cannot derive from published data. It is useful for: finding chemotypes that already bridge two proteins, triaging which E3 ligases are worth a ligand campaign, and asking at nomination whether a target even has a usable lysine.</p>
+<p>Nature has been depositing molecular glues in the PDB for thirty years without
+labelling them as such. BINMAN is the inventory: an empirical atlas of every
+non-polymer entity that buries meaningful surface against two or more distinct
+polymer chains at once, with the crystallisation furniture classified rather
+than quietly deleted.</p>
+<p>Around that atlas sit three more modules that answer the questions a degrader
+programme actually fails on, and one small language model that does the text
+work and none of the arithmetic.</p>
+<h2>What it does</h2>
+<div class="emd-table-wrap"><table class="emd-data-table">
+<thead>
+<tr>
+<th>Module</th>
+<th>Question</th>
+<th>Method</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td data-label="Module"><strong>Glue Atlas</strong></td>
+<td data-label="Question">Which deposited ligands bridge two protein chains?</td>
+<td data-label="Method">ΔSASA against each chain, heavy-atom contacts, bridging balance, PLIP interaction typing at both half-interfaces</td>
+</tr>
+<tr>
+<td data-label="Module"><strong>Degron Scan</strong></td>
+<td data-label="Question">Which human proteins carry the β-hairpin-with-exposed-glycine geometry that CRBN reads?</td>
+<td data-label="Method">DSSP over the AlphaFold human proteome, found by geometry rather than by sequence motif</td>
+</tr>
+<tr>
+<td data-label="Module"><strong>E3 Triage</strong></td>
+<td data-label="Question">Which E3 ligases are under-exploited and worth a ligand campaign?</td>
+<td data-label="Method">InterPro family assignment, fpocket druggability, expression selectivity, substrate counts, ranked by a transparent weighted sum with every component visible</td>
+</tr>
+<tr>
+<td data-label="Module"><strong>Degradability</strong></td>
+<td data-label="Question">Does this target have a usable lysine near the binding site?</td>
+<td data-label="Method">Lysine NZ accessibility and Cβ–Cβ geometry relative to a chosen site, against a reach window fitted to observed ubiquitylation sites rather than assumed</td>
+</tr>
+</tbody>
+</table></div>
+<h2>The two rules the project is built on</h2>
+<p><strong>Every module is validated against independently curated published datasets,
+never against controls written for this project.</strong> Where a dataset cannot be
+obtained, the metric that depends on it is reported as not computed, with the
+reason. It is never filled in with a substitute. <code>FINDINGS.md</code> states every
+number with its method and its n, and
+<a href="data/validation/MANIFEST.md"><code>data/validation/MANIFEST.md</code></a> records the
+version, licence, row count and retrieval date of every dataset used.</p>
+<p><strong>The language model never computes, estimates or reports a number.</strong> ΔSASA,
+Cβ–Cβ distances, pocket scores and pLDDT are computed deterministically in
+Python and passed to the interface. BINMAN-LM does three text jobs only:
+natural language to query object, evidence-class triage, and structured
+abstention. A number in its output that was not copied verbatim from a
+retrieved record is a defect, not a feature.</p>
+<h2>Current state</h2>
+<p>Phase 1 of four. See <a href="PROGRESS.md"><code>PROGRESS.md</code></a> for the live checklist,
+<a href="BUILD_LOG.md"><code>BUILD_LOG.md</code></a> for the event log and
+<a href="DECISIONS.md"><code>DECISIONS.md</code></a> for every judgement call with its reasoning and
+how to reverse it.</p>
+<p>An early result worth stating: the bridging filter recovers five of six
+canonical glues with literature-consistent interface residues, and it shows
+that a genuine CRBN neosubstrate glue is <strong>strongly asymmetric</strong> (bridging
+balance 0.33 to 0.36, against 0.88 for rapamycin). An intuitive symmetry
+threshold would have rejected exactly the class the project exists to find.
+That is in <code>FINDINGS.md</code> with the numbers.</p>
+<h2>Repository layout</h2>
+<pre><code>pipeline/     compute stages, each resumable and manifest-backed
+app/          Flask app, Mol* viewers, the Depot design system
+lm/           BINMAN-LM corpus generation and training scripts
+tools/        hardware probe, asset vendoring
+config/       hardware.toml and tuning.toml (generated), thresholds.toml (authored)
+data/         caches, manifests, validation derivatives (not redistributed)
+deploy/       written, never executed
+tests/        geometry against hand-computed cases, parser grid, schema integrity
+</code></pre>
+<p>Two things live in config and nowhere else: <strong>hardware settings</strong> come from
+<code>config/tuning.toml</code>, so no core count or memory figure is hard-coded anywhere,
+and <strong>every scientific threshold</strong> comes from <code>config/thresholds.toml</code>, so no
+cutoff is a literal in Python.</p>
+<h2>▶️ Running it</h2>
+<pre><code class="language-bash">pixi install                              # compute environment, osx-arm64
+pixi run hwprobe                          # writes config/hardware.toml and tuning.toml
+pixi run python pipeline/acquire_validation.py
+</code></pre>
+<p>The compute environment needs macOS 14.5 or newer, because every available
+<code>fpocket</code> build requires it.</p>
+<h2>📄 Licence and reuse</h2>
+<p>The code in this repository is available for reuse. The data is not ours to
+give: BINMAN reads ten third-party databases, several of which restrict
+redistribution, so no third-party dataset is bundled here or in the deployed
+atlas. Only computed metrics leave the build machine. If you reuse the atlas,
+read <code>data/validation/MANIFEST.md</code> first and cite the underlying resources
+separately.</p>
+<h2>👤 Author</h2>
+<p><strong>Marc C. Deller, D.Phil.</strong>
+Structural biologist and drug discovery scientist
+<a href="https://marcdeller.com">marcdeller.com</a> · <a href="mailto:marc@marcdeller.com">marc@marcdeller.com</a></p>

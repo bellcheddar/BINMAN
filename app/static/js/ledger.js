@@ -249,10 +249,17 @@
 
   /* ---------------------------------------------------------------- table --- */
 
+  /* Columns that are displayed but not filterable, so they carry no FieldSpec.
+   * Without this they would render with their raw database name as the title. */
+  var DISPLAY_LABELS = {
+    chain_a: 'Chain A', chain_b: 'Chain B', ligand_name: 'Ligand name',
+    structure_file: 'Structure', title: 'Title', id: 'ID'
+  };
+
   function columnDefinitions() {
     var all = fields();
     var columns = (B.defaultColumns || []).map(function (name) {
-      var spec = all[name] || { label: name, kind: 'text' };
+      var spec = all[name] || { label: DISPLAY_LABELS[name] || name, kind: 'text' };
       var definition = {
         title: spec.label + (spec.unit ? ' (' + spec.unit + ')' : ''),
         field: name,
@@ -293,12 +300,8 @@
       }
       return definition;
     });
-    /* Non-schema columns the viewer needs, shown where they are meaningful. */
-    if (state.recordType === 'bridge') {
-      columns.splice(3, 0,
-        { title: 'Chain A', field: 'chain_a', resizable: true },
-        { title: 'Chain B', field: 'chain_b', resizable: true });
-    }
+    /* chain_a and chain_b are already in the bridge record type's default
+     * columns, so they are not spliced in again: doing so rendered each twice. */
     return columns;
   }
 
@@ -314,6 +317,40 @@
       columns: columnDefinitions(),
       selectableRows: 1,
       index: 'id'
+    });
+    /* Tabulator 6.3.1 emits role="rowgroup" on both .tabulator-header and the
+     * .tabulator-header-contents nested inside it, which makes the grid invalid:
+     * a rowgroup cannot contain a rowgroup, and the columnheader cells then have
+     * no row parent. axe-core reports both as critical. The library controls this
+     * markup, so the roles are corrected once the table has built. */
+    state.table.on('tableBuilt', function () {
+      var holder = document.getElementById('ledger-table');
+      if (!holder) { return; }
+      var contents = holder.querySelector('.tabulator-header-contents');
+      if (contents) { contents.setAttribute('role', 'row'); }
+      var headers = holder.querySelector('.tabulator-headers');
+      if (headers) { headers.setAttribute('role', 'presentation'); }
+      // The scrollable tableholder is a focusable div sitting directly inside
+      // role="grid", which is not an allowed child. role="presentation" is
+      // ignored on a focusable element, so the holder becomes the row group and
+      // the table inside it becomes presentational, which leaves the structure
+      // grid > rowgroup > row > gridcell as ARIA requires.
+      var tableholder = holder.querySelector('.tabulator-tableholder');
+      if (tableholder) {
+        tableholder.setAttribute('role', 'rowgroup');
+        tableholder.setAttribute('aria-label', 'Table rows');
+      }
+      var innerTable = holder.querySelector('.tabulator-table');
+      if (innerTable) { innerTable.setAttribute('role', 'presentation'); }
+      // Tabulator renders header filters as bare inputs with no label.
+      holder.querySelectorAll('.tabulator-header-filter input').forEach(function (input) {
+        if (input.getAttribute('aria-label')) { return; }
+        var column = input.closest('.tabulator-col');
+        var title = column ? column.querySelector('.tabulator-col-title') : null;
+        var name = title ? title.textContent.trim() : 'column';
+        input.setAttribute('aria-label', 'Filter by ' + name);
+        input.setAttribute('title', 'Filter by ' + name);
+      });
     });
     state.table.on('rowClick', function (event, row) {
       var data = row.getData();
@@ -340,7 +377,7 @@
       if (Array.isArray(value)) { value = value.join(', '); }
       var tr = document.createElement('tr');
       var th = document.createElement('td');
-      th.textContent = (spec && spec.label) || key;
+      th.textContent = (spec && spec.label) || DISPLAY_LABELS[key] || key;
       var td = document.createElement('td');
       td.className = 'num';
       td.textContent = spec && spec.kind === 'number' ? Util.num(value) : String(value);

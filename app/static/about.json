@@ -1,12 +1,18 @@
 {
-  "generated_at": "2026-10-03T17:52:45+00:00",
+  "generated_at": "2026-10-03T18:57:03+00:00",
   "generator": "pipeline/build_about.py",
   "note": "Every value on this page is read from a build artefact. Nothing here is typed by hand, and a value that could not be read says 'not recorded' rather than showing a plausible guess.",
-  "schematic_description": "The pipeline runs left to right in four stages. Two kinds of input enter on the left: the primary data sources (RCSB, AlphaFold DB, UniProt, InterPro), and separately the validation datasets that serve as ground truth, of which 4 of 10 resolved. Stage 1, acquisition, catalogued 52,821 entries into priority tiers using httpx and tenacity. Stage 2, geometry, analysed 946 entries with gemmi and FreeSASA and found 427 bridges, with 0 entries failing. Stage 3, scan and triage, used DSSP and fpocket to produce 0 degron candidates, 0 triaged ligases and 0 scored lysines. Stage 4 trains BINMAN-LM with mlx-lm, which does text work only and never emits a number. Four modules leave on the right: Glue Atlas, Degron Scan, E3 Triage and Degradability.",
+  "schematic_description": "The pipeline runs left to right in four stages. Two kinds of input enter on the left: the primary data sources (RCSB, AlphaFold DB, UniProt, InterPro), and separately the validation datasets that serve as ground truth, of which 4 of 10 resolved. Stage 1, acquisition, catalogued 52,821 entries into priority tiers using httpx and tenacity. Stage 2, geometry, analysed 28,549 entries with gemmi and FreeSASA and found 16,179 bridges, with 0 entries failing. Stage 3, scan and triage, used DSSP and fpocket to produce 12 degron candidates, 10 triaged ligases and 1,650 scored lysines. Stage 4 trains BINMAN-LM with mlx-lm, which does text work only and never emits a number. Four modules leave on the right: Glue Atlas, Degron Scan, E3 Triage and Degradability.",
   "stages": {
     "bridges": {
-      "total": 946,
-      "ok": 946,
+      "total": 28549,
+      "ok": 28549,
+      "failed": 0,
+      "failure_reasons": {}
+    },
+    "build_about": {
+      "total": 1,
+      "ok": 1,
       "failed": 0,
       "failure_reasons": {}
     },
@@ -32,7 +38,60 @@
       "failed": 0,
       "failure_reasons": {}
     },
+    "degrons": {
+      "total": 4562,
+      "ok": 4380,
+      "failed": 182,
+      "failure_reasons": {
+        "RuntimeError": 95,
+        "afdb_model_unavailable": 87
+      }
+    },
+    "edges": {
+      "total": 1,
+      "ok": 1,
+      "failed": 0,
+      "failure_reasons": {}
+    },
+    "external_queries": {
+      "total": 1,
+      "ok": 1,
+      "failed": 0,
+      "failure_reasons": {}
+    },
+    "ligases": {
+      "total": 622,
+      "ok": 613,
+      "failed": 9,
+      "failure_reasons": {
+        "pocket": 9
+      }
+    },
+    "lm_corpus": {
+      "total": 1,
+      "ok": 1,
+      "failed": 0,
+      "failure_reasons": {}
+    },
+    "lm_eval": {
+      "total": 1,
+      "ok": 1,
+      "failed": 0,
+      "failure_reasons": {}
+    },
+    "lysines": {
+      "total": 12,
+      "ok": 12,
+      "failed": 0,
+      "failure_reasons": {}
+    },
     "references": {
+      "total": 1,
+      "ok": 1,
+      "failed": 0,
+      "failure_reasons": {}
+    },
+    "validate": {
       "total": 1,
       "ok": 1,
       "failed": 0,
@@ -49,34 +108,35 @@
   },
   "atlas": {
     "available": true,
-    "size_mb": 0.6,
-    "entry": 300,
+    "size_mb": 60.4,
+    "entry": 52821,
     "entry_failed": 0,
-    "bridge": 427,
+    "bridge": 16179,
     "bridge_failed": 0,
-    "ligand": 183,
-    "ligand_failed": 107,
-    "polymer_entity": 1946,
+    "ligand": 9952,
+    "ligand_failed": 3585,
+    "polymer_entity": 329765,
     "polymer_entity_failed": 0,
-    "degron": 0,
+    "degron": 12,
     "degron_failed": 0,
-    "ligase": 0,
+    "ligase": 10,
     "ligase_failed": 0,
-    "lysine": 0,
+    "lysine": 1650,
     "lysine_failed": 0,
-    "edge": 0,
+    "edge": 11022,
     "edge_failed": 0,
     "ccd_class_counts": {
-      "unknown": 110,
-      "glue_candidate": 27,
-      "cofactor": 11,
-      "metal": 10,
-      "buffer": 7,
-      "cryoprotectant": 5,
-      "peptide_like": 5,
-      "sugar": 4,
-      "lipid": 3,
-      "detergent": 1
+      "glue_candidate": 4452,
+      "unknown": 3777,
+      "cofactor": 538,
+      "buffer": 403,
+      "lipid": 223,
+      "peptide_like": 149,
+      "detergent": 126,
+      "cryoprotectant": 123,
+      "sugar": 86,
+      "metal": 57,
+      "covalent_modifier": 18
     },
     "novel_bridges": 0
   },
@@ -1236,40 +1296,34 @@
   },
   "worked_example": {
     "available": true,
-    "bridge_id": 47,
-    "pdb_id": "1A6V",
-    "ccd_id": "NPC",
-    "ligand_name": "4-HYDROXY-3-NITROPHENYLACETYL-EPSILON-AMINOCAPROIC ACID ANION",
-    "title": "B1-8 FV fragment complexed with a (4-hydroxy-3-nitrophenyl) acetate compound",
+    "bridge_id": 12658,
+    "pdb_id": "7T89",
+    "ccd_id": "CYC",
+    "ligand_name": "PHYCOCYANOBILIN",
+    "title": "Light harvesting complex Phycocyanin PC577 from the cryptophyte Hemiselmis pacifica CCMP 706",
     "method": "X-RAY DIFFRACTION",
-    "resolution": 1.8,
-    "chain_a": "L/A",
-    "chain_b": "H/B",
-    "dsasa_a": 288.44,
-    "dsasa_b": 421.79,
-    "dsasa_total": 710.23,
-    "bridging_balance": 0.6838,
-    "buried_fraction": 0.6526,
-    "contacts_a": 26,
-    "contacts_b": 32,
-    "heavy_atoms": 22,
+    "resolution": 1.0,
+    "chain_a": "B/B",
+    "chain_b": "D/D",
+    "dsasa_a": 141.8,
+    "dsasa_b": 143.1,
+    "dsasa_total": 284.9,
+    "bridging_balance": 0.9909,
+    "buried_fraction": 0.831,
+    "contacts_a": 5,
+    "contacts_b": 7,
+    "heavy_atoms": 43,
     "interface_residues_a": [
-      "TRP 93",
-      "TRP 98",
-      "TYR 34"
+      "ASN 76",
+      "ARG 77",
+      "ALA 80"
     ],
     "interface_residues_b": [
-      "TRP 333",
-      "ARG 350",
-      "HIS 335",
-      "TYR 399",
-      "LYS 359",
-      "TYR 401",
-      "SER 405"
+      "TYR 18"
     ],
     "accessions": [
-      "P01724",
-      "P01751"
+      "A0A067XP79",
+      "A0A067XP89"
     ],
     "criteria": [
       {
@@ -1341,10 +1395,317 @@
         "label": "its ligase has a pocket score"
       }
     ],
-    "candidate_pool": 58,
+    "candidate_pool": 400,
     "honest_note": "This record was chosen because every stage that has run worked on it. A reader should look at the misses list and the novel-bridge set in FINDINGS.md for the cases where stages did not."
   },
-  "validation": {},
+  "validation": {
+    "generated_at": "2026-10-03T18:17:13+00:00",
+    "atlas": "/Users/dellboy/Documents/Vibe_Coding/BINMAN/data/atlas/binman.sqlite",
+    "atlas_bytes": 63328256,
+    "note": "A metric whose dataset is unavailable is reported as computed: false with the reason. Nothing here is estimated, and no hand-written control was substituted for a missing published one (spec 4.1b).",
+    "9.1": {
+      "title": "Glue Atlas",
+      "artefact_precision": {
+        "computed": true,
+        "value": 0.9507,
+        "floor": 0.95,
+        "reason": "",
+        "passes": true,
+        "n": 345,
+        "not_called_glue": 328,
+        "note": "Measured over the artefact CCDs present in the atlas. The held-out-split figure in FINDINGS.md (0.927) is the one to quote: it was measured on a half of the list that the classification rules were not developed against."
+      },
+      "recall": {
+        "computed": false,
+        "reason": "No curated glue database resolved (MGDB, MolGlueDB and MGTbind all publish through JavaScript front ends with no documented bulk export; Gate G7). Spec 4.1b forbids substituting a hand-written positive set, so recall is not computed.",
+        "floor": 0.85,
+        "value": null
+      },
+      "three_way_agreement": {
+        "computed": false,
+        "reason": "no curated glue database resolved",
+        "floor": null,
+        "value": null
+      },
+      "misses": {
+        "computed": false,
+        "reason": "The misses list is the complement of recall and needs the same curated positives.",
+        "floor": null,
+        "value": null
+      },
+      "packing_specificity": {
+        "computed": false,
+        "reason": "ProtCID interface classification unavailable (Gate G7)",
+        "floor": 0.9,
+        "value": null
+      },
+      "counts": {
+        "bridges": 16179,
+        "glue_candidate_bridges": 4136,
+        "entries_with_a_bridge": 5475,
+        "symmetry_mediated": 1705
+      },
+      "novel_bridges": {
+        "computed": false,
+        "reason": "A novel bridge is one in NONE of the three curated glue databases, so the set is undeterminable while none has resolved. The column reads 0 in the atlas and must not be read as a real zero.",
+        "floor": null,
+        "value": null
+      },
+      "ccd_class_counts": {
+        "glue_candidate": 4452,
+        "unknown": 3777,
+        "cofactor": 538,
+        "buffer": 403,
+        "lipid": 223,
+        "peptide_like": 149,
+        "detergent": 126,
+        "cryoprotectant": 123,
+        "sugar": 86,
+        "metal": 57,
+        "covalent_modifier": 18
+      }
+    },
+    "9.2": {
+      "title": "Degron Scan",
+      "sensitivity": {
+        "computed": false,
+        "reason": "The matched degraded and non-degraded zinc-finger sets from the Molecular Cell 2025 and Nature Communications 2025 screens did not resolve (Gate G7). Specificity is the metric that matters here and there is no matched negative set to measure it against, so the module is presented as a hypothesis generator rather than a classifier, which is what spec 9.2 instructs for exactly this case.",
+        "floor": 0.7,
+        "value": null
+      },
+      "specificity": {
+        "computed": false,
+        "reason": "The matched degraded and non-degraded zinc-finger sets from the Molecular Cell 2025 and Nature Communications 2025 screens did not resolve (Gate G7). Specificity is the metric that matters here and there is no matched negative set to measure it against, so the module is presented as a hypothesis generator rather than a classifier, which is what spec 9.2 instructs for exactly this case.",
+        "floor": 0.6,
+        "value": null
+      },
+      "calibration": {
+        "computed": true,
+        "value": {
+          "min_strand_length": 2,
+          "max_turn_length": 6,
+          "min_tip_rel_sasa": 0.3,
+          "min_mean_plddt": 70.0,
+          "tip_region_half_width": 1,
+          "calibration_date": "2026-10-03",
+          "calibration_basis": "measured geometry of 5 documented CRBN/DCAF neosubstrate degrons",
+          "calibration_validated": false
+        },
+        "reason": "",
+        "note": "Calibrated to the measured geometry of five documented CRBN and DCAF degrons, as the single adjustment spec 9.6 permits (DECISIONS D-010). Not independently validated: see the reason above."
+      },
+      "documented_degron_recovery": {
+        "computed": true,
+        "reason": "",
+        "value": {
+          "recovered": 3,
+          "of": 5,
+          "found": [
+            "IKZF1 Gly151",
+            "SALL4 Gly416",
+            "CSNK1A1 Gly40"
+          ],
+          "missed": {
+            "IKZF3 Gly155": "relative SASA 0.15, buried in the monomer model",
+            "RBM39 Gly268": "in a helix, not a hairpin, in the monomer model"
+          }
+        },
+        "note": "A method sanity check, NOT the spec 9.2 metric: the set is small, it was used for calibration, and it contains no negatives."
+      },
+      "counts": {
+        "candidates": 12,
+        "proteins": 8
+      }
+    },
+    "9.3": {
+      "title": "E3 Triage",
+      "pocket_coverage": {
+        "computed": true,
+        "value": 1.0,
+        "floor": 0.8,
+        "reason": "",
+        "passes": true,
+        "n": 10,
+        "with_pocket": 10
+      },
+      "rank_enrichment_p": {
+        "computed": false,
+        "reason": "too few ligases to test: 0 validated against 10 others",
+        "floor": 0.01,
+        "value": null
+      },
+      "substrate_spearman": {
+        "computed": false,
+        "reason": "The atlas `substrate_count` column is populated from the UbiBrowser literature set itself, so a Spearman correlation against UbiBrowser would be a tautology (rho = 1 by construction) rather than a test. A genuine version needs a second, independent substrate source.",
+        "floor": 0.5,
+        "value": null
+      },
+      "counts": {
+        "ligases": 10,
+        "by_status": {
+          "ligandable unproven": 9,
+          "orphan": 1
+        },
+        "by_family": {}
+      },
+      "orphan_shortlist": [
+        {
+          "gene": "RNF228",
+          "uniprot_acc": "A0A7I2V3R4",
+          "triage_rank": 8,
+          "triage_score": 0.229828,
+          "pocket_score": 0.0,
+          "substrate_count": 0
+        }
+      ]
+    },
+    "9.4": {
+      "title": "Degradability",
+      "held_out_auc": {
+        "computed": false,
+        "reason": "Observed diGly ubiquitylation sites are unavailable: PhosphoSitePlus requires registration and the ProteomeXchange diGly datasets did not resolve (Gate G7). The reach window is therefore unfitted, no verdict is emitted, and the AUC is not computed.",
+        "floor": 0.65,
+        "value": null
+      },
+      "window_fitted": {
+        "computed": true,
+        "value": false,
+        "reason": "",
+        "fit_status": "not yet fitted"
+      },
+      "protein_level_split_honoured": {
+        "computed": false,
+        "reason": "No fit has run, so there is no split to assert.",
+        "floor": null,
+        "value": null
+      },
+      "honest_limits": [
+        "Observed ubiquitylation sites come from native E3 biology, not from induced ternary complexes, so the window would be a proxy even once fitted.",
+        "Absence of a reported site is weak evidence that a lysine is unusable: detection is incomplete and condition-dependent, which biases the negative set.",
+        "An AUC of 0.65 to 0.75 here would be a genuine and useful result. Anything above 0.9 should be treated as suspected leakage and investigated before it is believed."
+      ],
+      "counts": {
+        "lysines": 1650,
+        "with_verdict": 0
+      }
+    },
+    "9.5": {
+      "title": "BINMAN-LM",
+      "parse_rate": {
+        "computed": false,
+        "reason": "Phase 3 has not run: there is no model to evaluate.",
+        "floor": 0.99,
+        "value": null
+      },
+      "set_equality_synthetic": {
+        "computed": false,
+        "reason": "Phase 3 has not run: there is no model to evaluate.",
+        "floor": 0.9,
+        "value": null
+      },
+      "set_equality_external": {
+        "computed": false,
+        "reason": "Phase 3 has not run: there is no model to evaluate.",
+        "floor": 0.8,
+        "value": null
+      },
+      "triage_macro_f1": {
+        "computed": false,
+        "reason": "Phase 3 has not run: there is no model to evaluate.",
+        "floor": 0.85,
+        "value": null
+      },
+      "fabrication_rate": {
+        "computed": false,
+        "reason": "Phase 3 has not run: there is no model to evaluate.",
+        "floor": 0.0,
+        "value": null
+      }
+    },
+    "floors_missed": [],
+    "metrics_not_computed": [
+      {
+        "section": "9.1",
+        "metric": "recall",
+        "reason": "No curated glue database resolved (MGDB, MolGlueDB and MGTbind all publish through JavaScript front ends with no documented bulk export; Gate G7). Spec 4.1b forbids substituting a hand-written positive set, so recall is not computed."
+      },
+      {
+        "section": "9.1",
+        "metric": "three_way_agreement",
+        "reason": "no curated glue database resolved"
+      },
+      {
+        "section": "9.1",
+        "metric": "misses",
+        "reason": "The misses list is the complement of recall and needs the same curated positives."
+      },
+      {
+        "section": "9.1",
+        "metric": "packing_specificity",
+        "reason": "ProtCID interface classification unavailable (Gate G7)"
+      },
+      {
+        "section": "9.1",
+        "metric": "novel_bridges",
+        "reason": "A novel bridge is one in NONE of the three curated glue databases, so the set is undeterminable while none has resolved. The column reads 0 in the atlas and must not be read as a real zero."
+      },
+      {
+        "section": "9.2",
+        "metric": "sensitivity",
+        "reason": "The matched degraded and non-degraded zinc-finger sets from the Molecular Cell 2025 and Nature Communications 2025 screens did not resolve (Gate G7). Specificity is the metric that matters here and there is no matched negative set to measure it against, so the module is presented as a hypothesis generator rather than a classifier, which is what spec 9.2 instructs for exactly this case."
+      },
+      {
+        "section": "9.2",
+        "metric": "specificity",
+        "reason": "The matched degraded and non-degraded zinc-finger sets from the Molecular Cell 2025 and Nature Communications 2025 screens did not resolve (Gate G7). Specificity is the metric that matters here and there is no matched negative set to measure it against, so the module is presented as a hypothesis generator rather than a classifier, which is what spec 9.2 instructs for exactly this case."
+      },
+      {
+        "section": "9.3",
+        "metric": "rank_enrichment_p",
+        "reason": "too few ligases to test: 0 validated against 10 others"
+      },
+      {
+        "section": "9.3",
+        "metric": "substrate_spearman",
+        "reason": "The atlas `substrate_count` column is populated from the UbiBrowser literature set itself, so a Spearman correlation against UbiBrowser would be a tautology (rho = 1 by construction) rather than a test. A genuine version needs a second, independent substrate source."
+      },
+      {
+        "section": "9.4",
+        "metric": "held_out_auc",
+        "reason": "Observed diGly ubiquitylation sites are unavailable: PhosphoSitePlus requires registration and the ProteomeXchange diGly datasets did not resolve (Gate G7). The reach window is therefore unfitted, no verdict is emitted, and the AUC is not computed."
+      },
+      {
+        "section": "9.4",
+        "metric": "protein_level_split_honoured",
+        "reason": "No fit has run, so there is no split to assert."
+      },
+      {
+        "section": "9.5",
+        "metric": "parse_rate",
+        "reason": "Phase 3 has not run: there is no model to evaluate."
+      },
+      {
+        "section": "9.5",
+        "metric": "set_equality_synthetic",
+        "reason": "Phase 3 has not run: there is no model to evaluate."
+      },
+      {
+        "section": "9.5",
+        "metric": "set_equality_external",
+        "reason": "Phase 3 has not run: there is no model to evaluate."
+      },
+      {
+        "section": "9.5",
+        "metric": "triage_macro_f1",
+        "reason": "Phase 3 has not run: there is no model to evaluate."
+      },
+      {
+        "section": "9.5",
+        "metric": "fabrication_rate",
+        "reason": "Phase 3 has not run: there is no model to evaluate."
+      }
+    ]
+  },
   "thresholds": {
     "bridging": {
       "min_dsasa_per_chain_a2": 25.0,
@@ -1358,15 +1719,19 @@
       "glue_balance_strong": 0.5
     },
     "degron": {
-      "min_strand_length": 3,
-      "max_turn_length": 5,
+      "min_strand_length": 2,
+      "max_turn_length": 6,
       "tip_glycine_offsets": [
         -1,
         0,
         1
       ],
       "min_mean_plddt": 70.0,
-      "min_tip_rel_sasa": 0.4,
+      "tip_region_half_width": 1,
+      "min_tip_rel_sasa": 0.3,
+      "calibration_date": "2026-10-03",
+      "calibration_basis": "measured geometry of 5 documented CRBN/DCAF neosubstrate degrons",
+      "calibration_validated": false,
       "weight_plddt": 0.35,
       "weight_exposure": 0.4,
       "weight_regularity": 0.25
@@ -1383,7 +1748,51 @@
         "has_ligand"
       ],
       "pocket_volume_reference_a3": 1000.0,
-      "expression_breadth_tissue_tpm": 1.0
+      "expression_breadth_tissue_tpm": 1.0,
+      "families": {
+        "RING": "IPR001841",
+        "HECT": "IPR000569",
+        "RBR": "IPR002867",
+        "F-box": "IPR001810",
+        "BTB": "IPR000210",
+        "SOCS-box": "IPR001496",
+        "U-box": "IPR003613",
+        "Cullin": "IPR001373",
+        "APC-C": "IPR024991"
+      },
+      "exploitation": {
+        "clinically_validated": [
+          "CRBN",
+          "VHL"
+        ],
+        "chemically_validated": [
+          "BIRC2",
+          "BIRC3",
+          "XIAP",
+          "MDM2",
+          "DCAF15",
+          "DCAF16",
+          "DCAF11",
+          "KEAP1",
+          "FEM1B",
+          "RNF114",
+          "RNF4",
+          "BTRC",
+          "SKP2",
+          "CDC20",
+          "FBXW7",
+          "DDB1",
+          "CUL4A",
+          "CUL4B"
+        ],
+        "covalent_handle_only": [
+          "RNF114",
+          "DCAF16",
+          "DCAF11",
+          "FEM1B",
+          "KEAP1"
+        ]
+      }
     },
     "degradability": {
       "reach_window": {

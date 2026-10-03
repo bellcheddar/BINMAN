@@ -21,6 +21,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import math
 import shutil
 import subprocess
@@ -43,6 +44,13 @@ TRAINING_JSON = MODELS / "training.json"
 STAGE = "lm_train"
 
 BASE_MODEL = "mlx-community/Qwen2.5-3B-Instruct-4bit"
+
+# Training runs are pushed to Weights & Biases. mlx-lm reports stage 1 natively
+# through --report-to; the stage 2 DPO loop is this project's own code, so it
+# logs to the same run explicitly. Credentials come from ~/.netrc or
+# WANDB_API_KEY; when neither is present the run falls back to offline mode and
+# training is unaffected.
+WANDB_PROJECT = os.environ.get("BINMAN_WANDB_PROJECT", "binman-lm")
 
 # Spec 3.7 hyperparameters.
 LORA_RANK = 16
@@ -99,6 +107,25 @@ def prepare_sft_data() -> dict:
 # stage 1: LoRA SFT
 # --------------------------------------------------------------------------- #
 
+def wandb_available() -> bool:
+    """Is Weights & Biases importable and credentialed?
+
+    An uncredentialed run would block on an interactive login prompt, which
+    would hang an unattended build, so this checks for a key before enabling it.
+    """
+    try:
+        import wandb  # noqa: F401
+    except ImportError:
+        return False
+    if os.environ.get("WANDB_API_KEY"):
+        return True
+    netrc = Path.home() / ".netrc"
+    try:
+        return netrc.exists() and "api.wandb.ai" in netrc.read_text(errors="replace")
+    except OSError:
+        return False
+
+
 def stage_one(iters: int, batch_size: int, model: str = BASE_MODEL) -> dict:
     counts = prepare_sft_data()
     ADAPTERS.mkdir(parents=True, exist_ok=True)
@@ -118,7 +145,10 @@ def stage_one(iters: int, batch_size: int, model: str = BASE_MODEL) -> dict:
         "--val-batches", "20",
         "--max-seq-length", "1024",
         "--mask-prompt",
+        "--steps-per-report", "10",
     ]
+    if wandb_available():
+        command += ["--report-to", "wandb", "--project-name", WANDB_PROJECT]
     log_event("3.7", f"Stage 1 LoRA SFT starting: {counts['train']:,} train / "
                      f"{counts['valid']:,} valid examples, rank {LORA_RANK}, "
                      f"{LORA_LAYERS} layers, lr {LEARNING_RATE}, batch {batch_size}, "
@@ -149,6 +179,8 @@ def stage_one(iters: int, batch_size: int, model: str = BASE_MODEL) -> dict:
         "best_validation_loss": losses["best_validation"],
         "early_stopping_point": losses["best_validation_iter"],
         "log": str(log_path.relative_to(ROOT)),
+        "wandb_project": WANDB_PROJECT if wandb_available() else "",
+        "reported_to_wandb": wandb_available(),
     }
     if result.returncode != 0:
         log_event("3.7", f"Stage 1 FAILED with exit {result.returncode}. "
@@ -162,21 +194,29 @@ def stage_one(iters: int, batch_size: int, model: str = BASE_MODEL) -> dict:
 
 def _parse_losses(text: str) -> dict:
     """Pull the loss trace out of the trainer's stdout."""
+    import re
+
+    # mlx-lm 0.32 prints an ANSI-coloured table: "   100    val 0.023    7.82s"
+    # for validation and "   110    0.008 /\ ..." for training steps.
+    ansi = re.compile(r"\x1b\[[0-9;]*m")
+    val_line = re.compile(r"^\s*(\d+)\s+val\s+([0-9.]+)")
+    train_line = re.compile(r"^\s*(\d+)\s+([0-9.]+)\s")
+
     validation: list[dict] = []
     final_train = None
-    for line in text.splitlines():
-        if "Val loss" in line:
+    for raw in text.splitlines():
+        line = ansi.sub("", raw)
+        match = val_line.match(line)
+        if match:
+            validation.append({"iter": int(match.group(1)),
+                               "loss": float(match.group(2))})
+            continue
+        match = train_line.match(line)
+        if match and "val" not in line:
             try:
-                iteration = int(line.split("Iter")[1].split(":")[0].strip())
-                value = float(line.split("Val loss")[1].split(",")[0].strip())
-                validation.append({"iter": iteration, "loss": value})
-            except (IndexError, ValueError):
-                continue
-        elif "Train loss" in line:
-            try:
-                final_train = float(line.split("Train loss")[1].split(",")[0].strip())
-            except (IndexError, ValueError):
-                continue
+                final_train = float(match.group(2))
+            except ValueError:
+                pass
     best = min(validation, key=lambda r: r["loss"]) if validation else None
     return {
         "validation": validation,
@@ -290,13 +330,36 @@ def stage_two(batch_size: int, epochs: int = 1, limit: int | None = None) -> dic
                 (policy_chosen - item["ref_chosen"])
                 - (policy_rejected - item["ref_rejected"])
             )
-            total = total + nn.losses.log_sigmoid(margin) * -1.0
+            # -log(sigmoid(margin)), written as logaddexp for numerical
+            # stability. MLX exposes no log_sigmoid, and log(sigmoid(x))
+            # underflows for strongly negative x.
+            total = total + mx.logaddexp(mx.zeros_like(margin), -margin)
         return total / max(1, len(batch))
 
     value_and_grad = nn.value_and_grad(model, loss_fn)
     history: list[dict] = []
     step = 0
     started = time.monotonic()
+
+    # The DPO loop is this project's own code, so it reports to W&B itself.
+    run = None
+    if wandb_available():
+        try:
+            import wandb
+
+            run = wandb.init(
+                project=WANDB_PROJECT, job_type="dpo",
+                name=f"binman-lm-dpo-{time.strftime('%Y%m%d-%H%M%S')}",
+                config={"beta": DPO_BETA, "pairs": len(reference),
+                        "batch_size": batch_size, "epochs": epochs,
+                        "learning_rate": LEARNING_RATE, "base_model": BASE_MODEL,
+                        "stage": "2-preference"},
+                reinit=True,
+            )
+        except Exception as exc:  # noqa: BLE001
+            log_event("3.7", f"W&B unavailable for stage 2, training anyway: "
+                             f"{type(exc).__name__}")
+            run = None
 
     for epoch in range(epochs):
         for offset in range(0, len(reference), batch_size):
@@ -316,7 +379,13 @@ def stage_two(batch_size: int, epochs: int = 1, limit: int | None = None) -> dic
                     "history": history,
                 }
             step += 1
-            history.append({"step": step, "loss": float(loss.item())})
+            value = float(loss.item())
+            history.append({"step": step, "loss": value})
+            if run is not None:
+                try:
+                    run.log({"dpo/loss": value, "dpo/step": step})
+                except Exception:  # noqa: BLE001
+                    run = None
             if step % 20 == 0:
                 recent = sum(h["loss"] for h in history[-20:]) / 20
                 log_event("3.7", f"Stage 2: step {step}, mean loss over the last 20 "
@@ -331,6 +400,12 @@ def stage_two(batch_size: int, epochs: int = 1, limit: int | None = None) -> dic
     weights = dict(tree_flatten(model.trainable_parameters()))
     mx.save_safetensors(str(STAGE2_ADAPTERS / "adapters.safetensors"), weights)
 
+    if run is not None:
+        try:
+            run.finish()
+        except Exception:  # noqa: BLE001
+            pass
+
     elapsed = time.monotonic() - started
     log_event("3.7", f"Stage 2 DPO complete: {step} steps in {elapsed / 60:.1f} min, "
                      f"adapters saved to {STAGE2_ADAPTERS.relative_to(ROOT)}.")
@@ -341,6 +416,8 @@ def stage_two(batch_size: int, epochs: int = 1, limit: int | None = None) -> dic
         "first_loss": history[0]["loss"] if history else None,
         "final_loss": history[-1]["loss"] if history else None,
         "adapters": str(STAGE2_ADAPTERS.relative_to(ROOT)),
+        "wandb_project": WANDB_PROJECT if wandb_available() else "",
+        "reported_to_wandb": run is not None,
         "implementation": (
             "mlx-lm 0.32.0 ships no preference trainer, so this is the spec 3.7 "
             "mlx-examples DPO fallback, implemented against mlx-lm's LoRA "

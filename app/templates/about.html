@@ -44,10 +44,10 @@
   {# ---------------------------------------------------------- 6.6.1 ------- #}
   <h2 id="workflow">Workflow</h2>
   <div class="panel">
-    <div id="schematic-holder">
-      <img src="{{ url_for('static', filename='workflow.svg') }}" alt=""
-           class="schematic" style="width:100%;height:auto">
-    </div>
+    {# Inlined, not <img>: an SVG loaded as an image cannot read the page's CSS
+       custom properties, so the Depot tokens would resolve to nothing and every
+       fill would render black. #}
+    <div id="schematic-holder">{{ workflow_svg | safe }}</div>
     <details style="margin-top:0.6rem">
       <summary style="cursor:pointer;color:var(--accent)">Described in words</summary>
       <p style="margin-bottom:0">{{ about.schematic_description }}</p>

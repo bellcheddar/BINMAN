@@ -33,6 +33,10 @@ models/binman-lm/fused/*
 !models/binman-lm/adapters/.gitkeep
 !models/binman-lm/fused/.gitkeep
 
+# Weights & Biases local run directories (the runs themselves live on wandb.ai)
+wandb/
+**/wandb/
+
 # QC output
 qc/screenshots/
 qc/reports/
