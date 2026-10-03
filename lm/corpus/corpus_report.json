@@ -1,10 +1,10 @@
 {
-  "generated_at": "2026-10-03T18:23:26+00:00",
+  "generated_at": "2026-10-03T21:40:16+00:00",
   "seed": 20261003,
   "counts": {
-    "task_a_train": 4817,
-    "task_a_valid": 568,
-    "task_a_test": 615,
+    "task_a_train": 4752,
+    "task_a_valid": 574,
+    "task_a_test": 674,
     "task_a_preference": 1400,
     "task_c_train": 784,
     "task_c_valid": 98,
@@ -24,9 +24,9 @@
   "vocabulary_sizes": {
     "ccd_id": 4000,
     "ccd_class": 11,
-    "ligase_gene": 10,
-    "ligase_acc": 10,
-    "ligase_family": 2,
+    "ligase_gene": 650,
+    "ligase_acc": 650,
+    "ligase_family": 13,
     "verdict": 0,
     "evidence_class": 0,
     "motif_family": 1,
@@ -56,7 +56,7 @@
     "reason": "Spec 3.4 requires every Task B label to come from a published curated source, and the glue label specifically from the intersection of at least two of MGDB, MolGlueDB and MGTbind. None of those resolved, and PROTAC-DB did not either, so three of the five classes have no label source. Spec 4.1b forbids substituting hand-written labels, so the Task B corpus is NOT built and the 9.5 macro-F1 is reported as not computed."
   },
   "external_query_set": {
-    "built": false,
+    "built": true,
     "note": "Built separately by lm/harvest_external_queries.py (spec 3.6)."
   }
 }

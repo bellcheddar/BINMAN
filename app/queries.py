@@ -85,6 +85,10 @@ class RecordType:
     label: str
     fields: dict[str, FieldSpec]
     default_sort: str
+    # Which way the default sort runs. A rank field counts upward from the best,
+    # so sorting it descending shows the worst record first, which is what the
+    # E3 Triage table did before this was named per record type.
+    default_direction: str
     default_columns: tuple[str, ...]
     identity_columns: tuple[str, ...]   # what "the same row set" means for set equality
 
@@ -214,6 +218,7 @@ RECORD_TYPES: dict[str, RecordType] = {
             "LEFT JOIN ligand l ON l.ccd_id = b.ccd_id)"
         ),
         fields=_bridge_fields(), default_sort="dsasa_total",
+        default_direction="desc",
         default_columns=(
             "pdb_id", "ccd_id", "ccd_class", "chain_a", "chain_b", "dsasa_a", "dsasa_b",
             "dsasa_total", "bridging_balance", "buried_fraction", "resolution",
@@ -223,6 +228,7 @@ RECORD_TYPES: dict[str, RecordType] = {
     "degron": RecordType(
         name="degron", label="Degron Scan", table="degron",
         fields=_degron_fields(), default_sort="degron_geometry_score",
+        default_direction="desc",
         default_columns=(
             "uniprot_acc", "gene", "tip_res", "tip_aa", "turn_length",
             "mean_plddt", "tip_rel_sasa", "degron_geometry_score",
@@ -232,6 +238,7 @@ RECORD_TYPES: dict[str, RecordType] = {
     "ligase": RecordType(
         name="ligase", label="E3 Triage", table="ligase",
         fields=_ligase_fields(), default_sort="triage_rank",
+        default_direction="asc",      # rank 1 is the best ligase
         default_columns=(
             "gene", "uniprot_acc", "family", "pdb_entries", "pocket_score",
             "pocket_volume_a3", "substrate_count", "exploitation_status", "triage_rank",
@@ -241,6 +248,7 @@ RECORD_TYPES: dict[str, RecordType] = {
     "lysine": RecordType(
         name="lysine", label="Degradability", table="lysine",
         fields=_lysine_fields(), default_sort="nz_centroid_distance",
+        default_direction="asc",      # closest to the site first
         default_columns=(
             "uniprot_acc", "structure_id", "site_id", "res_num", "nz_rel_sasa",
             "cb_cb_distance", "nz_centroid_distance", "verdict",
@@ -393,7 +401,8 @@ def parse(payload: Any) -> Query:
     return Query(
         record_type=record_type, filters=filters,
         sort_field=sort_field or spec.default_sort,
-        sort_direction=sort_direction, limit=limit,
+        sort_direction=sort_direction if sort is not None else spec.default_direction,
+        limit=limit,
     )
 
 
@@ -514,6 +523,7 @@ def schema_summary() -> dict:
         name: {
             "label": spec.label,
             "default_sort": spec.default_sort,
+            "default_direction": spec.default_direction,
             "default_columns": list(spec.default_columns),
             "fields": {
                 field_name: {

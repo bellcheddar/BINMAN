@@ -458,3 +458,55 @@ script.
 **Reversal.** `pixi run python -m mlx_lm fuse --model <base> --adapter-path
 models/binman-lm/adapters --save-path models/binman-lm/fused --dequantize`, then
 check it with `generation_healthy()` before letting it serve anything.
+
+---
+
+## D-017: a per-entry work cap on the bridging geometry
+
+**Decision.** Entries whose assembly exceeds
+`bridging.max_chain_ligand_pairs` (20,000 chain-ligand pairs) are recorded as
+`failed:too_complex:<chains>x<ligands>` and skipped.
+
+**Context.** The bridging test is O(ligand instances x polymer chains). The
+catalogue is ordered shortest-first, so the tail of the queue is the enormous
+assemblies: 6NK6 has 960 chains and 720 ligand instances, 691,200 pairs, and took
+20 minutes on its own. With roughly 1,600 such entries left, the run was
+projecting past eight hours for the last 9% of the queue, having already taken
+three.
+
+**Alternatives considered.** Let it run. Cap on chain count alone, which would
+also exclude legitimate large ternaries. Sample the giant entries.
+
+**Reason.** This is a compute budget, not a scientific claim: nothing is asserted
+about whether those assemblies contain glues, and the skip is recorded in the
+`entry` and manifest tables so the counts reconcile and the set is re-runnable by
+raising the cap. For scale, a CRBN-DDB1 neosubstrate ternary is about 5 chains and
+3 ligands, 15 pairs, so the cap sits roughly a thousand times above the structures
+the project exists to find.
+
+**Result.** The remaining 17,353 entries finished in **6.2 minutes** at 46 entries
+per second, with **235 entries skipped (0.4% of the catalogue)**.
+
+**Reversal.** Raise `max_chain_ligand_pairs` in `config/thresholds.toml` and
+re-run with `--retry-failed`.
+
+---
+
+## D-018: each record type names its own default sort direction
+
+**Decision.** `RecordType` carries a `default_direction`, and the UI follows it.
+
+**Context.** Every table defaulted to descending. For `bridge` (sorted on ΔSASA)
+and `degron` (sorted on a geometry score) that is right, but `ligase` sorts on
+`triage_rank`, which counts upward from the best. The E3 Triage table therefore
+opened on rank 638, the worst ligase in the repertoire, with the ranked shortlist
+the module exists to produce buried at the far end. `lysine` had the same problem
+on distance to the site.
+
+**Reason.** The direction is a property of the field's meaning, so it belongs
+beside the field rather than as a single global default.
+
+**Result.** E3 Triage now opens on DCAF15 (rank 1), with VHL fifth and CRBN
+thirty-second, which is the shortlist.
+
+**Reversal.** Set every `default_direction` to `desc`.

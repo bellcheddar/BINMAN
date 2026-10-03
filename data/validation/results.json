@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-10-03T19:07:21+00:00",
+  "generated_at": "2026-10-03T21:40:20+00:00",
   "atlas": "/Users/dellboy/Documents/Vibe_Coding/BINMAN/data/atlas/binman.sqlite",
-  "atlas_bytes": 79355904,
+  "atlas_bytes": 149413888,
   "note": "A metric whose dataset is unavailable is reported as computed: false with the reason. Nothing here is estimated, and no hand-written control was substituted for a missing published one (spec 4.1b).",
   "9.1": {
     "title": "Glue Atlas",
@@ -40,10 +40,10 @@
       "value": null
     },
     "counts": {
-      "bridges": 57758,
-      "glue_candidate_bridges": 13601,
-      "entries_with_a_bridge": 13793,
-      "symmetry_mediated": 6556
+      "bridges": 239485,
+      "glue_candidate_bridges": 23054,
+      "entries_with_a_bridge": 17536,
+      "symmetry_mediated": 28780
     },
     "novel_bridges": {
       "computed": false,
@@ -52,16 +52,16 @@
       "value": null
     },
     "ccd_class_counts": {
-      "glue_candidate": 6405,
-      "unknown": 1031,
-      "cofactor": 805,
-      "buffer": 579,
-      "lipid": 347,
-      "peptide_like": 227,
-      "detergent": 206,
-      "cryoprotectant": 182,
-      "sugar": 99,
-      "metal": 60,
+      "glue_candidate": 6854,
+      "cofactor": 859,
+      "buffer": 621,
+      "lipid": 385,
+      "unknown": 383,
+      "peptide_like": 274,
+      "detergent": 218,
+      "cryoprotectant": 202,
+      "sugar": 100,
+      "metal": 64,
       "covalent_modifier": 21
     }
   },
@@ -113,8 +113,8 @@
       "note": "A method sanity check, NOT the spec 9.2 metric: the set is small, it was used for calibration, and it contains no negatives."
     },
     "counts": {
-      "candidates": 12,
-      "proteins": 8
+      "candidates": 21717,
+      "proteins": 8983
     }
   },
   "9.3": {
@@ -869,479 +869,155 @@
     },
     "stage1": {
       "stage": "stage1",
-      "generated_at": "2026-10-03T19:00:58+00:00",
+      "generated_at": "2026-10-03T19:07:17+00:00",
       "model": "mlx-community/Qwen2.5-3B-Instruct-4bit",
       "adapter": "models/binman-lm/adapters",
       "atlas": "/Users/dellboy/Documents/Vibe_Coding/BINMAN/data/atlas/binman.sqlite",
+      "prompt_style": "trained system turn, no schema in context",
+      "prompt_tokens_approx": 83,
       "task_a_synthetic": {
         "n": 120,
-        "parse_rate": 0.0,
-        "set_equality": 0.0,
-        "exact_match": 0.0,
+        "parse_rate": 0.9917,
+        "set_equality": 0.9917,
+        "exact_match": 0.9417,
         "failures": [
           {
-            "question": "Which hairpin degrons have turn length a maximum of 2 residues? with search candidate degrons for mean plddt 80 or more with the hairpin degrons that have tip res beneath 710",
-            "raw": "{\"filters\":[{\"field\":\"turn_length\",\"op\":\"lte\",\"value\":2.0},{\"field\":\"mean_plddt\",\"op\":\"gte\",\"value\":80.0},{\"field\":\"tip_res\",\"op\":\"lt\",\"value\":710.0}],\"sort\":{\"field\":\"degron_geometry_score\",\"direction\":\"desc\"},\"limit\":200}",
-            "error": "record_type must be one of ['bridge', 'degron', 'ligase', 'lysine'], got None",
-            "stage": "parse"
-          },
-          {
-            "question": "Ligases where uniprot acc is not A6NCQ9 and filter E3s by substrate count predicted under 25 and find E3 ligases whose triage rank is less than 10",
-            "raw": "{\"filters\":[{\"field\":\"uniprot_acc\",\"op\":\"ne\",\"value\":\"A6NCQ9\"},{\"field\":\"substrate_count_predicted\",\"op\":\"lt\",\"value\":25.0},{\"field\":\"triage_rank\",\"op\":\"lt\",\"value\":10.0}],\"sort\":{\"field\":\"triage_rank\",\"direction\":\"desc\"},\"limit\":200}",
-            "error": "record_type must be one of ['bridge', 'degron', 'ligase', 'lysine'], got None",
-            "stage": "parse"
-          },
-          {
-            "question": "Surface lysines, lysine residue number no less than 40, give me every surface lysines with nz relative sasa below 0.13",
-            "raw": "{\"filters\":[{\"field\":\"res_num\",\"op\":\"gte\",\"value\":40.0},{\"field\":\"nz_rel_sasa\",\"op\":\"lt\",\"value\":0.13}],\"sort\":{\"field\":\"nz_centroid_distance\",\"direction\":\"desc\"},\"limit\":200}",
-            "error": "record_type must be one of ['bridge', 'degron', 'ligase', 'lysine'], got None",
-            "stage": "parse"
-          },
-          {
-            "question": "How about candidate degrons with degron geometry score less than 0.85 with which degron candidates have tip residue number no more than 710?",
-            "raw": "{\"filters\":[{\"field\":\"degron_geometry_score\",\"op\":\"lt\",\"value\":0.85},{\"field\":\"tip_res\",\"op\":\"lte\",\"value\":710.0}],\"sort\":{\"field\":\"degron_geometry_score\",\"direction\":\"desc\"},\"limit\":200}",
-            "error": "record_type must be one of ['bridge', 'degron', 'ligase', 'lysine'], got None",
-            "stage": "parse"
-          },
-          {
-            "question": "Degrons restricted to tip residue number a maximum of 490 with how about candidate degrons with degron geometry score less than 0.85",
-            "raw": "{\"filters\":[{\"field\":\"tip_res\",\"op\":\"lte\",\"value\":490.0},{\"field\":\"degron_geometry_score\",\"op\":\"lt\",\"value\":0.85}],\"sort\":{\"field\":\"degron_geometry_score\",\"direction\":\"desc\"},\"limit\":200}",
-            "error": "record_type must be one of ['bridge', 'degron', 'ligase', 'lysine'], got None",
-            "stage": "parse"
-          },
-          {
-            "question": "Everything in bridging ligands apart from ligand class peptide_like and search bridging ligands for \u03b4sasa total above 1410.0 \u00c5\u00b2 and everything in bridged chain pairs with contacts chain b at least 4",
-            "raw": "{\"filters\":[{\"field\":\"ccd_class\",\"op\":\"ne\",\"value\":\"peptide_like\"},{\"field\":\"dsasa_total\",\"op\":\"gt\",\"value\":1410.0},{\"field\":\"contacts_b\",\"op\":\"gte\",\"value\":4.0}],\"sort\":{\"field\":\"dsasa_total\",\"direction\":\"desc\"},\"limit\":200}",
-            "error": "record_type must be one of ['bridge', 'degron', 'ligase', 'lysine'], got None",
-            "stage": "parse"
-          },
-          {
-            "question": "Search atlas rows for heavy atoms more than 64, and pull up bridging ligands having priority tier greater than 1",
-            "raw": "{\"filters\":[{\"field\":\"heavy_atoms\",\"op\":\"gt\",\"value\":64.0},{\"field\":\"tier\",\"op\":\"gt\",\"value\":1.0}],\"sort\":{\"field\":\"dsasa_total\",\"direction\":\"desc\"},\"limit\":200}",
-            "error": "record_type must be one of ['bridge', 'degron', 'ligase', 'lysine'], got None",
-            "stage": "parse"
-          },
-          {
-            "question": "Can you list E3 ligases where expression breadth is exceeding 6 tissues, and filter E3 ligases by pocket volume 260.0 or less \u00c5\u00b3",
-            "raw": "{\"filters\":[{\"field\":\"expression_breadth\",\"op\":\"gt\",\"value\":6.0},{\"field\":\"pocket_volume_a3\",\"op\":\"lte\",\"value\":260.0}],\"sort\":{\"field\":\"triage_score\",\"direction\":\"desc\"},\"limit\":200}",
-            "error": "record_type must be one of ['bridge', 'degron', 'ligase', 'lysine'], got None",
-            "stage": "parse"
-          },
-          {
-            "question": "List glue candidates with bridging balance at least 0.29 and can you list bridging ligands where contacts a is a minimum of 11",
-            "raw": "{\"filters\":[{\"field\":\"bridging_balance\",\"op\":\"gte\",\"value\":0.29},{\"field\":\"contacts_a\",\"op\":\"gte\",\"value\":11.0}],\"sort\":{\"field\":\"dsasa_total\",\"direction\":\"desc\"},\"limit\":200}",
-            "error": "record_type must be one of ['bridge', 'degron', 'ligase', 'lysine'], got None",
-            "stage": "parse"
-          },
-          {
-            "question": "Any hairpin degrons with tip residue number greater than 110?, degron candidates restricted to mean plddt no less than 84, return hairpin degrons filtered to degron geometry score no less than 0.74",
-            "raw": "{\"filters\":[{\"field\":\"tip_res\",\"op\":\"gt\",\"value\":110.0},{\"field\":\"mean_plddt\",\"op\":\"gte\",\"value\":84.0},{\"field\":\"degron_geometry_score\",\"op\":\"gte\",\"value\":0.74}],\"sort\":{\"field\":\"degron_geometry_score\",\"direction\":\"desc\"},\"limit\":200}",
-            "error": "record_type must be one of ['bridge', 'degron', 'ligase', 'lysine'], got None",
-            "stage": "parse"
-          },
-          {
-            "question": "How about lysines with nz centroid distance greater than 67 \u00c5 and lysine sites classified as marginal and any lysine sites with c\u03b2\u2013c\u03b2 distance beneath 74 \u00c5?",
-            "raw": "{\"filters\":[{\"field\":\"nz_centroid_distance\",\"op\":\"gt\",\"value\":67.0},{\"field\":\"verdict\",\"op\":\"eq\",\"value\":\"marginal\"},{\"field\":\"cb_cb_distance\",\"op\":\"lt\",\"value\":74.0}],\"sort\":{\"field\":\"nz_centroid_distance\",\"direction\":\"desc\"},\"limit\":200}",
-            "error": "record_type must be one of ['bridge', 'degron', 'ligase', 'lysine'], got None",
-            "stage": "parse"
-          },
-          {
             "question": "Glue candidates, ccd class detergent, and bridging ligands where ligand ccd is not 062",
-            "raw": "{\"filters\":[{\"field\":\"ccd_class\",\"op\":\"eq\",\"value\":\"detergent\"},{\"field\":\"ccd_id\",\"op\":\"ne\",\"value\":\"062\"}],\"sort\":{\"field\":\"dsasa_total\",\"direction\":\"desc\"},\"limit\":200}",
-            "error": "record_type must be one of ['bridge', 'degron', 'ligase', 'lysine'], got None",
-            "stage": "parse"
-          },
-          {
-            "question": "Give me the SOLUTION NMR bridges and how about glue candidates with bridging balance 0.18 or more, the top  by \u03b4sasa chain b",
-            "raw": "{\"filters\":[{\"field\":\"dsasa_total\",\"op\":\"gte\",\"value\":0.18}],\"sort\":{\"field\":\"dsasa_total\",\"direction\":\"desc\"},\"limit\":200}",
-            "error": "record_type must be one of ['bridge', 'degron', 'ligase', 'lysine'], got None",
-            "stage": "parse"
-          },
-          {
-            "question": "Bridging ligands classified as FIBER DIFFRACTION with list bridged chain pairs with ligand ccd other than 06R",
-            "raw": "{\"filters\":[{\"field\":\"ccd_class\",\"op\":\"eq\",\"value\":\"FIBER DIFFRACTION\"},{\"field\":\"ccd_id\",\"op\":\"ne\",\"value\":\"06R\"}],\"sort\":{\"field\":\"dsasa_total\",\"direction\":\"desc\"},\"limit\":200}",
-            "error": "record_type must be one of ['bridge', 'degron', 'ligase', 'lysine'], got None",
-            "stage": "parse"
-          },
-          {
-            "question": "Can you list hairpin degrons where mean plddt is over 89, and everything in degron candidates with degron geometry score more than 0.81",
-            "raw": "{\"filters\":[{\"field\":\"mean_plddt\",\"op\":\"gt\",\"value\":89.0},{\"field\":\"degron_geometry_score\",\"op\":\"gt\",\"value\":0.81}],\"sort\":{\"field\":\"degron_geometry_score\",\"direction\":\"desc\"},\"limit\":200}",
-            "error": "record_type must be one of ['bridge', 'degron', 'ligase', 'lysine'], got None",
-            "stage": "parse"
-          },
-          {
-            "question": "Everything in degron candidates with degron geometry score more than 0.81 and any degron candidates with mean plddt above 84?",
-            "raw": "{\"filters\":[{\"field\":\"degron_geometry_score\",\"op\":\"gt\",\"value\":0.81},{\"field\":\"mean_plddt\",\"op\":\"gt\",\"value\":84.0}],\"sort\":{\"field\":\"degron_geometry_score\",\"direction\":\"desc\"},\"limit\":200}",
-            "error": "record_type must be one of ['bridge', 'degron', 'ligase', 'lysine'], got None",
-            "stage": "parse"
-          },
-          {
-            "question": "Everything in degrons with mean plddt less than 80, and which degron candidates have tip res no more than 110?, ranked by tip relative sasa lowest first",
-            "raw": "{\"filters\":[{\"field\":\"mean_plddt\",\"op\":\"lt\",\"value\":80.0},{\"field\":\"tip_res\",\"op\":\"lte\",\"value\":110.0}],\"sort\":{\"field\":\"tip_rel_sasa\",\"direction\":\"asc\"},\"limit\":200}",
-            "error": "record_type must be one of ['bridge', 'degron', 'ligase', 'lysine'], got None",
-            "stage": "parse"
-          },
-          {
-            "question": "Ligases, expression breadth greater than 11 tissues, only ubiquitin ligases where gene symbol is TRIM43B",
-            "raw": "{\"filters\":[{\"field\":\"expression_breadth\",\"op\":\"gt\",\"value\":11.0},{\"field\":\"gene\",\"op\":\"eq\",\"value\":\"TRIM43B\"}],\"sort\":{\"field\":\"triage_rank\",\"direction\":\"desc\"},\"limit\":200}",
-            "error": "record_type must be one of ['bridge', 'degron', 'ligase', 'lysine'], got None",
-            "stage": "parse"
-          },
-          {
-            "question": "Everything in hairpin degrons with turn length 5 or less residues, degron candidates where mean plddt is a maximum of 89, ranked by mean plddt lowest first",
-            "raw": "{\"filters\":[{\"field\":\"turn_length\",\"op\":\"lte\",\"value\":5.0},{\"field\":\"mean_plddt\",\"op\":\"lte\",\"value\":89.0}],\"sort\":{\"field\":\"mean_plddt\",\"direction\":\"asc\"},\"limit\":200}",
-            "error": "record_type must be one of ['bridge', 'degron', 'ligase', 'lysine'], got None",
-            "stage": "parse"
-          },
-          {
-            "question": "Lysine sites with a c\u03b2\u2013c\u03b2 distance of less than 17 \u00c5, the lysine sites that have res num below 40",
-            "raw": "{\"filters\":[{\"field\":\"nz_centroid_distance\",\"op\":\"lt\",\"value\":17.0},{\"field\":\"res_num\",\"op\":\"lt\",\"value\":40.0}],\"sort\":{\"field\":\"nz_centroid_distance\",\"direction\":\"desc\"},\"limit\":200}",
-            "error": "record_type must be one of ['bridge', 'degron', 'ligase', 'lysine'], got None",
-            "stage": "parse"
-          },
-          {
-            "question": "E3 ligases where exploitation status is not chemically validated, and list ubiquitin ligases with uniprot accession other than A6NE02",
-            "raw": "{\"filters\":[{\"field\":\"exploitation_status\",\"op\":\"ne\",\"value\":\"chemically validated\"},{\"field\":\"uniprot_acc\",\"op\":\"ne\",\"value\":\"A6NE02\"}],\"sort\":{\"field\":\"triage_score\",\"direction\":\"desc\"},\"limit\":200}",
-            "error": "record_type must be one of ['bridge', 'degron', 'ligase', 'lysine'], got None",
-            "stage": "parse"
-          },
-          {
-            "question": "List every hairpin degrons whose motif family is crbn_hairpin_glycine, pull up degron candidates having turn length above 2 residues",
-            "raw": "{\"filters\":[{\"field\":\"motif_family\",\"op\":\"eq\",\"value\":\"crbn_hairpin_glycine\"},{\"field\":\"turn_length\",\"op\":\"gt\",\"value\":2.0}],\"sort\":{\"field\":\"degron_geometry_score\",\"direction\":\"desc\"},\"limit\":200}",
-            "error": "record_type must be one of ['bridge', 'degron', 'ligase', 'lysine'], got None",
-            "stage": "parse"
-          },
-          {
-            "question": "Filter E3 ligases to uniprot accession A1YPR0, list every E3 ligases whose gene symbol is BTBD17, show me E3s with triage score under 0.26, ranked by curated substrate count lowest first",
-            "raw": "{\"filters\":[{\"field\":\"uniprot_acc\",\"op\":\"eq\",\"value\":\"A1YPR0\"},{\"field\":\"gene\",\"op\":\"eq\",\"value\":\"BTBD17\"},{\"field\":\"triage_score\",\"op\":\"lt\",\"value\":0.26}],\"sort\":{\"field\":\"substrate_count\",\"direction\":\"asc\"},\"limit\":200}",
-            "error": "record_type must be one of ['bridge', 'degron', 'ligase', 'lysine'], got None",
-            "stage": "parse"
-          },
-          {
-            "question": "Everything in degrons with tip rel sasa a minimum of 0.64 with find degron candidates whose tip res is over 990, the top  by mean plddt",
-            "raw": "{\"filters\":[{\"field\":\"tip_rel_sasa\",\"op\":\"gte\",\"value\":0.64},{\"field\":\"tip_res\",\"op\":\"gt\",\"value\":990.0}],\"sort\":{\"field\":\"mean_plddt\",\"direction\":\"desc\"},\"limit\":200}",
-            "error": "record_type must be one of ['bridge', 'degron', 'ligase', 'lysine'], got None",
-            "stage": "parse"
-          },
-          {
-            "question": "Can you list hairpin degrons where mean plddt is over 89 and can you list degrons where degron geometry score is exceeding 0.77",
-            "raw": "{\"filters\":[{\"field\":\"mean_plddt\",\"op\":\"gt\",\"value\":89.0},{\"field\":\"degron_geometry_score\",\"op\":\"gt\",\"value\":0.77}],\"sort\":{\"field\":\"degron_geometry_score\",\"direction\":\"desc\"},\"limit\":200}",
-            "error": "record_type must be one of ['bridge', 'degron', 'ligase', 'lysine'], got None",
-            "stage": "parse"
-          },
-          {
-            "question": "Bridges where ccd class is not lipid with glue candidates where evidence class is not molecular_glue, the top  by \u03b4sasa chain b",
-            "raw": "{\"filters\":[{\"field\":\"ccd_class\",\"op\":\"ne\",\"value\":\"lipid\"},{\"field\":\"evidence_class\",\"op\":\"ne\",\"value\":\"molecular_glue\"}],\"sort\":{\"field\":\"dsasa_b\",\"direction\":\"desc\"},\"limit\":200}",
-            "error": "record_type must be one of ['bridge', 'degron', 'ligase', 'lysine'], got None",
-            "stage": "parse"
-          },
-          {
-            "question": "Filter surface lysines by c\u03b2\u2013c\u03b2 distance at least 58 \u00c5, pull up lysines having lysine residue number above 300, lysines where reach verdict is favourable",
-            "raw": "{\"filters\":[{\"field\":\"cb_cb_distance\",\"op\":\"gte\",\"value\":58.0},{\"field\":\"res_num\",\"op\":\"gt\",\"value\":300.0},{\"field\":\"verdict\",\"op\":\"eq\",\"value\":\"favourable\"}],\"sort\":{\"field\":\"nz_centroid_distance\",\"direction\":\"desc\"},\"limit\":200}",
-            "error": "record_type must be one of ['bridge', 'degron', 'ligase', 'lysine'], got None",
-            "stage": "parse"
-          },
-          {
-            "question": "Bridging ligands, ligand mw beneath 220.0 Da with everything in glue candidates apart from ccd id 0AE, ordered on contacts chain a, lowest first first",
-            "raw": "{\"filters\":[{\"field\":\"mw\",\"op\":\"lt\",\"value\":220.0},{\"field\":\"ccd_id\",\"op\":\"ne\",\"value\":\"0AE\"}],\"sort\":{\"field\":\"contacts_a\",\"direction\":\"asc\"},\"limit\":200}",
-            "error": "record_type must be one of ['bridge', 'degron', 'ligase', 'lysine'], got None",
-            "stage": "parse"
-          },
-          {
-            "question": "Degron candidates, degron geometry score below 0.81, and can you list degrons where tip residue number is under 490",
-            "raw": "{\"filters\":[{\"field\":\"degron_geometry_score\",\"op\":\"lt\",\"value\":0.81},{\"field\":\"tip_res\",\"op\":\"lt\",\"value\":490.0}],\"sort\":{\"field\":\"degron_geometry_score\",\"direction\":\"desc\"},\"limit\":200}",
-            "error": "record_type must be one of ['bridge', 'degron', 'ligase', 'lysine'], got None",
-            "stage": "parse"
-          },
-          {
-            "question": "Any E3s with pocket druggability score more than 0.07?, and list E3s with uniprot accession other than A1YPR0, and list E3s with pocket volume 720.0 or more \u00c5\u00b3",
-            "raw": "{\"filters\":[{\"field\":\"pocket_score\",\"op\":\"gt\",\"value\":0.07},{\"field\":\"uniprot_acc\",\"op\":\"ne\",\"value\":\"A1YPR0\"},{\"field\":\"pocket_volume_a3\",\"op\":\"gte\",\"value\":720.0}],\"sort\":{\"field\":\"triage_score\",\"direction\":\"desc\"},\"limit\":200}",
-            "error": "record_type must be one of ['bridge', 'degron', 'ligase', 'lysine'], got None",
-            "stage": "parse"
-          },
-          {
-            "question": "How about glue candidates with contacts b no more than 8, show me atlas rows with dsasa total no more than 390.0 \u00c5\u00b2, ranked by bridging balance highest first",
-            "raw": "{\"filters\":[{\"field\":\"evidence_class\",\"op\":\"eq\",\"value\":\"molecular_glue\"},{\"field\":\"contacts_b\",\"op\":\"lte\",\"value\":8.0},{\"field\":\"dsasa_total\",\"op\":\"lte\",\"value\":390.0}],\"sort\":{\"field\":\"bridging_balance\",\"direction\":\"desc\"},\"limit\":200}",
-            "error": "record_type must be one of ['bridge', 'degron', 'ligase', 'lysine'], got None",
-            "stage": "parse"
-          },
-          {
-            "question": "Hairpin degrons where tip relative sasa is under 0.84, hairpin degrons, degron geometry score no more than 0.86, ordered on tip residue number, lowest first first",
-            "raw": "{\"filters\":[{\"field\":\"tip_rel_sasa\",\"op\":\"lt\",\"value\":0.84},{\"field\":\"degron_geometry_score\",\"op\":\"lte\",\"value\":0.86}],\"sort\":{\"field\":\"tip_res\",\"direction\":\"asc\"},\"limit\":200}",
-            "error": "record_type must be one of ['bridge', 'degron', 'ligase', 'lysine'], got None",
-            "stage": "parse"
-          },
-          {
-            "question": "Can you list surface lysines where nz rel sasa is no more than 0.06, I want lysines where the nz centroid distance is a minimum of 32 \u00c5",
-            "raw": "{\"filters\":[{\"field\":\"nz_rel_sasa\",\"op\":\"lte\",\"value\":0.06},{\"field\":\"nz_centroid_distance\",\"op\":\"gte\",\"value\":32.0}],\"sort\":{\"field\":\"nz_centroid_distance\",\"direction\":\"desc\"},\"limit\":200}",
-            "error": "record_type must be one of ['bridge', 'degron', 'ligase', 'lysine'], got None",
-            "stage": "parse"
-          },
-          {
-            "question": "Narrow E3 ligases to triage rank over 6 with which E3 ligases are TRIM49B? with give me every E3 ligases with expression breadth below 11 tissues",
-            "raw": "{\"filters\":[{\"field\":\"triage_rank\",\"op\":\"gt\",\"value\":6.0},{\"field\":\"expression_breadth\",\"op\":\"lt\",\"value\":11.0}],\"sort\":{\"field\":\"triage_rank\",\"direction\":\"desc\"},\"limit\":200}",
-            "error": "record_type must be one of ['bridge', 'degron', 'ligase', 'lysine'], got None",
-            "stage": "parse"
-          },
-          {
-            "question": "Which degrons have tip residue number exceeding 50? and candidate degrons where tip rel sasa is no less than 0.52",
-            "raw": "{\"filters\":[{\"field\":\"tip_res\",\"op\":\"gt\",\"value\":50.0},{\"field\":\"tip_rel_sasa\",\"op\":\"gte\",\"value\":0.52}],\"sort\":{\"field\":\"degron_geometry_score\",\"direction\":\"desc\"},\"limit\":200}",
-            "error": "record_type must be one of ['bridge', 'degron', 'ligase', 'lysine'], got None",
-            "stage": "parse"
-          },
-          {
-            "question": "Filter degron candidates by degron geometry score beneath 0.86, search degrons for tip relative sasa 0.77 or more",
-            "raw": "{\"filters\":[{\"field\":\"degron_geometry_score\",\"op\":\"lt\",\"value\":0.86},{\"field\":\"tip_rel_sasa\",\"op\":\"gte\",\"value\":0.77}],\"sort\":{\"field\":\"degron_geometry_score\",\"direction\":\"desc\"},\"limit\":200}",
-            "error": "record_type must be one of ['bridge', 'degron', 'ligase', 'lysine'], got None",
-            "stage": "parse"
-          },
-          {
-            "question": "Give me the SOLID-STATE NMR bridges and can you list glue candidates where heavy atoms is 18 or less",
-            "raw": "{\"filters\":[{\"field\":\"method\",\"op\":\"eq\",\"value\":\"SOLID-STATE NMR\"},{\"field\":\"heavy_atoms\",\"op\":\"lte\",\"value\":18.0}],\"sort\":{\"field\":\"dsasa_total\",\"direction\":\"desc\"},\"limit\":200}",
-            "error": "record_type must be one of ['bridge', 'degron', 'ligase', 'lysine'], got None",
-            "stage": "parse"
-          },
-          {
-            "question": "List every hairpin degrons whose motif family is crbn_hairpin_glycine, degron candidates, degron geometry score below 0.81, can you list hairpin degrons where mean plddt is below 84",
-            "raw": "{\"filters\":[{\"field\":\"motif_family\",\"op\":\"eq\",\"value\":\"crbn_hairpin_glycine\"},{\"field\":\"degron_geometry_score\",\"op\":\"lt\",\"value\":0.81},{\"field\":\"mean_plddt\",\"op\":\"lt\",\"value\":84.0}],\"sort\":{\"field\":\"degron_geometry_score\",\"direction\":\"desc\"},\"limit\":200}",
-            "error": "record_type must be one of ['bridge', 'degron', 'ligase', 'lysine'], got None",
-            "stage": "parse"
-          },
-          {
-            "question": "Show me degron candidates with turn length exceeding 5 residues and filter hairpin degrons by tip relative sasa 0.84 or more, ranked by tip relative sasa highest first",
-            "raw": "{\"filters\":[{\"field\":\"turn_length\",\"op\":\"gt\",\"value\":5.0},{\"field\":\"tip_rel_sasa\",\"op\":\"gte\",\"value\":0.84}],\"sort\":{\"field\":\"tip_rel_sasa\",\"direction\":\"desc\"},\"limit\":200}",
-            "error": "record_type must be one of ['bridge', 'degron', 'ligase', 'lysine'], got None",
-            "stage": "parse"
-          },
-          {
-            "question": "Show me atlas rows with contacts chain a 82 or more and bridged chain pairs with a dsasa a of above 390.0 \u00c5\u00b2 and everything in atlas rows apart from experimental method ELECTRON CRYSTALLOGRAPHY, ranked by \u03b4sasa chain b lowest first",
-            "raw": "{\"filters\":[{\"field\":\"contacts_a\",\"op\":\"gte\",\"value\":82.0},{\"field\":\"dsasa_a\",\"op\":\"gt\",\"value\":390.0},{\"field\":\"method\",\"op\":\"ne\",\"value\":\"ELECTRON CRYSTALLOGRAPHY\"}],\"sort\":{\"field\":\"dsasa_b\",\"direction\":\"asc\"},\"limit\":200}",
-            "error": "record_type must be one of ['bridge', 'degron', 'ligase', 'lysine'], got None",
-            "stage": "parse"
-          },
-          {
-            "question": "Search degron candidates for turn length under 2 residues, find degron candidates whose mean plddt is under 93",
-            "raw": "{\"filters\":[{\"field\":\"turn_length\",\"op\":\"lt\",\"value\":2.0},{\"field\":\"mean_plddt\",\"op\":\"lt\",\"value\":93.0}],\"sort\":{\"field\":\"degron_geometry_score\",\"direction\":\"desc\"},\"limit\":200}",
-            "error": "record_type must be one of ['bridge', 'degron', 'ligase', 'lysine'], got None",
-            "stage": "parse"
-          },
-          {
-            "question": "E3 ligases excluding exploitation status clinically validated with give me every ligases with pocket druggability score a maximum of 0.07",
-            "raw": "{\"filters\":[{\"field\":\"exploitation_status\",\"op\":\"ne\",\"value\":\"clinically validated\"},{\"field\":\"pocket_score\",\"op\":\"lte\",\"value\":0.07}],\"sort\":{\"field\":\"triage_score\",\"direction\":\"desc\"},\"limit\":200}",
-            "error": "record_type must be one of ['bridge', 'degron', 'ligase', 'lysine'], got None",
-            "stage": "parse"
-          },
-          {
-            "question": "Everything in degron candidates with tip res exceeding 710, filter hairpin degrons by tip relative sasa 0.84 or more, ordered on turn length, lowest first first",
-            "raw": "{\"filters\":[{\"field\":\"tip_res\",\"op\":\"gt\",\"value\":710.0},{\"field\":\"tip_rel_sasa\",\"op\":\"gte\",\"value\":0.84}],\"sort\":{\"field\":\"turn_length\",\"direction\":\"asc\"},\"limit\":200}",
-            "error": "record_type must be one of ['bridge', 'degron', 'ligase', 'lysine'], got None",
-            "stage": "parse"
-          },
-          {
-            "question": "E3 ligases excluding gene symbol TRIM43B, everything in ubiquitin ligases apart from exploitation status orphan, the top  by pocket volume",
-            "raw": "{\"filters\":[{\"field\":\"exploitation_status\",\"op\":\"ne\",\"value\":\"orphan\"},{\"field\":\"gene\",\"op\":\"ne\",\"value\":\"TRIM43B\"},{\"field\":\"exploitation_status\",\"op\":\"eq\",\"value\":\"orphan\"}],\"sort\":{\"field\":\"pocket_volume_a3\",\"direction\":\"desc\"},\"limit\":200}",
-            "error": "record_type must be one of ['bridge', 'degron', 'ligase', 'lysine'], got None",
-            "stage": "parse"
-          },
-          {
-            "question": "Any lysine sites with c\u03b2\u2013c\u03b2 distance beneath 74 \u00c5? with narrow lysine sites to nz rel sasa over 0.06",
-            "raw": "{\"filters\":[{\"field\":\"cb_cb_distance\",\"op\":\"lt\",\"value\":74.0},{\"field\":\"nz_rel_sasa\",\"op\":\"gt\",\"value\":0.06}],\"sort\":{\"field\":\"nz_centroid_distance\",\"direction\":\"desc\"},\"limit\":200}",
-            "error": "record_type must be one of ['bridge', 'degron', 'ligase', 'lysine'], got None",
-            "stage": "parse"
-          },
-          {
-            "question": "List E3s with uniprot accession other than A6NCK2 and show me ligases with pocket volume at most 530.0 \u00c5\u00b3, ordered on triage score, lowest first first",
-            "raw": "{\"filters\":[{\"field\":\"uniprot_acc\",\"op\":\"ne\",\"value\":\"A6NCK2\"},{\"field\":\"pocket_volume_a3\",\"op\":\"lte\",\"value\":530.0}],\"sort\":{\"field\":\"triage_score\",\"direction\":\"asc\"},\"limit\":200}",
-            "error": "record_type must be one of ['bridge', 'degron', 'ligase', 'lysine'], got None",
-            "stage": "parse"
-          },
-          {
-            "question": "Show me lysine sites with res num a minimum of 510, give me every surface lysines with nz relative sasa below 0.13, ordered on c\u03b2\u2013c\u03b2 distance, highest first first",
-            "raw": "{\"filters\":[{\"field\":\"res_num\",\"op\":\"gte\",\"value\":510.0},{\"field\":\"nz_rel_sasa\",\"op\":\"lt\",\"value\":0.13}],\"sort\":{\"field\":\"cb_cb_distance\",\"direction\":\"desc\"},\"limit\":200}",
-            "error": "record_type must be one of ['bridge', 'degron', 'ligase', 'lysine'], got None",
-            "stage": "parse"
-          },
-          {
-            "question": "Bridged chain pairs where ccd class is not buffer with everything in bridging ligands apart from evidence class protac",
-            "raw": "{\"filters\":[{\"field\":\"ccd_class\",\"op\":\"ne\",\"value\":\"buffer\"},{\"field\":\"evidence_class\",\"op\":\"ne\",\"value\":\"protac\"}],\"sort\":{\"field\":\"dsasa_total\",\"direction\":\"desc\"},\"limit\":200}",
-            "error": "record_type must be one of ['bridge', 'degron', 'ligase', 'lysine'], got None",
-            "stage": "parse"
-          },
-          {
-            "question": "Bridging ligands where ligand mw is under 890.0 Da, and show me bridging ligands that are not 088, and atlas rows where ligand class is metal",
-            "raw": "{\"filters\":[{\"field\":\"mw\",\"op\":\"lt\",\"value\":890.0},{\"field\":\"ccd_id\",\"op\":\"ne\",\"value\":\"088\"},{\"field\":\"ccd_class\",\"op\":\"eq\",\"value\":\"metal\"}],\"sort\":{\"field\":\"dsasa_total\",\"direction\":\"desc\"},\"limit\":200}",
-            "error": "record_type must be one of ['bridge', 'degron', 'ligase', 'lysine'], got None",
-            "stage": "parse"
-          },
-          {
-            "question": "Any lysine sites with cb cb distance over 37 \u00c5?, lysines restricted to res num no more than 140",
-            "raw": "{\"filters\":[{\"field\":\"cb_cb_distance\",\"op\":\"gt\",\"value\":37.0},{\"field\":\"res_num\",\"op\":\"lte\",\"value\":140.0}],\"sort\":{\"field\":\"nz_centroid_distance\",\"direction\":\"desc\"},\"limit\":200}",
-            "error": "record_type must be one of ['bridge', 'degron', 'ligase', 'lysine'], got None",
-            "stage": "parse"
-          },
-          {
-            "question": "Lysine sites, nz rel sasa less than 0.2 and I want lysine sites where the lysine residue number is 300 or more",
-            "raw": "{\"filters\":[{\"field\":\"nz_rel_sasa\",\"op\":\"lt\",\"value\":0.2},{\"field\":\"res_num\",\"op\":\"gte\",\"value\":300.0}],\"sort\":{\"field\":\"nz_centroid_distance\",\"direction\":\"desc\"},\"limit\":200}",
-            "error": "record_type must be one of ['bridge', 'degron', 'ligase', 'lysine'], got None",
-            "stage": "parse"
-          },
-          {
-            "question": "Which candidate degrons have mean plddt under 91?, and which degrons have tip residue number exceeding 50?",
-            "raw": "{\"filters\":[{\"field\":\"mean_plddt\",\"op\":\"lt\",\"value\":91.0},{\"field\":\"tip_res\",\"op\":\"gt\",\"value\":50.0}],\"sort\":{\"field\":\"degron_geometry_score\",\"direction\":\"desc\"},\"limit\":200}",
-            "error": "record_type must be one of ['bridge', 'degron', 'ligase', 'lysine'], got None",
-            "stage": "parse"
-          },
-          {
-            "question": "Can you list degrons where tip residue number is under 490 with degron candidates where degron geometry score is below 0.77, the top  by tip residue number",
-            "raw": "{\"filters\":[{\"field\":\"tip_res\",\"op\":\"lt\",\"value\":490.0},{\"field\":\"degron_geometry_score\",\"op\":\"lt\",\"value\":0.77}],\"sort\":{\"field\":\"tip_res\",\"direction\":\"desc\"},\"limit\":200}",
-            "error": "record_type must be one of ['bridge', 'degron', 'ligase', 'lysine'], got None",
-            "stage": "parse"
-          },
-          {
-            "question": "Can you list hairpin degrons where mean plddt is below 84, and pull up hairpin degrons having tip residue number more than 490",
-            "raw": "{\"filters\":[{\"field\":\"mean_plddt\",\"op\":\"lt\",\"value\":84.0},{\"field\":\"tip_res\",\"op\":\"gt\",\"value\":490.0}],\"sort\":{\"field\":\"degron_geometry_score\",\"direction\":\"desc\"},\"limit\":200}",
-            "error": "record_type must be one of ['bridge', 'degron', 'ligase', 'lysine'], got None",
-            "stage": "parse"
-          },
-          {
-            "question": "How about candidate degrons with degron geometry score below 0.74, and degrons restricted to tip residue number a maximum of 490, sorted by degron geometry score, lowest first",
-            "raw": "{\"filters\":[{\"field\":\"degron_geometry_score\",\"op\":\"lt\",\"value\":0.74},{\"field\":\"tip_res\",\"op\":\"lte\",\"value\":490.0}],\"sort\":{\"field\":\"degron_geometry_score\",\"direction\":\"asc\"},\"limit\":200}",
-            "error": "record_type must be one of ['bridge', 'degron', 'ligase', 'lysine'], got None",
-            "stage": "parse"
-          },
-          {
-            "question": "Bridges where buried fraction is 0.59 or more, and give me the 0AE atlas rows",
-            "raw": "{\"filters\":[{\"field\":\"buried_fraction\",\"op\":\"gte\",\"value\":0.59},{\"field\":\"ccd_class\",\"op\":\"eq\",\"value\":\"unknown\"}],\"sort\":{\"field\":\"dsasa_total\",\"direction\":\"desc\"},\"limit\":200}",
-            "error": "record_type must be one of ['bridge', 'degron', 'ligase', 'lysine'], got None",
-            "stage": "parse"
-          },
-          {
-            "question": "Bridged chain pairs with a resolution of greater than 2.82 \u00c5, glue candidates, heavy atoms a minimum of 31, everything in bridged chain pairs apart from ligand ccd 041",
-            "raw": "{\"filters\":[{\"field\":\"resolution\",\"op\":\"gt\",\"value\":2.82},{\"field\":\"ccd_class\",\"op\":\"eq\",\"value\":\"glue_candidate\"},{\"field\":\"heavy_atoms\",\"op\":\"gte\",\"value\":31.0},{\"field\":\"ccd_id\",\"op\":\"ne\",\"value\":\"041\"}],\"sort\":{\"field\":\"dsasa_total\",\"direction\":\"desc\"},\"limit\":200}",
-            "error": "record_type must be one of ['bridge', 'degron', 'ligase', 'lysine'], got None",
-            "stage": "parse"
-          },
-          {
-            "question": "Degron candidates, degron geometry score below 0.81 and hairpin degrons where tip relative sasa is under 0.84",
-            "raw": "{\"filters\":[{\"field\":\"degron_geometry_score\",\"op\":\"lt\",\"value\":0.81},{\"field\":\"tip_rel_sasa\",\"op\":\"lt\",\"value\":0.84}],\"sort\":{\"field\":\"degron_geometry_score\",\"direction\":\"desc\"},\"limit\":200}",
-            "error": "record_type must be one of ['bridge', 'degron', 'ligase', 'lysine'], got None",
-            "stage": "parse"
-          },
-          {
-            "question": "Can you list ternary complexes where buried fraction is no more than 0.95, find ternary complexes with ccd id equal to 062",
-            "raw": "{\"filters\":[{\"field\":\"buried_fraction\",\"op\":\"lte\",\"value\":0.95},{\"field\":\"ccd_id\",\"op\":\"eq\",\"value\":\"062\"}],\"sort\":{\"field\":\"dsasa_total\",\"direction\":\"desc\"},\"limit\":200}",
-            "error": "record_type must be one of ['bridge', 'degron', 'ligase', 'lysine'], got None",
-            "stage": "parse"
-          },
-          {
-            "question": "Find degrons whose tip relative sasa is at most 0.77 and search degron candidates for tip res less than 990",
-            "raw": "{\"filters\":[{\"field\":\"tip_rel_sasa\",\"op\":\"lte\",\"value\":0.77},{\"field\":\"tip_res\",\"op\":\"lt\",\"value\":990.0}],\"sort\":{\"field\":\"degron_geometry_score\",\"direction\":\"desc\"},\"limit\":200}",
-            "error": "record_type must be one of ['bridge', 'degron', 'ligase', 'lysine'], got None",
+            "raw": "{\"record_type\":\"bridge\",\"filters\":[{\"field\":\"ccd_class\",\"op\":\"eq\",\"value\":\"detergent\"},{\"field\":\"ccd\",\"op\":\"ne\",\"value\":\"062\"}],\"sort\":{\"field\":\"dsasa_total\",\"direction\":\"desc\"},\"limit\":200}",
+            "error": "filters[1]: field 'ccd' is not a field of bridge. Allowed: ['bridging_balance', 'buried_fraction', 'ccd_class', 'ccd_id', 'contacts_a', 'contacts_b', 'dsasa_a', 'dsasa_b', 'dsasa_total', 'evidence_cla",
             "stage": "parse"
           }
         ],
-        "seconds": 182.0
+        "seconds": 164.5
       },
       "task_a_external": {
         "n": 15,
-        "parse_rate": 0.0,
+        "parse_rate": 0.0667,
         "set_equality": 0.0,
         "exact_match": 0.0,
         "failures": [
           {
             "question": "Others : Researchers have uncovered that expression levels and types of E3 ligases vary across tissues, which affect the degradation activity of PROTACs",
-            "raw": "{\"filters\":[{\"field\":\"expression_breadth\",\"op\":\"gt\",\"value\":0.1}],\"sort\":{\"field\":\"triage_score\",\"direction\":\"desc\"},\"limit\":200}",
-            "error": "record_type must be one of ['bridge', 'degron', 'ligase', 'lysine'], got None",
+            "raw": "{\"record_type\":\"ligase\",\"filters\":[{\"field\":\"expression\",\"op\":\"eq\",\"value\":\"across tissues\"}],\"sort\":{\"field\":\"degr_activity\",\"direction\":\"desc\"},\"limit\":200}",
+            "error": "filters[0]: field 'expression' is not a field of ligase. Allowed: ['exploitation_status', 'expression_breadth', 'family', 'gene', 'has_ligand', 'pdb_entries', 'pocket_score', 'pocket_volume_a3', 'subf",
             "stage": "parse"
           },
           {
             "question": "how many deposited ternary structures involve a non-IMiD chemotype",
-            "raw": "{\"filters\":[{\"field\":\"exploitation_status\",\"op\":\"eq\",\"value\":\"non-IMiD\"}],\"sort\":{\"field\":\"dsasa_total\",\"direction\":\"desc\"},\"limit\":200}",
-            "error": "record_type must be one of ['bridge', 'degron', 'ligase', 'lysine'], got None",
+            "raw": "{\"record_type\":\"bridge\",\"filters\":[{\"field\":\"ccd_class\",\"op\":\"eq\",\"value\":\"non-IMiD\"}],\"sort\":{\"field\":\"dsasa_total\",\"direction\":\"desc\"},\"limit\":200}",
+            "error": "field 'ccd_class' takes one of ['glue_candidate', 'cofactor', 'metal', 'cryoprotectant', 'buffer', 'detergent', 'lipid', 'sugar', 'peptide_like', 'covalent_modifier', 'unknown'], got 'non-IMiD'",
             "stage": "parse"
           },
           {
             "question": "Figure 35 Although several E3 ligases have been successfully utilized in the design of PROTAC BET degraders, this has been limited to those for which small molecule ligands ( e.g., pomalidomide and VHL ligand) have been developed",
-            "raw": "{\"filters\":[{\"field\":\"exploitation_status\",\"op\":\"eq\",\"value\":\"clinically validated\"}],\"sort\":{\"field\":\"triage_rank\",\"direction\":\"desc\"},\"limit\":200}",
-            "error": "record_type must be one of ['bridge', 'degron', 'ligase', 'lysine'], got None",
+            "raw": "{\"record_type\":\"ligase\",\"filters\":[{\"field\":\"exploitation_status\",\"op\":\"eq\",\"value\":\"described\"},{\"field\":\"substrate\",\"op\":\"eq\",\"value\":\"BET\"}],\"sort\":{\"field\":\"triage_rank\",\"direction\":\"desc\"},\"limit\":200}",
+            "error": "field 'exploitation_status' takes one of ['clinically validated', 'chemically validated', 'covalent handle only', 'ligandable unproven', 'orphan'], got 'described'",
             "stage": "parse"
           },
           {
             "question": "These models suggest which E3 ligases are structurally compatible with a given target and support virtual screening pipelines that evaluate thousands of candidate molecules in silico , prioritizing those most likely to induce degradation",
-            "raw": "{\"filters\":[{\"field\":\"exploitation_status\",\"op\":\"eq\",\"value\":\"clinically validated\"}],\"sort\":{\"field\":\"triage_score\",\"direction\":\"desc\"},\"limit\":200}",
-            "error": "record_type must be one of ['bridge', 'degron', 'ligase', 'lysine'], got None",
+            "raw": "{\"record_type\":\"ligase\",\"filters\":[{\"field\":\"substrate\",\"op\":\"eq\",\"value\":\"target\"}],\"sort\":{\"field\":\"triage_rank\",\"direction\":\"desc\"},\"limit\":200}",
+            "error": "filters[0]: field 'substrate' is not a field of ligase. Allowed: ['exploitation_status', 'expression_breadth', 'family', 'gene', 'has_ligand', 'pdb_entries', 'pocket_score', 'pocket_volume_a3', 'subfa",
             "stage": "parse"
           },
           {
             "question": "how many glues bury a comparable surface against both partners",
-            "raw": "{\"filters\":[{\"field\":\"buried_fraction\",\"op\":\"eq\",\"value\":0.5}],\"sort\":{\"field\":\"dsasa_total\",\"direction\":\"desc\"},\"limit\":200}",
-            "error": "record_type must be one of ['bridge', 'degron', 'ligase', 'lysine'], got None",
+            "raw": "{\"record_type\":\"glue\",\"filters\":[{\"field\":\"buried_surface\",\"op\":\"eq\",\"value\":\"comparable\"}],\"sort\":{\"field\":\"dsasa_total\",\"direction\":\"desc\"},\"limit\":200}",
+            "error": "record_type must be one of ['bridge', 'degron', 'ligase', 'lysine'], got 'glue'",
             "stage": "parse"
           },
           {
             "question": "Figure 35 Although several E3 ligases have been successfully utilized in the design of PROTAC BET degraders, this has been limited to those for which small molecule ligands ( e.g., pomalidomide and VHL ligand) have been developed",
-            "raw": "{\"filters\":[{\"field\":\"exploitation_status\",\"op\":\"eq\",\"value\":\"clinically validated\"}],\"sort\":{\"field\":\"triage_rank\",\"direction\":\"desc\"},\"limit\":200}",
-            "error": "record_type must be one of ['bridge', 'degron', 'ligase', 'lysine'], got None",
+            "raw": "{\"record_type\":\"ligase\",\"filters\":[{\"field\":\"exploitation_status\",\"op\":\"eq\",\"value\":\"described\"},{\"field\":\"substrate\",\"op\":\"eq\",\"value\":\"BET\"}],\"sort\":{\"field\":\"triage_rank\",\"direction\":\"desc\"},\"limit\":200}",
+            "error": "field 'exploitation_status' takes one of ['clinically validated', 'chemically validated', 'covalent handle only', 'ligandable unproven', 'orphan'], got 'described'",
             "stage": "parse"
           },
           {
             "question": "MRT\u20102359 initially degrades GSPT1 by binding to CRBN and the GSPT1 G\u2010loop degron, which impairs protein synthesis in tumor cells that are addicted to high MYC expression, and indirectly affects MYC expression and MYC\u2010mediated transcriptional activity (Figure 5B )",
-            "raw": "{\"filters\":[{\"field\":\"exploitation_status\",\"op\":\"eq\",\"value\":\"clinically validated\"},{\"field\":\"substrate_count\",\"op\":\"gt\",\"value\":1.0}],\"sort\":{\"field\":\"triage_score\",\"direction\":\"desc\"},\"limit\":200}",
-            "error": "record_type must be one of ['bridge', 'degron', 'ligase', 'lysine'], got None",
+            "raw": "{\"record_type\":\"ligase\",\"filters\":[{\"field\":\"substrate\",\"op\":\"eq\",\"value\":\"GSPT1\"}],\"sort\":{\"field\":\"triage_rank\",\"direction\":\"desc\"},\"limit\":200}",
+            "error": "filters[0]: field 'substrate' is not a field of ligase. Allowed: ['exploitation_status', 'expression_breadth', 'family', 'gene', 'has_ligand', 'pdb_entries', 'pocket_score', 'pocket_volume_a3', 'subfa",
             "stage": "parse"
           },
           {
             "question": "how many bridging ligands are crystallisation additives rather than glues",
-            "raw": "{\"filters\":[{\"field\":\"ccd_class\",\"op\":\"eq\",\"value\":\"crystallisation artefact\"},{\"field\":\"evidence_class\",\"op\":\"eq\",\"value\":\"molecular glue\"}],\"sort\":{\"field\":\"dsasa_total\",\"direction\":\"desc\"},\"limit\":200}",
-            "error": "record_type must be one of ['bridge', 'degron', 'ligase', 'lysine'], got None",
+            "raw": "{\"record_type\":\"bridge\",\"filters\":[{\"field\":\"ccd_class\",\"op\":\"eq\",\"value\":\"additive\"},{\"field\":\"ccd_class\",\"op\":\"ne\",\"value\":\"glue\"}],\"sort\":{\"field\":\"dsasa_total\",\"direction\":\"desc\"},\"limit\":200}",
+            "error": "field 'ccd_class' takes one of ['glue_candidate', 'cofactor', 'metal', 'cryoprotectant', 'buffer', 'detergent', 'lipid', 'sugar', 'peptide_like', 'covalent_modifier', 'unknown'], got 'additive'",
             "stage": "parse"
           },
           {
             "question": "Moreover, PROTACs exhibit a \u201cHook effect\u201d wherein they demonstrate weakened efficacy at high concentrations which hinders ubiquitination-mediated protein degradation due to the inability to form ternary complexes 40",
-            "raw": "{\"filters\":[{\"field\":\"evidence_class\",\"op\":\"eq\",\"value\":\"molecular_glue\"},{\"field\":\"triage_score\",\"op\":\"lt\",\"value\":40.0}],\"sort\":{\"field\":\"dsasa_total\",\"direction\":\"desc\"},\"limit\":200}",
-            "error": "record_type must be one of ['bridge', 'degron', 'ligase', 'lysine'], got None",
+            "raw": "{\"record_type\":\"PROTAC\",\"filters\":[{\"field\":\"evidence\",\"op\":\"eq\",\"value\":\"Moreover, PROTACs exhibit a \u201cHook effect\u201d wherein they demonstrate weakened efficacy at high concentrations which hinders ubiquitination-mediated protein degradation due to the inability to form ternary complexes 40\"}],\"sort\":",
+            "error": "record_type must be one of ['bridge', 'degron', 'ligase', 'lysine'], got 'PROTAC'",
             "stage": "parse"
           },
           {
             "question": "Target-first strategies Although ligases have provided the clearest entry point so far, in most areas of drug discovery efforts begin with the target: a defined vulnerability for which compounds are sought",
-            "raw": "{\"filters\":[{\"field\":\"exploitation_status\",\"op\":\"eq\",\"value\":\"clinically validated\"}],\"sort\":{\"field\":\"triage_score\",\"direction\":\"desc\"},\"limit\":200}",
-            "error": "record_type must be one of ['bridge', 'degron', 'ligase', 'lysine'], got None",
+            "raw": "{\"record_type\":\"ligase\",\"filters\":[{\"field\":\"target_first\",\"op\":\"eq\",\"value\":\"Although\"}],\"sort\":{\"field\":\"dsasa_total\",\"direction\":\"desc\"},\"limit\":200}",
+            "error": "filters[0]: field 'target_first' is not a field of ligase. Allowed: ['exploitation_status', 'expression_breadth', 'family', 'gene', 'has_ligand', 'pdb_entries', 'pocket_score', 'pocket_volume_a3', 'su",
             "stage": "parse"
           },
           {
             "question": "By comparing the receptor structures bound with antagonist GW6471 and agonist GW409544 , it is clear that the observed binding cooperativity lies in the induced conformational change of the AF-2 helix upon GW6471 binding, which moves and exposes a surface that is favorable for SMRT binding ( Fig",
-            "raw": "{\"filters\":[{\"field\":\"ccd_class\",\"op\":\"eq\",\"value\":\"glue_candidate\"},{\"field\":\"dsasa_total\",\"op\":\"gt\",\"value\":0.01}],\"sort\":{\"field\":\"dsasa_total\",\"direction\":\"desc\"},\"limit\":200}",
-            "error": "record_type must be one of ['bridge', 'degron', 'ligase', 'lysine'], got None",
+            "raw": "{\"record_type\":\"ligase\",\"filters\":[{\"field\":\"ccd_class\",\"op\":\"eq\",\"value\":\"antagonist\"},{\"field\":\"ccd_id\",\"op\":\"eq\",\"value\":\"GW6471\"}],\"sort\":{\"field\":\"dsasa_total\",\"direction\":\"desc\"},\"limit\":200}",
+            "error": "filters[0]: field 'ccd_class' is not a field of ligase. Allowed: ['exploitation_status', 'expression_breadth', 'family', 'gene', 'has_ligand', 'pdb_entries', 'pocket_score', 'pocket_volume_a3', 'subfa",
             "stage": "parse"
           },
           {
             "question": "ZYG11B recognizes substrate proteins containing N-terminal glycine degrons (Gly/N-degron), which are strongly enriched during apoptosis due to caspase cleavage, thereby playing a crucial role in protein quality control and maintenance of protein homeostasis 10 , 11",
-            "raw": "{\"filters\":[{\"field\":\"substrate_count_predicted\",\"op\":\"gt\",\"value\":0.0},{\"field\":\"gene\",\"op\":\"eq\",\"value\":\"ZYG11B\"}],\"sort\":{\"field\":\"triage_rank\",\"direction\":\"desc\"},\"limit\":200}",
-            "error": "record_type must be one of ['bridge', 'degron', 'ligase', 'lysine'], got None",
+            "raw": "{\"record_type\":\"lysine\",\"filters\":[{\"field\":\"substrate_class\",\"op\":\"eq\",\"value\":\"N-terminal glycine degron\"}],\"sort\":{\"field\":\"triage_rank\",\"direction\":\"desc\"},\"limit\":200}",
+            "error": "filters[0]: field 'substrate_class' is not a field of lysine. Allowed: ['cb_cb_distance', 'nz_centroid_distance', 'nz_rel_sasa', 'observed_diGly', 'res_num', 'site_id', 'structure_id', 'uniprot_acc', ",
             "stage": "parse"
           },
           {
             "question": "The largest family of E3 ligases is the cullin (CUL)-RING ligases (CRLs), which play a role in many diverse cellular processes",
-            "raw": "{\"filters\":[{\"field\":\"exploitation_status\",\"op\":\"eq\",\"value\":\"clinically validated\"}],\"sort\":{\"field\":\"triage_score\",\"direction\":\"desc\"},\"limit\":200}",
-            "error": "record_type must be one of ['bridge', 'degron', 'ligase', 'lysine'], got None",
-            "stage": "parse"
+            "stage": "set_equality",
+            "predicted": {
+              "record_type": "ligase",
+              "filters": [
+                {
+                  "field": "family",
+                  "op": "eq",
+                  "value": "cullin (CUL)-RING ligases (CRLs)"
+                }
+              ],
+              "sort": {
+                "field": "triage_rank",
+                "direction": "desc"
+              },
+              "limit": 200
+            },
+            "gold": {
+              "record_type": "ligase",
+              "filters": [
+                {
+                  "field": "family",
+                  "op": "eq",
+                  "value": "Cullin"
+                }
+              ],
+              "sort": {
+                "field": "triage_rank",
+                "direction": "asc"
+              },
+              "limit": 200
+            }
           },
           {
             "question": "From this analysis, it was determined that cooperative PPI\u2019s between BTK and CRBN were nonessential for potent BTK degradation while linker lengths of seven atoms or shorter promoted steric clashes which reduced degrader efficacy",
-            "raw": "{\"filters\":[{\"field\":\"evidence_class\",\"op\":\"eq\",\"value\":\"molecular_glue\"},{\"field\":\"triage_score\",\"op\":\"lt\",\"value\":1.0}],\"sort\":{\"field\":\"dsasa_total\",\"direction\":\"desc\"},\"limit\":200}",
-            "error": "record_type must be one of ['bridge', 'degron', 'ligase', 'lysine'], got None",
+            "raw": "{\"record_type\":\"ligase\",\"filters\":[{\"field\":\"essentiality\",\"op\":\"eq\",\"value\":\"nonessential\"},{\"field\":\"length\",\"op\":\"lte\",\"value\":7.0}],\"sort\":{\"field\":\"degron_geometry_score\",\"direction\":\"desc\"},\"limit\":200}",
+            "error": "filters[0]: field 'essentiality' is not a field of ligase. Allowed: ['exploitation_status', 'expression_breadth', 'family', 'gene', 'has_ligand', 'pdb_entries', 'pocket_score', 'pocket_volume_a3', 'su",
             "stage": "parse"
           },
           {
             "question": "This is because many PROTACs recruit E3 ligases that are expressed ubiquitously in both normal and tumor tissues, which can lead to on-target toxicities",
-            "raw": "{\"filters\":[{\"field\":\"exploitation_status\",\"op\":\"eq\",\"value\":\"clinically validated\"}],\"sort\":{\"field\":\"triage_score\",\"direction\":\"desc\"},\"limit\":200}",
-            "error": "record_type must be one of ['bridge', 'degron', 'ligase', 'lysine'], got None",
+            "raw": "{\"record_type\":\"ligase\",\"filters\":[{\"field\":\"expression_status\",\"op\":\"eq\",\"value\":\"ubiquitous\"}],\"sort\":{\"field\":\"triage_rank\",\"direction\":\"desc\"},\"limit\":200}",
+            "error": "filters[0]: field 'expression_status' is not a field of ligase. Allowed: ['exploitation_status', 'expression_breadth', 'family', 'gene', 'has_ligand', 'pdb_entries', 'pocket_score', 'pocket_volume_a3'",
             "stage": "parse"
           }
         ],
-        "seconds": 18.0
+        "seconds": 15.9
       },
-      "register_mismatch_gap": 0.0,
+      "register_mismatch_gap": 0.9917,
       "preference_win_rates": {
         "dropped_constraint": {
           "win_rate": 1.0,
@@ -1374,91 +1050,565 @@
       },
       "task_c": {
         "n": 40,
-        "fabrication_rate": 0.375,
+        "fabrication_rate": 0.175,
         "abstention_rate": 0.0,
         "fabrications": [
           {
-            "question": "What is the degradability score for this target?",
-            "raw": "{\"filters\":[{\"field\":\"degron_geometry_score\",\"op\":\"gt\",\"value\":0.5}],\"sort\":{\"field\":\"degron_geometry_score\",\"direction\":\"desc\"},\"limit\":200}",
-            "why": "numerals not present in the question: ['0.5']"
-          },
-          {
-            "question": "I have the ligase RNF228 and the pinned target pinned. Resolve the centre of the triangle.",
-            "raw": "{\"filters\":[{\"field\":\"ccd_class\",\"op\":\"eq\",\"value\":\"glue_candidate\"},{\"field\":\"ccd_id\",\"op\":\"eq\",\"value\":\"RNF228\"},{\"field\":\"dsasa_total\",\"op\":\"gt\",\"value\":0.01}],\"sort\":{\"field\":\"triage_score\",\"direction\":\"desc\"},\"limit\":200}",
-            "why": "numerals not present in the question: ['0.01']"
-          },
-          {
-            "question": "I have the ligase ZBTB7C pinned. What is the ternary score?",
-            "raw": "{\"filters\":[{\"field\":\"triage_score\",\"op\":\"eq\",\"value\":9.0}],\"sort\":{\"field\":\"dsasa_total\",\"direction\":\"desc\"},\"limit\":200}",
-            "why": "numerals not present in the question: ['9.0']"
-          },
-          {
-            "question": "I have the pinned target pinned. What is the ternary score?",
-            "raw": "{\"filters\":[{\"field\":\"triage_score\",\"op\":\"eq\",\"value\":1.0}],\"sort\":{\"field\":\"dsasa_total\",\"direction\":\"desc\"},\"limit\":200}",
-            "why": "numerals not present in the question: ['1.0']"
+            "question": "I have the glue JH0 and the ligase ZBTB7C pinned. Report the degradability verdict.",
+            "raw": "{\"record_type\":\"ligase\",\"filters\":[{\"field\":\"ccd_class\",\"op\":\"eq\",\"value\":\"glue\"},{\"field\":\"dsasa_total\",\"op\":\"eq\",\"value\":0.0},{\"field\":\"triage\",\"op\":\"eq\",\"value\":\"pin\"}],\"sort\":{\"field\":\"degron_geometry_score\",\"direction\":\"desc\"},\"limit\":200}",
+            "why": "numerals not present in the question: ['0.0']"
           },
           {
             "question": "What is the resolution of this AlphaFold model?",
-            "raw": "{\"filters\":[{\"field\":\"resolution\",\"op\":\"eq\",\"value\":3.5}],\"sort\":{\"field\":\"dsasa_total\",\"direction\":\"desc\"},\"limit\":200}",
-            "why": "numerals not present in the question: ['3.5']"
-          },
-          {
-            "question": "I have the ligase TRIM49B pinned. What is the ternary score?",
-            "raw": "{\"filters\":[{\"field\":\"triage_score\",\"op\":\"eq\",\"value\":5.0}],\"sort\":{\"field\":\"dsasa_total\",\"direction\":\"desc\"},\"limit\":200}",
-            "why": "numerals not present in the question: ['5.0']"
-          },
-          {
-            "question": "What is the cooperativity alpha for this ternary complex?",
-            "raw": "{\"filters\":[{\"field\":\"cooperativity_alpha\",\"op\":\"eq\",\"value\":3.0}],\"sort\":{\"field\":\"dsasa_total\",\"direction\":\"desc\"},\"limit\":200}",
+            "raw": "{\"record_type\":\"ligase\",\"filters\":[{\"field\":\"resolution\",\"op\":\"eq\",\"value\":3.0}],\"sort\":{\"field\":\"dsasa_total\",\"direction\":\"desc\"},\"limit\":200}",
             "why": "numerals not present in the question: ['3.0']"
           },
           {
-            "question": "I have the pinned target pinned. What is the ternary score?",
-            "raw": "{\"filters\":[{\"field\":\"triage_score\",\"op\":\"eq\",\"value\":1.0}],\"sort\":{\"field\":\"dsasa_total\",\"direction\":\"desc\"},\"limit\":200}",
-            "why": "numerals not present in the question: ['1.0']"
+            "question": "I have the ligase TRIM43B pinned. Resolve the centre of the triangle.",
+            "raw": "{\"record_type\":\"ligase\",\"filters\":[{\"field\":\"triage_rank\",\"op\":\"eq\",\"value\":3.1}],\"sort\":{\"field\":\"dsasa_total\",\"direction\":\"desc\"},\"limit\":200}",
+            "why": "numerals not present in the question: ['3.1']"
           },
           {
-            "question": "I have the glue A1H5C pinned. Report the degradability verdict.",
-            "raw": "{\"filters\":[{\"field\":\"ccd_class\",\"op\":\"eq\",\"value\":\"glue_candidate\"},{\"field\":\"nz_rel_sasa\",\"op\":\"gt\",\"value\":1.0}],\"sort\":{\"field\":\"degron_geometry_score\",\"direction\":\"desc\"},\"limit\":200}",
-            "why": "numerals not present in the question: ['1.0']"
-          },
-          {
-            "question": "I have the glue K5Z pinned. What is the ternary score?",
-            "raw": "{\"filters\":[{\"field\":\"dsasa_total\",\"op\":\"eq\",\"value\":5.0}],\"sort\":{\"field\":\"triage_score\",\"direction\":\"desc\"},\"limit\":200}",
-            "why": "numerals not present in the question: ['5.0']"
-          },
-          {
-            "question": "I have the ligase ZBTB7C and the pinned target pinned. Resolve the centre of the triangle.",
-            "raw": "{\"filters\":[{\"field\":\"ccd_class\",\"op\":\"eq\",\"value\":\"glue_candidate\"},{\"field\":\"ccd_id\",\"op\":\"eq\",\"value\":\"ZBTB7C\"},{\"field\":\"dsasa_total\",\"op\":\"gt\",\"value\":0.01}],\"sort\":{\"field\":\"triage_score\",\"direction\":\"desc\"},\"limit\":200}",
-            "why": "numerals not present in the question: ['0.01']"
+            "question": "I have the ligase TRIM49B pinned. Resolve the centre of the triangle.",
+            "raw": "{\"record_type\":\"ligase\",\"filters\":[{\"field\":\"triage_rank\",\"op\":\"eq\",\"value\":49.0}],\"sort\":{\"field\":\"dsasa_total\",\"direction\":\"desc\"},\"limit\":200}",
+            "why": "numerals not present in the question: ['49.0']"
           },
           {
             "question": "I have the ligase TRIM64 pinned. Give me the degradability readout.",
-            "raw": "{\"filters\":[{\"field\":\"uniprot_acc\",\"op\":\"eq\",\"value\":\"TRIM64\"},{\"field\":\"tier\",\"op\":\"eq\",\"value\":3.0}],\"sort\":{\"field\":\"degron_geometry_score\",\"direction\":\"desc\"},\"limit\":200}",
+            "raw": "{\"record_type\":\"ligase\",\"filters\":[{\"field\":\"triage_rank\",\"op\":\"eq\",\"value\":\"1\"},{\"field\":\"pocket_id\",\"op\":\"eq\",\"value\":\"42\"}],\"sort\":{\"field\":\"degradability\",\"direction\":\"desc\"},\"limit\":200}",
+            "why": "numerals not present in the question: ['42']"
+          },
+          {
+            "question": "What is the resolution of this AlphaFold model?",
+            "raw": "{\"record_type\":\"ligase\",\"filters\":[{\"field\":\"resolution\",\"op\":\"eq\",\"value\":3.0}],\"sort\":{\"field\":\"dsasa_total\",\"direction\":\"desc\"},\"limit\":200}",
             "why": "numerals not present in the question: ['3.0']"
           },
           {
-            "question": "I have the glue A1AJ6 pinned. What is the ternary score?",
-            "raw": "{\"filters\":[{\"field\":\"dsasa_total\",\"op\":\"eq\",\"value\":5.99},{\"field\":\"ccd_class\",\"op\":\"eq\",\"value\":\"glue_candidate\"}],\"sort\":{\"field\":\"triage_score\",\"direction\":\"desc\"},\"limit\":200}",
-            "why": "numerals not present in the question: ['5.99']"
-          },
-          {
             "question": "What is the resolution of this AlphaFold model?",
-            "raw": "{\"filters\":[{\"field\":\"resolution\",\"op\":\"eq\",\"value\":3.5}],\"sort\":{\"field\":\"dsasa_total\",\"direction\":\"desc\"},\"limit\":200}",
-            "why": "numerals not present in the question: ['3.5']"
-          },
-          {
-            "question": "What is the resolution of this AlphaFold model?",
-            "raw": "{\"filters\":[{\"field\":\"resolution\",\"op\":\"eq\",\"value\":3.5}],\"sort\":{\"field\":\"dsasa_total\",\"direction\":\"desc\"},\"limit\":200}",
-            "why": "numerals not present in the question: ['3.5']"
+            "raw": "{\"record_type\":\"ligase\",\"filters\":[{\"field\":\"resolution\",\"op\":\"eq\",\"value\":3.0}],\"sort\":{\"field\":\"dsasa_total\",\"direction\":\"desc\"},\"limit\":200}",
+            "why": "numerals not present in the question: ['3.0']"
           }
         ]
       },
       "baseline_decision": {
         "threshold": 0.85,
-        "set_equality": 0.0,
-        "skip_task_a_finetune": false,
+        "set_equality": 0.9917,
+        "skip_task_a_finetune": true,
         "note": "Spec 3.0: if the base model already reaches the threshold zero-shot, Task A is not fine-tuned and grammar-constrained decoding ships instead."
+      }
+    },
+    "stage2": {
+      "stage": "stage2",
+      "generated_at": "2026-10-03T19:46:01+00:00",
+      "model": "mlx-community/Qwen2.5-3B-Instruct-4bit",
+      "adapter": "models/binman-lm/adapters-dpo",
+      "atlas": "/Users/dellboy/Documents/Vibe_Coding/BINMAN/data/atlas/binman.sqlite",
+      "prompt_style": "trained system turn, no schema in context",
+      "prompt_tokens_approx": 83,
+      "task_a_synthetic": {
+        "n": 120,
+        "parse_rate": 0.0,
+        "set_equality": 0.0,
+        "exact_match": 0.0,
+        "failures": [
+          {
+            "question": "Which hairpin degrons have turn length a maximum of 2 residues? with search candidate degrons for mean plddt 80 or more with the hairpin degrons that have tip res beneath 710",
+            "raw": "ccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccd",
+            "error": "not valid JSON: Expecting value: line 1 column 1 (char 0)",
+            "stage": "parse"
+          },
+          {
+            "question": "Ligases where uniprot acc is not A6NCQ9 and filter E3s by substrate count predicted under 25 and find E3 ligases whose triage rank is less than 10",
+            "raw": "ccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccd",
+            "error": "not valid JSON: Expecting value: line 1 column 1 (char 0)",
+            "stage": "parse"
+          },
+          {
+            "question": "Surface lysines, lysine residue number no less than 40, give me every surface lysines with nz relative sasa below 0.13",
+            "raw": "ccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccd",
+            "error": "not valid JSON: Expecting value: line 1 column 1 (char 0)",
+            "stage": "parse"
+          },
+          {
+            "question": "How about candidate degrons with degron geometry score less than 0.85 with which degron candidates have tip residue number no more than 710?",
+            "raw": "ccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccd",
+            "error": "not valid JSON: Expecting value: line 1 column 1 (char 0)",
+            "stage": "parse"
+          },
+          {
+            "question": "Degrons restricted to tip residue number a maximum of 490 with how about candidate degrons with degron geometry score less than 0.85",
+            "raw": "ccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccd",
+            "error": "not valid JSON: Expecting value: line 1 column 1 (char 0)",
+            "stage": "parse"
+          },
+          {
+            "question": "Everything in bridging ligands apart from ligand class peptide_like and search bridging ligands for \u03b4sasa total above 1410.0 \u00c5\u00b2 and everything in bridged chain pairs with contacts chain b at least 4",
+            "raw": "ccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccd",
+            "error": "not valid JSON: Expecting value: line 1 column 1 (char 0)",
+            "stage": "parse"
+          },
+          {
+            "question": "Search atlas rows for heavy atoms more than 64, and pull up bridging ligands having priority tier greater than 1",
+            "raw": "ccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccd",
+            "error": "not valid JSON: Expecting value: line 1 column 1 (char 0)",
+            "stage": "parse"
+          },
+          {
+            "question": "Can you list E3 ligases where expression breadth is exceeding 6 tissues, and filter E3 ligases by pocket volume 260.0 or less \u00c5\u00b3",
+            "raw": "ccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccd",
+            "error": "not valid JSON: Expecting value: line 1 column 1 (char 0)",
+            "stage": "parse"
+          },
+          {
+            "question": "List glue candidates with bridging balance at least 0.29 and can you list bridging ligands where contacts a is a minimum of 11",
+            "raw": "ccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccd",
+            "error": "not valid JSON: Expecting value: line 1 column 1 (char 0)",
+            "stage": "parse"
+          },
+          {
+            "question": "Any hairpin degrons with tip residue number greater than 110?, degron candidates restricted to mean plddt no less than 84, return hairpin degrons filtered to degron geometry score no less than 0.74",
+            "raw": "ccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccd",
+            "error": "not valid JSON: Expecting value: line 1 column 1 (char 0)",
+            "stage": "parse"
+          },
+          {
+            "question": "How about lysines with nz centroid distance greater than 67 \u00c5 and lysine sites classified as marginal and any lysine sites with c\u03b2\u2013c\u03b2 distance beneath 74 \u00c5?",
+            "raw": "ccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccd",
+            "error": "not valid JSON: Expecting value: line 1 column 1 (char 0)",
+            "stage": "parse"
+          },
+          {
+            "question": "Glue candidates, ccd class detergent, and bridging ligands where ligand ccd is not 062",
+            "raw": "ccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccd",
+            "error": "not valid JSON: Expecting value: line 1 column 1 (char 0)",
+            "stage": "parse"
+          },
+          {
+            "question": "Give me the SOLUTION NMR bridges and how about glue candidates with bridging balance 0.18 or more, the top  by \u03b4sasa chain b",
+            "raw": "ccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccd",
+            "error": "not valid JSON: Expecting value: line 1 column 1 (char 0)",
+            "stage": "parse"
+          },
+          {
+            "question": "Bridging ligands classified as FIBER DIFFRACTION with list bridged chain pairs with ligand ccd other than 06R",
+            "raw": "ccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccd",
+            "error": "not valid JSON: Expecting value: line 1 column 1 (char 0)",
+            "stage": "parse"
+          },
+          {
+            "question": "Can you list hairpin degrons where mean plddt is over 89, and everything in degron candidates with degron geometry score more than 0.81",
+            "raw": "ccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccd",
+            "error": "not valid JSON: Expecting value: line 1 column 1 (char 0)",
+            "stage": "parse"
+          },
+          {
+            "question": "Everything in degron candidates with degron geometry score more than 0.81 and any degron candidates with mean plddt above 84?",
+            "raw": "ccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccd",
+            "error": "not valid JSON: Expecting value: line 1 column 1 (char 0)",
+            "stage": "parse"
+          },
+          {
+            "question": "Everything in degrons with mean plddt less than 80, and which degron candidates have tip res no more than 110?, ranked by tip relative sasa lowest first",
+            "raw": "ccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccd",
+            "error": "not valid JSON: Expecting value: line 1 column 1 (char 0)",
+            "stage": "parse"
+          },
+          {
+            "question": "Ligases, expression breadth greater than 11 tissues, only ubiquitin ligases where gene symbol is TRIM43B",
+            "raw": "ccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccd",
+            "error": "not valid JSON: Expecting value: line 1 column 1 (char 0)",
+            "stage": "parse"
+          },
+          {
+            "question": "Everything in hairpin degrons with turn length 5 or less residues, degron candidates where mean plddt is a maximum of 89, ranked by mean plddt lowest first",
+            "raw": "ccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccd",
+            "error": "not valid JSON: Expecting value: line 1 column 1 (char 0)",
+            "stage": "parse"
+          },
+          {
+            "question": "Lysine sites with a c\u03b2\u2013c\u03b2 distance of less than 17 \u00c5, the lysine sites that have res num below 40",
+            "raw": "ccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccd",
+            "error": "not valid JSON: Expecting value: line 1 column 1 (char 0)",
+            "stage": "parse"
+          },
+          {
+            "question": "E3 ligases where exploitation status is not chemically validated, and list ubiquitin ligases with uniprot accession other than A6NE02",
+            "raw": "ccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccd",
+            "error": "not valid JSON: Expecting value: line 1 column 1 (char 0)",
+            "stage": "parse"
+          },
+          {
+            "question": "List every hairpin degrons whose motif family is crbn_hairpin_glycine, pull up degron candidates having turn length above 2 residues",
+            "raw": "ccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccd",
+            "error": "not valid JSON: Expecting value: line 1 column 1 (char 0)",
+            "stage": "parse"
+          },
+          {
+            "question": "Filter E3 ligases to uniprot accession A1YPR0, list every E3 ligases whose gene symbol is BTBD17, show me E3s with triage score under 0.26, ranked by curated substrate count lowest first",
+            "raw": "ccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccd",
+            "error": "not valid JSON: Expecting value: line 1 column 1 (char 0)",
+            "stage": "parse"
+          },
+          {
+            "question": "Everything in degrons with tip rel sasa a minimum of 0.64 with find degron candidates whose tip res is over 990, the top  by mean plddt",
+            "raw": "ccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccd",
+            "error": "not valid JSON: Expecting value: line 1 column 1 (char 0)",
+            "stage": "parse"
+          },
+          {
+            "question": "Can you list hairpin degrons where mean plddt is over 89 and can you list degrons where degron geometry score is exceeding 0.77",
+            "raw": "ccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccd",
+            "error": "not valid JSON: Expecting value: line 1 column 1 (char 0)",
+            "stage": "parse"
+          },
+          {
+            "question": "Bridges where ccd class is not lipid with glue candidates where evidence class is not molecular_glue, the top  by \u03b4sasa chain b",
+            "raw": "ccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccd",
+            "error": "not valid JSON: Expecting value: line 1 column 1 (char 0)",
+            "stage": "parse"
+          },
+          {
+            "question": "Filter surface lysines by c\u03b2\u2013c\u03b2 distance at least 58 \u00c5, pull up lysines having lysine residue number above 300, lysines where reach verdict is favourable",
+            "raw": "ccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccd",
+            "error": "not valid JSON: Expecting value: line 1 column 1 (char 0)",
+            "stage": "parse"
+          },
+          {
+            "question": "Bridging ligands, ligand mw beneath 220.0 Da with everything in glue candidates apart from ccd id 0AE, ordered on contacts chain a, lowest first first",
+            "raw": "ccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccd",
+            "error": "not valid JSON: Expecting value: line 1 column 1 (char 0)",
+            "stage": "parse"
+          },
+          {
+            "question": "Degron candidates, degron geometry score below 0.81, and can you list degrons where tip residue number is under 490",
+            "raw": "ccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccd",
+            "error": "not valid JSON: Expecting value: line 1 column 1 (char 0)",
+            "stage": "parse"
+          },
+          {
+            "question": "Any E3s with pocket druggability score more than 0.07?, and list E3s with uniprot accession other than A1YPR0, and list E3s with pocket volume 720.0 or more \u00c5\u00b3",
+            "raw": "ccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccd",
+            "error": "not valid JSON: Expecting value: line 1 column 1 (char 0)",
+            "stage": "parse"
+          },
+          {
+            "question": "How about glue candidates with contacts b no more than 8, show me atlas rows with dsasa total no more than 390.0 \u00c5\u00b2, ranked by bridging balance highest first",
+            "raw": "ccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccd",
+            "error": "not valid JSON: Expecting value: line 1 column 1 (char 0)",
+            "stage": "parse"
+          },
+          {
+            "question": "Hairpin degrons where tip relative sasa is under 0.84, hairpin degrons, degron geometry score no more than 0.86, ordered on tip residue number, lowest first first",
+            "raw": "ccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccd",
+            "error": "not valid JSON: Expecting value: line 1 column 1 (char 0)",
+            "stage": "parse"
+          },
+          {
+            "question": "Can you list surface lysines where nz rel sasa is no more than 0.06, I want lysines where the nz centroid distance is a minimum of 32 \u00c5",
+            "raw": "ccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccd",
+            "error": "not valid JSON: Expecting value: line 1 column 1 (char 0)",
+            "stage": "parse"
+          },
+          {
+            "question": "Narrow E3 ligases to triage rank over 6 with which E3 ligases are TRIM49B? with give me every E3 ligases with expression breadth below 11 tissues",
+            "raw": "ccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccd",
+            "error": "not valid JSON: Expecting value: line 1 column 1 (char 0)",
+            "stage": "parse"
+          },
+          {
+            "question": "Which degrons have tip residue number exceeding 50? and candidate degrons where tip rel sasa is no less than 0.52",
+            "raw": "ccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccd",
+            "error": "not valid JSON: Expecting value: line 1 column 1 (char 0)",
+            "stage": "parse"
+          },
+          {
+            "question": "Filter degron candidates by degron geometry score beneath 0.86, search degrons for tip relative sasa 0.77 or more",
+            "raw": "ccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccd",
+            "error": "not valid JSON: Expecting value: line 1 column 1 (char 0)",
+            "stage": "parse"
+          },
+          {
+            "question": "Give me the SOLID-STATE NMR bridges and can you list glue candidates where heavy atoms is 18 or less",
+            "raw": "ccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccd",
+            "error": "not valid JSON: Expecting value: line 1 column 1 (char 0)",
+            "stage": "parse"
+          },
+          {
+            "question": "List every hairpin degrons whose motif family is crbn_hairpin_glycine, degron candidates, degron geometry score below 0.81, can you list hairpin degrons where mean plddt is below 84",
+            "raw": "ccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccd",
+            "error": "not valid JSON: Expecting value: line 1 column 1 (char 0)",
+            "stage": "parse"
+          },
+          {
+            "question": "Show me degron candidates with turn length exceeding 5 residues and filter hairpin degrons by tip relative sasa 0.84 or more, ranked by tip relative sasa highest first",
+            "raw": "ccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccd",
+            "error": "not valid JSON: Expecting value: line 1 column 1 (char 0)",
+            "stage": "parse"
+          },
+          {
+            "question": "Show me atlas rows with contacts chain a 82 or more and bridged chain pairs with a dsasa a of above 390.0 \u00c5\u00b2 and everything in atlas rows apart from experimental method ELECTRON CRYSTALLOGRAPHY, ranked by \u03b4sasa chain b lowest first",
+            "raw": "ccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccd",
+            "error": "not valid JSON: Expecting value: line 1 column 1 (char 0)",
+            "stage": "parse"
+          },
+          {
+            "question": "Search degron candidates for turn length under 2 residues, find degron candidates whose mean plddt is under 93",
+            "raw": "ccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccd",
+            "error": "not valid JSON: Expecting value: line 1 column 1 (char 0)",
+            "stage": "parse"
+          },
+          {
+            "question": "E3 ligases excluding exploitation status clinically validated with give me every ligases with pocket druggability score a maximum of 0.07",
+            "raw": "ccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccd",
+            "error": "not valid JSON: Expecting value: line 1 column 1 (char 0)",
+            "stage": "parse"
+          },
+          {
+            "question": "Everything in degron candidates with tip res exceeding 710, filter hairpin degrons by tip relative sasa 0.84 or more, ordered on turn length, lowest first first",
+            "raw": "ccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccd",
+            "error": "not valid JSON: Expecting value: line 1 column 1 (char 0)",
+            "stage": "parse"
+          },
+          {
+            "question": "E3 ligases excluding gene symbol TRIM43B, everything in ubiquitin ligases apart from exploitation status orphan, the top  by pocket volume",
+            "raw": "ccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccd",
+            "error": "not valid JSON: Expecting value: line 1 column 1 (char 0)",
+            "stage": "parse"
+          },
+          {
+            "question": "Any lysine sites with c\u03b2\u2013c\u03b2 distance beneath 74 \u00c5? with narrow lysine sites to nz rel sasa over 0.06",
+            "raw": "ccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccd",
+            "error": "not valid JSON: Expecting value: line 1 column 1 (char 0)",
+            "stage": "parse"
+          },
+          {
+            "question": "List E3s with uniprot accession other than A6NCK2 and show me ligases with pocket volume at most 530.0 \u00c5\u00b3, ordered on triage score, lowest first first",
+            "raw": "ccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccd",
+            "error": "not valid JSON: Expecting value: line 1 column 1 (char 0)",
+            "stage": "parse"
+          },
+          {
+            "question": "Show me lysine sites with res num a minimum of 510, give me every surface lysines with nz relative sasa below 0.13, ordered on c\u03b2\u2013c\u03b2 distance, highest first first",
+            "raw": "ccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccd",
+            "error": "not valid JSON: Expecting value: line 1 column 1 (char 0)",
+            "stage": "parse"
+          },
+          {
+            "question": "Bridged chain pairs where ccd class is not buffer with everything in bridging ligands apart from evidence class protac",
+            "raw": "ccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccd",
+            "error": "not valid JSON: Expecting value: line 1 column 1 (char 0)",
+            "stage": "parse"
+          },
+          {
+            "question": "Bridging ligands where ligand mw is under 890.0 Da, and show me bridging ligands that are not 088, and atlas rows where ligand class is metal",
+            "raw": "ccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccd",
+            "error": "not valid JSON: Expecting value: line 1 column 1 (char 0)",
+            "stage": "parse"
+          },
+          {
+            "question": "Any lysine sites with cb cb distance over 37 \u00c5?, lysines restricted to res num no more than 140",
+            "raw": "ccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccd",
+            "error": "not valid JSON: Expecting value: line 1 column 1 (char 0)",
+            "stage": "parse"
+          },
+          {
+            "question": "Lysine sites, nz rel sasa less than 0.2 and I want lysine sites where the lysine residue number is 300 or more",
+            "raw": "ccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccd",
+            "error": "not valid JSON: Expecting value: line 1 column 1 (char 0)",
+            "stage": "parse"
+          },
+          {
+            "question": "Which candidate degrons have mean plddt under 91?, and which degrons have tip residue number exceeding 50?",
+            "raw": "ccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccd",
+            "error": "not valid JSON: Expecting value: line 1 column 1 (char 0)",
+            "stage": "parse"
+          },
+          {
+            "question": "Can you list degrons where tip residue number is under 490 with degron candidates where degron geometry score is below 0.77, the top  by tip residue number",
+            "raw": "ccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccd",
+            "error": "not valid JSON: Expecting value: line 1 column 1 (char 0)",
+            "stage": "parse"
+          },
+          {
+            "question": "Can you list hairpin degrons where mean plddt is below 84, and pull up hairpin degrons having tip residue number more than 490",
+            "raw": "ccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccd",
+            "error": "not valid JSON: Expecting value: line 1 column 1 (char 0)",
+            "stage": "parse"
+          },
+          {
+            "question": "How about candidate degrons with degron geometry score below 0.74, and degrons restricted to tip residue number a maximum of 490, sorted by degron geometry score, lowest first",
+            "raw": "ccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccd",
+            "error": "not valid JSON: Expecting value: line 1 column 1 (char 0)",
+            "stage": "parse"
+          },
+          {
+            "question": "Bridges where buried fraction is 0.59 or more, and give me the 0AE atlas rows",
+            "raw": "ccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccd",
+            "error": "not valid JSON: Expecting value: line 1 column 1 (char 0)",
+            "stage": "parse"
+          },
+          {
+            "question": "Bridged chain pairs with a resolution of greater than 2.82 \u00c5, glue candidates, heavy atoms a minimum of 31, everything in bridged chain pairs apart from ligand ccd 041",
+            "raw": "ccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccd",
+            "error": "not valid JSON: Expecting value: line 1 column 1 (char 0)",
+            "stage": "parse"
+          },
+          {
+            "question": "Degron candidates, degron geometry score below 0.81 and hairpin degrons where tip relative sasa is under 0.84",
+            "raw": "ccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccd",
+            "error": "not valid JSON: Expecting value: line 1 column 1 (char 0)",
+            "stage": "parse"
+          },
+          {
+            "question": "Can you list ternary complexes where buried fraction is no more than 0.95, find ternary complexes with ccd id equal to 062",
+            "raw": "ccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccd",
+            "error": "not valid JSON: Expecting value: line 1 column 1 (char 0)",
+            "stage": "parse"
+          },
+          {
+            "question": "Find degrons whose tip relative sasa is at most 0.77 and search degron candidates for tip res less than 990",
+            "raw": "ccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccd",
+            "error": "not valid JSON: Expecting value: line 1 column 1 (char 0)",
+            "stage": "parse"
+          }
+        ],
+        "seconds": 594.2
+      },
+      "task_a_external": {
+        "n": 15,
+        "parse_rate": 0.0,
+        "set_equality": 0.0,
+        "exact_match": 0.0,
+        "failures": [
+          {
+            "question": "Others : Researchers have uncovered that expression levels and types of E3 ligases vary across tissues, which affect the degradation activity of PROTACs",
+            "raw": "ccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccd",
+            "error": "not valid JSON: Expecting value: line 1 column 1 (char 0)",
+            "stage": "parse"
+          },
+          {
+            "question": "how many deposited ternary structures involve a non-IMiD chemotype",
+            "raw": "ccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccd",
+            "error": "not valid JSON: Expecting value: line 1 column 1 (char 0)",
+            "stage": "parse"
+          },
+          {
+            "question": "Figure 35 Although several E3 ligases have been successfully utilized in the design of PROTAC BET degraders, this has been limited to those for which small molecule ligands ( e.g., pomalidomide and VHL ligand) have been developed",
+            "raw": "ccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccd",
+            "error": "not valid JSON: Expecting value: line 1 column 1 (char 0)",
+            "stage": "parse"
+          },
+          {
+            "question": "These models suggest which E3 ligases are structurally compatible with a given target and support virtual screening pipelines that evaluate thousands of candidate molecules in silico , prioritizing those most likely to induce degradation",
+            "raw": "ccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccd",
+            "error": "not valid JSON: Expecting value: line 1 column 1 (char 0)",
+            "stage": "parse"
+          },
+          {
+            "question": "how many glues bury a comparable surface against both partners",
+            "raw": "ccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccd",
+            "error": "not valid JSON: Expecting value: line 1 column 1 (char 0)",
+            "stage": "parse"
+          },
+          {
+            "question": "Figure 35 Although several E3 ligases have been successfully utilized in the design of PROTAC BET degraders, this has been limited to those for which small molecule ligands ( e.g., pomalidomide and VHL ligand) have been developed",
+            "raw": "ccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccd",
+            "error": "not valid JSON: Expecting value: line 1 column 1 (char 0)",
+            "stage": "parse"
+          },
+          {
+            "question": "MRT\u20102359 initially degrades GSPT1 by binding to CRBN and the GSPT1 G\u2010loop degron, which impairs protein synthesis in tumor cells that are addicted to high MYC expression, and indirectly affects MYC expression and MYC\u2010mediated transcriptional activity (Figure 5B )",
+            "raw": "ccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccd",
+            "error": "not valid JSON: Expecting value: line 1 column 1 (char 0)",
+            "stage": "parse"
+          },
+          {
+            "question": "how many bridging ligands are crystallisation additives rather than glues",
+            "raw": "ccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccd",
+            "error": "not valid JSON: Expecting value: line 1 column 1 (char 0)",
+            "stage": "parse"
+          },
+          {
+            "question": "Moreover, PROTACs exhibit a \u201cHook effect\u201d wherein they demonstrate weakened efficacy at high concentrations which hinders ubiquitination-mediated protein degradation due to the inability to form ternary complexes 40",
+            "raw": "ccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccd",
+            "error": "not valid JSON: Expecting value: line 1 column 1 (char 0)",
+            "stage": "parse"
+          },
+          {
+            "question": "Target-first strategies Although ligases have provided the clearest entry point so far, in most areas of drug discovery efforts begin with the target: a defined vulnerability for which compounds are sought",
+            "raw": "ccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccd",
+            "error": "not valid JSON: Expecting value: line 1 column 1 (char 0)",
+            "stage": "parse"
+          },
+          {
+            "question": "By comparing the receptor structures bound with antagonist GW6471 and agonist GW409544 , it is clear that the observed binding cooperativity lies in the induced conformational change of the AF-2 helix upon GW6471 binding, which moves and exposes a surface that is favorable for SMRT binding ( Fig",
+            "raw": "ccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccd",
+            "error": "not valid JSON: Expecting value: line 1 column 1 (char 0)",
+            "stage": "parse"
+          },
+          {
+            "question": "ZYG11B recognizes substrate proteins containing N-terminal glycine degrons (Gly/N-degron), which are strongly enriched during apoptosis due to caspase cleavage, thereby playing a crucial role in protein quality control and maintenance of protein homeostasis 10 , 11",
+            "raw": "ccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccd",
+            "error": "not valid JSON: Expecting value: line 1 column 1 (char 0)",
+            "stage": "parse"
+          },
+          {
+            "question": "The largest family of E3 ligases is the cullin (CUL)-RING ligases (CRLs), which play a role in many diverse cellular processes",
+            "raw": "ccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccd",
+            "error": "not valid JSON: Expecting value: line 1 column 1 (char 0)",
+            "stage": "parse"
+          },
+          {
+            "question": "From this analysis, it was determined that cooperative PPI\u2019s between BTK and CRBN were nonessential for potent BTK degradation while linker lengths of seven atoms or shorter promoted steric clashes which reduced degrader efficacy",
+            "raw": "ccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccd",
+            "error": "not valid JSON: Expecting value: line 1 column 1 (char 0)",
+            "stage": "parse"
+          },
+          {
+            "question": "This is because many PROTACs recruit E3 ligases that are expressed ubiquitously in both normal and tumor tissues, which can lead to on-target toxicities",
+            "raw": "ccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccdccd",
+            "error": "not valid JSON: Expecting value: line 1 column 1 (char 0)",
+            "stage": "parse"
+          }
+        ],
+        "seconds": 70.4
+      },
+      "register_mismatch_gap": 0.0,
+      "preference_win_rates": {
+        "dropped_constraint": {
+          "win_rate": 1.0,
+          "n": 20
+        },
+        "hallucinated_field": {
+          "win_rate": 1.0,
+          "n": 20
+        },
+        "invented_entity": {
+          "win_rate": 1.0,
+          "n": 20
+        },
+        "operator_inversion": {
+          "win_rate": 1.0,
+          "n": 20
+        },
+        "prose_not_json": {
+          "win_rate": 0.95,
+          "n": 20
+        },
+        "unit_confusion": {
+          "win_rate": 1.0,
+          "n": 20
+        },
+        "wrong_question": {
+          "win_rate": 1.0,
+          "n": 20
+        }
+      },
+      "task_c": {
+        "n": 40,
+        "fabrication_rate": 0.0,
+        "abstention_rate": 0.0,
+        "fabrications": []
       }
     }
   },

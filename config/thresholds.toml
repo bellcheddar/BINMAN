@@ -19,6 +19,19 @@ default_assembly_id          = "1"
 glue_balance_floor           = 0.30   # below this, reported but not headline
 glue_balance_strong          = 0.50   # used by the worked-example selector (6.6.4)
 
+# Work cap per entry. The bridging test is O(ligand instances x polymer chains),
+# and the tail of the PDB holds assemblies where that product is enormous: 6NK6
+# has 960 chains and 720 ligand instances (691,200 pairs) and took 20 minutes.
+# Entries above this cap are recorded as `failed:too_complex:<chains>x<ligands>`
+# rather than processed, so they stay visible in the counts and can be re-run by
+# raising the cap. This is a compute budget, not a scientific claim: nothing is
+# asserted about whether those assemblies contain glues.
+#
+# For scale, a CRBN-DDB1 neosubstrate ternary is about 5 chains and 3 ligands
+# (15 pairs), so the cap is roughly a thousand times larger than the structures
+# this project exists to find.
+max_chain_ligand_pairs       = 20000
+
 [degron]
 # spec 5.2: beta-hairpin with an exposed glycine at the tip.
 #

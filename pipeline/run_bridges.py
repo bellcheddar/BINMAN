@@ -71,6 +71,20 @@ def _geometry_worker(job: dict) -> dict:
             return {"pdb_id": pdb_id, "status": "failed:no_polymer_chains",
                     "seconds": round(time.monotonic() - started, 3)}
 
+        # Work cap: the bridging test is O(ligands x chains) and the tail of the
+        # PDB holds assemblies where that product runs to hundreds of thousands.
+        # Skipping them is recorded as data so the counts reconcile.
+        chains_count = len(assembly.polymers)
+        ligands_count = len(assembly.ligands)
+        cap = int(config.t("bridging.max_chain_ligand_pairs"))
+        if chains_count * ligands_count > cap:
+            return {
+                "pdb_id": pdb_id,
+                "status": f"failed:too_complex:{chains_count}x{ligands_count}",
+                "seconds": round(time.monotonic() - started, 3),
+                "polymer_units": chains_count, "ligands_considered": ligands_count,
+            }
+
         # CCD metadata comes from the catalogue row, so the worker makes no
         # network call of its own.
         ligand_meta = {

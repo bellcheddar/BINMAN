@@ -20,7 +20,7 @@
     schema: B.schema || {},
     filters: [],
     sortField: B.defaultSort,
-    sortDirection: 'desc',
+    sortDirection: B.defaultDirection || 'desc',
     table: null,
     viewer: null,
     lastRows: []

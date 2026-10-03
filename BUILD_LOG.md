@@ -328,3 +328,38 @@ One line per meaningful event, timestamped UTC (spec Section 0 rule 5).
 | 2026-10-03T20:52:42+00:00 | 2.1 | 15,750/20,431 scanned, 17,419 candidates, 496 failed, 1.6/s, ~0.8 h remaining. |
 | 2026-10-03T20:56:00+00:00 | 1.3 | 35,204/52,681 entries, 230,703 bridges, 0 failed, 3.2 entries/s, ~1.5 h remaining. |
 | 2026-10-03T20:57:42+00:00 | 2.1 | 16,228/20,431 scanned, 18,009 candidates, 502 failed, 1.6/s, ~0.7 h remaining. |
+| 2026-10-03T21:01:28+00:00 | 1.3 | 35,259/52,681 entries, 232,206 bridges, 0 failed, 3.1 entries/s, ~1.6 h remaining. |
+| 2026-10-03T21:02:42+00:00 | 2.1 | 16,705/20,431 scanned, 18,585 candidates, 511 failed, 1.6/s, ~0.6 h remaining. |
+| 2026-10-03T21:06:55+00:00 | 1.3 | 35,268/52,681 entries, 235,526 bridges, 0 failed, 3.0 entries/s, ~1.6 h remaining. |
+| 2026-10-03T21:07:43+00:00 | 2.1 | 17,189/20,431 scanned, 19,301 candidates, 519 failed, 1.6/s, ~0.6 h remaining. |
+| 2026-10-03T21:12:04+00:00 | 1.3 | 35,325/52,681 entries, 238,177 bridges, 0 failed, 2.9 entries/s, ~1.6 h remaining. |
+| 2026-10-03T21:12:43+00:00 | 2.1 | 17,666/20,431 scanned, 20,040 candidates, 523 failed, 1.6/s, ~0.5 h remaining. |
+| 2026-10-03T21:12:43+00:00 | 1.3 | Bridge run starting: 17,353 entries pending of 52,822 catalogued (tiers 1 to 3), 16 IO workers, 14 geometry workers. |
+| 2026-10-03T21:17:43+00:00 | 2.1 | 18,161/20,431 scanned, 20,465 candidates, 529 failed, 1.6/s, ~0.4 h remaining. |
+| 2026-10-03T21:17:44+00:00 | 1.3 | 16,971/17,353 entries, 854 bridges, 90 failed, 56.5 entries/s, ~0.0 h remaining. |
+| 2026-10-03T21:18:57+00:00 | 1.3 | Bridge run finished: 17,353 entries in 6.2 min, 858 bridges, 235 failed, 46.4 entries/s. |
+| 2026-10-03T21:19:56+00:00 | 1.5 | Trimmed structures: 25 representative (entry, ligand) pairs at balance >= 0.3, trim radius 8.0 A. |
+| 2026-10-03T21:20:01+00:00 | 1.5 | Trimmed structures complete: 25 written, 0 reused, 0 failed, 3.6 MB total. |
+| 2026-10-03T21:20:29+00:00 | 4.3 | Atlas built: 52,821 entries, 239,485 bridges (novel set not determinable: no curated glue database resolved (G7)), 9,981 ligands, 12 degrons, 650 ligases, 1,650 lysines, 136.2 MB. |
+| 2026-10-03T21:20:40+00:00 | 1.5 | Trimmed structures: 3,838 representative (entry, ligand) pairs at balance >= 0.3, trim radius 8.0 A. |
+| 2026-10-03T21:22:17+00:00 | 1.5 | 500/3,838 trimmed, 88 MB so far, 0 failed. |
+| 2026-10-03T21:22:43+00:00 | 2.1 | 18,646/20,431 scanned, 21,034 candidates, 539 failed, 1.6/s, ~0.3 h remaining. |
+| 2026-10-03T21:24:00+00:00 | 1.5 | 1,000/3,838 trimmed, 161 MB so far, 0 failed. |
+| 2026-10-03T21:25:41+00:00 | 1.5 | 1,500/3,838 trimmed, 242 MB so far, 0 failed. |
+| 2026-10-03T21:27:12+00:00 | 1.5 | 2,000/3,838 trimmed, 317 MB so far, 0 failed. |
+| 2026-10-03T21:27:44+00:00 | 2.1 | 19,139/20,431 scanned, 21,325 candidates, 548 failed, 1.6/s, ~0.2 h remaining. |
+| 2026-10-03T21:28:36+00:00 | 1.5 | 2,500/3,838 trimmed, 383 MB so far, 0 failed. |
+| 2026-10-03T21:30:30+00:00 | 1.5 | 3,000/3,838 trimmed, 469 MB so far, 0 failed. |
+| 2026-10-03T21:32:45+00:00 | 2.1 | 19,640/20,431 scanned, 21,570 candidates, 559 failed, 1.6/s, ~0.1 h remaining. |
+| 2026-10-03T21:33:52+00:00 | 1.5 | 3,500/3,838 trimmed, 622 MB so far, 0 failed. |
+| 2026-10-03T21:36:13+00:00 | 1.5 | Trimmed structures complete: 3,813 written, 25 reused, 0 failed, 753.6 MB total. |
+| 2026-10-03T21:37:45+00:00 | 2.1 | 20,148/20,431 scanned, 21,707 candidates, 568 failed, 1.6/s, ~0.0 h remaining. |
+| 2026-10-03T21:38:58+00:00 | 2.1 | Degron scan complete: 20,279 proteins scanned, 21,717 candidate degrons written, 570 failed. |
+| 2026-10-03T21:39:42+00:00 | 2.4 | Edge table built: 30,057 edges (19,048 bridged_by, 0 curated ubiquitylates, 11,001 predicted, 8 has_degron). |
+| 2026-10-03T21:39:56+00:00 | 4.3 | Atlas built: 52,821 entries, 239,485 bridges (novel set not determinable: no curated glue database resolved (G7)), 9,981 ligands, 21,717 degrons, 650 ligases, 1,650 lysines, 142.5 MB. |
+| 2026-10-03T21:40:16+00:00 | 3.2 | Corpus grounding: 28 numeric field ranges read from the atlas, vocabularies {'ccd_id': 4000, 'ccd_class': 11, 'ligase_gene': 650, 'ligase_acc': 650, 'ligase_family': 13, 'verdict': 0, 'evidence_class': 0, 'motif_family': 1, 'method': 15}. |
+| 2026-10-03T21:40:16+00:00 | 3.2 | Task A generated 6,000 pairs, 6,000 validated by the app parser, 0 rejected and dropped (the corpus therefore has zero label noise by construction). |
+| 2026-10-03T21:40:16+00:00 | 3.2 | Corpus written: Task A 4,752/574/674, 1,400 preference pairs across 7 modes, Task C 784 train. Task B buildable: False. |
+| 2026-10-03T21:40:18+00:00 | 3.7 | Stage 1 LoRA SFT starting: 5,536 train / 672 valid examples, rank 16, 16 layers, lr 1e-05, batch 4, 1200 iterations. |
+| 2026-10-03T21:40:20+00:00 | 9 | Validation run against binman.sqlite: 10 metric(s) not computed (dataset unavailable), 1 measured floor(s) missed. |
+| 2026-10-03T21:40:30+00:00 | 4.1b | About tab generated: 51 references, 4/10 datasets resolved, worked example selected, 2 value(s) not recorded. |

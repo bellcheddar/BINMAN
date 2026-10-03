@@ -21,6 +21,7 @@ def module_context(record_type: str, **extra: Any) -> dict:
         "schema": schema_summary(),
         "default_columns": list(spec.default_columns),
         "default_sort": spec.default_sort,
+        "default_direction": spec.default_direction,
         "atlas_available": db.available(),
     }
     context.update(extra)

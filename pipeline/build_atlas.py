@@ -262,6 +262,23 @@ _BRIDGE_INSERT = (
 )
 
 
+def attach_structure_files(connection: sqlite3.Connection) -> int:
+    """Point every bridge row at its trimmed viewer structure (stage 1.5).
+
+    One file is written per (entry, ligand), so every bridge in that entry using
+    that ligand references the same file.
+    """
+    mapping = read_jsonl(INTERIM / "structure_map.jsonl")
+    if not mapping:
+        return 0
+    connection.executemany(
+        "UPDATE bridge SET structure_file = ? WHERE pdb_id = ? AND ccd_id = ?",
+        [(row["structure_file"], row["pdb_id"], row["ccd_id"]) for row in mapping],
+    )
+    return int(connection.execute(
+        "SELECT COUNT(*) FROM bridge WHERE structure_file != ''").fetchone()[0])
+
+
 def load_failed_entries(connection: sqlite3.Connection) -> int:
     """Carry stage failures into the entry table so the counts reconcile."""
     manifest = Manifest("bridges")
@@ -340,6 +357,7 @@ def build(fresh: bool = True) -> dict:
         # carried into the atlas and shown in the UI.
         counts["novel_bridge_determinable"] = novel_determinable
         counts["entry_failed"] = load_failed_entries(connection)
+        counts["bridges_with_structure"] = attach_structure_files(connection)
         counts["degron"] = load_table_from_jsonl(
             connection, "degron", INTERIM / "degrons.jsonl",
             ("uniprot_acc", "afdb_id", "gene", "start_res", "end_res", "tip_res",
