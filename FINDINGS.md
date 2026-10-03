@@ -54,20 +54,68 @@ reported as a column, never used to exclude a candidate.
 
 ## Section 9.1 Glue Atlas validation
 
-Not computed yet: the stage has not run.
+### What the atlas contains
 
-**Recall against curated glue databases cannot currently be computed.** All
-three curated sources named in spec 4.1b (MGDB, MolGlueDB, MGTbind) publish
-through JavaScript front ends with no documented bulk-export endpoint. Gate G7
-is open and the gap is recorded in `data/validation/MANIFEST.md` with the
-verified manual route for each. Spec 4.1b forbids substituting a hand-written
-control, so no substitute has been made.
+| Quantity | Count |
+|---|---:|
+| Bridges (entry, ligand instance, chain pair) | 57,758 |
+| Entries carrying at least one bridge | 13,793 |
+| Bridges whose ligand is a glue candidate | 13,601 |
+| Bridges flagged symmetry mediated | 6,556 |
 
-**Artefact precision can be computed.** BioLiP2's artefact ligand list resolved
-(463 CCD codes, BSD-2-Clause, confirmed against `script/rmligand.cpp` in
-`kad-ecoli/mmCIF2BioLiP`, which documents the file as the artefact ligand list).
-Spec 9.1 asks for artefact precision to be reported before recall, and that is
-the metric that is available.
+Crystallisation furniture is **classified, not deleted**, so the counts
+reconcile. Chemical component classes across the 9,962 components
+seen:
+
+| Class | Count |
+|---|---:|
+| `glue_candidate` | 6,405 |
+| `unknown` | 1,031 |
+| `cofactor` | 805 |
+| `buffer` | 579 |
+| `lipid` | 347 |
+| `peptide_like` | 227 |
+| `detergent` | 206 |
+| `cryoprotectant` | 182 |
+| `sugar` | 99 |
+| `metal` | 60 |
+| `covalent_modifier` | 21 |
+
+### Artefact precision: 0.9449 (floor 0.95)
+
+**Reported before recall, as spec 9.1 instructs**: a tool that finds every known
+glue and also calls PEG a glue is useless, while the reverse is merely
+incomplete.
+
+Measured over the 345 BioLiP2 artefact CCD codes present in the atlas,
+326 of which are correctly not called glue candidates. On a
+deterministic held-out half of the full 463-code list, used so the rules could
+not be tuned on the number being reported, it measures **0.927**.
+
+Replacing name matching with structural rules over SMILES lifted this from
+**0.799 to 0.953** overall. No threshold was loosened.
+
+**The floor is missed, and the reason matters more than the number.** BioLiP's
+`ligand_list` is not pure furniture: its own curation code treats the file as a
+list of *candidate* artefacts and checks each against the entry's PubMed abstract
+before excluding it. The components BINMAN still calls drug-like include
+nevirapine, IBMX, kainic acid and an antifolate. Reaching 0.95 would mean
+deliberately misclassifying approved drugs as crystallisation furniture. Gate G6
+carries the decision.
+
+### Recall, the misses list and the novel-bridge set: not computed
+
+All three curated glue databases (MGDB, MolGlueDB, MGTbind) publish through
+JavaScript front ends with no documented bulk-export endpoint, and none resolved
+(Gate G7). Spec 4.1b forbids substituting a hand-written positive set, so none
+was made.
+
+**This suppresses the headline result.** A novel bridge is defined as one
+appearing in *none* of the three databases, so the set is undeterminable. The
+`novel_bridge` column reads 0 throughout the atlas, and both the UI and the
+atlas builder state in words that this is not a real zero.
+
+Packing specificity is also not computed: ProtCID did not resolve.
 
 ## Section 9.2 Degron Scan validation
 
@@ -144,10 +192,48 @@ that, and the module's UI says so on its face.
 
 ## Section 9.3 E3 Triage validation
 
-Not computed yet: the stage has not run. UbiBrowser resolved (3,158
-literature-curated human E3-substrate pairs plus the predicted network), so the
-substrate-count agreement and enrichment tests are computable once the ligase
-table exists.
+| Metric | Measured | Floor | Verdict |
+|---|---|---|---|
+| Rank enrichment of validated ligases (one-sided Mann-Whitney) | **p = 0.002422** | p < 0.01 | **passes** |
+| Ligases with a pocket score rather than a failure status | **0.9815** | 0.8 | **passes** |
+| Substrate-count agreement with UbiBrowser (Spearman) | not computed | 0.5 | see below |
+
+The enrichment compares 17 clinically or
+chemically validated ligases against the other
+633, with `exploitation_status` and `has_ligand`
+**held out of the ranking weights**, so the test is not circular.
+
+### The repertoire was wrong, and the validation is what found it
+
+The enrichment first measured **p = 0.069** and failed. The cause was not the
+threshold: the InterPro signature list had no DCAF entry, and **CRBN and VHL were
+absent from the E3 repertoire entirely**, along with DCAF15 and DCAF16. The
+"validated" group contained twelve chemically validated ligases and not one
+clinically validated ligase, because both were missing.
+
+Adding the CULT, VHL-box, DCAF15, DCAF16 and DCAF families (signatures read from
+each protein's own UniProt cross-references, and UniProt's own name annotation
+for the DCAF family, which has no distinguishing signature) took the repertoire
+from 625 to 650 ligases and the enrichment to p = 0.0024.
+
+Where the known degrader ligases now rank, with their status held out of the
+score:
+
+| Ligase | Family | Triage rank | Pocket score | Status |
+|---|---|---:|---:|---|
+| DCAF15 | DCAF15 | **1** | 0.988 | chemically validated |
+| VHL | VHL-box | **5** | 0.693 | clinically validated |
+| DCAF16 | DCAF16 | **6** | 0.921 | chemically validated |
+| CRBN | CULT | **32** | 0.532 | clinically validated |
+| KEAP1 | BTB | 85 | 0.219 | chemically validated |
+
+### A tautology in the specified metric
+
+Spec 9.3 asks for a Spearman correlation between the atlas's `substrate_count`
+and UbiBrowser. The atlas column **is populated from UbiBrowser**, so the
+correlation is 1 by construction and tests nothing. It is reported as not
+computed, with that reason. A genuine version needs a second, independent
+substrate source.
 
 ## Section 9.4 Degradability validation
 
@@ -157,4 +243,71 @@ starting values carry no empirical standing.
 
 ## Section 9.5 BINMAN-LM
 
-Not computed yet: Phase 3 has not run.
+### Task A: natural language to query object
+
+| Metric | Baseline (zero-shot) | Fine-tuned | Floor |
+|---|---:|---:|---:|
+| Parse rate | 0.2833 | **0.9917** | 0.99 |
+| Set equality against the real SQLite | 0.2333 | **0.9917** | 0.90 |
+| Exact match | 0.05 | 0.9417 | reported |
+| Prompt tokens needed | 841 | **83** | — |
+
+The spec 3.0 baseline was run **before any training**, as the spec requires. At
+set equality 0.2333 it was far below the 0.85 threshold at
+which Task A would not have been fine-tuned, so it was.
+
+**A measurement worth recording.** The first evaluation of the fine-tuned
+adapters scored 0.0, worse than the untrained baseline. The cause was a
+train/serve prompt mismatch, not a bad fine-tune: training used a short system
+turn, and the evaluation prepended a 6 KB schema the model had never seen, after
+which it began omitting `record_type` and the parser rejected everything.
+Measured directly on one query, the same adapters emit a complete valid object
+with the training prompt and the same object minus `record_type` with the schema
+prepended. The fine-tune has internalised the schema, which is why it needs 83
+prompt tokens where the baseline needs 841.
+
+### Corpus
+
+| Set | Count |
+|---|---:|
+| Task A train / valid / test | 4,817 / 568 / 615 |
+| Task A preference pairs | 1,400 (exactly 200 per corruption mode) |
+| Task C train / valid / test | 784 / 98 / 98 |
+| Task C preference pairs | 980 |
+| Generated pairs rejected by the parser | 0 |
+
+Label noise is **zero by construction**: every shipped pair was validated by the
+same parser the app uses. Splits hold out compositions, not tokens.
+
+### Task B: not built, and why
+
+Spec 3.4 requires every Task B label to come from a published curated source, and
+the glue label specifically from the intersection of at least two of MGDB,
+MolGlueDB and MGTbind. None resolved, and neither did PROTAC-DB, so three of the
+five classes (`molecular_glue`, `protac`, `bivalent_inhibitor`) have **no label
+source at all**. Only `native_cofactor` and `crystallisation_artefact` could be
+labelled, from BioLiP2.
+
+Spec 4.1b forbids hand-written labels, so the corpus was not built and the macro-F1
+is reported as not computed rather than measured on two classes and presented as
+if it were five.
+
+### External query set
+
+15 queries, of which **12 carry phrasing harvested verbatim from open-access
+reviews** (463 candidate sentences were extracted from Europe PMC full text) and
+3 carry the project's own phrasing, flagged as such in the file. Only the 12 test
+register mismatch; mixing the two silently would overstate the number.
+
+### Training
+
+Stage 1 LoRA SFT: rank 16, 16 layers, lr 1e-5, 1,200 iterations, validation loss
+2.494 to 0.001, 431 tokens/s, 6.0 GB peak, 13.5 minutes on the M2 Ultra. Reported
+to Weights & Biases as
+`binman-lm-sft-qwen2.5-3b-4bit-r16-l16-i1200-b4-20261003-1914`.
+
+Stage 2 used the spec 3.7 DPO fallback: mlx-lm 0.32.0 ships no preference trainer
+(`mlx_lm.tuner.losses` exposes only KL and JS divergences, and its dataset loader
+has no notion of a chosen or rejected completion), so the loop is implemented
+against mlx-lm's LoRA machinery with reference log-probabilities cached once from
+the frozen stage 1 model.

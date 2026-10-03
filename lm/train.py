@@ -52,6 +52,32 @@ BASE_MODEL = "mlx-community/Qwen2.5-3B-Instruct-4bit"
 # training is unaffected.
 WANDB_PROJECT = os.environ.get("BINMAN_WANDB_PROJECT", "binman-lm")
 
+
+def run_name(stage: str, **parts) -> str:
+    """A descriptive W&B run name.
+
+    mlx-lm names its run after the adapter directory, which makes every run in
+    the project show up as "adapters". The name here says which stage it is,
+    which base model, and the hyperparameters that distinguish one run from
+    another, so the project list is readable without opening anything.
+    """
+    base = BASE_MODEL.rsplit("/", 1)[-1].replace("-Instruct", "").lower()
+    suffix = "-".join(f"{k}{v}" for k, v in parts.items())
+    stamp = time.strftime("%Y%m%d-%H%M")
+    return f"binman-lm-{stage}-{base}-{suffix}-{stamp}"
+
+
+def wandb_env(name: str, group: str, notes: str, tags: list[str]) -> dict:
+    """Environment that names and groups a run mlx-lm starts on our behalf."""
+    return {
+        "WANDB_NAME": name,
+        "WANDB_RUN_GROUP": group,
+        "WANDB_JOB_TYPE": "sft",
+        "WANDB_NOTES": notes,
+        "WANDB_TAGS": ",".join(tags),
+        "WANDB_PROJECT": WANDB_PROJECT,
+    }
+
 # Spec 3.7 hyperparameters.
 LORA_RANK = 16
 LORA_LAYERS = 16
@@ -147,8 +173,21 @@ def stage_one(iters: int, batch_size: int, model: str = BASE_MODEL) -> dict:
         "--mask-prompt",
         "--steps-per-report", "10",
     ]
+    environment = dict(os.environ)
+    name = ""
+    group = f"binman-lm-{time.strftime('%Y%m%d')}"
     if wandb_available():
         command += ["--report-to", "wandb", "--project-name", WANDB_PROJECT]
+        name = run_name("sft", r=LORA_RANK, l=LORA_LAYERS, i=iters, b=batch_size)
+        environment.update(wandb_env(
+            name, group,
+            notes=(f"Stage 1 LoRA SFT. Task A (query) and Task C (abstain) "
+                   f"interleaved, {counts['train']} train / {counts['valid']} valid. "
+                   f"rank {LORA_RANK}, {LORA_LAYERS} layers, lr {LEARNING_RATE}, "
+                   f"mask-prompt, max-seq 1024."),
+            tags=["stage1-sft", "lora", f"rank{LORA_RANK}", "task-a", "task-c",
+                  "qwen2.5-3b-4bit"],
+        ))
     log_event("3.7", f"Stage 1 LoRA SFT starting: {counts['train']:,} train / "
                      f"{counts['valid']:,} valid examples, rank {LORA_RANK}, "
                      f"{LORA_LAYERS} layers, lr {LEARNING_RATE}, batch {batch_size}, "
@@ -159,7 +198,7 @@ def stage_one(iters: int, batch_size: int, model: str = BASE_MODEL) -> dict:
     log_path.parent.mkdir(parents=True, exist_ok=True)
     with log_path.open("w", encoding="utf-8") as handle:
         result = subprocess.run(command, stdout=handle, stderr=subprocess.STDOUT,
-                                text=True)
+                                text=True, env=environment)
     elapsed = time.monotonic() - started
 
     text = log_path.read_text(errors="replace")
@@ -180,7 +219,9 @@ def stage_one(iters: int, batch_size: int, model: str = BASE_MODEL) -> dict:
         "early_stopping_point": losses["best_validation_iter"],
         "log": str(log_path.relative_to(ROOT)),
         "wandb_project": WANDB_PROJECT if wandb_available() else "",
-        "reported_to_wandb": wandb_available(),
+        "wandb_run_name": name,
+        "wandb_group": group,
+        "reported_to_wandb": bool(name),
     }
     if result.returncode != 0:
         log_event("3.7", f"Stage 1 FAILED with exit {result.returncode}. "
@@ -349,7 +390,13 @@ def stage_two(batch_size: int, epochs: int = 1, limit: int | None = None) -> dic
 
             run = wandb.init(
                 project=WANDB_PROJECT, job_type="dpo",
-                name=f"binman-lm-dpo-{time.strftime('%Y%m%d-%H%M%S')}",
+                name=run_name("dpo", beta=DPO_BETA, pairs=len(reference)),
+                group=f"binman-lm-{time.strftime('%Y%m%d')}",
+                tags=["stage2-dpo", "preference", f"beta{DPO_BETA}",
+                      "qwen2.5-3b-4bit"],
+                notes=("Stage 2 preference tuning on the corruption pairs. "
+                       "mlx-lm 0.32 ships no preference trainer, so this is the "
+                       "spec 3.7 DPO fallback with cached reference logprobs."),
                 config={"beta": DPO_BETA, "pairs": len(reference),
                         "batch_size": batch_size, "epochs": epochs,
                         "learning_rate": LEARNING_RATE, "base_model": BASE_MODEL,
@@ -417,6 +464,7 @@ def stage_two(batch_size: int, epochs: int = 1, limit: int | None = None) -> dic
         "final_loss": history[-1]["loss"] if history else None,
         "adapters": str(STAGE2_ADAPTERS.relative_to(ROOT)),
         "wandb_project": WANDB_PROJECT if wandb_available() else "",
+        "wandb_run_name": run.name if run is not None else "",
         "reported_to_wandb": run is not None,
         "implementation": (
             "mlx-lm 0.32.0 ships no preference trainer, so this is the spec 3.7 "

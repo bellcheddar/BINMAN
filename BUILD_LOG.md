@@ -231,3 +231,18 @@ One line per meaningful event, timestamped UTC (spec Section 0 rule 5).
 | 2026-10-03T19:12:32+00:00 | 2.1 | 6,023/20,431 scanned, 6,729 candidates, 244 failed, 1.7/s, ~2.4 h remaining. |
 | 2026-10-03T19:14:49+00:00 | 3.7 | Stage 1 LoRA SFT starting: 5,601 train / 666 valid examples, rank 16, 16 layers, lr 1e-05, batch 4, 1200 iterations. |
 | 2026-10-03T19:15:43+00:00 | 1.3 | 31,602/52,681 entries, 78,335 bridges, 0 failed, 6.2 entries/s, ~0.9 h remaining. |
+| 2026-10-03T19:17:32+00:00 | 2.1 | 6,524/20,431 scanned, 7,420 candidates, 261 failed, 1.7/s, ~2.3 h remaining. |
+| 2026-10-03T19:20:43+00:00 | 1.3 | 31,891/52,681 entries, 91,106 bridges, 0 failed, 5.9 entries/s, ~1.0 h remaining. |
+| 2026-10-03T19:22:32+00:00 | 2.1 | 7,027/20,431 scanned, 7,957 candidates, 278 failed, 1.7/s, ~2.2 h remaining. |
+| 2026-10-03T19:25:43+00:00 | 1.3 | 32,319/52,681 entries, 103,943 bridges, 0 failed, 5.7 entries/s, ~1.0 h remaining. |
+| 2026-10-03T19:27:33+00:00 | 2.1 | 7,530/20,431 scanned, 8,403 candidates, 293 failed, 1.7/s, ~2.1 h remaining. |
+| 2026-10-03T19:28:30+00:00 | 3.7 | Stage 1 complete in 13.7 min. Best validation loss 0.002 at iteration 1000. |
+| 2026-10-03T19:28:36+00:00 | 3.7 | Stage 2 DPO starting on 600 preference pairs, beta 0.1. mlx-lm 0.32.0 provides no preference trainer, so this is the documented mlx-examples DPO fallback implemented against mlx-lm's LoRA machinery. |
+| 2026-10-03T19:29:21+00:00 | 3.7 | Stage 2: reference log-probabilities cached for 200/600 pairs. |
+| 2026-10-03T19:30:35+00:00 | 3.7 | Stage 2: reference log-probabilities cached for 400/600 pairs. |
+| 2026-10-03T19:30:44+00:00 | 1.3 | 32,517/52,681 entries, 114,101 bridges, 0 failed, 5.4 entries/s, ~1.0 h remaining. |
+| 2026-10-03T19:31:45+00:00 | 3.7 | Stage 2: reference log-probabilities cached for 600/600 pairs. |
+| 2026-10-03T19:31:45+00:00 | 3.7 | Stage 2: reference cache built for 600 pairs in 3.1 min. |
+| 2026-10-03T19:32:19+00:00 | 3.7 | Stage 2: step 20, mean loss over the last 20 steps 0.6585. |
+| 2026-10-03T19:32:33+00:00 | 2.1 | 8,022/20,431 scanned, 8,945 candidates, 317 failed, 1.7/s, ~2.1 h remaining. |
+| 2026-10-03T19:32:41+00:00 | 3.7 | Stage 2: step 40, mean loss over the last 20 steps 0.5302. |
