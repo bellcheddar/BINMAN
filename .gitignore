@@ -27,11 +27,21 @@ data/validation/*.jsonl
 data/validation/*.txt
 data/validation/*.gz
 
-# model weights: never committed, never shipped to the droplet (spec 3.9)
+# Model weights: never committed, never shipped to the droplet (spec 3.9).
+# Covers every adapter directory, including the rejected DPO attempts and the
+# per-round training directories, not just the two named paths.
+models/**/*.safetensors
+models/**/*.npz
+models/**/*.bin
+models/**/*.gguf
 models/binman-lm/adapters/*
+models/binman-lm/adapters-dpo/*
 models/binman-lm/fused/*
+models/binman-lm/runs/
 !models/binman-lm/adapters/.gitkeep
 !models/binman-lm/fused/.gitkeep
+# training.json is a report, not a weight, and the About tab reads it
+!models/binman-lm/training.json
 
 # Weights & Biases local run directories (the runs themselves live on wandb.ai)
 wandb/
