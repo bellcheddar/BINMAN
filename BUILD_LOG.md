@@ -246,3 +246,7 @@ One line per meaningful event, timestamped UTC (spec Section 0 rule 5).
 | 2026-10-03T19:32:19+00:00 | 3.7 | Stage 2: step 20, mean loss over the last 20 steps 0.6585. |
 | 2026-10-03T19:32:33+00:00 | 2.1 | 8,022/20,431 scanned, 8,945 candidates, 317 failed, 1.7/s, ~2.1 h remaining. |
 | 2026-10-03T19:32:41+00:00 | 3.7 | Stage 2: step 40, mean loss over the last 20 steps 0.5302. |
+| 2026-10-03T19:33:00+00:00 | 3.7 | Stage 2: step 60, mean loss over the last 20 steps 0.3655. |
+| 2026-10-03T19:33:15+00:00 | 3.7 | Stage 2: step 80, mean loss over the last 20 steps 0.1228. |
+| 2026-10-03T19:33:32+00:00 | 3.7 | Stage 2: step 100, mean loss over the last 20 steps 0.0354. |
+| 2026-10-03T19:33:44+00:00 | 3.7 | Stage 2: step 120, mean loss over the last 20 steps 0.0046. |
