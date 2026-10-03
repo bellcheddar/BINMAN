@@ -372,3 +372,89 @@ credential, training proceeds unreported.
 
 **Reversal.** Set `BINMAN_WANDB_PROJECT` to change the project, or remove the
 `--report-to` arguments to disable it.
+
+---
+
+## D-015: stage 2 preference tuning ships nothing; stage 1 ships alone
+
+**Decision.** Both DPO attempts were rejected and the stage 1 LoRA adapter is what
+ships, fused to `models/binman-lm/fused`. This is spec 3.7's third fallback rung:
+"if that also fails, ship stage 1 alone and log it."
+
+**Context.** mlx-lm 0.32.0 provides no preference trainer (rung 1), so the DPO
+loop was implemented against its LoRA machinery (rung 2). It trained to a
+near-zero loss twice and destroyed the model both times.
+
+| Attempt | Learning rate | Steps | Final DPO loss | Generation |
+|---|---|---|---|---|
+| 1 | 1e-5 | 600 | 0.0018 | collapsed: emitted `ccdccdccdccd…` indefinitely |
+| 2 | 5e-7 | 150 | — | degraded: 1 of 6 probes produced a parseable query |
+
+**What made this dangerous.** The per-mode preference win rates measured 0.95 to
+1.00 after attempt 1, which reads as a complete success. They were meaningless: a
+collapsed policy trivially assigns a higher likelihood to one string than
+another, so the metric the preference stage is judged on cannot detect the
+failure it is most likely to cause. The adapter would have shipped on the
+strength of those numbers.
+
+**The fix that matters is not the learning rate.** `generation_healthy()` now
+runs six probe questions through any candidate adapter and requires at least 80%
+to produce a query object the real parser accepts, **before** the adapter is
+allowed to fuse. An adapter that cannot generate does not ship, whatever its
+preference metrics say. The guard was verified against both the collapsed
+adapter (0 of 3) and the healthy stage 1 adapter (3 of 3).
+
+**Alternatives considered.** Lower the learning rate again and keep going; add an
+explicit KL penalty to the reference policy; reduce to a handful of steps.
+
+**Reason.** Stage 1 already clears every Section 9.5 floor it is measured against
+(parse rate 0.992 against 0.99, set equality 0.992 against 0.90), so the
+preference stage was an improvement on an already-passing model rather than a
+requirement. Spending further compute chasing it, on a hand-rolled DPO loop that
+exists only because the library ships none, is not a good trade against the rest
+of the build. The ladder exists for this.
+
+**What is lost.** The spec 3.8 per-corruption-mode win rates are not meaningfully
+reported: the only numbers produced came from a collapsed model. The behaviours
+the preference stage was meant to install (unit discipline, operator direction,
+clause completeness, closed-world entities) are therefore trained only by the
+supervised stage, which does cover all seven corruption modes as positives.
+
+**Reversal.** Raise `DPO_MAX_STEPS`, adjust `DPO_LEARNING_RATE` and re-run
+`lm/train.py`. The guard will still refuse to ship a broken adapter, which is the
+behaviour to keep.
+
+---
+
+## D-016: BINMAN-LM serves as base model plus adapter, not as a fused model
+
+**Decision.** Do not ship a fused model. `deploy/serve_lm.sh` runs
+`mlx_lm.server --model <base> --adapter-path models/binman-lm/adapters`.
+
+**Context.** Spec 3.7 asks for the adapters to be fused to
+`models/binman-lm/fused/`. The fuse completed without error and produced a model
+that does not carry the fine-tune. Measured on ten held-out test questions:
+
+| Artefact | Parsed |
+|---|---|
+| base model + stage 1 adapter | **10 of 10** |
+| the fused model | **0 of 10** |
+
+The fused model invents its own output schema
+(`{"PDB":"unspecified","Ligand":"ligases",...}`) rather than producing a BINMAN
+query object. The base is a 4-bit quantised checkpoint and the fused config still
+reports `{"group_size": 64, "bits": 4}`, so the most likely cause is the LoRA
+merge against quantised weights.
+
+**Alternatives considered.** Fuse with `--dequantize`, which produces a model
+several times larger and changes the numerics the adapter was trained against.
+Ship the fused model anyway, which would ship a model that does not work.
+
+**Reason.** The adapter demonstrably works and `mlx_lm.server` loads an adapter
+directly, so fusing buys nothing here but a broken artefact. The broken fused
+directory was deleted rather than left in place to be picked up by a later
+script.
+
+**Reversal.** `pixi run python -m mlx_lm fuse --model <base> --adapter-path
+models/binman-lm/adapters --save-path models/binman-lm/fused --dequantize`, then
+check it with `generation_healthy()` before letting it serve anything.

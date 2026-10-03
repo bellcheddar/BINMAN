@@ -280,3 +280,36 @@ One line per meaningful event, timestamped UTC (spec Section 0 rule 5).
 | 2026-10-03T19:39:04+00:00 | 3.7 | Fuse succeeded: models/binman-lm/fused |
 | 2026-10-03T19:40:46+00:00 | 1.3 | 32,821/52,681 entries, 128,339 bridges, 0 failed, 5.0 entries/s, ~1.1 h remaining. |
 | 2026-10-03T19:42:33+00:00 | 2.1 | 8,975/20,431 scanned, 9,844 candidates, 352 failed, 1.7/s, ~1.9 h remaining. |
+| 2026-10-03T19:45:46+00:00 | 1.3 | 32,877/52,681 entries, 136,513 bridges, 0 failed, 4.8 entries/s, ~1.2 h remaining. |
+| 2026-10-03T19:45:53+00:00 | 3.8 | stage2: loading mlx-community/Qwen2.5-3B-Instruct-4bit with adapters at models/binman-lm/adapters-dpo |
+| 2026-10-03T19:47:33+00:00 | 2.1 | 9,473/20,431 scanned, 10,326 candidates, 371 failed, 1.7/s, ~1.8 h remaining. |
+| 2026-10-03T19:50:46+00:00 | 1.3 | 32,936/52,681 entries, 147,413 bridges, 0 failed, 4.6 entries/s, ~1.2 h remaining. |
+| 2026-10-03T19:52:34+00:00 | 2.1 | 9,967/20,431 scanned, 10,889 candidates, 383 failed, 1.7/s, ~1.8 h remaining. |
+| 2026-10-03T19:55:46+00:00 | 1.3 | 33,062/52,681 entries, 164,510 bridges, 0 failed, 4.4 entries/s, ~1.2 h remaining. |
+| 2026-10-03T19:57:36+00:00 | 2.1 | 10,462/20,431 scanned, 11,368 candidates, 395 failed, 1.7/s, ~1.7 h remaining. |
+| 2026-10-03T20:00:01+00:00 | 3.8 | stage2: parse rate 0.0, set equality 0.0 on 120 synthetic queries. |
+| 2026-10-03T20:00:46+00:00 | 1.3 | 33,166/52,681 entries, 172,789 bridges, 0 failed, 4.2 entries/s, ~1.3 h remaining. |
+| 2026-10-03T20:02:36+00:00 | 2.1 | 10,943/20,431 scanned, 11,933 candidates, 404 failed, 1.7/s, ~1.6 h remaining. |
+| 2026-10-03T20:05:46+00:00 | 1.3 | 33,384/52,681 entries, 180,446 bridges, 0 failed, 4.1 entries/s, ~1.3 h remaining. |
+| 2026-10-03T20:07:38+00:00 | 2.1 | 11,431/20,431 scanned, 12,401 candidates, 413 failed, 1.7/s, ~1.5 h remaining. |
+| 2026-10-03T20:08:15+00:00 | 3.7 | Stage 2 retry: lr 5e-7 (was 1e-5), 150 steps (was 600). The first attempt reached a near-zero DPO loss by collapsing the policy rather than learning the preference. |
+| 2026-10-03T20:08:21+00:00 | 3.7 | Stage 2 DPO starting on 600 preference pairs, beta 0.1. mlx-lm 0.32.0 provides no preference trainer, so this is the documented mlx-examples DPO fallback implemented against mlx-lm's LoRA machinery. |
+| 2026-10-03T20:09:04+00:00 | 3.7 | Stage 2: reference log-probabilities cached for 200/600 pairs. |
+| 2026-10-03T20:10:17+00:00 | 3.7 | Stage 2: reference log-probabilities cached for 400/600 pairs. |
+| 2026-10-03T20:10:47+00:00 | 1.3 | 33,529/52,681 entries, 187,169 bridges, 0 failed, 4.0 entries/s, ~1.3 h remaining. |
+| 2026-10-03T20:11:30+00:00 | 3.7 | Stage 2: reference log-probabilities cached for 600/600 pairs. |
+| 2026-10-03T20:11:30+00:00 | 3.7 | Stage 2: reference cache built for 600 pairs in 3.1 min. |
+| 2026-10-03T20:11:57+00:00 | 3.7 | Stage 2: step 20, mean loss over the last 20 steps 0.6913. |
+| 2026-10-03T20:12:16+00:00 | 3.7 | Stage 2: step 40, mean loss over the last 20 steps 0.6848. |
+| 2026-10-03T20:12:31+00:00 | 3.7 | Stage 2: step 60, mean loss over the last 20 steps 0.6799. |
+| 2026-10-03T20:12:38+00:00 | 2.1 | 11,900/20,431 scanned, 12,834 candidates, 423 failed, 1.7/s, ~1.4 h remaining. |
+| 2026-10-03T20:12:44+00:00 | 3.7 | Stage 2: step 80, mean loss over the last 20 steps 0.6749. |
+| 2026-10-03T20:12:57+00:00 | 3.7 | Stage 2: step 100, mean loss over the last 20 steps 0.6675. |
+| 2026-10-03T20:13:08+00:00 | 3.7 | Stage 2: step 120, mean loss over the last 20 steps 0.6658. |
+| 2026-10-03T20:13:20+00:00 | 3.7 | Stage 2: step 140, mean loss over the last 20 steps 0.6561. |
+| 2026-10-03T20:13:29+00:00 | 3.7 | Stage 2 DPO complete: 150 steps in 2.0 min, adapters saved to models/binman-lm/adapters-dpo. |
+| 2026-10-03T20:14:12+00:00 | 3.7 | Stage 2 retry REJECTED by the guard: only 1/6 probes parsed; sample output '{"record_type":"ligase","filters":[{"field":"pocket_score","op":"gt","value":0.5}],"sort":'. Shipping stage 1 alone (spec 3.7 fallback). |
+| 2026-10-03T20:14:23+00:00 | 3.7 | Fuse succeeded: models/binman-lm/fused |
+| 2026-10-03T20:15:47+00:00 | 1.3 | 33,728/52,681 entries, 194,443 bridges, 0 failed, 3.9 entries/s, ~1.4 h remaining. |
+| 2026-10-03T20:17:39+00:00 | 2.1 | 12,386/20,431 scanned, 13,291 candidates, 433 failed, 1.6/s, ~1.4 h remaining. |
+| 2026-10-03T20:20:47+00:00 | 1.3 | 33,921/52,681 entries, 211,806 bridges, 0 failed, 3.8 entries/s, ~1.4 h remaining. |

@@ -6,9 +6,10 @@
     "adapter_rank": 16,
     "adapter_layers": 16,
     "fine_tune_type": "lora",
-    "fused": true,
+    "fused": false,
     "build_date": "2026-10-03",
-    "shipped_adapter": "models/binman-lm/adapters-dpo"
+    "shipped_adapter": "models/binman-lm/adapters",
+    "serving": "mlx_lm.server --model <base> --adapter-path models/binman-lm/adapters"
   },
   "hardware": {
     "chip": "Apple M2 Ultra",
@@ -104,22 +105,31 @@
   },
   "stage_2": {
     "ran": true,
-    "steps": 600,
+    "steps": 150,
     "beta": 0.1,
     "epochs": 1,
     "pairs": 600,
-    "wall_clock_seconds": 427.0,
+    "wall_clock_seconds": 118.7,
     "first_loss": 0.6930940747261047,
-    "final_loss": 0.0017723877681419253,
+    "final_loss": 0.6095183491706848,
     "adapters": "models/binman-lm/adapters-dpo",
     "wandb_project": "binman-lm",
+    "wandb_run_name": "binman-qwen-2.5-3b-4bit-round03",
     "reported_to_wandb": true,
-    "implementation": "mlx-lm 0.32.0 ships no preference trainer, so this is the spec 3.7 mlx-examples DPO fallback, implemented against mlx-lm's LoRA machinery with cached reference log-probabilities."
+    "implementation": "mlx-lm 0.32.0 ships no preference trainer, so this is the spec 3.7 mlx-examples DPO fallback, implemented against mlx-lm's LoRA machinery with cached reference log-probabilities.",
+    "generation_guard": {
+      "healthy": false,
+      "parsed": 1,
+      "n": 6,
+      "parse_rate": 0.167,
+      "reason": "only 1/6 probes parsed; sample output '{\"record_type\":\"ligase\",\"filters\":[{\"field\":\"pocket_score\",\"op\":\"gt\",\"value\":0.5}],\"sort\":'"
+    },
+    "shipped": false
   },
   "fuse": {
-    "fused": true,
-    "path": "models/binman-lm/fused",
-    "adapter": "models/binman-lm/adapters-dpo",
-    "error": ""
+    "fused": false,
+    "path": "",
+    "adapter": "models/binman-lm/adapters",
+    "reason": "mlx-lm's fuse produced a model that does not carry the fine-tune: it parsed 0 of 10 held-out test questions and invented its own output schema, while the same adapter loaded against the base model parses 10 of 10. The fused artefact was deleted rather than shipped. BINMAN-LM serves as base model plus adapter, which mlx_lm.server supports directly."
   }
 }

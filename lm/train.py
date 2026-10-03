@@ -129,6 +129,10 @@ LEARNING_RATE = 1e-5
 MIN_ITERS = 600
 MAX_ITERS = 1200
 DPO_BETA = 0.1
+# Preference tuning needs a much gentler step than the SFT stage: the first run
+# reused the SFT learning rate for 600 updates and collapsed the policy.
+DPO_LEARNING_RATE = 5e-7
+DPO_MAX_STEPS = 150
 
 
 # --------------------------------------------------------------------------- #
@@ -400,7 +404,7 @@ def stage_two(batch_size: int, epochs: int = 1, limit: int | None = None,
         return {"ran": False,
                 "reason": "no trainable LoRA parameters found after freezing"}
 
-    optimizer = optim.Adam(learning_rate=LEARNING_RATE)
+    optimizer = optim.Adam(learning_rate=DPO_LEARNING_RATE)
 
     def loss_fn(batch: list[dict]):
         total = mx.zeros(())
@@ -456,6 +460,8 @@ def stage_two(batch_size: int, epochs: int = 1, limit: int | None = None,
 
     for epoch in range(epochs):
         for offset in range(0, len(reference), batch_size):
+            if step >= DPO_MAX_STEPS:
+                break
             batch = reference[offset:offset + batch_size]
             if not batch:
                 continue
@@ -517,6 +523,94 @@ def stage_two(batch_size: int, epochs: int = 1, limit: int | None = None,
             "mlx-examples DPO fallback, implemented against mlx-lm's LoRA "
             "machinery with cached reference log-probabilities."
         ),
+    }
+
+
+# --------------------------------------------------------------------------- #
+# the generation guard
+# --------------------------------------------------------------------------- #
+
+def generation_healthy(adapter_path: Path, samples: int = 6) -> dict:
+    """Does this adapter still produce parseable query objects?
+
+    Stage 2 can reach a near-zero DPO loss by collapsing the policy rather than
+    by learning the preference: a degenerate model trivially scores one string
+    above another, so the win rates look perfect while generation is ruined. The
+    first DPO run did exactly that and emitted "ccdccdccdccd..." forever.
+
+    Nothing downstream noticed, because the preference metric cannot see it. So
+    the adapter is checked against the parser before it is allowed to ship.
+    """
+    import sys as _sys
+
+    _sys.path.insert(0, str(ROOT))
+    from app.queries import QueryError, parse as parse_query
+    from mlx_lm import generate, load
+    from mlx_lm.sample_utils import make_sampler
+
+    from lm.evaluate import TRAINED_SYSTEM, extract_json
+
+    # Probes come from the held-out test corpus, not from hand-written
+    # questions: freehand phrasings drift out of the training distribution and
+    # fail for ordinary reasons (asking for "relative SASA" when the field is
+    # `nz_rel_sasa`), which would make the guard reject healthy adapters. The
+    # guard exists to catch collapse, so it must measure the same distribution
+    # the real metric does.
+    probes: list[str] = []
+    test_file = CORPUS / "task_a_test.jsonl"
+    if test_file.exists():
+        with test_file.open(encoding="utf-8") as handle:
+            for line in handle:
+                line = line.strip()
+                if not line:
+                    continue
+                try:
+                    row = json.loads(line)
+                except json.JSONDecodeError:
+                    continue
+                probes.append(row["messages"][1]["content"])
+                if len(probes) >= samples:
+                    break
+    if not probes:
+        probes = ["ligases with a pocket score above 0.5"]
+
+    # The path may be an adapter directory or a fused model directory. A fused
+    # model is a complete model and must be loaded as one, not as an adapter.
+    is_adapter = (adapter_path / "adapter_config.json").exists()
+    try:
+        if is_adapter:
+            model, tokenizer = load(BASE_MODEL, adapter_path=str(adapter_path))
+        else:
+            model, tokenizer = load(str(adapter_path))
+    except Exception as exc:  # noqa: BLE001
+        return {"healthy": False, "parsed": 0, "n": len(probes),
+                "kind": "adapter" if is_adapter else "model",
+                "reason": f"would not load: {type(exc).__name__}: {exc}"[:160]}
+
+    parsed = 0
+    examples = []
+    for question in probes:
+        messages = [{"role": "system", "content": TRAINED_SYSTEM},
+                    {"role": "user", "content": question}]
+        prompt = tokenizer.apply_chat_template(
+            messages, add_generation_prompt=True, tokenize=False)
+        try:
+            raw = generate(model, tokenizer, prompt=prompt, max_tokens=200,
+                           sampler=make_sampler(temp=0.0), verbose=False)
+            parse_query(extract_json(raw))
+            parsed += 1
+        except (QueryError, Exception):  # noqa: B014
+            examples.append(raw[:90] if "raw" in dir() else "")
+    rate = parsed / max(1, len(probes))
+    # A collapsed model parses essentially nothing; a merely imperfect one parses
+    # most. The threshold separates those two states, it is not a quality bar:
+    # quality is measured properly by lm/evaluate.py against the real database.
+    return {
+        "healthy": rate >= 0.8, "parsed": parsed, "n": len(probes),
+        "parse_rate": round(rate, 3),
+        "reason": "" if rate >= 0.8 else
+                  f"only {parsed}/{len(probes)} probes parsed; sample output "
+                  f"{examples[0]!r}" if examples else "",
     }
 
 
@@ -614,7 +708,22 @@ def run(iters: int | None = None, skip_stage_two: bool = False,
             log_event("3.7", f"Stage 2 unavailable, shipping stage 1 alone: "
                              f"{type(exc).__name__}")
 
-    adapter = STAGE2_ADAPTERS if report["stage_2"].get("ran") else ADAPTERS
+    # Spec 3.7's third rung: if stage 2 did not help, ship stage 1 alone and log
+    # it. "Did not help" now includes "trained successfully but broke
+    # generation", which the preference metric alone cannot detect.
+    adapter = ADAPTERS
+    if report["stage_2"].get("ran"):
+        guard = generation_healthy(STAGE2_ADAPTERS)
+        report["stage_2"]["generation_guard"] = guard
+        if guard["healthy"]:
+            adapter = STAGE2_ADAPTERS
+            log_event("3.7", f"Stage 2 adapter passed the generation guard "
+                             f"({guard['parsed']}/{guard['n']} probes parsed) and ships.")
+        else:
+            log_event("3.7", f"Stage 2 adapter REJECTED by the generation guard: "
+                             f"{guard['reason'][:140]}. Shipping stage 1 alone "
+                             f"(spec 3.7 fallback).")
+            report["stage_2"]["shipped"] = False
     report["fuse"] = fuse(adapter)
     report["identity"]["fused"] = bool(report["fuse"]["fused"])
     report["identity"]["shipped_adapter"] = str(adapter.relative_to(ROOT))
