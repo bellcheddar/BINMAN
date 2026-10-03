@@ -71,8 +71,76 @@ the metric that is available.
 
 ## Section 9.2 Degron Scan validation
 
-Not computed yet: the stage has not run. The matched zinc-finger screen sets
-have not yet been acquired.
+**The spec 9.2 metric cannot be computed.** It requires the matched degraded and
+non-degraded zinc-finger sets from the Molecular Cell 2025 and Nature
+Communications 2025 screens, and neither resolved (Gate G7). Sensitivity and
+specificity are therefore **not computed**, not estimated. Without the matched
+negative set there is no way to know whether a hairpin-plus-glycine filter is
+selecting anything, so the Degron Scan ships as a **hypothesis generator, not a
+classifier**, exactly as spec 9.2 instructs for this case.
+
+What follows is a method sanity check against degrons documented in the
+structural literature. It is **not** a substitute for 9.2: the set is small, it
+was used to calibrate the thresholds, and it contains no negatives.
+
+### The spec 5.2 thresholds, applied literally, recover no zinc-finger degron
+
+Run as written, the filter found none of IKZF1, IKZF3, SALL4 or RBM39. The
+diagnosis is specific and reproducible. In the AlphaFold model of IKZF1,
+residues 145 and 146 form an extended strand that bridges antiparallel to 153
+and 154 (DSSP bridge partners 145 to 154 and 146 to 153), with Gly151 in the
+connecting turn at pLDDT 72. That is a textbook hairpin degron, and it failed
+three thresholds at once:
+
+| Criterion | Spec value | IKZF1 measures | Outcome |
+|---|---|---|---|
+| Strand length | ≥ 3 residues | 2 and 2 | rejected |
+| Turn length | ≤ 5 residues | 6 | rejected |
+| Tip relative SASA | ≥ 0.40 | 0.34 at Gly151 | rejected |
+
+Measured across five documented CRBN and DCAF neosubstrate degrons:
+
+| Gene | Degron Gly | pLDDT | Relative SASA | Strand A | Strand B | Turn |
+|---|---|---|---|---|---|---|
+| IKZF1 | 151 | 71.9 | 0.34 | 2 | 2 | 6 |
+| IKZF3 | 155 | 86.4 | 0.15 | 2 | 1 | – |
+| SALL4 | 416 | 85.5 | 0.44 | 2 | 2 | 6 |
+| CSNK1A1 | 40 | 96.4 | 0.48 | 8 | 8 | 5 |
+| RBM39 | 268 | 91.1 | 0.43 | 0 | 8 | – |
+
+**The zinc-finger degron is a two-residue β-hairpin with a six-residue turn.**
+The thresholds were calibrated to that measurement as the single adjustment spec
+9.6 permits (DECISIONS D-010), and the tip definition was corrected to find the
+glycine in the turn rather than the turn's geometric apex (DECISIONS D-011),
+because on a six-residue turn those are two residues apart.
+
+### Recovery after calibration
+
+| Gene | Documented Gly | Found | Score | Relative SASA | pLDDT |
+|---|---|---|---|---|---|
+| IKZF1 | 151 | **Gly151** | 0.632 | 0.34 | 70.6 |
+| SALL4 | 416 | **Gly416** | 0.725 | 0.44 | 85.3 |
+| CSNK1A1 | 40 | **Gly40** | 0.718 | 0.48 | 96.7 |
+| IKZF3 | 155 | miss | – | 0.15 | – |
+| RBM39 | 268 | miss | – | – | – |
+
+**3 of 5**, with both misses diagnosed rather than hidden:
+
+- **IKZF3 Gly155** has relative SASA 0.15: its degron glycine is largely buried
+  in the monomer model and becomes exposed only in the ternary complex. A floor
+  low enough to catch it would fire across most of the proteome.
+- **RBM39 Gly268** sits in a helix in the monomer model, with no hairpin at all.
+  Its recruitment to DCAF15 involves an RRM surface rather than a hairpin
+  degron, so a hairpin filter is the wrong instrument for it.
+
+### What this does and does not establish
+
+It establishes that the filter can find the geometry it is meant to find, and
+that the spec's literal thresholds could not. It establishes nothing about
+specificity. Relaxing the strand floor from 3 to 2 admits far more hairpins
+proteome-wide, and the cost is unmeasured because the matched negative set is
+unavailable. `calibration_validated = false` in `config/thresholds.toml` records
+that, and the module's UI says so on its face.
 
 ## Section 9.3 E3 Triage validation
 

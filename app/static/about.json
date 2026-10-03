@@ -1,0 +1,1528 @@
+{
+  "generated_at": "2026-10-03T17:52:45+00:00",
+  "generator": "pipeline/build_about.py",
+  "note": "Every value on this page is read from a build artefact. Nothing here is typed by hand, and a value that could not be read says 'not recorded' rather than showing a plausible guess.",
+  "schematic_description": "The pipeline runs left to right in four stages. Two kinds of input enter on the left: the primary data sources (RCSB, AlphaFold DB, UniProt, InterPro), and separately the validation datasets that serve as ground truth, of which 4 of 10 resolved. Stage 1, acquisition, catalogued 52,821 entries into priority tiers using httpx and tenacity. Stage 2, geometry, analysed 946 entries with gemmi and FreeSASA and found 427 bridges, with 0 entries failing. Stage 3, scan and triage, used DSSP and fpocket to produce 0 degron candidates, 0 triaged ligases and 0 scored lysines. Stage 4 trains BINMAN-LM with mlx-lm, which does text work only and never emits a number. Four modules leave on the right: Glue Atlas, Degron Scan, E3 Triage and Degradability.",
+  "stages": {
+    "bridges": {
+      "total": 946,
+      "ok": 946,
+      "failed": 0,
+      "failure_reasons": {}
+    },
+    "build_atlas": {
+      "total": 1,
+      "ok": 1,
+      "failed": 0,
+      "failure_reasons": {}
+    },
+    "catalogue": {
+      "total": 52821,
+      "ok": 52821,
+      "failed": 0,
+      "tiers": {
+        "1": 902,
+        "2": 34539,
+        "3": 17380
+      }
+    },
+    "catalogue_stage": {
+      "total": 1,
+      "ok": 1,
+      "failed": 0,
+      "failure_reasons": {}
+    },
+    "references": {
+      "total": 1,
+      "ok": 1,
+      "failed": 0,
+      "failure_reasons": {}
+    },
+    "validation_acquire": {
+      "total": 10,
+      "ok": 4,
+      "failed": 6,
+      "failure_reasons": {
+        "all_routes_exhausted": 12
+      }
+    }
+  },
+  "atlas": {
+    "available": true,
+    "size_mb": 0.6,
+    "entry": 300,
+    "entry_failed": 0,
+    "bridge": 427,
+    "bridge_failed": 0,
+    "ligand": 183,
+    "ligand_failed": 107,
+    "polymer_entity": 1946,
+    "polymer_entity_failed": 0,
+    "degron": 0,
+    "degron_failed": 0,
+    "ligase": 0,
+    "ligase_failed": 0,
+    "lysine": 0,
+    "lysine_failed": 0,
+    "edge": 0,
+    "edge_failed": 0,
+    "ccd_class_counts": {
+      "unknown": 110,
+      "glue_candidate": 27,
+      "cofactor": 11,
+      "metal": 10,
+      "buffer": 7,
+      "cryoprotectant": 5,
+      "peptide_like": 5,
+      "sugar": 4,
+      "lipid": 3,
+      "detergent": 1
+    },
+    "novel_bridges": 0
+  },
+  "datasets": [
+    {
+      "name": "biolip2_annotations",
+      "resolved": true,
+      "rows": 1071951,
+      "licence": "free for academic use, redistribution not granted in writing",
+      "redistributable": false,
+      "version": "weekly release, pinned by retrieval date",
+      "retrieved": "2026-10-03T17:08:18+00:00",
+      "url": "https://seq2fun.dcmb.med.umich.edu/BioLiP2/download/BioLiP.txt.gz",
+      "homepage": "https://zhanggroup.org/BioLiP/",
+      "purpose": "Glue Atlas: biologically relevant ligand reference and cofactor labels for LM Task B",
+      "citation": "10.1093/nar/gkad630",
+      "manual_route": "",
+      "attempts": [
+        {
+          "url": "https://seq2fun.dcmb.med.umich.edu/BioLiP2/download/BioLiP.txt.gz",
+          "note": "BioLiP2 redundant annotation table",
+          "rows": 1071951,
+          "outcome": "ok"
+        }
+      ]
+    },
+    {
+      "name": "biolip2_artefacts",
+      "resolved": true,
+      "rows": 463,
+      "licence": "BSD-2-Clause (Zhang-Freddolino lab, mmCIF2BioLiP)",
+      "redistributable": true,
+      "version": "curation code at master; the list is versioned with the repository",
+      "retrieved": "2026-10-03T17:08:08+00:00",
+      "url": "https://raw.githubusercontent.com/kad-ecoli/mmCIF2BioLiP/master/ligand_list",
+      "homepage": "https://zhanggroup.org/BioLiP/",
+      "purpose": "Glue Atlas artefact precision (spec 9.1): BINMAN must class these as furniture",
+      "citation": "10.1093/nar/gkad630",
+      "manual_route": "",
+      "attempts": [
+        {
+          "url": "https://raw.githubusercontent.com/kad-ecoli/mmCIF2BioLiP/master/ligand_list",
+          "note": "artefact ligand list consumed by script/rmligand.cpp",
+          "rows": 463,
+          "outcome": "ok"
+        }
+      ]
+    },
+    {
+      "name": "ubibrowser_literature_e3",
+      "resolved": true,
+      "rows": 3158,
+      "licence": "not determined",
+      "redistributable": false,
+      "version": "UbiBrowser 2.0 / v3 web release",
+      "retrieved": "2026-10-03T17:08:20+00:00",
+      "url": "http://ubibrowser.bio-it.cn/ubibrowser_v3/Public/download/literature/literature.E3.txt.gz",
+      "homepage": "http://ubibrowser.bio-it.cn/ubibrowser_v3/",
+      "purpose": "E3 Triage substrate counts and the enrichment test (spec 9.3)",
+      "citation": "10.1093/nar/gkab962",
+      "manual_route": "",
+      "attempts": [
+        {
+          "url": "http://ubibrowser.bio-it.cn/ubibrowser_v3/Public/download/literature/literature.E3.txt.gz",
+          "note": "literature-curated E3-substrate interactions",
+          "rows": 3158,
+          "outcome": "ok"
+        }
+      ]
+    },
+    {
+      "name": "ubibrowser_predicted_e3",
+      "resolved": true,
+      "rows": 113656,
+      "licence": "not determined",
+      "redistributable": false,
+      "version": "UbiBrowser v3 H.sapiens prediction set, retained at p < 0.01",
+      "retrieved": "2026-10-03T17:18:13+00:00",
+      "url": "http://ubibrowser.bio-it.cn/ubibrowser_v3/Public/download/E3/H.sapiens.result.txt.gz",
+      "homepage": "http://ubibrowser.bio-it.cn/ubibrowser_v3/",
+      "purpose": "E3 Triage: predicted E3-substrate network, reported separately from curated",
+      "citation": "10.1093/nar/gkab962",
+      "manual_route": "",
+      "attempts": [
+        {
+          "url": "http://ubibrowser.bio-it.cn/ubibrowser_v3/Public/download/E3/H.sapiens.result.txt.gz",
+          "note": "predicted human E3-substrate interactions",
+          "rows": 113656,
+          "outcome": "ok"
+        }
+      ]
+    },
+    {
+      "name": "degronopedia",
+      "resolved": false,
+      "rows": 0,
+      "licence": "not determined",
+      "redistributable": false,
+      "version": "web release, pinned by retrieval date",
+      "retrieved": "2026-10-03T17:13:44+00:00",
+      "url": "",
+      "homepage": "https://degronopedia.com/",
+      "purpose": "Degron Scan cross-reference (spec 9.2)",
+      "citation": "10.1093/nar/gkad1025",
+      "manual_route": "No static data path or API responded. The site offers per-protein lookup and a degron motif table at https://degronopedia.com/degronopedia/degron_motifs. Export from there, or request the bulk set from the Pokrzywa lab.",
+      "attempts": [
+        {
+          "url": "https://degronopedia.com/degronopedia/data/degrons.csv",
+          "note": "static path, if exposed",
+          "outcome": "fetch_failed:FileNotFoundError: 404 https://degronopedia.com/degronopedia/data/degrons.csv"
+        },
+        {
+          "url": "https://degronopedia.com/degronopedia/api/degrons",
+          "note": "API, if exposed",
+          "outcome": "fetch_failed:FileNotFoundError: 404 https://degronopedia.com/degronopedia/api/degrons"
+        }
+      ]
+    },
+    {
+      "name": "mgdb_glues",
+      "resolved": false,
+      "rows": 0,
+      "licence": "open access, terms not stated for bulk reuse",
+      "redistributable": false,
+      "version": "NAR 2026 54(D1) D1488 release",
+      "retrieved": "2026-10-03T17:13:34+00:00",
+      "url": "",
+      "homepage": "http://mgdb.idruglab.cn/",
+      "purpose": "Glue Atlas recall, curated set 1 of 3 (spec 9.1)",
+      "citation": "10.1093/nar/gkaf1131",
+      "manual_route": "Bulk export is stated as planned future work in the paper, not yet live. Verified: the Europe PMC supplementary archive for PMC12807674 holds only two TIFF figures and an 8 MB `Supplementary Data.docx`, with no machine-readable glue table. Obtain by browsing http://mgdb.idruglab.cn/ and exporting the compound table from the web interface, or by contacting the authors for the 7396-compound set.",
+      "attempts": [
+        {
+          "url": "http://mgdb.idruglab.cn/download/all",
+          "note": "bulk export, if exposed",
+          "outcome": "html_not_data:676_bytes"
+        },
+        {
+          "url": "http://mgdb.idruglab.cn/api/download",
+          "note": "API bulk export, if exposed",
+          "outcome": "html_not_data:676_bytes"
+        },
+        {
+          "url": "http://mgdb.idruglab.cn/api/glue/list",
+          "note": "listing API, if exposed",
+          "outcome": "html_not_data:676_bytes"
+        }
+      ]
+    },
+    {
+      "name": "mgtbind_ternary",
+      "resolved": false,
+      "rows": 0,
+      "licence": "not determined",
+      "redistributable": false,
+      "version": "NAR 2026 54(D1) D1500 release",
+      "retrieved": "2026-10-03T17:13:40+00:00",
+      "url": "",
+      "homepage": "http://mgtbind.idruglab.cn/",
+      "purpose": "Glue Atlas recall set 3 of 3 and ternary partner assignment (spec 9.1)",
+      "citation": "not yet verified",
+      "manual_route": "No bulk-export endpoint responded and the host returns 404 for the paths tried. Check the NAR 2026 54(D1) D1500 article for the current URL, which may differ from the idruglab host.",
+      "attempts": [
+        {
+          "url": "http://mgtbind.idruglab.cn/api/download",
+          "note": "bulk export, if exposed",
+          "outcome": "fetch_failed:FileNotFoundError: 404 http://mgtbind.idruglab.cn/api/download"
+        },
+        {
+          "url": "http://mgtbind.idruglab.cn/download/all",
+          "note": "bulk export, if exposed",
+          "outcome": "fetch_failed:FileNotFoundError: 404 http://mgtbind.idruglab.cn/download/all"
+        }
+      ]
+    },
+    {
+      "name": "molgluedb_glues",
+      "resolved": false,
+      "rows": 0,
+      "licence": "free and open access, terms not stated for bulk reuse",
+      "redistributable": false,
+      "version": "NAR 2025 advance article gkaf811",
+      "retrieved": "2026-10-03T17:13:38+00:00",
+      "url": "",
+      "homepage": "https://www.molgluedb.com/",
+      "purpose": "Glue Atlas recall, curated set 2 of 3 (spec 9.1)",
+      "citation": "10.1093/nar/gkaf811",
+      "manual_route": "JavaScript front end with no documented bulk-export endpoint. Browse https://www.molgluedb.com/ and export the compound table, or request it from the authors.",
+      "attempts": [
+        {
+          "url": "https://www.molgluedb.com/api/download",
+          "note": "bulk export, if exposed",
+          "outcome": "html_not_data:1686_bytes"
+        },
+        {
+          "url": "https://www.molgluedb.com/api/glue/all",
+          "note": "listing API, if exposed",
+          "outcome": "html_not_data:1686_bytes"
+        },
+        {
+          "url": "https://www.molgluedb.com/attachment/download/molgluedb.csv",
+          "note": "attachment path, if exposed",
+          "outcome": "html_not_data:1686_bytes"
+        }
+      ]
+    },
+    {
+      "name": "protacdb_protacs",
+      "resolved": false,
+      "rows": 0,
+      "licence": "internal use only, redistribution prohibited (Hou group terms, 2024-09-29)",
+      "redistributable": false,
+      "version": "PROTAC-DB 3.0",
+      "retrieved": "2026-10-03T17:13:43+00:00",
+      "url": "",
+      "homepage": "https://cadd.zju.edu.cn/protacdb/",
+      "purpose": "LM Task B confusable negative class and Glue Atlas exclusion set (spec 9.1, 3.4)",
+      "citation": "10.1093/nar/gkae768",
+      "manual_route": "The downloads page populates its table by JavaScript. Download the PROTAC SDF or XLSX from https://cadd.zju.edu.cn/protacdb/downloads by hand. Note the terms of use (2024-09-29) restrict the data to internal use: the parsed derivative must stay local and must never be bundled into the atlas.",
+      "attempts": [
+        {
+          "url": "https://cadd.zju.edu.cn/protacdb/api/download/protac",
+          "note": "bulk export, if exposed",
+          "outcome": "html_not_data:23832_bytes"
+        },
+        {
+          "url": "https://cadd.zju.edu.cn/protacdb/downloads/protac.csv",
+          "note": "static path, if exposed",
+          "outcome": "html_not_data:23832_bytes"
+        }
+      ]
+    },
+    {
+      "name": "protcid_interfaces",
+      "resolved": false,
+      "rows": 0,
+      "licence": "free for academic use",
+      "redistributable": false,
+      "version": "web release, pinned by retrieval date",
+      "retrieved": "2026-10-03T17:13:44+00:00",
+      "url": "",
+      "homepage": "https://dunbrack2.fccc.edu/ProtCiD/",
+      "purpose": "Glue Atlas packing specificity (spec 9.1): packing-only interfaces must not be called glue interfaces",
+      "citation": "10.1093/nar/gkac1120",
+      "manual_route": "The download page moved; https://dunbrack2.fccc.edu/ProtCiD/ links to a PDBfam download under /ProtCiD/PDBfam/Download.aspx. Fetch the Pfam domain interface cluster table from there by hand.",
+      "attempts": [
+        {
+          "url": "https://dunbrack2.fccc.edu/ProtCiD/Download/PfamDomainInterfaceCluster.txt",
+          "note": "domain interface clusters, if exposed",
+          "outcome": "fetch_failed:FileNotFoundError: 404 https://dunbrack2.fccc.edu/ProtCiD/Download/PfamDomainInterfaceCluster.txt"
+        }
+      ]
+    }
+  ],
+  "datasets_resolved": 4,
+  "datasets_total": 10,
+  "references": [
+    {
+      "name": "AlphaFold Protein Structure Database: massively expanding the structural coverage of protein-sequence space with high-accuracy models",
+      "key": "alphafold_db",
+      "type": "database",
+      "version": "not recorded",
+      "retrieved": "2026-10-03T17:47:30+00:00",
+      "used_for": "Degron Scan over the human predicted proteome",
+      "licence": "CC-BY-4.0",
+      "doi": "10.1093/nar/gkab1061",
+      "home": "https://doi.org/10.1093/nar/gkab1061",
+      "repo": "",
+      "verified": true,
+      "verification": "Crossref verified",
+      "authors": "Varadi, Mihaly and Anyango, Stephen and Deshpande, Mandar and Nair, Sreenath and Natassia, Cindy and Yordanova, Galabina and Yuan, David and Stroe, Oana and Wood, Gemma and Laydon, Agata and \u017d\u00eddek, Augustin and Green, Tim",
+      "year": "2021",
+      "container": "Nucleic Acids Research"
+    },
+    {
+      "name": "BioLiP2: an updated structure database for biologically relevant ligand\u2013protein interactions",
+      "key": "biolip2",
+      "type": "database",
+      "version": "weekly release, pinned by retrieval date",
+      "retrieved": "2026-10-03T17:08:18+00:00",
+      "used_for": "Glue Atlas artefact precision and cofactor labels for LM Task B",
+      "licence": "free for academic use; curation code BSD-2-Clause",
+      "doi": "10.1093/nar/gkad630",
+      "home": "https://doi.org/10.1093/nar/gkad630",
+      "repo": "https://github.com/kad-ecoli/mmCIF2BioLiP",
+      "verified": true,
+      "verification": "Crossref verified",
+      "authors": "Zhang, Chengxin and Zhang, Xi and Freddolino, Lydia and Zhang, Yang",
+      "year": "2023",
+      "container": "Nucleic Acids Research"
+    },
+    {
+      "name": "Chemical Component Dictionary",
+      "key": "ccd",
+      "type": "database",
+      "version": "not recorded",
+      "retrieved": "2026-10-03T17:47:30+00:00",
+      "used_for": "ligand classification, formula and parent assignment",
+      "licence": "CC0-1.0",
+      "doi": "10.2210/wwpdb/doc_ccd",
+      "home": "https://doi.org/10.2210/wwpdb/doc_ccd",
+      "repo": "",
+      "verified": true,
+      "verification": "Crossref verified",
+      "authors": "",
+      "year": "2019",
+      "container": "RCSB Protein Data Bank"
+    },
+    {
+      "name": "DEGRONOPEDIA: a web server for proteome-wide inspection of degrons",
+      "key": "degronopedia",
+      "type": "database",
+      "version": "web release, pinned by retrieval date",
+      "retrieved": "2026-10-03T17:13:44+00:00",
+      "used_for": "Degron Scan cross-reference",
+      "licence": "not determined",
+      "doi": "10.1093/nar/gkae238",
+      "home": "https://doi.org/10.1093/nar/gkae238",
+      "repo": "",
+      "verified": true,
+      "verification": "Crossref verified",
+      "authors": "Szulc, Natalia A and Stefaniak, Filip and Piechota, Ma\u0142gorzata and Soszy\u0144ska, Anna and Pi\u00f3rkowska, Gabriela and Cappannini, Andrea and Bujnicki, Janusz\u00a0M and Maniaci, Chiara and Pokrzywa, Wojciech",
+      "year": "2024",
+      "container": "Nucleic Acids Research"
+    },
+    {
+      "name": "Europe PMC: a full-text literature database for the life sciences and platform for innovation",
+      "key": "europepmc",
+      "type": "database",
+      "version": "not recorded",
+      "retrieved": "2026-10-03T17:47:30+00:00",
+      "used_for": "abstracts for the LM Task B triage corpus",
+      "licence": "varies by article",
+      "doi": "10.1093/nar/gku1061",
+      "home": "https://doi.org/10.1093/nar/gku1061",
+      "repo": "",
+      "verified": true,
+      "verification": "Crossref verified",
+      "authors": "",
+      "year": "2014",
+      "container": "Nucleic Acids Research"
+    },
+    {
+      "name": "InterPro: An integrated documentation resource for protein families, domains and functional sites",
+      "key": "interpro",
+      "type": "database",
+      "version": "not recorded",
+      "retrieved": "2026-10-03T17:47:30+00:00",
+      "used_for": "E3 ligase family assignment and domain boundaries",
+      "licence": "CC0-1.0",
+      "doi": "10.1093/bib/3.3.225",
+      "home": "https://doi.org/10.1093/bib/3.3.225",
+      "repo": "",
+      "verified": true,
+      "verification": "Crossref verified",
+      "authors": "",
+      "year": "2002",
+      "container": "Briefings in Bioinformatics"
+    },
+    {
+      "name": "MGDB: a curated database for molecular glues",
+      "key": "mgdb",
+      "type": "database",
+      "version": "NAR 2026 54(D1) D1488 release",
+      "retrieved": "2026-10-03T17:13:34+00:00",
+      "used_for": "Glue Atlas recall, curated glue set 1 of 3",
+      "licence": "open access, bulk export not yet available",
+      "doi": "10.1093/nar/gkaf1131",
+      "home": "https://doi.org/10.1093/nar/gkaf1131",
+      "repo": "",
+      "verified": true,
+      "verification": "Crossref verified",
+      "authors": "Li, Chenxin and Luo, Haolin and Pang, Yu and Liu, Yun and Luo, Yutao and Liang, Xinni and Li, Hongyi and Li, Wennuo and Wang, Ling",
+      "year": "2025",
+      "container": "Nucleic Acids Research"
+    },
+    {
+      "name": "MolGlueDB: an online database of molecular glues",
+      "key": "molgluedb",
+      "type": "database",
+      "version": "NAR 2025 advance article gkaf811",
+      "retrieved": "2026-10-03T17:13:38+00:00",
+      "used_for": "Glue Atlas recall, curated glue set 2 of 3",
+      "licence": "free and open access",
+      "doi": "10.1093/nar/gkaf811",
+      "home": "https://doi.org/10.1093/nar/gkaf811",
+      "repo": "",
+      "verified": true,
+      "verification": "Crossref verified",
+      "authors": "Wang, Xiao and Zhuang, Zhiyao and Zhang, Chengwei and Zhang, Bowen and Zhan, Wei and Wang, Yifan and Liu, Zhaojuan and Yuan, Shanwen and Niu, Wenjia and He, Qi and Tian, Yanqing and Xu, Ximing",
+      "year": "2025",
+      "container": "Nucleic Acids Research"
+    },
+    {
+      "name": "Open Targets Platform: supporting systematic drug\u2013target identification and prioritisation",
+      "key": "open_targets",
+      "type": "database",
+      "version": "not recorded",
+      "retrieved": "2026-10-03T17:47:30+00:00",
+      "used_for": "ligase expression breadth, tumour enrichment and tractability",
+      "licence": "CC0-1.0",
+      "doi": "10.1093/nar/gkaa1027",
+      "home": "https://doi.org/10.1093/nar/gkaa1027",
+      "repo": "",
+      "verified": true,
+      "verification": "Crossref verified",
+      "authors": "Ochoa, David and Hercules, Andrew and Carmona, Miguel and Suveges, Daniel and Gonzalez-Uriarte, Asier and Malangone, Cinzia and Miranda, Alfredo and Fumis, Luca and Carvalho-Silva, Denise and Spitzer, Michaela and Baker, Jarrod and Ferrer, Javier",
+      "year": "2020",
+      "container": "Nucleic Acids Research"
+    },
+    {
+      "name": "PDBe: searching the Protein Data Bank",
+      "key": "pdbe",
+      "type": "database",
+      "version": "not recorded",
+      "retrieved": "2026-10-03T17:47:30+00:00",
+      "used_for": "ligand chemistry cross-check and validation summaries",
+      "licence": "CC0-1.0",
+      "doi": "10.6019/tol.pdbe-sea-t.2015.00001.1",
+      "home": "https://doi.org/10.6019/tol.pdbe-sea-t.2015.00001.1",
+      "repo": "",
+      "verified": true,
+      "verification": "Crossref verified",
+      "authors": "",
+      "year": "",
+      "container": ""
+    },
+    {
+      "name": "PhosphoSitePlus, 2014: mutations, PTMs and recalibrations",
+      "key": "phosphositeplus",
+      "type": "database",
+      "version": "not recorded",
+      "retrieved": "2026-10-03T17:47:30+00:00",
+      "used_for": "Degradability reach window calibration from observed diGly sites",
+      "licence": "free for non-commercial use, registration required",
+      "doi": "10.1093/nar/gku1267",
+      "home": "https://doi.org/10.1093/nar/gku1267",
+      "repo": "",
+      "verified": true,
+      "verification": "Crossref verified",
+      "authors": "Hornbeck, Peter V. and Zhang, Bin and Murray, Beth and Kornhauser, Jon M. and Latham, Vaughan and Skrzypek, Elzbieta",
+      "year": "2014",
+      "container": "Nucleic Acids Research"
+    },
+    {
+      "name": "PROTAC-DB 3.0: an updated database of PROTACs with extended pharmacokinetic parameters",
+      "key": "protacdb3",
+      "type": "database",
+      "version": "PROTAC-DB 3.0",
+      "retrieved": "2026-10-03T17:13:43+00:00",
+      "used_for": "LM Task B confusable negative class; Glue Atlas exclusion set",
+      "licence": "internal use only, redistribution prohibited (Hou group terms, 2024-09-29)",
+      "doi": "10.1093/nar/gkae768",
+      "home": "https://doi.org/10.1093/nar/gkae768",
+      "repo": "",
+      "verified": true,
+      "verification": "Crossref verified",
+      "authors": "Ge, Jingxuan and Li, Shimeng and Weng, Gaoqi and Wang, Huating and Fang, Meijing and Sun, Huiyong and Deng, Yafeng and Hsieh, Chang- Yu and Li, Dan and Hou, Tingjun",
+      "year": "2024",
+      "container": "Nucleic Acids Research"
+    },
+    {
+      "name": "The protein common interface database (ProtCID)--a comprehensive database of interactions of homologous proteins in multiple crystal forms",
+      "key": "protcid",
+      "type": "database",
+      "version": "web release, pinned by retrieval date",
+      "retrieved": "2026-10-03T17:13:44+00:00",
+      "used_for": "Glue Atlas packing specificity: packing-only interfaces must not be called glue interfaces",
+      "licence": "free for academic use",
+      "doi": "10.1093/nar/gkq1059",
+      "home": "https://doi.org/10.1093/nar/gkq1059",
+      "repo": "",
+      "verified": true,
+      "verification": "Crossref verified",
+      "authors": "Xu, Q. and Dunbrack, R. L.",
+      "year": "2010",
+      "container": "Nucleic Acids Research"
+    },
+    {
+      "name": "The Protein Data Bank",
+      "key": "rcsb_pdb",
+      "type": "database",
+      "version": "not recorded",
+      "retrieved": "2026-10-03T17:47:30+00:00",
+      "used_for": "entry discovery, metadata and biological assemblies",
+      "licence": "CC0-1.0",
+      "doi": "10.1093/nar/28.1.235",
+      "home": "https://doi.org/10.1093/nar/28.1.235",
+      "repo": "",
+      "verified": true,
+      "verification": "Crossref verified",
+      "authors": "Berman, H. M.",
+      "year": "2000",
+      "container": "Nucleic Acids Research"
+    },
+    {
+      "name": "UbiBrowser 2.0: a comprehensive resource for proteome-wide known and predicted ubiquitin ligase/deubiquitinase\u2013substrate interactions in eukaryotic species",
+      "key": "ubibrowser2",
+      "type": "database",
+      "version": "UbiBrowser 2.0 / v3 web release",
+      "retrieved": "2026-10-03T17:08:20+00:00",
+      "used_for": "E3 Triage substrate counts and the spec 9.3 enrichment test",
+      "licence": "not determined",
+      "doi": "10.1093/nar/gkab962",
+      "home": "https://doi.org/10.1093/nar/gkab962",
+      "repo": "",
+      "verified": true,
+      "verification": "Crossref verified",
+      "authors": "Wang, Xun and Li, Yang and He, Mengqi and Kong, Xiangren and Jiang, Peng and Liu, Xi and Diao, Lihong and Zhang, Xinlei and Li, Honglei and Ling, Xinping and Xia, Simin and Liu, Zhongyang",
+      "year": "2021",
+      "container": "Nucleic Acids Research"
+    },
+    {
+      "name": "UniProt: the universal protein knowledgebase",
+      "key": "uniprot",
+      "type": "database",
+      "version": "not recorded",
+      "retrieved": "2026-10-03T17:47:30+00:00",
+      "used_for": "accession mapping, sequences and keyword annotation",
+      "licence": "CC-BY-4.0",
+      "doi": "10.1093/nar/gky092",
+      "home": "https://doi.org/10.1093/nar/gky092",
+      "repo": "",
+      "verified": true,
+      "verification": "Crossref verified",
+      "authors": "UniProt\u00a0Consortium, The",
+      "year": "2018",
+      "container": "Nucleic Acids Research"
+    },
+    {
+      "name": "Archivo",
+      "key": "archivo",
+      "type": "font",
+      "version": "google-fonts-latest",
+      "retrieved": "2026-10-03T16:43:52+00:00",
+      "used_for": "Depot design system, display face",
+      "licence": "SIL Open Font License 1.1",
+      "doi": "",
+      "home": "https://fonts.google.com/specimen/Archivo",
+      "repo": "",
+      "verified": false,
+      "verification": "vendored asset, pinned by SHA-256",
+      "authors": "",
+      "year": "",
+      "container": ""
+    },
+    {
+      "name": "IBM Plex Mono",
+      "key": "ibm_plex_mono",
+      "type": "font",
+      "version": "google-fonts-latest",
+      "retrieved": "2026-10-03T16:43:53+00:00",
+      "used_for": "Depot design system, data face",
+      "licence": "SIL Open Font License 1.1",
+      "doi": "",
+      "home": "https://fonts.google.com/specimen/IBM+Plex+Mono",
+      "repo": "",
+      "verified": false,
+      "verification": "vendored asset, pinned by SHA-256",
+      "authors": "",
+      "year": "",
+      "container": ""
+    },
+    {
+      "name": "Spline Sans",
+      "key": "spline_sans",
+      "type": "font",
+      "version": "google-fonts-latest",
+      "retrieved": "2026-10-03T16:43:53+00:00",
+      "used_for": "Depot design system, body face",
+      "licence": "SIL Open Font License 1.1",
+      "doi": "",
+      "home": "https://fonts.google.com/specimen/Spline+Sans",
+      "repo": "",
+      "verified": false,
+      "verification": "vendored asset, pinned by SHA-256",
+      "authors": "",
+      "year": "",
+      "container": ""
+    },
+    {
+      "name": "Qwen2.5-3B-Instruct model card",
+      "key": "qwen25",
+      "type": "model",
+      "version": "3B-Instruct, 4-bit via mlx-lm",
+      "retrieved": "2026-10-03T17:47:30+00:00",
+      "used_for": "BINMAN-LM base model",
+      "licence": "Apache-2.0",
+      "doi": "",
+      "home": "https://huggingface.co/Qwen/Qwen2.5-3B-Instruct",
+      "repo": "",
+      "verified": false,
+      "verification": "software with no citeable paper: canonical URL recorded instead",
+      "authors": "Qwen Team, Alibaba Cloud",
+      "year": "2024",
+      "container": ""
+    },
+    {
+      "name": "Anticancer sulfonamides target splicing by inducing RBM39 degradation via recruitment to DCAF15",
+      "key": "dcaf15_rbm39",
+      "type": "paper",
+      "version": "not recorded",
+      "retrieved": "2026-10-03T17:47:30+00:00",
+      "used_for": "DCAF15 with aryl sulfonamides and RBM39",
+      "licence": "publisher terms",
+      "doi": "10.1126/science.aal3755",
+      "home": "https://doi.org/10.1126/science.aal3755",
+      "repo": "",
+      "verified": true,
+      "verification": "Crossref verified",
+      "authors": "Han, Ting and Goralski, Maria and Gaskill, Nicholas and Capota, Emanuela and Kim, Jiwoong and Ting, Tabitha C. and Xie, Yang and Williams, Noelle S. and Nijhawan, Deepak",
+      "year": "2017",
+      "container": "Science"
+    },
+    {
+      "name": "Auxin and TIR1 Ubiquitin Ligase",
+      "key": "tir1_auxin",
+      "type": "paper",
+      "version": "not recorded",
+      "retrieved": "2026-10-03T17:47:30+00:00",
+      "used_for": "the TIR1-auxin co-receptor structure",
+      "licence": "publisher terms",
+      "doi": "10.2210/rcsb_pdb/mom_2009_2",
+      "home": "https://doi.org/10.2210/rcsb_pdb/mom_2009_2",
+      "repo": "",
+      "verified": true,
+      "verification": "Crossref verified",
+      "authors": "Goodsell, D.S.",
+      "year": "2009",
+      "container": "RCSB Protein Data Bank"
+    },
+    {
+      "name": "CK1\u03b1 Degradation Underlies Lenalidomide Activity in del(5q) MDS",
+      "key": "ck1a_lenalidomide",
+      "type": "paper",
+      "version": "not recorded",
+      "retrieved": "2026-10-03T17:47:30+00:00",
+      "used_for": "lenalidomide-induced CK1alpha degradation in del(5q) MDS",
+      "licence": "publisher terms",
+      "doi": "10.1158/2159-8290.cd-rw2015-130",
+      "home": "https://doi.org/10.1158/2159-8290.cd-rw2015-130",
+      "repo": "",
+      "verified": true,
+      "verification": "Crossref verified",
+      "authors": "",
+      "year": "2015",
+      "container": "Cancer Discovery"
+    },
+    {
+      "name": "Defining the human C2H2 zinc finger degrome targeted by thalidomide analogs through CRBN",
+      "key": "zf_degradation_screen",
+      "type": "paper",
+      "version": "not recorded",
+      "retrieved": "2026-10-03T17:47:30+00:00",
+      "used_for": "Degron Scan matched degraded and non-degraded zinc-finger sets",
+      "licence": "publisher terms",
+      "doi": "10.1126/science.aat0572",
+      "home": "https://doi.org/10.1126/science.aat0572",
+      "repo": "",
+      "verified": true,
+      "verification": "Crossref verified",
+      "authors": "Sievers, Quinlan L. and Petzold, Georg and Bunker, Richard D. and Renneville, Aline and S\u0142abicki, Miko\u0142aj and Liddicoat, Brian J. and Abdulrahman, Wassim and Mikkelsen, Tarjei and Ebert, Benjamin L. and Thom\u00e4, Nicolas H.",
+      "year": "2018",
+      "container": "Science"
+    },
+    {
+      "name": "Lenalidomide Causes Selective Degradation of IKZF1 and IKZF3 in Multiple Myeloma Cells",
+      "key": "crbn_imid_degradation",
+      "type": "paper",
+      "version": "not recorded",
+      "retrieved": "2026-10-03T17:47:30+00:00",
+      "used_for": "CRBN-IMiD neosubstrate degradation, the founding observation",
+      "licence": "publisher terms",
+      "doi": "10.1126/science.1244851",
+      "home": "https://doi.org/10.1126/science.1244851",
+      "repo": "",
+      "verified": true,
+      "verification": "Crossref verified",
+      "authors": "Kr\u00f6nke, Jan and Udeshi, Namrata D. and Narla, Anupama and Grauman, Peter and Hurst, Slater N. and McConkey, Marie and Svinkina, Tanya and Heckl, Dirk and Comer, Eamon and Li, Xiaoyu and Ciarlo, Christie and Hartman, Emily",
+      "year": "2014",
+      "container": "Science"
+    },
+    {
+      "name": "Maximum Allowed Solvent Accessibilites of Residues in Proteins",
+      "key": "tien_sasa",
+      "type": "paper",
+      "version": "not recorded",
+      "retrieved": "2026-10-03T17:47:30+00:00",
+      "used_for": "maximum residue accessibility reference for relative SASA",
+      "licence": "CC-BY-4.0",
+      "doi": "10.1371/journal.pone.0080635",
+      "home": "https://doi.org/10.1371/journal.pone.0080635",
+      "repo": "",
+      "verified": true,
+      "verification": "Crossref verified",
+      "authors": "Tien, Matthew Z. and Meyer, Austin G. and Sydykova, Dariya K. and Spielman, Stephanie J. and Wilke, Claus O.",
+      "year": "2013",
+      "container": "PLoS ONE"
+    },
+    {
+      "name": "Structure of the DDB1\u2013CRBN E3 ubiquitin ligase in complex with thalidomide",
+      "key": "imid_zf_interface",
+      "type": "paper",
+      "version": "not recorded",
+      "retrieved": "2026-10-03T17:47:30+00:00",
+      "used_for": "structural basis of the IMiD-induced CRBN-zinc-finger interface",
+      "licence": "publisher terms",
+      "doi": "10.1038/nature13527",
+      "home": "https://doi.org/10.1038/nature13527",
+      "repo": "",
+      "verified": true,
+      "verification": "Crossref verified",
+      "authors": "Fischer, Eric S. and B\u00f6hm, Kerstin and Lydeard, John R. and Yang, Haidi and Stadler, Michael B. and Cavadini, Simone and Nagel, Jane and Serluca, Fabrizio and Acker, Vincent and Lingaraju, Gondichatnahalli M. and Tichkule, Ritesh B. and Schebesta, Michael",
+      "year": "2014",
+      "container": "Nature"
+    },
+    {
+      "name": "Structure of the FKBP12-Rapamycin Complex Interacting with Binding Domain of Human FRAP",
+      "key": "fkbp_rapamycin_frb",
+      "type": "paper",
+      "version": "not recorded",
+      "retrieved": "2026-10-03T17:47:30+00:00",
+      "used_for": "the FKBP12-rapamycin-FRB ternary complex",
+      "licence": "publisher terms",
+      "doi": "10.1126/science.273.5272.239",
+      "home": "https://doi.org/10.1126/science.273.5272.239",
+      "repo": "",
+      "verified": true,
+      "verification": "Crossref verified",
+      "authors": "Choi, Jungwon and Chen, Jie and Schreiber, Stuart L. and Clardy, Jon",
+      "year": "1996",
+      "container": "Science"
+    },
+    {
+      "name": "Systematic and Quantitative Assessment of the Ubiquitin-Modified Proteome",
+      "key": "digly_proteomics",
+      "type": "paper",
+      "version": "not recorded",
+      "retrieved": "2026-10-03T17:47:30+00:00",
+      "used_for": "proteome-wide diGly ubiquitylation site mapping",
+      "licence": "publisher terms",
+      "doi": "10.1016/j.molcel.2011.08.025",
+      "home": "https://doi.org/10.1016/j.molcel.2011.08.025",
+      "repo": "",
+      "verified": true,
+      "verification": "Crossref verified",
+      "authors": "Kim, Woong and Bennett, Eric\u00a0J. and Huttlin, Edward\u00a0L. and Guo, Ailan and Li, Jing and Possemato, Anthony and Sowa, Mathew\u00a0E. and Rad, Ramin and Rush, John and Comb, Michael\u00a0J. and Harper, J.\u00a0Wade and Gygi, Steven\u00a0P.",
+      "year": "2011",
+      "container": "Molecular Cell"
+    },
+    {
+      "name": "The CDK inhibitor CR8 acts as a molecular glue degrader that depletes cyclin K",
+      "key": "cr8_cyclink",
+      "type": "paper",
+      "version": "not recorded",
+      "retrieved": "2026-10-03T17:47:30+00:00",
+      "used_for": "the CDK-inhibitor-induced DDB1-cyclin K complex",
+      "licence": "publisher terms",
+      "doi": "10.1038/s41586-020-2374-x",
+      "home": "https://doi.org/10.1038/s41586-020-2374-x",
+      "repo": "",
+      "verified": true,
+      "verification": "Crossref verified",
+      "authors": "S\u0142abicki, Miko\u0142aj and Kozicka, Zuzanna and Petzold, Georg and Li, Yen-Der and Manojkumar, Manisha and Bunker, Richard D. and Donovan, Katherine A. and Sievers, Quinlan L. and Koeppel, Jonas and Suchyta, Dakota and Sperling, Adam S. and Fink, Emma C.",
+      "year": "2020",
+      "container": "Nature"
+    },
+    {
+      "name": "The Eukaryotic Proteome Is Shaped by E3\u00a0Ubiquitin Ligases Targeting C-Terminal Degrons",
+      "key": "glycine_degron",
+      "type": "paper",
+      "version": "not recorded",
+      "retrieved": "2026-10-03T17:47:30+00:00",
+      "used_for": "the C-terminal glycine degron rule for CRBN substrates",
+      "licence": "publisher terms",
+      "doi": "10.1016/j.cell.2018.04.028",
+      "home": "https://doi.org/10.1016/j.cell.2018.04.028",
+      "repo": "",
+      "verified": true,
+      "verification": "Crossref verified",
+      "authors": "Koren, Itay and Timms, Richard T. and Kula, Tomasz and Xu, Qikai and Li, Mamie Z. and Elledge, Stephen J.",
+      "year": "2018",
+      "container": "Cell"
+    },
+    {
+      "name": "Biotite: a unifying open source computational biology framework in Python",
+      "key": "biotite",
+      "type": "software",
+      "version": "not recorded",
+      "retrieved": "2026-10-03T17:47:30+00:00",
+      "used_for": "structure handling and superposition",
+      "licence": "BSD-3-Clause",
+      "doi": "10.1186/s12859-018-2367-z",
+      "home": "https://doi.org/10.1186/s12859-018-2367-z",
+      "repo": "",
+      "verified": true,
+      "verification": "Crossref verified",
+      "authors": "Kunzmann, Patrick and Hamacher, Kay",
+      "year": "2018",
+      "container": "BMC Bioinformatics"
+    },
+    {
+      "name": "D3",
+      "key": "d3",
+      "type": "software",
+      "version": "7.9.0",
+      "retrieved": "2026-10-03T16:43:51+00:00",
+      "used_for": "lens graph, ternary triangle",
+      "licence": "ISC",
+      "doi": "",
+      "home": "https://d3js.org/",
+      "repo": "https://github.com/d3/d3",
+      "verified": false,
+      "verification": "vendored asset, pinned by SHA-256",
+      "authors": "",
+      "year": "",
+      "container": ""
+    },
+    {
+      "name": "Dictionary of protein secondary structure: Pattern recognition of hydrogen\u2010bonded and geometrical features",
+      "key": "dssp",
+      "type": "software",
+      "version": "not recorded",
+      "retrieved": "2026-10-03T17:47:30+00:00",
+      "used_for": "secondary structure for hairpin detection",
+      "licence": "BSD-2-Clause",
+      "doi": "10.1002/bip.360221211",
+      "home": "https://doi.org/10.1002/bip.360221211",
+      "repo": "",
+      "verified": true,
+      "verification": "Crossref verified",
+      "authors": "Kabsch, Wolfgang and Sander, Christian",
+      "year": "1983",
+      "container": "Biopolymers"
+    },
+    {
+      "name": "DuckDB-wasm",
+      "key": "duckdb",
+      "type": "software",
+      "version": "not recorded",
+      "retrieved": "2026-10-03T17:47:30+00:00",
+      "used_for": "analytical store during the pipeline",
+      "licence": "MIT",
+      "doi": "10.14778/3554821.3554847",
+      "home": "https://doi.org/10.14778/3554821.3554847",
+      "repo": "",
+      "verified": true,
+      "verification": "Crossref verified",
+      "authors": "Kohn, Andr\u00e9 and Moritz, Dominik and Raasveldt, Mark and M\u00fchleisen, Hannes and Neumann, Thomas",
+      "year": "2022",
+      "container": "Proceedings of the VLDB Endowment"
+    },
+    {
+      "name": "D\u00b3 Data-Driven Documents",
+      "key": "d3",
+      "type": "software",
+      "version": "7.9.0",
+      "retrieved": "2026-10-03T17:47:30+00:00",
+      "used_for": "the lens graph and the ternary triangle",
+      "licence": "ISC",
+      "doi": "10.1109/tvcg.2011.185",
+      "home": "https://doi.org/10.1109/tvcg.2011.185",
+      "repo": "https://github.com/d3/d3",
+      "verified": true,
+      "verification": "Crossref verified",
+      "authors": "Bostock, M. and Ogievetsky, V. and Heer, J.",
+      "year": "2011",
+      "container": "IEEE Transactions on Visualization and Computer Graphics"
+    },
+    {
+      "name": "Flask: a lightweight WSGI web application framework",
+      "key": "flask",
+      "type": "software",
+      "version": "not recorded",
+      "retrieved": "2026-10-03T17:47:30+00:00",
+      "used_for": "the serving layer",
+      "licence": "BSD-3-Clause",
+      "doi": "",
+      "home": "https://flask.palletsprojects.com/",
+      "repo": "",
+      "verified": false,
+      "verification": "software with no citeable paper: canonical URL recorded instead",
+      "authors": "Ronacher, A. and the Pallets team",
+      "year": "",
+      "container": ""
+    },
+    {
+      "name": "Fpocket: An open source platform for ligand pocket detection",
+      "key": "fpocket",
+      "type": "software",
+      "version": "not recorded",
+      "retrieved": "2026-10-03T17:47:30+00:00",
+      "used_for": "pocket detection and druggability scoring on ligase structures",
+      "licence": "MIT",
+      "doi": "10.1186/1471-2105-10-168",
+      "home": "https://doi.org/10.1186/1471-2105-10-168",
+      "repo": "",
+      "verified": true,
+      "verification": "Crossref verified",
+      "authors": "Le Guilloux, Vincent and Schmidtke, Peter and Tuffery, Pierre",
+      "year": "2009",
+      "container": "BMC Bioinformatics"
+    },
+    {
+      "name": "FreeSASA: An open source C library for solvent accessible surface area calculations",
+      "key": "freesasa",
+      "type": "software",
+      "version": "not recorded",
+      "retrieved": "2026-10-03T17:47:30+00:00",
+      "used_for": "solvent accessible surface area and \u0394SASA",
+      "licence": "MIT",
+      "doi": "10.12688/f1000research.7931.1",
+      "home": "https://doi.org/10.12688/f1000research.7931.1",
+      "repo": "",
+      "verified": true,
+      "verification": "Crossref verified",
+      "authors": "Mitternacht, Simon",
+      "year": "2016",
+      "container": "F1000Research"
+    },
+    {
+      "name": "GEMMI: A library for structural biology",
+      "key": "gemmi",
+      "type": "software",
+      "version": "not recorded",
+      "retrieved": "2026-10-03T17:47:30+00:00",
+      "used_for": "mmCIF parsing, assemblies and neighbour search",
+      "licence": "MPL-2.0",
+      "doi": "10.21105/joss.04200",
+      "home": "https://doi.org/10.21105/joss.04200",
+      "repo": "https://github.com/project-gemmi/gemmi",
+      "verified": true,
+      "verification": "Crossref verified",
+      "authors": "Wojdyr, Marcin",
+      "year": "2022",
+      "container": "Journal of Open Source Software"
+    },
+    {
+      "name": "MLX: efficient and flexible machine learning on Apple silicon",
+      "key": "mlx",
+      "type": "software",
+      "version": "not recorded",
+      "retrieved": "2026-10-03T17:47:30+00:00",
+      "used_for": "BINMAN-LM fine-tuning and serving",
+      "licence": "MIT",
+      "doi": "",
+      "home": "https://github.com/ml-explore/mlx",
+      "repo": "https://github.com/ml-explore/mlx",
+      "verified": false,
+      "verification": "software with no citeable paper: canonical URL recorded instead",
+      "authors": "Hannun, A. and Digani, J. and Katharopoulos, A. and Collobert, R.",
+      "year": "2023",
+      "container": ""
+    },
+    {
+      "name": "Mol*",
+      "key": "mol*",
+      "type": "software",
+      "version": "5.12.0",
+      "retrieved": "2026-10-03T16:43:51+00:00",
+      "used_for": "every structure viewer",
+      "licence": "MIT",
+      "doi": "",
+      "home": "https://molstar.org/",
+      "repo": "https://github.com/molstar/molstar",
+      "verified": false,
+      "verification": "vendored asset, pinned by SHA-256",
+      "authors": "",
+      "year": "",
+      "container": ""
+    },
+    {
+      "name": "Mol* Viewer: modern web app for 3D visualization and analysis of large biomolecular structures",
+      "key": "molstar",
+      "type": "software",
+      "version": "5.12.0",
+      "retrieved": "2026-10-03T17:47:30+00:00",
+      "used_for": "every structure viewer in the app",
+      "licence": "MIT",
+      "doi": "10.1093/nar/gkab314",
+      "home": "https://doi.org/10.1093/nar/gkab314",
+      "repo": "https://github.com/molstar/molstar",
+      "verified": true,
+      "verification": "Crossref verified",
+      "authors": "Sehnal, David and Bittrich, Sebastian and Deshpande, Mandar and Svobodov\u00e1, Radka and Berka, Karel and Bazgier, V\u00e1clav and Velankar, Sameer and Burley, Stephen K and Ko\u010da, Jaroslav and Rose, Alexander S",
+      "year": "2021",
+      "container": "Nucleic Acids Research"
+    },
+    {
+      "name": "Open Babel: An open chemical toolbox",
+      "key": "openbabel",
+      "type": "software",
+      "version": "not recorded",
+      "retrieved": "2026-10-03T17:47:30+00:00",
+      "used_for": "CIF to PDB conversion in the PLIP path",
+      "licence": "GPL-2.0",
+      "doi": "10.1186/1758-2946-3-33",
+      "home": "https://doi.org/10.1186/1758-2946-3-33",
+      "repo": "",
+      "verified": true,
+      "verification": "Crossref verified",
+      "authors": "O'Boyle, Noel M and Banck, Michael and James, Craig A and Morley, Chris and Vandermeersch, Tim and Hutchison, Geoffrey R",
+      "year": "2011",
+      "container": "Journal of Cheminformatics"
+    },
+    {
+      "name": "P2Rank: machine learning based tool for rapid and accurate prediction of ligand binding sites from protein structure",
+      "key": "p2rank",
+      "type": "software",
+      "version": "not recorded",
+      "retrieved": "2026-10-03T17:47:30+00:00",
+      "used_for": "documented fallback for pocket detection",
+      "licence": "MIT",
+      "doi": "10.1186/s13321-018-0285-8",
+      "home": "https://doi.org/10.1186/s13321-018-0285-8",
+      "repo": "",
+      "verified": true,
+      "verification": "Crossref verified",
+      "authors": "Kriv\u00e1k, Radoslav and Hoksza, David",
+      "year": "2018",
+      "container": "Journal of Cheminformatics"
+    },
+    {
+      "name": "PLIP 2021: expanding the scope of the protein\u2013ligand interaction profiler to DNA and RNA",
+      "key": "plip",
+      "type": "software",
+      "version": "not recorded",
+      "retrieved": "2026-10-03T17:47:30+00:00",
+      "used_for": "interaction typing at each half-interface",
+      "licence": "GPL-2.0",
+      "doi": "10.1093/nar/gkab294",
+      "home": "https://doi.org/10.1093/nar/gkab294",
+      "repo": "",
+      "verified": true,
+      "verification": "Crossref verified",
+      "authors": "Adasme, Melissa F and Linnemann, Katja L and Bolz, Sarah Naomi and Kaiser, Florian and Salentin, Sebastian and Haupt, V\u00a0Joachim and Schroeder, Michael",
+      "year": "2021",
+      "container": "Nucleic Acids Research"
+    },
+    {
+      "name": "Plotly.js",
+      "key": "plotly.js",
+      "type": "software",
+      "version": "2.35.2",
+      "retrieved": "2026-10-03T16:43:51+00:00",
+      "used_for": "distributions, scatter, confusion matrix heatmap",
+      "licence": "MIT",
+      "doi": "",
+      "home": "https://plotly.com/javascript/",
+      "repo": "https://github.com/plotly/plotly.js",
+      "verified": false,
+      "verification": "vendored asset, pinned by SHA-256",
+      "authors": "",
+      "year": "",
+      "container": ""
+    },
+    {
+      "name": "Plotly.js: open source JavaScript charting library",
+      "key": "plotly",
+      "type": "software",
+      "version": "2.35.2",
+      "retrieved": "2026-10-03T17:47:30+00:00",
+      "used_for": "distributions, scatter and the confusion matrix",
+      "licence": "MIT",
+      "doi": "",
+      "home": "https://plotly.com/javascript/",
+      "repo": "https://github.com/plotly/plotly.js",
+      "verified": false,
+      "verification": "software with no citeable paper: canonical URL recorded instead",
+      "authors": "Plotly Technologies Inc.",
+      "year": "",
+      "container": ""
+    },
+    {
+      "name": "RDKit: Open-source cheminformatics",
+      "key": "rdkit",
+      "type": "software",
+      "version": "not recorded",
+      "retrieved": "2026-10-03T17:47:30+00:00",
+      "used_for": "ligand properties, SMILES and the structural classification rules",
+      "licence": "BSD-3-Clause",
+      "doi": "",
+      "home": "https://www.rdkit.org/",
+      "repo": "https://github.com/rdkit/rdkit",
+      "verified": false,
+      "verification": "software with no citeable paper: canonical URL recorded instead",
+      "authors": "Landrum, G. and the RDKit contributors",
+      "year": "",
+      "container": ""
+    },
+    {
+      "name": "Tabulator",
+      "key": "tabulator",
+      "type": "software",
+      "version": "6.3.1",
+      "retrieved": "2026-10-03T16:43:52+00:00",
+      "used_for": "the ledger table, the reference table",
+      "licence": "MIT",
+      "doi": "",
+      "home": "https://tabulator.info/",
+      "repo": "https://github.com/olifolkerd/tabulator",
+      "verified": false,
+      "verification": "vendored asset, pinned by SHA-256",
+      "authors": "",
+      "year": "",
+      "container": ""
+    },
+    {
+      "name": "Tabulator: interactive tables and data grids",
+      "key": "tabulator",
+      "type": "software",
+      "version": "6.3.1",
+      "retrieved": "2026-10-03T17:47:30+00:00",
+      "used_for": "the ledger table and the reference table",
+      "licence": "MIT",
+      "doi": "",
+      "home": "https://tabulator.info/",
+      "repo": "https://github.com/olifolkerd/tabulator",
+      "verified": false,
+      "verification": "software with no citeable paper: canonical URL recorded instead",
+      "authors": "Folkerd, O.",
+      "year": "",
+      "container": ""
+    }
+  ],
+  "reference_summary": {
+    "total": 51,
+    "verified": 38,
+    "unverified": 13,
+    "licence_not_determined": 2
+  },
+  "model_card": {
+    "trained": false,
+    "status_note": "Phase 3 has not run, so there is no model to describe. The app is fully functional without it: the natural-language box is the only feature that depends on the model, and it is hidden when BINMAN_LM_URL is unset.",
+    "identity": {},
+    "training": {},
+    "tasks": [],
+    "results": {},
+    "baseline": {},
+    "hardware": {
+      "chip": "Apple M2 Ultra",
+      "gpu_cores": 60,
+      "performance_cores": 16,
+      "memory_gb": 128.0,
+      "mlx_version": "0.32.3"
+    },
+    "limits": [
+      "The model never computes, estimates or reports a numeric value. Every number in BINMAN is computed deterministically in Python and passed to the interface.",
+      "The vocabulary is closed: the model can only name fields, operators, ligases and classes that exist in the built atlas.",
+      "The underlying databases have a training cutoff. A glue deposited after the pinned release of each curated database is not in them.",
+      "Register mismatch: the synthetic test set shares a generator with the training set, so the externally authored query set is the number that matters and the gap between them is reported."
+    ],
+    "availability": {
+      "endpoint_live": false,
+      "note": "The app is fully functional without the model."
+    }
+  },
+  "worked_example": {
+    "available": true,
+    "bridge_id": 47,
+    "pdb_id": "1A6V",
+    "ccd_id": "NPC",
+    "ligand_name": "4-HYDROXY-3-NITROPHENYLACETYL-EPSILON-AMINOCAPROIC ACID ANION",
+    "title": "B1-8 FV fragment complexed with a (4-hydroxy-3-nitrophenyl) acetate compound",
+    "method": "X-RAY DIFFRACTION",
+    "resolution": 1.8,
+    "chain_a": "L/A",
+    "chain_b": "H/B",
+    "dsasa_a": 288.44,
+    "dsasa_b": 421.79,
+    "dsasa_total": 710.23,
+    "bridging_balance": 0.6838,
+    "buried_fraction": 0.6526,
+    "contacts_a": 26,
+    "contacts_b": 32,
+    "heavy_atoms": 22,
+    "interface_residues_a": [
+      "TRP 93",
+      "TRP 98",
+      "TYR 34"
+    ],
+    "interface_residues_b": [
+      "TRP 333",
+      "ARG 350",
+      "HIS 335",
+      "TYR 399",
+      "LYS 359",
+      "TYR 401",
+      "SER 405"
+    ],
+    "accessions": [
+      "P01724",
+      "P01751"
+    ],
+    "criteria": [
+      {
+        "key": "two_database_agreement",
+        "label": "present in at least two of the three curated glue databases",
+        "met": false,
+        "relaxed": true
+      },
+      {
+        "key": "passes_bridging_filter",
+        "label": "passes the bridging filter",
+        "met": true,
+        "relaxed": false
+      },
+      {
+        "key": "balance_above_threshold",
+        "label": "bridging balance above the strong threshold",
+        "met": true,
+        "relaxed": true
+      },
+      {
+        "key": "substrate_has_degron",
+        "label": "its substrate carries a degron found by the Phase 2 scan",
+        "met": false,
+        "relaxed": true
+      },
+      {
+        "key": "ligase_has_pocket_score",
+        "label": "its ligase has a pocket score",
+        "met": false,
+        "relaxed": true
+      },
+      {
+        "key": "target_has_favourable_lysine",
+        "label": "its target has a mapped lysine with a favourable verdict",
+        "met": false,
+        "relaxed": true
+      },
+      {
+        "key": "highest_resolution",
+        "label": "the highest-resolution structure among the candidates",
+        "met": true,
+        "relaxed": true
+      }
+    ],
+    "relaxed": [
+      {
+        "key": "highest_resolution",
+        "label": "the highest-resolution structure among the candidates"
+      },
+      {
+        "key": "two_database_agreement",
+        "label": "present in at least two of the three curated glue databases"
+      },
+      {
+        "key": "balance_above_threshold",
+        "label": "bridging balance above the strong threshold"
+      },
+      {
+        "key": "target_has_favourable_lysine",
+        "label": "its target has a mapped lysine with a favourable verdict"
+      },
+      {
+        "key": "substrate_has_degron",
+        "label": "its substrate carries a degron found by the Phase 2 scan"
+      },
+      {
+        "key": "ligase_has_pocket_score",
+        "label": "its ligase has a pocket score"
+      }
+    ],
+    "candidate_pool": 58,
+    "honest_note": "This record was chosen because every stage that has run worked on it. A reader should look at the misses list and the novel-bridge set in FINDINGS.md for the cases where stages did not."
+  },
+  "validation": {},
+  "thresholds": {
+    "bridging": {
+      "min_dsasa_per_chain_a2": 25.0,
+      "min_heavy_atom_contacts": 3,
+      "contact_cutoff_a": 4.0,
+      "min_ligand_heavy_atoms": 10,
+      "sasa_probe_radius_a": 1.4,
+      "sasa_algorithm": "LeeRichards",
+      "default_assembly_id": "1",
+      "glue_balance_floor": 0.3,
+      "glue_balance_strong": 0.5
+    },
+    "degron": {
+      "min_strand_length": 3,
+      "max_turn_length": 5,
+      "tip_glycine_offsets": [
+        -1,
+        0,
+        1
+      ],
+      "min_mean_plddt": 70.0,
+      "min_tip_rel_sasa": 0.4,
+      "weight_plddt": 0.35,
+      "weight_exposure": 0.4,
+      "weight_regularity": 0.25
+    },
+    "e3_triage": {
+      "weight_pocket_score": 0.3,
+      "weight_pocket_volume": 0.1,
+      "weight_structural_coverage": 0.15,
+      "weight_expression_selectivity": 0.2,
+      "weight_substrate_count": 0.15,
+      "weight_family_novelty": 0.1,
+      "validation_held_out_fields": [
+        "exploitation_status",
+        "has_ligand"
+      ],
+      "pocket_volume_reference_a3": 1000.0,
+      "expression_breadth_tissue_tpm": 1.0
+    },
+    "degradability": {
+      "reach_window": {
+        "fitted": false,
+        "fit_status": "not yet fitted",
+        "min_nz_rel_sasa": 0.35,
+        "favourable_cb_cb_min_a": 5.0,
+        "favourable_cb_cb_max_a": 18.0,
+        "marginal_cb_cb_max_a": 24.0,
+        "dataset_version": "not recorded",
+        "fit_date": "not recorded",
+        "held_out_auc": 0.0,
+        "held_out_auc_floor": 0.65
+      }
+    },
+    "validation": {
+      "glue_recall_floor": 0.85,
+      "glue_artefact_precision_floor": 0.95,
+      "glue_packing_specificity_floor": 0.9,
+      "degron_sensitivity_floor": 0.7,
+      "degron_specificity_floor": 0.6,
+      "e3_enrichment_p_max": 0.01,
+      "e3_substrate_spearman_floor": 0.5,
+      "e3_pocket_coverage_floor": 0.8,
+      "degradability_auc_floor": 0.65,
+      "lm_parse_rate_floor": 0.99,
+      "lm_set_equality_synthetic_floor": 0.9,
+      "lm_set_equality_external_floor": 0.8,
+      "lm_triage_macro_f1_floor": 0.85,
+      "lm_corruption_mode_floor": 0.8,
+      "lm_fabrication_rate_max": 0.0,
+      "lm_baseline_skip_finetune_at": 0.85
+    },
+    "atlas": {
+      "max_bundle_gb": 2.5,
+      "max_entity_json_kb": 150,
+      "structure_trim_radius_a": 8.0,
+      "lens_graph_max_nodes": 400,
+      "lens_graph_default_depth": 2
+    }
+  },
+  "tuning": {
+    "compute": {
+      "cpu_workers": 14,
+      "io_workers": 16,
+      "freesasa_workers": 14,
+      "dssp_workers": 14,
+      "memory_headroom_gb": 24,
+      "usable_memory_gb": 104.0,
+      "max_compute_hours": 96
+    },
+    "model": {
+      "model_device": "mps",
+      "model_instances": 1,
+      "mlx_batch_size": 4,
+      "mlx_available": true,
+      "gate_g1_candidate": false
+    },
+    "io": {
+      "rcsb_rate_limit_per_sec": 8,
+      "afdb_rate_limit_per_sec": 8,
+      "generic_rate_limit_per_sec": 4,
+      "retry_attempts": 5,
+      "retry_backoff_seconds": 2,
+      "http_timeout_seconds": 60
+    },
+    "disk": {
+      "gate_g5_free_gb_floor": 50,
+      "free_gb_at_probe": 1513.7
+    },
+    "env": {
+      "PYTORCH_ENABLE_MPS_FALLBACK": "1",
+      "TOKENIZERS_PARALLELISM": "false",
+      "OMP_NUM_THREADS": "14"
+    }
+  },
+  "hardware": {
+    "host": {
+      "chip": "Apple M2 Ultra",
+      "gpu_chipset": "Apple M2 Ultra",
+      "gpu_cores": 60,
+      "machine": "arm64",
+      "os": "Darwin 27.0.0",
+      "python": "3.11.16",
+      "python_executable": "/Users/dellboy/Documents/Vibe_Coding/BINMAN/.pixi/envs/default/bin/python",
+      "hostname": "Marcs-Mac-Studio.local"
+    },
+    "cpu": {
+      "performance_cores": 16,
+      "efficiency_cores": 8,
+      "physical_cores": 24,
+      "logical_cores": 24
+    },
+    "memory": {
+      "total_bytes": 137438953472,
+      "total_gb": 128.0
+    },
+    "disk": {
+      "path": "/Users/dellboy/Documents/Vibe_Coding/BINMAN",
+      "total_gb": 3721.9,
+      "used_gb": 2208.2,
+      "free_gb": 1513.7
+    },
+    "mps": {
+      "installed": true,
+      "version": "2.14.1",
+      "available": true,
+      "built": true
+    },
+    "mlx": {
+      "installed": true,
+      "version": "0.32.3",
+      "default_device": "Device(gpu, 0)",
+      "smoke_test": true
+    },
+    "tools": {
+      "gemmi": "0.7.5",
+      "freesasa": "2.2.1",
+      "biotite": "1.6.0",
+      "rdkit": "2026.03.6",
+      "mkdssp": "mkdssp version 4.6.1",
+      "fpocket": "***** POCKET HUNTING BEGINS *****",
+      "obabel": "Open Babel 3.2.1 -- Jul 11 2026 -- 19:54:53",
+      "java": "present"
+    }
+  },
+  "gates": [
+    {
+      "gate": "G6",
+      "excerpt": "Spec 9.1 artefact precision measures 0.927 on a held-out half of BioLiP2's artefact ligand list, against a 0.95 floor. Decision needed: proceed with the caveat below, or change the metric definition.\n\nThe diagnosis is that the metric as specified assumes BioLiP's `ligand_list` is pure crystallisation furniture. It is not. BioLiP's own curation code treats it as a list of *candidate* artefacts and then checks each one against the entry's PubMed abstract before excluding it, so the list retains genuine ligands. Of the 22 components BINMAN still calls `glue_candidate`, the majority are real pharmacology: nevirapine (an approved NNRTI), IBMX, kainic acid, 10-propargyl-5,8-dideazafolic acid (an antifolate) and a chlorinated indole sulfonamide inhibitor. Classing those as drug-like is the correct answer, not an error, and driving the number to 0.95 would mean deliberately misclassifying approv"
+    }
+  ],
+  "unrecorded": [
+    "licence for reference 'degronopedia'",
+    "licence for reference 'ubibrowser2'"
+  ],
+  "citation": {
+    "project": "Deller, M. C. BINMAN: Blind-spot INventory of Molecular Adhesives and Neosubstrates.",
+    "repository": "https://github.com/bellcheddar/binman",
+    "instruction": "Cite BINMAN for the atlas itself, and cite every underlying resource separately: the atlas is a derivative of the databases listed in the reference table, and they deserve their own citation."
+  }
+}

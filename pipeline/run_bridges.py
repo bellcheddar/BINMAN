@@ -229,7 +229,7 @@ def run(max_tier: int = 3, limit: int | None = None, retry_failed: bool = False)
                     if row is None:
                         exhausted = True
                         break
-                    downloads[io_pool.submit(_download, dict(row))] = row["pdb_id"]
+                    downloads[io_pool.submit(_download, dict(row), fetcher)] = row["pdb_id"]
                 return not exhausted
 
             top_up()

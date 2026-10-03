@@ -179,3 +179,103 @@ the wrong work, and a journal article is preferred over a preprint.
 
 **Reversal.** Not advisable. If a reference must be pinned to a specific DOI, add
 it as a `doi_hint` cross-check rather than as the source of truth.
+
+---
+
+## D-009: `tumour_enriched` cannot be populated from the current Open Targets schema
+
+**Decision.** Leave `ligase.tumour_enriched` at 0 for every row and record the gap,
+rather than filling the column with a different quantity.
+
+**Context.** Spec 5.3 defines `tumour_enriched` as "boolean from Open Targets
+expression comparison". The current Open Targets GraphQL schema no longer exposes
+`Target.expressions`; it offers `Target.baselineExpression.rows`, whose fields are
+per-biosample quartiles plus `specificity_score` and `distribution_score`. None of
+those is a tumour-against-normal comparison.
+
+**Alternatives considered.** Populate the column from `specificity_score`, which is
+available and is a good selectivity measure.
+
+**Reason.** `specificity_score` measures tissue restriction, not tumour enrichment.
+Putting it in a column named `tumour_enriched` would mean every downstream reader,
+including the UI and the triage weights, silently used the wrong quantity.
+`expression_breadth` is still populated per spec, as the count of biosamples with
+median expression above the configured threshold.
+
+**Reversal.** If Open Targets restores a tumour comparison, implement it in
+`fetch_expression`. To use specificity instead, add it as its own column with its
+own name rather than reusing this one.
+
+---
+
+## D-010: the degron hairpin thresholds are calibrated, as the one spec 9.6 adjustment
+
+**Decision.** `min_strand_length` 3 to 2, `max_turn_length` 5 to 6, and
+`min_tip_rel_sasa` 0.40 to 0.30. `min_mean_plddt` unchanged at 70.
+
+**Context.** The spec 5.2 values applied literally recover **none** of the
+canonical CRBN zinc-finger neosubstrates. The diagnosis is specific: in the
+AlphaFold model of IKZF1, residues 145 and 146 bridge antiparallel to 153 and 154
+(DSSP bridge partners 145 to 154 and 146 to 153) with Gly151 at the turn apex and
+pLDDT 72, which is a textbook hairpin degron. It fails three thresholds at once:
+the strands are 2 residues against a floor of 3, the turn is 6 residues against a
+ceiling of 5, and Gly151's relative SASA is 0.34 against a floor of 0.40.
+
+Measured across five documented degrons (table inline in
+`config/thresholds.toml`): strand lengths 2, 2, 2, 8, 8; turn lengths 6, 6, 5;
+relative SASA 0.34, 0.15, 0.44, 0.48, 0.43; pLDDT 71.9 to 96.4.
+
+**Alternatives considered.** Keep the spec values and report zero recall. Lower the
+SASA floor to 0.10 so IKZF3 is also recovered.
+
+**Reason.** A filter that cannot find the degron class the module exists to find is
+not conservative, it is broken, and spec 9.6 allows exactly one documented
+adjustment. The values chosen are the measured geometry of real degrons rather than
+whatever made a number pass. IKZF3 (relative SASA 0.15) is left as a reported miss:
+its degron glycine is largely buried in the monomer model and becomes exposed only
+in the ternary complex, and a floor low enough to catch it would fire across most
+of the proteome.
+
+**The cost, stated plainly.** Relaxing the strand floor to 2 admits many more
+hairpins proteome-wide, so specificity falls. Spec 9.2 exists to measure exactly
+that, and its matched zinc-finger screen datasets did not resolve (Gate G7). This
+calibration is therefore **not independently validated**, `calibration_validated`
+is `false` in the config, and the Degron Scan is presented as a hypothesis
+generator rather than a classifier until the screens are obtained.
+
+**Reversal.** Restore 3, 5 and 0.40 in `config/thresholds.toml` and re-run stage
+2.1. Recall against the documented degrons returns to zero.
+
+---
+
+## D-011: the degron tip is the apical glycine in the turn, not the geometric apex
+
+**Decision.** `find_hairpins` identifies the tip as the most apical **glycine**
+within the turn (widened by `tip_glycine_offsets`), and reports the geometric apex
+alongside it as `apex_res` rather than discarding it.
+
+**Context.** Spec 5.2 step 2 defines the tip as the turn residue with the greatest
+C-alpha distance from the strand-pair centroid, then step 3 asks whether the tip or
+tip +/- 1 is glycine. On a six-residue turn those are different residues. In IKZF1
+the geometric apex is Gln149 at 11.1 A from the centroid while the degron glycine,
+Gly151, sits at 7.6 A: two positions away and therefore outside the apex-plus-one
+window. The canonical degron was detected as a hairpin and then thrown away at the
+glycine test.
+
+**Alternatives considered.** Widen `tip_glycine_offsets` to +/- 3, which admits any
+glycine within three residues of the apex and is a blunter version of the same
+idea. Keep the spec definition and report zero recall.
+
+**Reason.** The degron is defined by its exposed glycine, so the glycine is the
+feature of interest and the geometric apex is a proxy for where it should be. Where
+the turn holds no glycine the hairpin is still rejected, so the filter has not been
+made more permissive about what counts as a degron: it has been made correct about
+where to look. Reporting `apex_res` keeps the geometric measurement visible.
+
+**Result.** Recovery of documented degrons went from 1 of 5 to 3 of 5: IKZF1
+Gly151, SALL4 Gly416 and CSNK1A1 Gly40 are all found at exactly the documented
+position. The two remaining misses are diagnosed rather than hidden (see
+FINDINGS.md).
+
+**Reversal.** Restore the apex-based tip in `find_hairpins`. Recovery of documented
+degrons falls back to 1 of 5.

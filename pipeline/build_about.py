@@ -1,0 +1,736 @@
+"""Generate the About tab (spec 6.6).
+
+**Governing rule: the About tab is generated, never authored.** Every number,
+version, citation and count is read at build time from artefacts the pipeline
+already produces, and written to `app/static/about.json`. A hand-written About
+page is wrong within one build and nobody notices. Where a value cannot be read
+from an artefact, the page shows "not recorded" and the build logs it.
+
+Sources read:
+    data/validation/MANIFEST.md     dataset versions, licences, row counts
+    data/validation/references.json Crossref-verified references
+    data/validation/results.json    Section 9 metrics (when validate.py has run)
+    config/thresholds.toml          every scientific cutoff
+    config/tuning.toml              the derived build settings
+    config/hardware.toml            what it ran on
+    data/manifests/*.jsonl          per-stage counts and failures
+    app/static/vendor/VENDOR.json   pinned front-end assets
+    data/atlas/binman.sqlite        the shipped row counts
+
+Writes:
+    app/static/about.json           everything the template renders
+    app/static/workflow.svg         the schematic, drawn from the manifests
+"""
+
+from __future__ import annotations
+
+import argparse
+import json
+import re
+import sqlite3
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
+from pipeline.common import (  # noqa: E402
+    ATLAS, CONFIG_DIR, MANIFESTS, ROOT, VALIDATION, Manifest, load_config,
+    log_event, read_jsonl, utcnow,
+)
+
+ABOUT_JSON = ROOT / "app" / "static" / "about.json"
+WORKFLOW_SVG = ROOT / "app" / "static" / "workflow.svg"
+VENDOR_JSON = ROOT / "app" / "static" / "vendor" / "VENDOR.json"
+DB_PATH = ATLAS / "binman.sqlite"
+STAGE = "build_about"
+
+NOT_RECORDED = "not recorded"
+
+
+def _json(path: Path, default=None):
+    if not path.exists():
+        return default
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return default
+
+
+# --------------------------------------------------------------------------- #
+# stage counts
+# --------------------------------------------------------------------------- #
+
+def stage_counts() -> dict:
+    """Real counts and failure tallies per stage, read from the manifests."""
+    stages = {}
+    for path in sorted(MANIFESTS.glob("*.jsonl")):
+        name = path.stem
+        if name == "catalogue":
+            # The catalogue is the data, not a manifest of it.
+            rows = read_jsonl(path)
+            tiers: dict[str, int] = {}
+            for row in rows:
+                if row.get("pdb_id"):
+                    tiers[str(row.get("tier", "?"))] = tiers.get(str(row.get("tier", "?")), 0) + 1
+            stages["catalogue"] = {
+                "total": sum(tiers.values()), "ok": sum(tiers.values()),
+                "failed": 0, "tiers": tiers,
+            }
+            continue
+        manifest = Manifest(name)
+        counts = manifest.counts()
+        failures = manifest.failures()
+        reasons: dict[str, int] = {}
+        for row in failures:
+            reason = str(row.get("status", "failed:unknown")).split(":", 2)
+            label = reason[1] if len(reason) > 1 else "unknown"
+            reasons[label] = reasons.get(label, 0) + 1
+        stages[name] = {
+            "total": counts.get("total", 0),
+            "ok": counts.get("ok", 0),
+            "failed": counts.get("failed", 0),
+            "failure_reasons": dict(sorted(reasons.items(), key=lambda kv: -kv[1])[:8]),
+        }
+    return stages
+
+
+def atlas_counts() -> dict:
+    """Row counts from the shipped database, which is what the UI serves."""
+    if not DB_PATH.exists():
+        return {"available": False}
+    out: dict = {"available": True, "size_mb": round(DB_PATH.stat().st_size / (1024 ** 2), 1)}
+    connection = sqlite3.connect(f"file:{DB_PATH}?mode=ro", uri=True)
+    try:
+        for table in ("entry", "bridge", "ligand", "polymer_entity",
+                      "degron", "ligase", "lysine", "edge"):
+            try:
+                out[table] = int(connection.execute(
+                    f"SELECT COUNT(*) FROM {table}").fetchone()[0])
+                out[f"{table}_failed"] = int(connection.execute(
+                    f"SELECT COUNT(*) FROM {table} WHERE status != 'ok'").fetchone()[0])
+            except sqlite3.Error:
+                out[table] = 0
+        try:
+            out["ccd_class_counts"] = {
+                row[0]: row[1] for row in connection.execute(
+                    "SELECT ccd_class, COUNT(*) FROM ligand GROUP BY ccd_class "
+                    "ORDER BY COUNT(*) DESC")
+            }
+            out["novel_bridges"] = int(connection.execute(
+                "SELECT COUNT(*) FROM bridge WHERE novel_bridge = 1").fetchone()[0])
+        except sqlite3.Error:
+            pass
+    finally:
+        connection.close()
+    return out
+
+
+# --------------------------------------------------------------------------- #
+# datasets
+# --------------------------------------------------------------------------- #
+
+def dataset_rows() -> list[dict]:
+    """Parse the validation manifest's own stage records, not the markdown.
+
+    Reading the JSONL rather than re-parsing MANIFEST.md keeps a single source
+    of truth: the markdown and this page are both renderings of the same rows.
+    """
+    rows = []
+    for row in Manifest("validation_acquire").read():
+        rows.append({
+            "name": row.get("key", ""),
+            "resolved": row.get("status") == "ok",
+            "rows": row.get("rows", 0),
+            "licence": row.get("licence", NOT_RECORDED),
+            "redistributable": bool(row.get("redistributable")),
+            "version": row.get("version_note", NOT_RECORDED),
+            "retrieved": row.get("at", NOT_RECORDED),
+            "url": row.get("url", ""),
+            "homepage": row.get("homepage", ""),
+            "purpose": row.get("purpose", ""),
+            "citation": row.get("citation", NOT_RECORDED),
+            "manual_route": row.get("manual_route", ""),
+            "attempts": row.get("attempts", []),
+        })
+    # Keep the newest record per dataset: the stage is re-runnable.
+    newest: dict[str, dict] = {}
+    for row in rows:
+        newest[row["name"]] = row
+    return sorted(newest.values(), key=lambda r: (not r["resolved"], r["name"]))
+
+
+def reference_rows() -> list[dict]:
+    """The reference table (spec 6.6.3), joined from references.json."""
+    payload = _json(VALIDATION / "references.json", {}) or {}
+    datasets = {row["name"]: row for row in dataset_rows()}
+    out = []
+    for record in payload.get("references", []):
+        out.append({
+            "name": record.get("title") or NOT_RECORDED,
+            "key": record.get("key", ""),
+            "type": record.get("type", NOT_RECORDED),
+            "version": record.get("version") or _dataset_version(record.get("key", ""), datasets),
+            "retrieved": _dataset_retrieved(record.get("key", ""), datasets)
+                         or record.get("checked_at", NOT_RECORDED),
+            "used_for": record.get("used_for", NOT_RECORDED),
+            "licence": record.get("licence") or "not determined",
+            "doi": record.get("doi", ""),
+            "home": record.get("url", ""),
+            "repo": record.get("repo", ""),
+            "verified": bool(record.get("verified")),
+            "verification": record.get("verification", ""),
+            "authors": record.get("authors", ""),
+            "year": record.get("year", ""),
+            "container": record.get("container", ""),
+        })
+
+    # Pinned front-end assets are software the build touched, so they belong in
+    # the same table (spec 6.6.3 says every piece of software).
+    vendor = _json(VENDOR_JSON, {}) or {}
+    seen = {r["name"].lower() for r in out}
+    for asset in vendor.get("assets", []):
+        label = asset.get("name", "")
+        if not label or label.lower() in seen:
+            continue
+        seen.add(label.lower())
+        out.append({
+            "name": label, "key": label.lower().replace(" ", "_"),
+            "type": asset.get("type", "software"), "version": asset.get("version", NOT_RECORDED),
+            "retrieved": asset.get("retrieved_at", NOT_RECORDED),
+            "used_for": asset.get("used_for", NOT_RECORDED),
+            "licence": asset.get("licence", "not determined"),
+            "doi": "", "home": asset.get("home", ""), "repo": asset.get("repo", ""),
+            "verified": False, "verification": "vendored asset, pinned by SHA-256",
+            "authors": "", "year": "", "container": "",
+        })
+    return sorted(out, key=lambda r: (r["type"], r["name"].lower()))
+
+
+def _dataset_version(key: str, datasets: dict) -> str:
+    for name, row in datasets.items():
+        if key and (key in name or name.startswith(key[:8])):
+            return row.get("version", NOT_RECORDED)
+    return NOT_RECORDED
+
+
+def _dataset_retrieved(key: str, datasets: dict) -> str:
+    for name, row in datasets.items():
+        if key and (key in name or name.startswith(key[:8])):
+            return row.get("retrieved", "")
+    return ""
+
+
+# --------------------------------------------------------------------------- #
+# model card
+# --------------------------------------------------------------------------- #
+
+def model_card() -> dict:
+    """Spec 6.6.2. Nothing on this panel is typed by hand.
+
+    Returns `trained: False` with an explanation when Phase 3 has not run, which
+    is itself a generated statement rather than a placeholder.
+    """
+    results = _json(VALIDATION / "results.json", {}) or {}
+    lm = results.get("binman_lm") or {}
+    training = _json(ROOT / "models" / "binman-lm" / "training.json", {}) or {}
+    hardware = load_config().hardware
+
+    return {
+        "trained": bool(lm or training),
+        "status_note": (
+            "Phase 3 has not run, so there is no model to describe. "
+            "The app is fully functional without it: the natural-language box is "
+            "the only feature that depends on the model, and it is hidden when "
+            "BINMAN_LM_URL is unset."
+            if not (lm or training) else ""
+        ),
+        "identity": training.get("identity", {}),
+        "training": training.get("training", {}),
+        "tasks": training.get("tasks", []),
+        "results": lm,
+        "baseline": lm.get("baseline", {}),
+        "hardware": {
+            "chip": hardware.get("host", {}).get("chip", NOT_RECORDED),
+            "gpu_cores": hardware.get("host", {}).get("gpu_cores", NOT_RECORDED),
+            "performance_cores": hardware.get("cpu", {}).get("performance_cores", NOT_RECORDED),
+            "memory_gb": hardware.get("memory", {}).get("total_gb", NOT_RECORDED),
+            "mlx_version": hardware.get("mlx", {}).get("version", NOT_RECORDED),
+        },
+        "limits": [
+            "The model never computes, estimates or reports a numeric value. "
+            "Every number in BINMAN is computed deterministically in Python and "
+            "passed to the interface.",
+            "The vocabulary is closed: the model can only name fields, operators, "
+            "ligases and classes that exist in the built atlas.",
+            "The underlying databases have a training cutoff. A glue deposited "
+            "after the pinned release of each curated database is not in them.",
+            "Register mismatch: the synthetic test set shares a generator with the "
+            "training set, so the externally authored query set is the number that "
+            "matters and the gap between them is reported.",
+        ],
+        "availability": {
+            "endpoint_live": bool(__import__("os").environ.get("BINMAN_LM_URL")),
+            "note": "The app is fully functional without the model.",
+        },
+    }
+
+
+# --------------------------------------------------------------------------- #
+# worked example (spec 6.6.4)
+# --------------------------------------------------------------------------- #
+
+CRITERIA = [
+    ("two_database_agreement", "present in at least two of the three curated glue databases"),
+    ("passes_bridging_filter", "passes the bridging filter"),
+    ("balance_above_threshold", "bridging balance above the strong threshold"),
+    ("substrate_has_degron", "its substrate carries a degron found by the Phase 2 scan"),
+    ("ligase_has_pocket_score", "its ligase has a pocket score"),
+    ("target_has_favourable_lysine", "its target has a mapped lysine with a favourable verdict"),
+    ("highest_resolution", "the highest-resolution structure among the candidates"),
+]
+
+# Spec 6.6.4 relaxation order: resolution, then two-database agreement, then balance.
+RELAX_ORDER = ["highest_resolution", "two_database_agreement", "balance_above_threshold",
+               "target_has_favourable_lysine", "substrate_has_degron",
+               "ligase_has_pocket_score"]
+
+
+def worked_example() -> dict:
+    """Pick one record deterministically and carry it through all four modules.
+
+    Selection is never hardcoded. Where no record satisfies every criterion the
+    conditions relax in the documented order, which ones were relaxed is logged,
+    and the page states which criteria the example actually meets.
+    """
+    if not DB_PATH.exists():
+        return {"available": False,
+                "note": "The atlas has not been built, so no example can be selected."}
+
+    config = load_config()
+    balance_strong = float(config.t("bridging.glue_balance_strong"))
+    connection = sqlite3.connect(f"file:{DB_PATH}?mode=ro", uri=True)
+    connection.row_factory = sqlite3.Row
+
+    try:
+        candidates = [dict(row) for row in connection.execute(
+            "SELECT b.*, e.resolution, e.title, e.method, l.name AS ligand_name, l.mw "
+            "FROM bridge b "
+            "LEFT JOIN entry e ON e.pdb_id = b.pdb_id "
+            "LEFT JOIN ligand l ON l.ccd_id = b.ccd_id "
+            "WHERE b.status = 'ok' AND b.ccd_class = 'glue_candidate' "
+            "AND b.symmetry_mediated = 0 "
+            "ORDER BY b.bridging_balance DESC, b.dsasa_total DESC LIMIT 400"
+        )]
+        if not candidates:
+            return {"available": False,
+                    "note": "No glue candidate bridge has been found yet, so no "
+                            "example can be selected."}
+
+        degron_accessions = {
+            row[0] for row in connection.execute(
+                "SELECT DISTINCT uniprot_acc FROM degron WHERE status = 'ok'")
+        }
+        pocket_accessions = {
+            row[0] for row in connection.execute(
+                "SELECT uniprot_acc FROM ligase WHERE pocket_score IS NOT NULL")
+        }
+        favourable_accessions = {
+            row[0] for row in connection.execute(
+                "SELECT DISTINCT uniprot_acc FROM lysine WHERE verdict = 'favourable'")
+        }
+        curated_entries = _curated_glue_entries()
+
+        scored = []
+        for row in candidates:
+            accessions = {
+                r[0] for r in connection.execute(
+                    "SELECT uniprot_acc FROM polymer_entity WHERE pdb_id = ? "
+                    "AND uniprot_acc IS NOT NULL AND uniprot_acc != ''",
+                    (row["pdb_id"],))
+            }
+            met = {
+                "two_database_agreement": row["pdb_id"] in curated_entries,
+                "passes_bridging_filter": True,
+                "balance_above_threshold": (row["bridging_balance"] or 0) >= balance_strong,
+                "substrate_has_degron": bool(accessions & degron_accessions),
+                "ligase_has_pocket_score": bool(accessions & pocket_accessions),
+                "target_has_favourable_lysine": bool(accessions & favourable_accessions),
+                "highest_resolution": row.get("resolution") is not None,
+            }
+            row["criteria_met"] = met
+            row["accessions"] = sorted(accessions)
+            scored.append(row)
+
+        required = [name for name, _ in CRITERIA]
+        relaxed: list[str] = []
+        chosen = None
+        while True:
+            eligible = [
+                r for r in scored
+                if all(r["criteria_met"].get(name) for name in required)
+            ]
+            if eligible:
+                # Among the candidates, take the highest-resolution structure.
+                eligible.sort(key=lambda r: (
+                    r.get("resolution") if r.get("resolution") is not None else 99.0,
+                    -(r.get("bridging_balance") or 0),
+                ))
+                chosen = eligible[0]
+                break
+            next_drop = next((name for name in RELAX_ORDER if name in required), None)
+            if next_drop is None:
+                break
+            required.remove(next_drop)
+            relaxed.append(next_drop)
+
+        if chosen is None:
+            return {"available": False,
+                    "note": "No bridge satisfied even the relaxed criteria."}
+
+        labels = dict(CRITERIA)
+        return {
+            "available": True,
+            "bridge_id": chosen.get("id"),
+            "pdb_id": chosen.get("pdb_id"),
+            "ccd_id": chosen.get("ccd_id"),
+            "ligand_name": chosen.get("ligand_name") or NOT_RECORDED,
+            "title": chosen.get("title") or NOT_RECORDED,
+            "method": chosen.get("method") or NOT_RECORDED,
+            "resolution": chosen.get("resolution"),
+            "chain_a": chosen.get("chain_a"), "chain_b": chosen.get("chain_b"),
+            "dsasa_a": chosen.get("dsasa_a"), "dsasa_b": chosen.get("dsasa_b"),
+            "dsasa_total": chosen.get("dsasa_total"),
+            "bridging_balance": chosen.get("bridging_balance"),
+            "buried_fraction": chosen.get("buried_fraction"),
+            "contacts_a": chosen.get("contacts_a"), "contacts_b": chosen.get("contacts_b"),
+            "heavy_atoms": chosen.get("heavy_atoms"),
+            "interface_residues_a": _decode(chosen.get("interface_residues_a")),
+            "interface_residues_b": _decode(chosen.get("interface_residues_b")),
+            "accessions": chosen.get("accessions", []),
+            "criteria": [
+                {"key": key, "label": labels[key],
+                 "met": bool(chosen["criteria_met"].get(key)),
+                 "relaxed": key in relaxed}
+                for key, _ in CRITERIA
+            ],
+            "relaxed": [{"key": key, "label": labels[key]} for key in relaxed],
+            "candidate_pool": len(scored),
+            "honest_note": (
+                "This record was chosen because every stage that has run worked on "
+                "it. A reader should look at the misses list and the novel-bridge "
+                "set in FINDINGS.md for the cases where stages did not."
+            ),
+        }
+    finally:
+        connection.close()
+
+
+def _decode(value):
+    if isinstance(value, str) and value:
+        try:
+            return json.loads(value)
+        except json.JSONDecodeError:
+            return []
+    return value or []
+
+
+def _curated_glue_entries() -> set[str]:
+    import csv
+
+    found: set[str] = set()
+    for name in ("mgdb_glues", "molgluedb_glues", "mgtbind_ternary"):
+        path = VALIDATION / f"{name}.tsv"
+        if not path.exists():
+            continue
+        with path.open(encoding="utf-8") as handle:
+            for row in csv.DictReader(handle, delimiter="\t"):
+                for key, value in row.items():
+                    if "pdb" in (key or "").lower() and value:
+                        for token in str(value).replace(";", ",").split(","):
+                            token = token.strip().upper()
+                            if len(token) == 4 and token[0].isdigit():
+                                found.add(token)
+    return found
+
+
+# --------------------------------------------------------------------------- #
+# the workflow schematic (spec 6.6.1)
+# --------------------------------------------------------------------------- #
+
+def workflow_svg(stages: dict, atlas: dict, datasets: list[dict]) -> tuple[str, str]:
+    """Draw the four-stage schematic from the manifests, plus a text description.
+
+    Theme-aware: every colour comes from a Depot token via `currentColor` or an
+    explicit `var(--token)`, so nothing is legible in only one theme. The text
+    description is for screen readers, which cannot read the SVG.
+    """
+    resolved = sum(1 for d in datasets if d["resolved"])
+    catalogue = stages.get("catalogue", {})
+    bridges = stages.get("bridges", {})
+
+    columns = [
+        {
+            "title": "1 · Acquisition",
+            "software": "httpx, tenacity",
+            "lines": [
+                f"{catalogue.get('total', 0):,} entries catalogued",
+                f"tier 1 {catalogue.get('tiers', {}).get('1', 0):,} · "
+                f"tier 2 {catalogue.get('tiers', {}).get('2', 0):,} · "
+                f"tier 3 {catalogue.get('tiers', {}).get('3', 0):,}",
+            ],
+            "failed": 0,
+        },
+        {
+            "title": "2 · Geometry",
+            "software": "gemmi, FreeSASA",
+            "lines": [
+                f"{bridges.get('ok', 0):,} entries analysed",
+                f"{atlas.get('bridge', 0):,} bridges found",
+            ],
+            "failed": bridges.get("failed", 0),
+        },
+        {
+            "title": "3 · Scan and triage",
+            "software": "DSSP, fpocket",
+            "lines": [
+                f"{atlas.get('degron', 0):,} degrons scanned",
+                f"{atlas.get('ligase', 0):,} ligases triaged",
+                f"{atlas.get('lysine', 0):,} lysines scored",
+            ],
+            "failed": (stages.get("degrons", {}).get("failed", 0)
+                       + stages.get("ligases", {}).get("failed", 0)),
+        },
+        {
+            "title": "4 · Model",
+            "software": "mlx-lm",
+            "lines": [
+                "BINMAN-LM: not trained"
+                if not (VALIDATION / "results.json").exists()
+                else "BINMAN-LM: see model card",
+                "never emits a number",
+            ],
+            "failed": 0,
+        },
+    ]
+
+    width, height = 1000, 440
+    box_w, box_h, gap = 186, 150, 30
+    left_margin = 136
+    top = 112
+
+    parts = [
+        f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {width} {height}" '
+        f'class="schematic" role="img" aria-labelledby="wf-title wf-desc">',
+        '<title id="wf-title">BINMAN pipeline schematic</title>',
+        '<desc id="wf-desc">Described in the text below the figure.</desc>',
+        '<style>'
+        '.wf-box{fill:var(--surface);stroke:var(--line);stroke-width:1.5}'
+        '.wf-ds{fill:var(--accent-soft);stroke:var(--accent);stroke-width:1.5;stroke-dasharray:4 3}'
+        '.wf-t{fill:var(--ink);font:600 13px var(--display),sans-serif}'
+        '.wf-s{fill:var(--muted);font:10px var(--data),monospace}'
+        '.wf-n{fill:var(--ink);font:11px var(--data),monospace}'
+        '.wf-bad{fill:var(--bad);font:11px var(--data),monospace}'
+        '.wf-arrow{stroke:var(--line);stroke-width:1.5;fill:none}'
+        '.wf-head{fill:var(--muted);font:600 10px var(--display),sans-serif;'
+        'letter-spacing:.06em;text-transform:uppercase}'
+        '</style>',
+        f'<marker id="wf-tip" markerWidth="7" markerHeight="7" refX="6" refY="3.5" '
+        f'orient="auto"><path d="M0,0 L7,3.5 L0,7Z" fill="var(--line)"/></marker>',
+    ]
+
+    # Inputs on the left: primary sources, and validation sets as a distinct shape.
+    parts.append(f'<text class="wf-head" x="12" y="{top - 24}">Inputs</text>')
+    parts.append(
+        f'<rect class="wf-box" x="12" y="{top}" width="108" height="58" rx="2"/>'
+        f'<text class="wf-t" x="22" y="{top + 22}">Sources</text>'
+        f'<text class="wf-s" x="22" y="{top + 38}">RCSB, AFDB,</text>'
+        f'<text class="wf-s" x="22" y="{top + 50}">UniProt, InterPro</text>'
+    )
+    parts.append(
+        f'<rect class="wf-ds" x="12" y="{top + 76}" width="108" height="58" rx="2"/>'
+        f'<text class="wf-t" x="22" y="{top + 98}">Ground truth</text>'
+        f'<text class="wf-s" x="22" y="{top + 114}">{resolved} of {len(datasets)}</text>'
+        f'<text class="wf-s" x="22" y="{top + 126}">datasets resolved</text>'
+    )
+
+    for index, column in enumerate(columns):
+        x = left_margin + index * (box_w + gap)
+        parts.append(
+            f'<g class="wf-node" data-stage="{index + 1}" tabindex="0">'
+            f'<rect class="wf-box" x="{x}" y="{top}" width="{box_w}" height="{box_h}" rx="2"/>'
+            f'<text class="wf-t" x="{x + 12}" y="{top + 24}">{column["title"]}</text>'
+            f'<text class="wf-s" x="{x + 12}" y="{top + 40}">{column["software"]}</text>'
+        )
+        for line_index, line in enumerate(column["lines"]):
+            parts.append(
+                f'<text class="wf-n" x="{x + 12}" y="{top + 64 + line_index * 16}">{line}</text>'
+            )
+        if column["failed"]:
+            parts.append(
+                f'<text class="wf-bad" x="{x + 12}" y="{top + box_h - 14}">'
+                f'{column["failed"]:,} failed</text>'
+            )
+        parts.append('</g>')
+        if index < len(columns) - 1:
+            start = x + box_w
+            parts.append(
+                f'<path class="wf-arrow" d="M{start},{top + box_h / 2} '
+                f'L{start + gap - 6},{top + box_h / 2}" marker-end="url(#wf-tip)"/>'
+            )
+
+    parts.append(
+        f'<path class="wf-arrow" d="M120,{top + 29} L{left_margin - 6},{top + 50}" '
+        f'marker-end="url(#wf-tip)"/>'
+    )
+    parts.append(
+        f'<path class="wf-arrow" d="M120,{top + 105} L{left_margin - 6},{top + 90}" '
+        f'marker-end="url(#wf-tip)"/>'
+    )
+
+    # Modules leaving on the right.
+    out_x = left_margin + 4 * (box_w + gap)
+    parts.append(f'<text class="wf-head" x="{out_x}" y="{top - 24}">Modules</text>')
+    for index, label in enumerate(("Glue Atlas", "Degron Scan", "E3 Triage", "Degradability")):
+        y = top + index * 34
+        parts.append(
+            f'<rect class="wf-box" x="{out_x}" y="{y}" width="124" height="26" rx="2"/>'
+            f'<text class="wf-n" x="{out_x + 10}" y="{y + 18}">{label}</text>'
+        )
+    parts.append(
+        f'<path class="wf-arrow" d="M{out_x - gap + 6},{top + box_h / 2} '
+        f'L{out_x - 6},{top + box_h / 2}" marker-end="url(#wf-tip)"/>'
+    )
+    parts.append('</svg>')
+
+    description = (
+        "The pipeline runs left to right in four stages. Two kinds of input enter "
+        "on the left: the primary data sources (RCSB, AlphaFold DB, UniProt, "
+        "InterPro), and separately the validation datasets that serve as ground "
+        f"truth, of which {resolved} of {len(datasets)} resolved. "
+        f"Stage 1, acquisition, catalogued {catalogue.get('total', 0):,} entries "
+        f"into priority tiers using httpx and tenacity. "
+        f"Stage 2, geometry, analysed {bridges.get('ok', 0):,} entries with gemmi "
+        f"and FreeSASA and found {atlas.get('bridge', 0):,} bridges, with "
+        f"{bridges.get('failed', 0):,} entries failing. "
+        f"Stage 3, scan and triage, used DSSP and fpocket to produce "
+        f"{atlas.get('degron', 0):,} degron candidates, {atlas.get('ligase', 0):,} "
+        f"triaged ligases and {atlas.get('lysine', 0):,} scored lysines. "
+        "Stage 4 trains BINMAN-LM with mlx-lm, which does text work only and never "
+        "emits a number. Four modules leave on the right: Glue Atlas, Degron Scan, "
+        "E3 Triage and Degradability."
+    )
+    return "\n".join(parts), description
+
+
+# --------------------------------------------------------------------------- #
+# build
+# --------------------------------------------------------------------------- #
+
+def build() -> dict:
+    config = load_config()
+    stages = stage_counts()
+    atlas = atlas_counts()
+    datasets = dataset_rows()
+    references = reference_rows()
+    svg, description = workflow_svg(stages, atlas, datasets)
+    example = worked_example()
+    results = _json(VALIDATION / "results.json", {}) or {}
+
+    unrecorded: list[str] = []
+    for row in references:
+        if row["licence"] in {"not determined", "", NOT_RECORDED}:
+            unrecorded.append(f"licence for reference '{row['key']}'")
+        if not row["doi"] and not row["home"]:
+            unrecorded.append(f"DOI and URL both missing for '{row['key']}'")
+
+    about = {
+        "generated_at": utcnow(),
+        "generator": "pipeline/build_about.py",
+        "note": (
+            "Every value on this page is read from a build artefact. Nothing here "
+            "is typed by hand, and a value that could not be read says "
+            f"'{NOT_RECORDED}' rather than showing a plausible guess."
+        ),
+        "schematic_description": description,
+        "stages": stages,
+        "atlas": atlas,
+        "datasets": datasets,
+        "datasets_resolved": sum(1 for d in datasets if d["resolved"]),
+        "datasets_total": len(datasets),
+        "references": references,
+        "reference_summary": {
+            "total": len(references),
+            "verified": sum(1 for r in references if r["verified"]),
+            "unverified": sum(1 for r in references if not r["verified"]),
+            "licence_not_determined": sum(
+                1 for r in references if r["licence"] in {"not determined", ""}),
+        },
+        "model_card": model_card(),
+        "worked_example": example,
+        "validation": results,
+        "thresholds": config.thresholds,
+        "tuning": config.tuning,
+        "hardware": config.hardware,
+        "gates": _gate_state(),
+        "unrecorded": sorted(set(unrecorded)),
+        "citation": {
+            "project": "Deller, M. C. BINMAN: Blind-spot INventory of Molecular "
+                       "Adhesives and Neosubstrates.",
+            "repository": "https://github.com/bellcheddar/binman",
+            "instruction": (
+                "Cite BINMAN for the atlas itself, and cite every underlying "
+                "resource separately: the atlas is a derivative of the databases "
+                "listed in the reference table, and they deserve their own citation."
+            ),
+        },
+    }
+
+    ABOUT_JSON.parent.mkdir(parents=True, exist_ok=True)
+    ABOUT_JSON.write_text(json.dumps(about, indent=2, default=str) + "\n")
+    WORKFLOW_SVG.write_text(svg + "\n")
+
+    Manifest(STAGE).record(
+        "build", status="ok", references=len(references),
+        datasets_resolved=about["datasets_resolved"], datasets_total=len(datasets),
+        example_available=bool(example.get("available")),
+        unrecorded=len(about["unrecorded"]),
+        about_bytes=ABOUT_JSON.stat().st_size,
+    )
+    log_event("4.1b", f"About tab generated: {len(references)} references, "
+                      f"{about['datasets_resolved']}/{len(datasets)} datasets resolved, "
+                      f"worked example {'selected' if example.get('available') else 'unavailable'}, "
+                      f"{len(about['unrecorded'])} value(s) not recorded.")
+    return about
+
+
+def _gate_state() -> list[dict]:
+    """Which gates are open, read from GATE_OPEN.md rather than assumed."""
+    path = ROOT / "GATE_OPEN.md"
+    if not path.exists():
+        return []
+    text = path.read_text(encoding="utf-8")
+    match = re.search(r"#\s*Gate\s+(\S+)\s+open", text)
+    return [{
+        "gate": match.group(1) if match else NOT_RECORDED,
+        "excerpt": text.split("## What is needed", 1)[-1].strip()[:900],
+    }]
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description="Generate the About tab")
+    parser.parse_args()
+    about = build()
+    print(f"references          : {about['reference_summary']}")
+    print(f"datasets resolved   : {about['datasets_resolved']}/{about['datasets_total']}")
+    print(f"worked example      : {about['worked_example'].get('available')}")
+    if about["worked_example"].get("available"):
+        example = about["worked_example"]
+        print(f"  {example['pdb_id']} / {example['ccd_id']} "
+              f"balance {example['bridging_balance']} res {example['resolution']}")
+        print(f"  relaxed: {[r['key'] for r in example['relaxed']] or 'nothing'}")
+    print(f"not recorded        : {len(about['unrecorded'])}")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

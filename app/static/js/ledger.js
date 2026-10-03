@@ -421,7 +421,7 @@
         if (!selection.target) { return null; }
         return {
           role: 'degron',
-          url: 'https://alphafold.ebi.ac.uk/files/AF-' + selection.target + '-F1-model_v4.cif',
+          url: B.afdbCifUrl(selection.target),
           format: 'mmcif',
           identifier: 'AF-' + selection.target,
           identifierHref: 'https://alphafold.ebi.ac.uk/entry/' + selection.target,
@@ -450,7 +450,7 @@
         if (!selection.target) { return null; }
         return {
           role: 'degradability',
-          url: 'https://alphafold.ebi.ac.uk/files/AF-' + selection.target + '-F1-model_v4.cif',
+          url: B.afdbCifUrl(selection.target),
           format: 'mmcif',
           identifier: selection.target + (selection.site ? ' · ' + selection.site : ''),
           identifierHref: 'https://www.uniprot.org/uniprotkb/' + selection.target

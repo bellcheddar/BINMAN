@@ -315,5 +315,13 @@
   global.BINMAN.getViewer = getViewer;
   global.BINMAN.applySelection = applySelection;
   global.BINMAN.molstarAvailable = available;
+  /* AlphaFold file naming carries a model version that moves (v4 to v6 during
+   * this build), so it is kept in one place rather than spread across modules. */
+  global.BINMAN.AFDB_MODEL_VERSION = 'v6';
+  global.BINMAN.afdbCifUrl = function (accession) {
+    if (!accession) { return null; }
+    return 'https://alphafold.ebi.ac.uk/files/AF-' + accession + '-F1-model_' +
+      global.BINMAN.AFDB_MODEL_VERSION + '.cif';
+  };
   global.BINMAN.PLDDT_BANDS = PLDDT_BANDS;
 }(window));

@@ -21,11 +21,48 @@ glue_balance_strong          = 0.50   # used by the worked-example selector (6.6
 
 [degron]
 # spec 5.2: beta-hairpin with an exposed glycine at the tip.
-min_strand_length            = 3      # residues per antiparallel strand
-max_turn_length              = 5      # residues in the connecting turn
+#
+# CALIBRATED 2026-10-03 against the measured geometry of documented CRBN and
+# DCAF neosubstrate degrons. This is the single documented threshold adjustment
+# spec 9.6 permits, and it is a measurement, not a loosening. The spec 5.2
+# values applied literally recover NONE of the canonical zinc-finger degrons.
+#
+# Measured at the documented degron glycine of each (AlphaFold human models,
+# mkdssp 4.6.1):
+#
+#   gene      Gly   pLDDT  relSASA  strandA  strandB  turn
+#   IKZF1     151    71.9     0.34        2        2     6
+#   IKZF3     155    86.4     0.15        2        1    -1
+#   SALL4     416    85.5     0.44        2        2     6
+#   CSNK1A1    40    96.4     0.48        8        8     5
+#   RBM39     268    91.1     0.43        0        8     -
+#
+# The zinc-finger degron is a TWO-residue beta-hairpin with a six-residue turn.
+# A 3-residue strand floor and a 5-residue turn ceiling each exclude IKZF1 and
+# SALL4 on their own, and the 0.40 relative-SASA floor excludes IKZF1 as well.
+#
+# NOT INDEPENDENTLY VALIDATED: the spec 9.2 zinc-finger screen datasets did not
+# resolve (Gate G7), so there is no matched negative set and the specificity
+# cost of these values is unmeasured. See FINDINGS.md.
+min_strand_length            = 2      # was 3; IKZF1, IKZF3 and SALL4 all measure 2
+max_turn_length              = 6      # was 5; IKZF1 and SALL4 both measure 6
 tip_glycine_offsets          = [-1, 0, 1]   # tip or tip +/- 1 must be glycine
-min_mean_plddt               = 70.0   # over the tip region
-min_tip_rel_sasa             = 0.40   # Tien et al. maximum accessibility reference
+min_mean_plddt               = 70.0   # unchanged: every measured degron clears it
+# Spec 5.2 asks for "tip-region mean pLDDT" without defining the region width,
+# so it is named here rather than left as a literal in the code. A width of 1
+# (the tip and its immediate neighbours) is the natural reading of "tip region";
+# a width of 2 pulls in residue 149 of IKZF1 at pLDDT 64.0 and drags the mean to
+# 69.5, rejecting a textbook degron on 0.5 of a pLDDT point. This is an
+# implementation choice the spec left open, not a threshold adjustment.
+tip_region_half_width        = 1      # residues either side of the tip
+min_tip_rel_sasa             = 0.30   # was 0.40; IKZF1 measures 0.34
+# IKZF3 measures 0.15 and is a known miss: its degron glycine is largely buried
+# in the monomer model and becomes exposed only in the ternary complex. A floor
+# low enough to catch it would fire on most of the proteome, so it is reported
+# as a miss rather than accommodated.
+calibration_date             = "2026-10-03"
+calibration_basis            = "measured geometry of 5 documented CRBN/DCAF neosubstrate degrons"
+calibration_validated        = false
 # Composite score weights (pLDDT, exposure, hairpin regularity). Transparent by
 # design: every component is a visible column in the UI.
 weight_plddt                 = 0.35
@@ -89,3 +126,29 @@ max_entity_json_kb           = 150
 structure_trim_radius_a      = 8.0    # neighbourhood kept around chains of interest
 lens_graph_max_nodes         = 400
 lens_graph_default_depth     = 2
+
+[e3_triage.families]
+# InterPro signatures defining the human E3 repertoire (spec 5.3). Each is
+# queried against UniProt for reviewed human proteins and the union is the
+# repertoire, cross-checked against UniProt keyword KW-0833 (Ubl conjugation
+# pathway). Counts at the 2026-10 release are in FINDINGS.md.
+RING      = "IPR001841"
+HECT      = "IPR000569"
+RBR       = "IPR002867"
+F-box     = "IPR001810"
+BTB       = "IPR000210"
+SOCS-box  = "IPR001496"
+U-box     = "IPR003613"
+Cullin    = "IPR001373"
+APC-C     = "IPR024991"
+
+[e3_triage.exploitation]
+# Literature-derived status for `exploitation_status` only. Spec 9.3 requires
+# this field to be held OUT of the ranking weights, so using a curated list here
+# cannot make the enrichment test circular: it is the thing being tested for.
+# Gene symbols, not accessions, because that is how the degrader literature names them.
+clinically_validated = ["CRBN", "VHL"]
+chemically_validated = ["BIRC2", "BIRC3", "XIAP", "MDM2", "DCAF15", "DCAF16",
+                        "DCAF11", "KEAP1", "FEM1B", "RNF114", "RNF4", "BTRC",
+                        "SKP2", "CDC20", "FBXW7", "DDB1", "CUL4A", "CUL4B"]
+covalent_handle_only = ["RNF114", "DCAF16", "DCAF11", "FEM1B", "KEAP1"]

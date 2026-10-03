@@ -1,0 +1,334 @@
+{% extends "base.html" %}
+{#
+  The About tab is GENERATED, never authored (spec 6.6).
+
+  There is no metric, version, count or citation written as a literal anywhere in
+  this template. Every value comes from `about.json`, which pipeline/build_about.py
+  writes from the build artefacts. Where a value could not be read the generator
+  puts "not recorded" in the data and this template shows it.
+#}
+{% macro value(v) -%}
+{%- if v is none or v == '' -%}<span class="pill">not recorded</span>
+{%- else -%}{{ v }}{%- endif -%}
+{%- endmacro %}
+
+{% block content %}
+<div class="pane">
+
+{% if not generated %}
+  <h1>About BINMAN</h1>
+  <div class="notice notice--bad">
+    <strong>This page has not been generated yet.</strong>
+    The About tab is built from the pipeline's own artefacts rather than written
+    by hand, so it does not exist until the build has produced something to
+    describe. Run <code>pixi run python pipeline/build_about.py</code>.
+  </div>
+{% else %}
+
+  <div class="pane__head">
+    <h1>About BINMAN</h1>
+    <span class="meta">generated {{ about.generated_at }} by <code>{{ about.generator }}</code></span>
+  </div>
+  <p style="max-width:68ch;color:var(--muted);margin-top:0">{{ about.note }}</p>
+
+  {% if about.unrecorded %}
+    <div class="notice">
+      <strong>{{ about.unrecorded | length }} value(s) could not be read from an artefact</strong>
+      and are shown as "not recorded" rather than guessed:
+      <ul style="margin:0.4rem 0 0">
+        {% for item in about.unrecorded %}<li>{{ item }}</li>{% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+
+  {# ---------------------------------------------------------- 6.6.1 ------- #}
+  <h2 id="workflow">Workflow</h2>
+  <div class="panel">
+    <div id="schematic-holder">
+      <img src="{{ url_for('static', filename='workflow.svg') }}" alt=""
+           class="schematic" style="width:100%;height:auto">
+    </div>
+    <details style="margin-top:0.6rem">
+      <summary style="cursor:pointer;color:var(--accent)">Described in words</summary>
+      <p style="margin-bottom:0">{{ about.schematic_description }}</p>
+    </details>
+  </div>
+
+  <div class="panel">
+    <h3>Stage counts, read from the manifests</h3>
+    <table class="grid-table">
+      <thead><tr><th>Stage</th><th class="num">Total</th><th class="num">Succeeded</th>
+        <th class="num">Failed</th><th>Failure reasons</th></tr></thead>
+      <tbody>
+        {% for name, stage in about.stages.items() %}
+          <tr>
+            <td><code>{{ name }}</code></td>
+            <td class="num">{{ stage.total | thousands }}</td>
+            <td class="num">{{ stage.ok | thousands }}</td>
+            <td class="num" {% if stage.failed %}style="color:var(--bad)"{% endif %}>
+              {{ stage.failed | thousands }}</td>
+            <td>
+              {% for reason, count in (stage.failure_reasons or {}).items() %}
+                <span class="pill pill--bad">{{ reason }} × {{ count }}</span>
+              {% endfor %}
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {# ---------------------------------------------------------- datasets ---- #}
+  <h2 id="datasets">Ground truth</h2>
+  <p style="max-width:68ch;color:var(--muted)">
+    Every module is judged against independently curated published datasets.
+    <strong>{{ about.datasets_resolved }} of {{ about.datasets_total }}</strong>
+    resolved. Where a dataset could not be obtained the metric that depends on it
+    is reported as not computed: no hand-written control was ever substituted for
+    a missing published one.
+  </p>
+  <div class="panel" style="padding:0"><div id="dataset-table"></div></div>
+
+  {% set unresolved = about.datasets | rejectattr('resolved') | list %}
+  {% if unresolved %}
+    <div class="panel">
+      <h3>What is missing, and how to get it</h3>
+      {% for dataset in unresolved %}
+        <p style="margin:0.6rem 0">
+          <code>{{ dataset.name }}</code> ·
+          <a href="{{ dataset.homepage }}" target="_blank" rel="noopener noreferrer">{{ dataset.homepage }}</a><br>
+          <span style="color:var(--muted)">{{ dataset.manual_route or 'No manual route recorded.' }}</span>
+        </p>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  {# ---------------------------------------------------------- 6.6.4 ------- #}
+  <h2 id="example">Worked example</h2>
+  {% set ex = about.worked_example %}
+  {% if not ex.available %}
+    <div class="notice">{{ ex.note }}</div>
+  {% else %}
+    <p style="max-width:68ch;color:var(--muted)">
+      One record carried end to end through all four modules, so a first-time
+      visitor understands what BINMAN does without pinning anything. The record
+      is chosen deterministically from
+      {{ ex.candidate_pool | thousands }} candidates, never hardcoded.
+    </p>
+
+    <div class="panel">
+      <h3>Which criteria this example meets</h3>
+      <table class="grid-table">
+        <tbody>
+          {% for criterion in ex.criteria %}
+            <tr>
+              <td>
+                {% if criterion.met %}<span class="pill pill--good">met</span>
+                {% elif criterion.relaxed %}<span class="pill pill--warn">relaxed</span>
+                {% else %}<span class="pill pill--bad">not met</span>{% endif %}
+              </td>
+              <td>{{ criterion.label }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% if ex.relaxed %}
+        <p style="margin:0.6rem 0 0;color:var(--muted);font-size:0.86rem">
+          {{ ex.relaxed | length }} criterion(a) were relaxed, in the documented
+          order, because no record satisfied all of them. A worked example that
+          quietly stops being true is worse than none, so the relaxation is shown
+          rather than hidden.
+        </p>
+      {% endif %}
+    </div>
+
+    <div class="about-step" id="example-step-1">
+      <div class="about-step__n">Step 1 · found in the atlas</div>
+      <h3 style="color:var(--ink)">{{ ex.pdb_id }} · {{ ex.ccd_id }}</h3>
+      <p style="margin-top:0">{{ ex.title }}</p>
+      <div class="split">
+        <div>
+          <table class="grid-table">
+            <tbody>
+              <tr><td>Ligand</td><td>{{ value(ex.ligand_name) }}</td></tr>
+              <tr><td>Method</td><td>{{ value(ex.method) }}</td></tr>
+              <tr><td>Resolution</td><td class="num">{{ ex.resolution | sigfig }} Å</td></tr>
+              <tr><td>ΔSASA chain {{ ex.chain_a }}</td><td class="num">{{ ex.dsasa_a | sigfig(4) }} Å²</td></tr>
+              <tr><td>ΔSASA chain {{ ex.chain_b }}</td><td class="num">{{ ex.dsasa_b | sigfig(4) }} Å²</td></tr>
+              <tr><td>Bridging balance</td><td class="num"><strong>{{ ex.bridging_balance | sigfig }}</strong></td></tr>
+              <tr><td>Buried fraction</td><td class="num">{{ ex.buried_fraction | sigfig }}</td></tr>
+              <tr><td>Heavy-atom contacts</td><td class="num">{{ ex.contacts_a }} / {{ ex.contacts_b }}</td></tr>
+              <tr><td>Ligand heavy atoms</td><td class="num">{{ ex.heavy_atoms }}</td></tr>
+            </tbody>
+          </table>
+          <p style="font-size:0.86rem;color:var(--muted)">
+            This passes the bridging filter because it buries more than the
+            minimum area against <em>both</em> chains at once and makes enough
+            heavy-atom contacts to each. A PEG oligomer in the same entry fails
+            on two counts: it is classified as a cryoprotectant from its
+            structure, and it grazes one chain rather than bridging two.
+          </p>
+        </div>
+        <div>
+          {% with viewer_id='viewer-example-1', role='glue',
+                  empty_message='Loading the ternary complex.' %}
+            {% include "_viewer.html" %}
+          {% endwith %}
+        </div>
+      </div>
+    </div>
+
+    <div class="about-step" id="example-step-2">
+      <div class="about-step__n">Step 2 · does its substrate carry a degron?</div>
+      {% if ex.criteria | selectattr('key', 'equalto', 'substrate_has_degron')
+            | selectattr('met') | list %}
+        <p>The substrate carries a hairpin degron found by the Phase 2 scan.</p>
+      {% else %}
+        <div class="notice">
+          The Degron Scan has not run, so this step cannot be shown for this
+          record. It is listed above as a relaxed criterion rather than
+          illustrated with a number that does not exist.
+        </div>
+      {% endif %}
+      <div class="split">
+        <div><p style="color:var(--muted);font-size:0.86rem">
+          Accessions in this entry: {% for acc in ex.accessions %}<code>{{ acc }}</code> {% endfor %}
+        </p></div>
+        <div>
+          {% with viewer_id='viewer-example-2', role='degron',
+                  empty_message='The AlphaFold model loads here once the Degron Scan has run.' %}
+            {% include "_viewer.html" %}
+          {% endwith %}
+        </div>
+      </div>
+    </div>
+
+    <div class="about-step" id="example-step-3">
+      <div class="about-step__n">Step 3 · its ligase in context</div>
+      <div class="notice">
+        The E3 Triage stage has not run, so there is no pocket score, volume or
+        triage rank for this record yet.
+      </div>
+    </div>
+
+    <div class="about-step" id="example-step-4">
+      <div class="about-step__n">Step 4 · is the target degradable?</div>
+      {% set window = about.thresholds.degradability.reach_window %}
+      {% if window.fitted %}
+        <p>Held-out AUC {{ window.held_out_auc | sigfig }}, fitted
+           {{ window.fit_date }} against {{ window.dataset_version }}.</p>
+      {% else %}
+        <div class="notice notice--bad">
+          The reach window is not fitted ({{ window.fit_status }}), so no verdict
+          is shown. The spec 1.0 starting values carry no empirical standing and
+          are deliberately not used to produce a number.
+        </div>
+      {% endif %}
+    </div>
+
+    <p>
+      <a class="btn btn--accent" id="try-it"
+         href="{{ url_for('ledger.index') }}#glue={{ ex.pdb_id }}:{{ ex.ccd_id }}:{{ ex.bridge_id }}">
+        Try it yourself: load this record into the live selection
+      </a>
+    </p>
+    <p style="max-width:68ch;color:var(--muted);font-size:0.9rem">{{ ex.honest_note }}</p>
+  {% endif %}
+
+  {# ---------------------------------------------------------- 6.6.2 ------- #}
+  <h2 id="model">BINMAN-LM model card</h2>
+  {% set card = about.model_card %}
+  {% if not card.trained %}
+    <div class="notice">{{ card.status_note }}</div>
+  {% else %}
+    <div class="panel">
+      <h3>Identity</h3>
+      <table class="grid-table"><tbody>
+        {% for key, item in card.identity.items() %}
+          <tr><td>{{ key | replace('_', ' ') }}</td><td>{{ value(item) }}</td></tr>
+        {% endfor %}
+      </tbody></table>
+    </div>
+    <div class="panel">
+      <h3>Results</h3>
+      <table class="grid-table"><tbody>
+        {% for key, item in card.results.items() if item is not mapping %}
+          <tr><td>{{ key | replace('_', ' ') }}</td><td class="num">{{ item | sigfig }}</td></tr>
+        {% endfor %}
+      </tbody></table>
+    </div>
+  {% endif %}
+
+  <div class="panel">
+    <h3>What it ran on</h3>
+    <table class="grid-table"><tbody>
+      {% for key, item in card.hardware.items() %}
+        <tr><td>{{ key | replace('_', ' ') }}</td><td>{{ value(item) }}</td></tr>
+      {% endfor %}
+    </tbody></table>
+  </div>
+
+  <div class="limits">
+    <strong>Limits, stated here rather than in a footnote.</strong>
+    <ul style="margin:0.4rem 0 0">
+      {% for limit in card.limits %}<li>{{ limit }}</li>{% endfor %}
+    </ul>
+  </div>
+
+  <div class="panel">
+    <h3>Availability</h3>
+    <p style="margin:0">
+      {% if card.availability.endpoint_live %}
+        <span class="pill pill--good">endpoint live</span>
+      {% else %}
+        <span class="pill">endpoint not configured for this deployment</span>
+      {% endif %}
+      {{ card.availability.note }}
+    </p>
+  </div>
+
+  {# ---------------------------------------------------------- 6.6.3 ------- #}
+  <h2 id="references">References</h2>
+  <p style="max-width:68ch;color:var(--muted)">
+    Every database, dataset, model and piece of software the build touched.
+    {{ about.reference_summary.total }} rows:
+    {{ about.reference_summary.verified }} Crossref verified,
+    {{ about.reference_summary.unverified }} unverified and kept rather than
+    dropped, {{ about.reference_summary.licence_not_determined }} with a licence
+    that could not be determined. References are resolved by Crossref search and
+    checked against the expected title, because an earlier revision's
+    hand-written DOIs included several that resolved to the wrong paper.
+  </p>
+  <div class="panel" style="padding:0"><div id="reference-table"></div></div>
+  <p>
+    <button class="btn" type="button" id="bibtex-export">Export BibTeX</button>
+  </p>
+
+  <div class="panel">
+    <h3>How to cite BINMAN</h3>
+    <p style="margin:0 0 0.4rem"><code>{{ about.citation.project }}</code><br>
+      <a href="{{ about.citation.repository }}" target="_blank" rel="noopener noreferrer">{{ about.citation.repository }}</a></p>
+    <p style="margin:0;color:var(--muted)">{{ about.citation.instruction }}</p>
+  </div>
+
+  {% if about.gates %}
+    <h2 id="gates">Open gates</h2>
+    {% for gate in about.gates %}
+      <div class="panel">
+        <h3>Gate {{ gate.gate }}</h3>
+        <pre style="white-space:pre-wrap;font-family:var(--data);font-size:0.78rem;margin:0">{{ gate.excerpt }}</pre>
+      </div>
+    {% endfor %}
+  {% endif %}
+
+{% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  window.BINMAN = window.BINMAN || {};
+  window.BINMAN.about = {{ about | tojson }};
+</script>
+<script src="{{ url_for('static', filename='js/about.js') }}"></script>
+{% endblock %}

@@ -179,7 +179,7 @@
       B.applySelection(state.viewer, Selection.get(), function () {
         return {
           role: 'lens',
-          url: 'https://alphafold.ebi.ac.uk/files/AF-' + node.id + '-F1-model_v4.cif',
+          url: B.afdbCifUrl(node.id),
           format: 'mmcif',
           identifier: node.gene || node.id,
           identifierHref: 'https://www.uniprot.org/uniprotkb/' + node.id

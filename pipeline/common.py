@@ -240,6 +240,26 @@ class RateLimiter:
             self._next = now + self._interval
 
 
+GZIP_MAGIC = b"\x1f\x8b"
+
+
+def _maybe_gunzip(content: bytes) -> bytes:
+    """Decompress a gzip body that arrived without a Content-Encoding header.
+
+    UniProt's stream endpoint serves gzip but does not always declare it, so
+    httpx hands back the raw deflate stream. Sniffing the magic bytes is the
+    only reliable test.
+    """
+    if content[:2] != GZIP_MAGIC:
+        return content
+    import gzip
+
+    try:
+        return gzip.decompress(content)
+    except OSError:
+        return content
+
+
 def request_hash(method: str, url: str, params: Any = None, body: Any = None) -> str:
     """Stable cache key for a request."""
     payload = json.dumps(
@@ -379,6 +399,7 @@ class Fetcher:
                 # A corrupt cache entry is a cache miss, not a build failure.
                 blob_path.unlink(missing_ok=True)
         content, meta = self._attempt(method, url, params, json_body, headers)
+        content = _maybe_gunzip(content)
         text = content.decode("utf-8", errors="replace")
         try:
             parsed = json.loads(text)

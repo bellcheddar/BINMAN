@@ -69,3 +69,79 @@ One line per meaningful event, timestamped UTC (spec Section 0 rule 5).
 | 2026-10-03T17:46:58+00:00 | 12.3 | references.bib: 44 references, 38 Crossref matched by search (0 preprints), 6 unmatched, 6 with no DOI, 2 with licence not determined. |
 | 2026-10-03T17:47:18+00:00 | 12.3 | references.bib: 44 references, 37 Crossref matched by search (0 preprints), 7 unmatched, 7 with no DOI, 2 with licence not determined. |
 | 2026-10-03T17:47:30+00:00 | 12.3 | references.bib: 44 references, 38 Crossref matched by search (0 preprints), 6 unmatched, 6 with no DOI, 2 with licence not determined. |
+| 2026-10-03T17:49:27+00:00 | 1.3 | Bridge run starting: 52,761 entries pending of 52,822 catalogued (tiers 1 to 3), 16 IO workers, 14 geometry workers. |
+| 2026-10-03T17:50:30+00:00 | 1.3 | Bridge run starting: 80 entries pending of 52,822 catalogued (tiers 1 to 1), 16 IO workers, 14 geometry workers. |
+| 2026-10-03T17:50:33+00:00 | 1.3 | Bridge run finished: 80 entries in 0.0 min, 23 bridges, 0 failed, 31.3 entries/s. |
+| 2026-10-03T17:50:41+00:00 | 1.3 | Bridge run starting: 52,681 entries pending of 52,822 catalogued (tiers 1 to 3), 16 IO workers, 14 geometry workers. |
+| 2026-10-03T17:52:45+00:00 | 4.1b | About tab generated: 51 references, 4/10 datasets resolved, worked example selected, 2 value(s) not recorded. |
+| 2026-10-03T17:55:41+00:00 | 1.3 | 5,957/52,681 entries, 7,049 bridges, 0 failed, 19.9 entries/s, ~0.7 h remaining. |
+| 2026-10-03T17:56:49+00:00 | 2.2 | UniProt keyword KW-0833 cross-check set: 755 reviewed human proteins. |
+| 2026-10-03T17:56:53+00:00 | 2.2 | InterPro IPR001841 (RING): 296 human reviewed proteins. |
+| 2026-10-03T17:57:23+00:00 | 2.2 | InterPro IPR000569 (HECT): 28 human reviewed proteins. |
+| 2026-10-03T17:57:24+00:00 | 2.2 | InterPro IPR002867 (RBR): 14 human reviewed proteins. |
+| 2026-10-03T17:57:26+00:00 | 2.2 | InterPro IPR001810 (F-box): 67 human reviewed proteins. |
+| 2026-10-03T17:57:48+00:00 | 2.2 | InterPro IPR000210 (BTB): 178 human reviewed proteins. |
+| 2026-10-03T17:57:54+00:00 | 2.2 | InterPro IPR001496 (SOCS-box): 38 human reviewed proteins. |
+| 2026-10-03T17:57:56+00:00 | 2.2 | InterPro IPR003613 (U-box): 9 human reviewed proteins. |
+| 2026-10-03T17:57:57+00:00 | 2.2 | InterPro IPR001373 (Cullin): 9 human reviewed proteins. |
+| 2026-10-03T17:57:59+00:00 | 2.2 | InterPro IPR024991 (APC-C): 1 human reviewed proteins. |
+| 2026-10-03T17:57:59+00:00 | 2.2 | Repertoire: 625 ligases from 9 InterPro signatures, 389 also carrying the KW-0833 keyword. Per family: {'RING': 296, 'HECT': 28, 'RBR': 14, 'F-box': 67, 'BTB': 178, 'SOCS-box': 38, 'U-box': 9, 'Cullin': 9, 'APC-C': 1}. |
+| 2026-10-03T17:57:59+00:00 | 2.2 | UbiBrowser substrate counts loaded: 445 E3s with curated substrates, 588 with predicted. |
+| 2026-10-03T18:00:42+00:00 | 1.3 | 8,197/52,681 entries, 7,844 bridges, 0 failed, 13.7 entries/s, ~0.9 h remaining. |
+| 2026-10-03T18:01:15+00:00 | 2.2 | E3 triage complete: 6 ligases, 0 with a pocket score (coverage 0.000, floor 0.8). Notes: {'structure_download_failed:FileNotFoundError': 6, 'open_targets_failed:RuntimeError': 6}. |
+| 2026-10-03T18:02:31+00:00 | 2.2 | UniProt keyword KW-0833 cross-check set: 755 reviewed human proteins. |
+| 2026-10-03T18:02:31+00:00 | 2.2 | InterPro IPR001841 (RING): 296 human reviewed proteins. |
+| 2026-10-03T18:02:31+00:00 | 2.2 | InterPro IPR000569 (HECT): 28 human reviewed proteins. |
+| 2026-10-03T18:02:31+00:00 | 2.2 | InterPro IPR002867 (RBR): 14 human reviewed proteins. |
+| 2026-10-03T18:02:31+00:00 | 2.2 | InterPro IPR001810 (F-box): 67 human reviewed proteins. |
+| 2026-10-03T18:02:31+00:00 | 2.2 | InterPro IPR000210 (BTB): 178 human reviewed proteins. |
+| 2026-10-03T18:02:31+00:00 | 2.2 | InterPro IPR001496 (SOCS-box): 38 human reviewed proteins. |
+| 2026-10-03T18:02:31+00:00 | 2.2 | InterPro IPR003613 (U-box): 9 human reviewed proteins. |
+| 2026-10-03T18:02:31+00:00 | 2.2 | InterPro IPR001373 (Cullin): 9 human reviewed proteins. |
+| 2026-10-03T18:02:31+00:00 | 2.2 | InterPro IPR024991 (APC-C): 1 human reviewed proteins. |
+| 2026-10-03T18:02:31+00:00 | 2.2 | Repertoire: 625 ligases from 9 InterPro signatures, 389 also carrying the KW-0833 keyword. Per family: {'RING': 296, 'HECT': 28, 'RBR': 14, 'F-box': 67, 'BTB': 178, 'SOCS-box': 38, 'U-box': 9, 'Cullin': 9, 'APC-C': 1}. |
+| 2026-10-03T18:02:31+00:00 | 2.2 | UbiBrowser substrate counts loaded: 445 E3s with curated substrates, 588 with predicted. |
+| 2026-10-03T18:03:40+00:00 | 2.2 | E3 triage complete: 8 ligases, 2 with a pocket score (coverage 0.250, floor 0.8). Notes: {'fpocket': 2, 'open_targets_failed:RuntimeError': 2}. |
+| 2026-10-03T18:04:36+00:00 | 2.2 | UniProt keyword KW-0833 cross-check set: 755 reviewed human proteins. |
+| 2026-10-03T18:04:36+00:00 | 2.2 | InterPro IPR001841 (RING): 296 human reviewed proteins. |
+| 2026-10-03T18:04:36+00:00 | 2.2 | InterPro IPR000569 (HECT): 28 human reviewed proteins. |
+| 2026-10-03T18:04:36+00:00 | 2.2 | InterPro IPR002867 (RBR): 14 human reviewed proteins. |
+| 2026-10-03T18:04:36+00:00 | 2.2 | InterPro IPR001810 (F-box): 67 human reviewed proteins. |
+| 2026-10-03T18:04:36+00:00 | 2.2 | InterPro IPR000210 (BTB): 178 human reviewed proteins. |
+| 2026-10-03T18:04:36+00:00 | 2.2 | InterPro IPR001496 (SOCS-box): 38 human reviewed proteins. |
+| 2026-10-03T18:04:36+00:00 | 2.2 | InterPro IPR003613 (U-box): 9 human reviewed proteins. |
+| 2026-10-03T18:04:36+00:00 | 2.2 | InterPro IPR001373 (Cullin): 9 human reviewed proteins. |
+| 2026-10-03T18:04:36+00:00 | 2.2 | InterPro IPR024991 (APC-C): 1 human reviewed proteins. |
+| 2026-10-03T18:04:36+00:00 | 2.2 | Repertoire: 625 ligases from 9 InterPro signatures, 389 also carrying the KW-0833 keyword. Per family: {'RING': 296, 'HECT': 28, 'RBR': 14, 'F-box': 67, 'BTB': 178, 'SOCS-box': 38, 'U-box': 9, 'Cullin': 9, 'APC-C': 1}. |
+| 2026-10-03T18:04:36+00:00 | 2.2 | UbiBrowser substrate counts loaded: 445 E3s with curated substrates, 588 with predicted. |
+| 2026-10-03T18:04:56+00:00 | 2.2 | E3 triage complete: 10 ligases, 10 with a pocket score (coverage 1.000, floor 0.8). Notes: {'fpocket': 10, 'open_targets': 10}. |
+| 2026-10-03T18:05:06+00:00 | 2.2 | UniProt keyword KW-0833 cross-check set: 755 reviewed human proteins. |
+| 2026-10-03T18:05:06+00:00 | 2.2 | InterPro IPR001841 (RING): 296 human reviewed proteins. |
+| 2026-10-03T18:05:06+00:00 | 2.2 | InterPro IPR000569 (HECT): 28 human reviewed proteins. |
+| 2026-10-03T18:05:06+00:00 | 2.2 | InterPro IPR002867 (RBR): 14 human reviewed proteins. |
+| 2026-10-03T18:05:06+00:00 | 2.2 | InterPro IPR001810 (F-box): 67 human reviewed proteins. |
+| 2026-10-03T18:05:06+00:00 | 2.2 | InterPro IPR000210 (BTB): 178 human reviewed proteins. |
+| 2026-10-03T18:05:06+00:00 | 2.2 | InterPro IPR001496 (SOCS-box): 38 human reviewed proteins. |
+| 2026-10-03T18:05:06+00:00 | 2.2 | InterPro IPR003613 (U-box): 9 human reviewed proteins. |
+| 2026-10-03T18:05:06+00:00 | 2.2 | InterPro IPR001373 (Cullin): 9 human reviewed proteins. |
+| 2026-10-03T18:05:06+00:00 | 2.2 | InterPro IPR024991 (APC-C): 1 human reviewed proteins. |
+| 2026-10-03T18:05:06+00:00 | 2.2 | Repertoire: 625 ligases from 9 InterPro signatures, 389 also carrying the KW-0833 keyword. Per family: {'RING': 296, 'HECT': 28, 'RBR': 14, 'F-box': 67, 'BTB': 178, 'SOCS-box': 38, 'U-box': 9, 'Cullin': 9, 'APC-C': 1}. |
+| 2026-10-03T18:05:06+00:00 | 2.2 | UbiBrowser substrate counts loaded: 445 E3s with curated substrates, 588 with predicted. |
+| 2026-10-03T18:05:42+00:00 | 1.3 | 10,433/52,681 entries, 8,786 bridges, 0 failed, 11.6 entries/s, ~1.0 h remaining. |
+| 2026-10-03T18:07:04+00:00 | 2.1 | Human reviewed proteome: 20,431 accessions. |
+| 2026-10-03T18:07:04+00:00 | 2.1 | Degron scan: 25 accessions pending, 16 IO workers, 14 DSSP workers. |
+| 2026-10-03T18:07:22+00:00 | 2.1 | Degron scan complete: 25 proteins scanned, 12 candidate degrons written, 0 failed. |
+| 2026-10-03T18:10:42+00:00 | 1.3 | 12,735/52,681 entries, 10,923 bridges, 0 failed, 10.6 entries/s, ~1.0 h remaining. |
+| 2026-10-03T18:11:43+00:00 | 2.2 | 50/625 ligases processed. Notes: {'fpocket': 40, 'open_targets': 38, 'open_targets_no_expression': 2}. |
+| 2026-10-03T18:12:30+00:00 | 2.1 | Human reviewed proteome: 20,431 accessions. |
+| 2026-10-03T18:12:30+00:00 | 2.1 | Degron scan: 20,431 accessions pending, 16 IO workers, 14 DSSP workers. |
+| 2026-10-03T18:14:43+00:00 | 2.2 | 100/625 ligases processed. Notes: {'fpocket': 87, 'open_targets': 87, 'open_targets_no_expression': 3, 'structure_download_failed:FileNotFoundError': 3}. |
+| 2026-10-03T18:14:47+00:00 | 2.3 | Reach window NOT fitted: no diGly site data (G7). No verdict column is produced, and the spec 1.0 starting values remain flagged unfitted. |
+| 2026-10-03T18:14:47+00:00 | 2.3 | Degradability: 12 glue-candidate bridges to measure. |
+| 2026-10-03T18:14:54+00:00 | 2.3 | Degradability complete: 1,650 lysines over 12 sites, 0 failed. Verdicts assigned: 0 (0 is expected and correct while the reach window is unfitted). |
+| 2026-10-03T18:15:31+00:00 | 2.4 | Edge table built: 11,022 edges (21 bridged_by, 0 curated ubiquitylates, 11,001 predicted, 0 has_degron). |
+| 2026-10-03T18:15:42+00:00 | 1.3 | 15,040/52,681 entries, 14,540 bridges, 0 failed, 10.0 entries/s, ~1.0 h remaining. |
+| 2026-10-03T18:17:11+00:00 | 2.2 | 150/625 ligases processed. Notes: {'fpocket': 136, 'open_targets': 134, 'open_targets_no_expression': 5, 'structure_download_failed:FileNotFoundError': 4, 'no_ensembl_gene_id': 1}. |
+| 2026-10-03T18:17:13+00:00 | 4.3 | Atlas built: 52,821 entries, 16,179 bridges (novel set not determinable: no curated glue database resolved (G7)), 9,952 ligands, 12 degrons, 10 ligases, 1,650 lysines, 60.4 MB. |
+| 2026-10-03T18:17:13+00:00 | 9 | Validation run against binman.sqlite: 16 metric(s) not computed (dataset unavailable), 0 measured floor(s) missed. |
+| 2026-10-03T18:17:30+00:00 | 2.1 | 503/20,431 scanned, 547 candidates, 18 failed, 1.7/s, ~3.3 h remaining. |

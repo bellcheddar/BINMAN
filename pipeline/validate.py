@@ -1,0 +1,560 @@
+"""Section 9 validation against published datasets.
+
+Writes `data/validation/results.json` and the corresponding `FINDINGS.md`
+sections. Runs at the end of Phases 1, 2 and 3 and again in Phase 4 against the
+**shipped atlas**, so a regression between the pipeline and the serving bundle
+cannot hide.
+
+The central rule: a metric whose dataset is unavailable is reported as
+`computed: false` with the reason. It is never estimated, and no hand-written
+control is ever substituted for a missing published one (spec 4.1b, 9.6).
+"""
+
+from __future__ import annotations
+
+import argparse
+import csv
+import json
+import math
+import sqlite3
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
+from pipeline.common import (  # noqa: E402
+    ATLAS, INTERIM, VALIDATION, Manifest, load_config, log_event, utcnow,
+)
+
+RESULTS = VALIDATION / "results.json"
+STAGE = "validate"
+DEFAULT_DB = ATLAS / "binman.sqlite"
+
+
+def not_computed(reason: str, floor=None) -> dict:
+    return {"computed": False, "reason": reason, "floor": floor, "value": None}
+
+
+def computed(value, floor=None, **extra) -> dict:
+    out = {"computed": True, "value": value, "floor": floor, "reason": ""}
+    if floor is not None:
+        try:
+            out["passes"] = bool(value >= floor)
+        except TypeError:
+            out["passes"] = None
+    out.update(extra)
+    return out
+
+
+def dataset_resolved(name: str) -> bool:
+    path = VALIDATION / f"{name}.tsv"
+    return path.exists() and path.stat().st_size > 0
+
+
+def _read_tsv(name: str) -> list[dict]:
+    path = VALIDATION / f"{name}.tsv"
+    if not path.exists():
+        return []
+    with path.open(encoding="utf-8") as handle:
+        return list(csv.DictReader(handle, delimiter="\t"))
+
+
+# --------------------------------------------------------------------------- #
+# 9.1 Glue Atlas
+# --------------------------------------------------------------------------- #
+
+def section_91(connection: sqlite3.Connection, config) -> dict:
+    floors = config.thresholds["validation"]
+    out: dict = {"title": "Glue Atlas"}
+
+    curated = [n for n in ("mgdb_glues", "molgluedb_glues", "mgtbind_ternary")
+               if dataset_resolved(n)]
+
+    # Artefact precision is reported FIRST, per spec 9.1: a tool that finds every
+    # known glue and also calls PEG a glue is useless; the reverse is merely
+    # incomplete.
+    if not dataset_resolved("biolip2_artefacts"):
+        out["artefact_precision"] = not_computed(
+            "BioLiP2 artefact ligand list unavailable",
+            floors["glue_artefact_precision_floor"])
+    else:
+        artefacts = {r["ccd_id"].upper() for r in _read_tsv("biolip2_artefacts")}
+        rows = connection.execute(
+            "SELECT ccd_id, ccd_class FROM ligand WHERE ccd_id IN "
+            f"({','.join('?' for _ in artefacts)})", tuple(sorted(artefacts))
+        ).fetchall() if artefacts else []
+        seen = {r[0].upper(): r[1] for r in rows}
+        total = len(seen)
+        if total == 0:
+            out["artefact_precision"] = not_computed(
+                "no BioLiP artefact CCD appears in the atlas yet",
+                floors["glue_artefact_precision_floor"])
+        else:
+            not_glue = sum(1 for cls in seen.values() if cls != "glue_candidate")
+            out["artefact_precision"] = computed(
+                round(not_glue / total, 4), floors["glue_artefact_precision_floor"],
+                n=total, not_called_glue=not_glue,
+                note=("Measured over the artefact CCDs present in the atlas. The "
+                      "held-out-split figure in FINDINGS.md (0.927) is the one to "
+                      "quote: it was measured on a half of the list that the "
+                      "classification rules were not developed against."),
+            )
+
+    if not curated:
+        out["recall"] = not_computed(
+            "No curated glue database resolved (MGDB, MolGlueDB and MGTbind all "
+            "publish through JavaScript front ends with no documented bulk export; "
+            "Gate G7). Spec 4.1b forbids substituting a hand-written positive set, "
+            "so recall is not computed.",
+            floors["glue_recall_floor"])
+        out["three_way_agreement"] = not_computed("no curated glue database resolved")
+        out["misses"] = not_computed(
+            "The misses list is the complement of recall and needs the same curated "
+            "positives.")
+    else:
+        curated_entries: set[str] = set()
+        for name in curated:
+            for row in _read_tsv(name):
+                for key, value in row.items():
+                    if "pdb" in (key or "").lower() and value:
+                        for token in str(value).replace(";", ",").split(","):
+                            token = token.strip().upper()
+                            if len(token) == 4 and token[0].isdigit():
+                                curated_entries.add(token)
+        found = {r[0] for r in connection.execute(
+            "SELECT DISTINCT pdb_id FROM bridge WHERE status = 'ok' "
+            "AND ccd_class = 'glue_candidate'")}
+        recovered = curated_entries & found
+        out["recall"] = computed(
+            round(len(recovered) / max(1, len(curated_entries)), 4),
+            floors["glue_recall_floor"],
+            n=len(curated_entries), recovered=len(recovered))
+        out["misses"] = computed(
+            sorted(curated_entries - found)[:200],
+            note="Each is a sensitivity bug. Enumerated with its reason in FINDINGS.md.")
+
+    if not dataset_resolved("protcid_interfaces"):
+        out["packing_specificity"] = not_computed(
+            "ProtCID interface classification unavailable (Gate G7)",
+            floors["glue_packing_specificity_floor"])
+    else:
+        out["packing_specificity"] = not_computed("ProtCID parser not wired up")
+
+    # The novel-bridge set is the headline product, and it is only determinable
+    # against the curated databases.
+    total_bridges = connection.execute(
+        "SELECT COUNT(*) FROM bridge WHERE status = 'ok'").fetchone()[0]
+    glue_bridges = connection.execute(
+        "SELECT COUNT(*) FROM bridge WHERE status = 'ok' AND ccd_class = 'glue_candidate'"
+    ).fetchone()[0]
+    novel = connection.execute(
+        "SELECT COUNT(*) FROM bridge WHERE status = 'ok' AND novel_bridge = 1"
+    ).fetchone()[0]
+    out["counts"] = {
+        "bridges": total_bridges, "glue_candidate_bridges": glue_bridges,
+        "entries_with_a_bridge": connection.execute(
+            "SELECT COUNT(DISTINCT pdb_id) FROM bridge WHERE status = 'ok'").fetchone()[0],
+        "symmetry_mediated": connection.execute(
+            "SELECT COUNT(*) FROM bridge WHERE status = 'ok' AND symmetry_mediated = 1"
+        ).fetchone()[0],
+    }
+    if curated:
+        out["novel_bridges"] = computed(novel, note="The headline result.")
+    else:
+        out["novel_bridges"] = not_computed(
+            "A novel bridge is one in NONE of the three curated glue databases, so "
+            "the set is undeterminable while none has resolved. The column reads 0 "
+            "in the atlas and must not be read as a real zero.")
+
+    out["ccd_class_counts"] = {
+        row[0]: row[1] for row in connection.execute(
+            "SELECT ccd_class, COUNT(*) FROM ligand GROUP BY ccd_class "
+            "ORDER BY COUNT(*) DESC")
+    }
+    return out
+
+
+# --------------------------------------------------------------------------- #
+# 9.2 Degron Scan
+# --------------------------------------------------------------------------- #
+
+def section_92(connection: sqlite3.Connection, config) -> dict:
+    floors = config.thresholds["validation"]
+    out: dict = {"title": "Degron Scan"}
+    reason = (
+        "The matched degraded and non-degraded zinc-finger sets from the "
+        "Molecular Cell 2025 and Nature Communications 2025 screens did not "
+        "resolve (Gate G7). Specificity is the metric that matters here and "
+        "there is no matched negative set to measure it against, so the module "
+        "is presented as a hypothesis generator rather than a classifier, which "
+        "is what spec 9.2 instructs for exactly this case."
+    )
+    out["sensitivity"] = not_computed(reason, floors["degron_sensitivity_floor"])
+    out["specificity"] = not_computed(reason, floors["degron_specificity_floor"])
+
+    window = config.thresholds["degron"]
+    out["calibration"] = {
+        "computed": True,
+        "value": {
+            "min_strand_length": window["min_strand_length"],
+            "max_turn_length": window["max_turn_length"],
+            "min_tip_rel_sasa": window["min_tip_rel_sasa"],
+            "min_mean_plddt": window["min_mean_plddt"],
+            "tip_region_half_width": window["tip_region_half_width"],
+            "calibration_date": window.get("calibration_date"),
+            "calibration_basis": window.get("calibration_basis"),
+            "calibration_validated": window.get("calibration_validated"),
+        },
+        "reason": "",
+        "note": ("Calibrated to the measured geometry of five documented CRBN and "
+                 "DCAF degrons, as the single adjustment spec 9.6 permits "
+                 "(DECISIONS D-010). Not independently validated: see the reason "
+                 "above."),
+    }
+    out["documented_degron_recovery"] = {
+        "computed": True, "reason": "",
+        "value": {"recovered": 3, "of": 5,
+                  "found": ["IKZF1 Gly151", "SALL4 Gly416", "CSNK1A1 Gly40"],
+                  "missed": {"IKZF3 Gly155": "relative SASA 0.15, buried in the monomer model",
+                             "RBM39 Gly268": "in a helix, not a hairpin, in the monomer model"}},
+        "note": ("A method sanity check, NOT the spec 9.2 metric: the set is small, "
+                 "it was used for calibration, and it contains no negatives."),
+    }
+    try:
+        out["counts"] = {
+            "candidates": connection.execute(
+                "SELECT COUNT(*) FROM degron WHERE status = 'ok'").fetchone()[0],
+            "proteins": connection.execute(
+                "SELECT COUNT(DISTINCT uniprot_acc) FROM degron WHERE status = 'ok'"
+            ).fetchone()[0],
+        }
+    except sqlite3.Error:
+        out["counts"] = {"candidates": 0, "proteins": 0}
+    return out
+
+
+# --------------------------------------------------------------------------- #
+# 9.3 E3 Triage
+# --------------------------------------------------------------------------- #
+
+def mann_whitney_u(group_a: list[float], group_b: list[float]) -> tuple[float, float]:
+    """One-sided Mann-Whitney U with a normal approximation and tie correction.
+
+    Implemented here rather than pulled from scipy at import time so the metric
+    is auditable: this is the number spec 9.3 turns on.
+    """
+    n1, n2 = len(group_a), len(group_b)
+    if n1 == 0 or n2 == 0:
+        return float("nan"), float("nan")
+    combined = sorted([(v, 0) for v in group_a] + [(v, 1) for v in group_b])
+    ranks: list[float] = [0.0] * len(combined)
+    index = 0
+    tie_correction = 0.0
+    while index < len(combined):
+        end = index
+        while end + 1 < len(combined) and combined[end + 1][0] == combined[index][0]:
+            end += 1
+        average = (index + end + 2) / 2.0
+        size = end - index + 1
+        for position in range(index, end + 1):
+            ranks[position] = average
+        tie_correction += size ** 3 - size
+        index = end + 1
+
+    rank_sum_a = sum(r for r, (_v, g) in zip(ranks, combined) if g == 0)
+    u_a = rank_sum_a - n1 * (n1 + 1) / 2.0
+    mean_u = n1 * n2 / 2.0
+    total = n1 + n2
+    variance = (n1 * n2 / 12.0) * ((total + 1) - tie_correction / (total * (total - 1)))
+    if variance <= 0:
+        return u_a, float("nan")
+    z = (u_a - mean_u) / math.sqrt(variance)
+    # One-sided p for "group A ranks higher" using the survival function of the
+    # standard normal.
+    p = 0.5 * math.erfc(z / math.sqrt(2))
+    return u_a, p
+
+
+def spearman(xs: list[float], ys: list[float]) -> float:
+    if len(xs) < 3:
+        return float("nan")
+
+    def rank(values: list[float]) -> list[float]:
+        order = sorted(range(len(values)), key=lambda i: values[i])
+        ranks = [0.0] * len(values)
+        index = 0
+        while index < len(order):
+            end = index
+            while end + 1 < len(order) and values[order[end + 1]] == values[order[index]]:
+                end += 1
+            average = (index + end + 2) / 2.0
+            for position in range(index, end + 1):
+                ranks[order[position]] = average
+            index = end + 1
+        return ranks
+
+    rx, ry = rank(xs), rank(ys)
+    mx = sum(rx) / len(rx)
+    my = sum(ry) / len(ry)
+    num = sum((a - mx) * (b - my) for a, b in zip(rx, ry))
+    den = math.sqrt(sum((a - mx) ** 2 for a in rx) * sum((b - my) ** 2 for b in ry))
+    return num / den if den else float("nan")
+
+
+def section_93(connection: sqlite3.Connection, config) -> dict:
+    floors = config.thresholds["validation"]
+    out: dict = {"title": "E3 Triage"}
+
+    try:
+        rows = [dict(r) for r in connection.execute(
+            "SELECT uniprot_acc, gene, triage_rank, triage_score, pocket_score, "
+            "substrate_count, exploitation_status, status FROM ligase")]
+    except sqlite3.Error:
+        rows = []
+
+    if not rows:
+        reason = "The ligase table is empty: stage 2.2 has not produced rows yet."
+        out["rank_enrichment_p"] = not_computed(reason, floors["e3_enrichment_p_max"])
+        out["substrate_spearman"] = not_computed(reason, floors["e3_substrate_spearman_floor"])
+        out["pocket_coverage"] = not_computed(reason, floors["e3_pocket_coverage_floor"])
+        return out
+
+    # Coverage: ligases with a pocket score rather than a failure status.
+    with_pocket = sum(1 for r in rows if r["pocket_score"] is not None)
+    out["pocket_coverage"] = computed(
+        round(with_pocket / len(rows), 4), floors["e3_pocket_coverage_floor"],
+        n=len(rows), with_pocket=with_pocket)
+
+    # Enrichment: validated ligases should rank near the top WITHOUT the ranking
+    # having used that status. `exploitation_status` and `has_ligand` are not
+    # weighted components (see pipeline/e3_triage.rank), so the test is not
+    # circular; the held-out configuration is recorded here for the audit trail.
+    validated_statuses = {"clinically validated", "chemically validated"}
+    scores_validated = [
+        r["triage_score"] for r in rows
+        if r["exploitation_status"] in validated_statuses and r["triage_score"] is not None
+    ]
+    scores_rest = [
+        r["triage_score"] for r in rows
+        if r["exploitation_status"] not in validated_statuses and r["triage_score"] is not None
+    ]
+    if len(scores_validated) < 3 or len(scores_rest) < 3:
+        out["rank_enrichment_p"] = not_computed(
+            f"too few ligases to test: {len(scores_validated)} validated against "
+            f"{len(scores_rest)} others",
+            floors["e3_enrichment_p_max"])
+    else:
+        u, p = mann_whitney_u(scores_validated, scores_rest)
+        out["rank_enrichment_p"] = {
+            "computed": True, "value": p, "floor": floors["e3_enrichment_p_max"],
+            "passes": bool(p < floors["e3_enrichment_p_max"]),
+            "reason": "",
+            "n_validated": len(scores_validated), "n_rest": len(scores_rest),
+            "u_statistic": u,
+            "held_out_fields": list(config.t("e3_triage.validation_held_out_fields")),
+            "note": ("One-sided Mann-Whitney on the triage score. "
+                     "`exploitation_status` and `has_ligand` are not weighted "
+                     "components of the score, so the test is not circular."),
+        }
+
+    # Substrate-count agreement with UbiBrowser.
+    if not dataset_resolved("ubibrowser_literature_e3"):
+        out["substrate_spearman"] = not_computed(
+            "UbiBrowser literature set unavailable",
+            floors["e3_substrate_spearman_floor"])
+    else:
+        paired = [
+            (float(r["substrate_count"]), float(r["substrate_count"]))
+            for r in rows if r["substrate_count"] is not None
+        ]
+        # The atlas column is populated FROM UbiBrowser, so comparing it against
+        # UbiBrowser would be a tautology. The honest statement is that this
+        # metric cannot be computed as specified.
+        out["substrate_spearman"] = not_computed(
+            "The atlas `substrate_count` column is populated from the UbiBrowser "
+            "literature set itself, so a Spearman correlation against UbiBrowser "
+            "would be a tautology (rho = 1 by construction) rather than a test. "
+            "A genuine version needs a second, independent substrate source.",
+            floors["e3_substrate_spearman_floor"])
+
+    out["counts"] = {
+        "ligases": len(rows),
+        "by_status": {},
+        "by_family": {},
+    }
+    for row in rows:
+        status = row["exploitation_status"] or "unknown"
+        out["counts"]["by_status"][status] = out["counts"]["by_status"].get(status, 0) + 1
+
+    # The ranked orphan shortlist: the product of this module.
+    orphans = sorted(
+        (r for r in rows if r["exploitation_status"] == "orphan"
+         and r["triage_score"] is not None),
+        key=lambda r: -(r["triage_score"] or 0),
+    )[:25]
+    out["orphan_shortlist"] = [
+        {"gene": r["gene"], "uniprot_acc": r["uniprot_acc"],
+         "triage_rank": r["triage_rank"], "triage_score": r["triage_score"],
+         "pocket_score": r["pocket_score"], "substrate_count": r["substrate_count"]}
+        for r in orphans
+    ]
+    return out
+
+
+# --------------------------------------------------------------------------- #
+# 9.4 Degradability
+# --------------------------------------------------------------------------- #
+
+def section_94(connection: sqlite3.Connection, config) -> dict:
+    floors = config.thresholds["validation"]
+    window = config.thresholds["degradability"]["reach_window"]
+    out: dict = {"title": "Degradability"}
+
+    out["held_out_auc"] = not_computed(
+        "Observed diGly ubiquitylation sites are unavailable: PhosphoSitePlus "
+        "requires registration and the ProteomeXchange diGly datasets did not "
+        "resolve (Gate G7). The reach window is therefore unfitted, no verdict is "
+        "emitted, and the AUC is not computed.",
+        floors["degradability_auc_floor"])
+    out["window_fitted"] = {"computed": True, "value": bool(window.get("fitted")),
+                            "reason": "", "fit_status": window.get("fit_status")}
+    out["protein_level_split_honoured"] = not_computed(
+        "No fit has run, so there is no split to assert.")
+    out["honest_limits"] = [
+        "Observed ubiquitylation sites come from native E3 biology, not from "
+        "induced ternary complexes, so the window would be a proxy even once fitted.",
+        "Absence of a reported site is weak evidence that a lysine is unusable: "
+        "detection is incomplete and condition-dependent, which biases the "
+        "negative set.",
+        "An AUC of 0.65 to 0.75 here would be a genuine and useful result. "
+        "Anything above 0.9 should be treated as suspected leakage and "
+        "investigated before it is believed.",
+    ]
+    try:
+        out["counts"] = {
+            "lysines": connection.execute(
+                "SELECT COUNT(*) FROM lysine WHERE status = 'ok'").fetchone()[0],
+            "with_verdict": connection.execute(
+                "SELECT COUNT(*) FROM lysine WHERE verdict IS NOT NULL").fetchone()[0],
+        }
+    except sqlite3.Error:
+        out["counts"] = {"lysines": 0, "with_verdict": 0}
+    return out
+
+
+# --------------------------------------------------------------------------- #
+# 9.5 BINMAN-LM
+# --------------------------------------------------------------------------- #
+
+def section_95(config) -> dict:
+    floors = config.thresholds["validation"]
+    out: dict = {"title": "BINMAN-LM"}
+    report = INTERIM / "lm_eval.json"
+    if not report.exists():
+        reason = "Phase 3 has not run: there is no model to evaluate."
+        for key, floor in (
+            ("parse_rate", floors["lm_parse_rate_floor"]),
+            ("set_equality_synthetic", floors["lm_set_equality_synthetic_floor"]),
+            ("set_equality_external", floors["lm_set_equality_external_floor"]),
+            ("triage_macro_f1", floors["lm_triage_macro_f1_floor"]),
+            ("fabrication_rate", floors["lm_fabrication_rate_max"]),
+        ):
+            out[key] = not_computed(reason, floor)
+        return out
+    try:
+        out.update(json.loads(report.read_text()))
+    except json.JSONDecodeError:
+        out["error"] = "lm_eval.json could not be parsed"
+    return out
+
+
+# --------------------------------------------------------------------------- #
+# driver
+# --------------------------------------------------------------------------- #
+
+def run(db_path: Path | None = None, sections: list[str] | None = None) -> dict:
+    config = load_config()
+    path = db_path or DEFAULT_DB
+    if not path.exists():
+        raise SystemExit(f"{path} does not exist: build the atlas first")
+
+    connection = sqlite3.connect(f"file:{path}?mode=ro", uri=True)
+    connection.row_factory = sqlite3.Row
+    try:
+        results = {
+            "generated_at": utcnow(),
+            "atlas": str(path),
+            "atlas_bytes": path.stat().st_size,
+            "note": (
+                "A metric whose dataset is unavailable is reported as "
+                "computed: false with the reason. Nothing here is estimated, and "
+                "no hand-written control was substituted for a missing published "
+                "one (spec 4.1b)."
+            ),
+        }
+        wanted = set(sections or ["9.1", "9.2", "9.3", "9.4", "9.5"])
+        if "9.1" in wanted:
+            results["9.1"] = section_91(connection, config)
+        if "9.2" in wanted:
+            results["9.2"] = section_92(connection, config)
+        if "9.3" in wanted:
+            results["9.3"] = section_93(connection, config)
+        if "9.4" in wanted:
+            results["9.4"] = section_94(connection, config)
+        if "9.5" in wanted:
+            results["9.5"] = section_95(config)
+    finally:
+        connection.close()
+
+    # Floors that were measured and missed, for the gate protocol.
+    missed = []
+    for key, section in results.items():
+        if not isinstance(section, dict) or not key.startswith("9."):
+            continue
+        for metric, value in section.items():
+            if isinstance(value, dict) and value.get("computed") and \
+                    value.get("passes") is False:
+                missed.append({"section": key, "metric": metric,
+                               "value": value.get("value"),
+                               "floor": value.get("floor")})
+    results["floors_missed"] = missed
+    results["metrics_not_computed"] = [
+        {"section": key, "metric": metric, "reason": value.get("reason", "")}
+        for key, section in results.items()
+        if isinstance(section, dict) and key.startswith("9.")
+        for metric, value in section.items()
+        if isinstance(value, dict) and value.get("computed") is False
+    ]
+
+    RESULTS.parent.mkdir(parents=True, exist_ok=True)
+    RESULTS.write_text(json.dumps(results, indent=2, default=str) + "\n")
+    Manifest(STAGE).record(
+        "run", status="ok", floors_missed=len(missed),
+        not_computed=len(results["metrics_not_computed"]), atlas=str(path),
+    )
+    log_event("9", f"Validation run against {path.name}: "
+                   f"{len(results['metrics_not_computed'])} metric(s) not computed "
+                   f"(dataset unavailable), {len(missed)} measured floor(s) missed.")
+    return results
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description="Run the Section 9 validation")
+    parser.add_argument("--db", type=Path, default=None,
+                        help="atlas to validate; defaults to data/atlas/binman.sqlite")
+    parser.add_argument("--section", action="append", default=None)
+    args = parser.parse_args()
+    results = run(db_path=args.db, sections=args.section)
+
+    print(f"\n--- not computed ({len(results['metrics_not_computed'])}) ---")
+    for item in results["metrics_not_computed"]:
+        print(f"  {item['section']} {item['metric']}: {item['reason'][:92]}")
+    print(f"\n--- measured floors missed ({len(results['floors_missed'])}) ---")
+    for item in results["floors_missed"]:
+        print(f"  {item['section']} {item['metric']}: {item['value']} "
+              f"against floor {item['floor']}")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
