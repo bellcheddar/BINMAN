@@ -211,6 +211,17 @@ def candidates() -> list[Candidate]:
                   "publisher terms",
                   query="Defining the human C2H2 zinc finger degrome targeted by thalidomide analogs through CRBN",
                   expect=("zinc finger",)),
+        # Used by degron_slabicki (per-compound nested validation), by
+        # degron_alascan (the measured per-position weights the shipped column
+        # carries) and by degron_panel (the 29-compound transfer test). It was
+        # missing from this registry while three modules and a shipped column
+        # depended on it, which is exactly what the registry exists to catch.
+        Candidate("zf_glutarimide_screen", "paper",
+                  "per-compound zinc-finger degradation, alanine scan and the "
+                  "29-analog validation panel",
+                  "publisher terms",
+                  query="Expanding the druggable zinc-finger proteome defines properties of drug-induced degradation",
+                  expect=("zinc-finger", "degradation")),
         Candidate("tien_sasa", "paper",
                   "maximum residue accessibility reference for relative SASA", "CC-BY-4.0",
                   query="Maximum allowed solvent accessibilites of residues in proteins",

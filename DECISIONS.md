@@ -388,7 +388,7 @@ near-zero loss twice and destroyed the model both times.
 | Attempt | Learning rate | Steps | Final DPO loss | Generation |
 |---|---|---|---|---|
 | 1 | 1e-5 | 600 | 0.0018 | collapsed: emitted `ccdccdccdccd…` indefinitely |
-| 2 | 5e-7 | 150 | — | degraded: 1 of 6 probes produced a parseable query |
+| 2 | 5e-7 | 150 | n/a | degraded: 1 of 6 probes produced a parseable query |
 
 **What made this dangerous.** The per-mode preference win rates measured 0.95 to
 1.00 after attempt 1, which reads as a complete success. They were meaningless: a
@@ -1428,7 +1428,7 @@ re-based. Gate G6 stays open.
 
 | approach | AUC | sd |
 |---|---|---|
-| geometry alone, the shipped score | 0.441 | — |
+| geometry alone, the shipped score | 0.441 | n/a |
 | sequence, classifying the 32 FDR-significant labels | **0.636** | 0.082 |
 | sequence, regressing on continuous fold depletion | 0.605 | 0.124 |
 | sequence plus geometry as a feature | 0.638 | 0.085 |
@@ -1706,6 +1706,11 @@ directly, by ranking compounds on breadth against predictability. They are in
 the paper and not in the distributed file. The lead contact offers reanalysis
 data on request, which is a human-to-human ask rather than a download.
 
+> **Superseded by D-053.** Both of those claims were wrong. The 27 compounds
+> are in supplement 5, the validation screen, which is not truncated; no
+> request was needed. The test was run and the promiscuity hypothesis above is
+> **not supported**.
+
 ## D-048: the threshold objective was wrong, and the grammar transfers
 
 **Decision.** Pomalidomide and lenalidomide **clear both spec 9.2 floors** under
@@ -1932,3 +1937,82 @@ It costs nothing and removes a real failure mode for wider windows.
 than only those at hairpin candidates. That is a different column with
 different semantics, per protein rather than per candidate, and it should be
 added as one rather than quietly widening this one.
+
+## D-053: the promiscuity hypothesis was testable after all, and it is wrong
+
+**Decision.** D-047's promiscuity hypothesis is **not supported**. Breadth does
+not predict whether a compound's degradation is readable from sequence. The
+pomalidomide-trained model transfers above chance to every one of the 24
+glutarimide analogs whose AUC is estimable, including the broadest compound in
+the set. The hypothesis stays in the record as a hypothesis that was tested and
+failed, which is worth more than one left open.
+
+**What made the test possible.** D-047 said the other 27 compounds were "in the
+paper and not in the distributed file" and named the human-to-human ask as the
+only route. That was wrong about the file, not about the paper. Supplement 4,
+the primary screen, is the truncated one. Supplement 5, the validation screen,
+is a modern `.xlsx`, is not truncated, and carries all 29 compounds against 57
+constructs the primary screen had already shown to be degrons. No reanalysis
+request was needed: the data was already on disk, in the file next to the one
+being read.
+
+**The join, which failed silently first.** The ratio table keys on
+`Construct.ZnF` ("BCL6_570-627"), which matches the library's `Construct`
+column and not its `Construct_Name` ("BCL6_570-627.Validation_AA"). The variant
+sits in `Category` (WT, Mut1, Mut2, Mut3) and only the WT rows are the
+compound's effect on the native degron. The first run printed a header and no
+rows, which is again the good kind of failure.
+
+**The result, gene-disjoint.** Every Sievers row from a panel gene is held out
+of training, so no panel protein contributes its own label.
+
+| | value |
+|---|---:|
+| compounds with an estimable AUC | 24 of 29 |
+| mean AUC | **0.779** |
+| median / min / max | 0.769 / 0.671 / 0.954 |
+| above chance | **24 of 24** |
+| permutation p (2,000 shuffles) | **0.0005** |
+| breadth against AUC, Spearman | **+0.175 (p=0.41)** |
+| breadth against AUC, Pearson | +0.039 (p=0.86) |
+
+The correlation is not negative as the hypothesis required. If anything it is
+weakly positive. ALV1, the broadest compound in the panel at 54% of constructs,
+transfers at 0.726.
+
+**Why this does not contradict D-047's measurement.** The two experiments ask
+different questions and both results stand. D-047 fitted each compound a model
+on its own screen: ALV1's own nested AUC really is 0.565. This fits one model on
+pomalidomide and tests it against each compound's labels. So what fails for
+ALV1 is fitting its 316 positives across 9,097 reporters, not reading its
+degrons. The reconciliation that fits is the weak tail near the FDR cut: a broad
+compound's label set includes many marginal calls, those are what resist
+fitting, and a panel of 57 already-validated degrons does not contain them.
+That is itself a hypothesis, and it is a more specific one than the one it
+replaces.
+
+**The caveat that matters, stated as a limit not a footnote.** 69 of the panel's
+72 anchored cores also occur in the Sievers library, because C2H2 fingers repeat
+across the proteome. Removing every training row that shares a core, as well as
+holding out the genes, drops the training positives from 12 to 5 and the mean
+AUC to 0.579 at permutation p=0.16. Those two causes are separated by a
+size-matched control: 200 gene-disjoint fits subsampled to 5 positives with
+shared cores still allowed average 0.716, which puts the core-disjoint result at
+the 6.5th percentile of that distribution. So most of the drop is the smaller
+training set and a real residual is the core sharing. The transfer is above
+chance and partly carried by core identity across proteins, and 57 constructs
+cannot separate the two cleanly. Both numbers ship.
+
+**The panel's own limit.** These 57 constructs are validated degrons, so
+breadth across them is selectivity within known degrons and not a proteome hit
+rate: pomalidomide degrades 42% of the panel and 0.1% of the primary library.
+The ordering is the right one and the range is compressed, which weakens a null
+correlation as evidence. It does not weaken the positive finding, which is that
+a pomalidomide model reads degrons for compounds it was never trained on.
+
+**Also found, not used.** Supplement 8 carries 412 compounds with SMILES and a
+per-compound activity profile, and supplement 7 a CRBN alanine scan over 111
+ligase mutations. Supplement 8 measures only 10 constructs per compound, too few
+for a per-compound sequence AUC, so it cannot extend this test; it would support
+a chemistry-side model, which is a different module. Recorded so the next person
+does not go looking for data that is already here.

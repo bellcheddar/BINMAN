@@ -23,7 +23,7 @@ by the spec's own reference list, not by an independent curator.
 | 6UML | CRBN + DDB1 + thalidomide + SALL4 | Y70 | 518.7 / 188.9 | 0.364 | 0.94 |
 | 2P1Q | TIR1 + auxin + IAA7 | IAC | 450.6 / 146.4 | 0.325 | 0.99 |
 | 6TD3 | DDB1 + CDK12 + cyclin K + CR8 | RC8 | 287.3 / 850.5 | 0.338 | 0.94 |
-| 5HXD | DCAF15 (not the sulfonamide ternary) | none | — | — | — |
+| 5HXD | DCAF15 (not the sulfonamide ternary) | none | n/a | n/a | n/a |
 
 Five of the six recovered their bridging ligand. 5HXD is not a ternary glue
 complex, so finding no bridge in it is the correct result rather than a miss.
@@ -179,7 +179,7 @@ interface data (DECISIONS D-023).
 |---|---|---|---|
 | Sensitivity on the degraded set | **0.656** (21/32) | 0.70 | **misses** |
 | Specificity on the matched non-degraded set | **0.353** (1,932/5,476) | 0.60 | **misses** |
-| ROC AUC over `degron_geometry_score` | **0.441** | — | below chance |
+| ROC AUC over `degron_geometry_score` | **0.441** | n/a | below chance |
 
 **The geometric degron filter has no specificity, and the honest reading is that
 it is detecting the C2H2 fold rather than degradability.** Gate G6 is open
@@ -273,7 +273,7 @@ no gene appears in both halves of any split.
 | | geometry | sequence model |
 |---|---|---|
 | ROC AUC | 0.441 | **0.637** (sd 0.089) |
-| permutation null | — | 0.510 (sd 0.071, p95 0.615) |
+| permutation null | n/a | 0.510 (sd 0.071, p95 0.615) |
 | best Youden's J | 0.022 | **0.214** |
 | at sensitivity | 0.656 | 0.344 |
 | and specificity | 0.366 | 0.870 |
@@ -339,7 +339,7 @@ Fitting one model per compound, same features and same grouped evaluation:
 | lenalidomide | 8 | 0.823 | +1.98 sd | 0.511 | yes, 0.750 / 0.600 |
 | CC-122 | 17 | 0.708 | +2.12 sd | 0.362 | yes |
 | CC-220 | 17 | 0.664 | +1.70 sd | 0.307 | no |
-| thalidomide | 7 | — | — | — | too few positives to fit |
+| thalidomide | 7 | n/a | n/a | n/a | too few positives to fit |
 
 **Pomalidomide is the clean case**: AUC 0.826 against a permutation null of
 0.509, clearing it by 2.91 standard deviations, and an operating point at
@@ -434,13 +434,63 @@ the encoding: these are 58-residue tandem constructs and 5,201 of 9,097 carry
 two C2H2 motifs, so both fingers are encoded separately, which lifted the AUC
 by about 0.02 and no more.
 
-**The pattern that fits is promiscuity.** The two compounds where sequence
-predicts degradation degrade 0.1% and 0.2% of the library. The two where it
-does not degrade 2.8% and 4.3%, twenty times as many. A selective degrader
-picks substrates by a readable sequence feature; a promiscuous one appears not
-to, and what decides its substrate set is something this encoding does not see.
-That is a hypothesis the data supports rather than a conclusion it proves, and
-it is the most useful thing the larger screen contributed.
+**The pattern that seemed to fit was promiscuity.** The two compounds where
+sequence predicted degradation degrade 0.1% and 0.2% of the library. The two
+where it did not degrade 2.8% and 4.3%, twenty times as many. The reading was
+that a selective degrader picks substrates by a readable sequence feature and a
+promiscuous one does not. It was recorded as a hypothesis rather than a
+conclusion, and it needed the other 27 compounds to test.
+
+**It was then tested on all 29, and it is wrong.** See the next section. Two
+compounds are not a trend, and this one did not survive twenty-seven more.
+
+### All 29 compounds: breadth does not predict readability
+
+The 27 missing compounds were not missing. The truncated table is supplement 4,
+the primary screen. Supplement 5, the validation screen, is a modern `.xlsx`,
+is not truncated, and assays all 29 analogs against 57 constructs the primary
+screen had already shown to be degrons. The test the hypothesis asked for was
+possible on data already on disk.
+
+One model is fitted on the Sievers pomalidomide degrome and scored against each
+compound's own labels, with every Sievers row from a panel gene held out so no
+panel protein contributes its own label.
+
+| | value |
+|---|---:|
+| compounds with an estimable AUC | 24 of 29 |
+| mean AUC | **0.779** |
+| median / min / max | 0.769 / 0.671 / 0.954 |
+| above chance | **24 of 24** |
+| permutation p, 2,000 shuffles | **0.0005** |
+| breadth against AUC, Spearman | **+0.175 (p=0.41)** |
+
+The correlation is not negative, which is what the hypothesis required. ALV1,
+the broadest compound in the panel at 54% of its constructs, transfers at 0.726.
+A pomalidomide model reads degrons for compounds it never saw.
+
+**Both earlier numbers still stand.** ALV1's own nested AUC really is 0.565. The
+two experiments ask different questions: that one fits each compound a model on
+its own screen, this one fits pomalidomide and tests the transfer. What fails
+for ALV1 is fitting its 316 positives across 9,097 reporters, not reading its
+degrons. The reconciliation that fits is the weak tail near the FDR cut, which a
+panel of already-validated degrons does not contain. That is a hypothesis too,
+and a narrower one.
+
+**What the transfer leans on.** 69 of the panel's 72 anchored cores also occur
+in the Sievers library, because C2H2 fingers repeat across the proteome. Barring
+those rows as well as the genes drops the training positives from 12 to 5 and
+the mean AUC to 0.579 at p=0.16. A size-matched control separates the two
+causes: 200 gene-disjoint fits subsampled to 5 positives, shared cores still
+allowed, average 0.716, putting the core-disjoint result at the 6.5th percentile.
+Most of the drop is the smaller training set and a real residual is the core
+sharing. Both numbers ship, because 57 constructs cannot separate them cleanly.
+
+**And the panel's own limit.** These are validated degrons, so breadth across
+them is selectivity within known degrons and not a proteome hit rate:
+pomalidomide degrades 42% of the panel and 0.1% of the primary library. The
+ordering is right and the range is compressed, which weakens a null correlation
+as evidence while leaving the positive finding intact.
 
 ### The calibration history, which stands
 
@@ -640,12 +690,12 @@ the model on the Hub rather than whichever evaluation ran last.
 |---|---:|---:|---:|---|
 | Parse rate, synthetic held out | 0.5133 | **1.000** | 0.99 | **passes** |
 | Set equality, synthetic held out | 0.3467 | **1.000** | 0.90 | **passes** |
-| Triage macro-F1 (Task B) | — | **0.9336** | 0.85 | **passes** |
+| Triage macro-F1 (Task B) | n/a | **0.9336** | 0.85 | **passes** |
 | Fabrication rate (Task C) | 0.30 | **0.000** | 0.00 max | **passes** |
-| Abstention rate (Task C) | 0.00 | **1.000** | reported | — |
-| Exact match | 0.12 | 0.975 | reported | — |
-| Prompt tokens needed | 841 | **83** | — | — |
-| Set equality, externally phrased | — | **not computed** | 0.80 | see below |
+| Abstention rate (Task C) | 0.00 | **1.000** | reported | n/a |
+| Exact match | 0.12 | 0.975 | reported | n/a |
+| Prompt tokens needed | 841 | **83** | n/a | n/a |
+| Set equality, externally phrased | n/a | **not computed** | 0.80 | see below |
 
 **Every spec 9.5 floor that can be measured now passes.** Parse rate was the
 last to clear: round 05 reached 0.9867 and missed by two queries out of 150,

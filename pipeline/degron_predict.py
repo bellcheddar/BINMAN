@@ -16,8 +16,18 @@ one in ten of the atlas's hairpin candidates is a zinc finger.
 **What the score means.** Trained on the Sievers pomalidomide degrome with
 features weighted by the Slabicki alanine scan, it reaches a nested held-out
 AUC of 0.830 with sensitivity 0.867 at specificity 0.613, which clears spec
-9.2's floors. It is specific to pomalidomide: the same features predict
-lenalidomide well and the promiscuous analogs barely at all (D-047).
+9.2's floors.
+
+**How far it generalises, corrected.** This docstring previously said the score
+was specific to pomalidomide and predicted the promiscuous analogs barely at
+all, on two compounds. Tested against all 29 glutarimides of the Slabicki
+validation panel it transfers above chance to every one of the 24 whose AUC is
+estimable, mean 0.779 gene-disjoint at permutation p=0.0005, and breadth does
+not predict failure (D-053). The column is still named for pomalidomide because
+that is what it was trained and thresholded on, and it should be read as a
+glutarimide degron score rather than a pomalidomide-only one. Part of that
+transfer is carried by anchored cores the training library shares with the
+panel, which `pipeline/degron_panel.py` quantifies rather than hides.
 """
 
 from __future__ import annotations

@@ -163,8 +163,9 @@ def _degron_fields() -> dict[str, FieldSpec]:
                   description="a geometric filter rank, not a calibrated probability"),
         FieldSpec("imid_degradation_score", "number", "IMiD degradation score",
                   description=("predicted probability that this C2H2 zinc finger "
-                               "is degraded by pomalidomide; empty where the "
-                               "candidate carries no zinc finger")),
+                               "is degraded by a glutarimide; trained on "
+                               "pomalidomide, empty where the candidate carries "
+                               "no zinc finger")),
         FieldSpec("motif_family", "text", "Motif family"),
         FieldSpec("is_known_neosubstrate", "bool", "Known neosubstrate"),
     ]

@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-04T15:55:01+00:00",
+  "generated_at": "2026-10-04T17:14:36+00:00",
   "references": [
     {
       "key": "biolip2",
@@ -18,7 +18,7 @@
       "container": "Nucleic Acids Research",
       "publisher": "Oxford University Press (OUP)",
       "is_preprint": false,
-      "checked_at": "2026-10-04T15:55:01+00:00",
+      "checked_at": "2026-10-04T17:14:35+00:00",
       "query": "BioLiP2 updated structure database biologically relevant ligand protein interactions"
     },
     {
@@ -38,7 +38,7 @@
       "container": "Nucleic Acids Research",
       "publisher": "Oxford University Press (OUP)",
       "is_preprint": false,
-      "checked_at": "2026-10-04T15:55:01+00:00",
+      "checked_at": "2026-10-04T17:14:35+00:00",
       "query": "ProtCID protein common interface database Dunbrack"
     },
     {
@@ -58,7 +58,7 @@
       "container": "Nucleic Acids Research",
       "publisher": "Oxford University Press (OUP)",
       "is_preprint": false,
-      "checked_at": "2026-10-04T15:55:01+00:00",
+      "checked_at": "2026-10-04T17:14:35+00:00",
       "query": "MGDB a curated database for molecular glues"
     },
     {
@@ -78,7 +78,7 @@
       "container": "Nucleic Acids Research",
       "publisher": "Oxford University Press (OUP)",
       "is_preprint": false,
-      "checked_at": "2026-10-04T15:55:01+00:00",
+      "checked_at": "2026-10-04T17:14:35+00:00",
       "query": "MolGlueDB an online database of molecular glues"
     },
     {
@@ -98,7 +98,7 @@
       "container": "Nucleic Acids Research",
       "publisher": "Oxford University Press (OUP)",
       "is_preprint": false,
-      "checked_at": "2026-10-04T15:55:01+00:00",
+      "checked_at": "2026-10-04T17:14:35+00:00",
       "query": "MGTbind database molecular glue ternary complexes binding"
     },
     {
@@ -118,7 +118,7 @@
       "container": "Nucleic Acids Research",
       "publisher": "Oxford University Press (OUP)",
       "is_preprint": false,
-      "checked_at": "2026-10-04T15:55:01+00:00",
+      "checked_at": "2026-10-04T17:14:35+00:00",
       "query": "PROTAC-DB 3.0 updated database of PROTACs extended pharmacokinetic parameters"
     },
     {
@@ -138,7 +138,7 @@
       "container": "Nucleic Acids Research",
       "publisher": "Oxford University Press (OUP)",
       "is_preprint": false,
-      "checked_at": "2026-10-04T15:55:01+00:00",
+      "checked_at": "2026-10-04T17:14:35+00:00",
       "query": "DEGRONOPEDIA web server proteome-wide inspection of degrons"
     },
     {
@@ -158,7 +158,7 @@
       "container": "Nucleic Acids Research",
       "publisher": "Oxford University Press (OUP)",
       "is_preprint": false,
-      "checked_at": "2026-10-04T15:55:01+00:00",
+      "checked_at": "2026-10-04T17:14:35+00:00",
       "query": "UbiBrowser 2.0 comprehensive resource proteome-wide known and predicted ubiquitin ligase substrate interactions"
     },
     {
@@ -178,7 +178,7 @@
       "container": "Nucleic Acids Research",
       "publisher": "Oxford University Press (OUP)",
       "is_preprint": false,
-      "checked_at": "2026-10-04T15:55:01+00:00",
+      "checked_at": "2026-10-04T17:14:35+00:00",
       "query": "PhosphoSitePlus mutations PTMs and recalibrations"
     },
     {
@@ -198,7 +198,7 @@
       "container": "Nucleic Acids Research",
       "publisher": "Oxford University Press (OUP)",
       "is_preprint": false,
-      "checked_at": "2026-10-04T15:55:01+00:00",
+      "checked_at": "2026-10-04T17:14:35+00:00",
       "query": "AlphaFold Protein Structure Database massively expanding the structural coverage of protein sequence space"
     },
     {
@@ -218,7 +218,7 @@
       "container": "Nucleic Acids Research",
       "publisher": "Oxford University Press (OUP)",
       "is_preprint": false,
-      "checked_at": "2026-10-04T15:55:01+00:00",
+      "checked_at": "2026-10-04T17:14:35+00:00",
       "query": "UniProt the Universal Protein Knowledgebase"
     },
     {
@@ -238,7 +238,7 @@
       "container": "Briefings in Bioinformatics",
       "publisher": "Oxford University Press (OUP)",
       "is_preprint": false,
-      "checked_at": "2026-10-04T15:55:01+00:00",
+      "checked_at": "2026-10-04T17:14:35+00:00",
       "query": "InterPro protein sequence classification resource"
     },
     {
@@ -258,7 +258,7 @@
       "container": "Nucleic Acids Research",
       "publisher": "Oxford University Press (OUP)",
       "is_preprint": false,
-      "checked_at": "2026-10-04T15:55:01+00:00",
+      "checked_at": "2026-10-04T17:14:35+00:00",
       "query": "Open Targets Platform supporting systematic drug target identification and prioritisation"
     },
     {
@@ -278,7 +278,7 @@
       "container": "Nucleic Acids Research",
       "publisher": "Oxford University Press (OUP)",
       "is_preprint": false,
-      "checked_at": "2026-10-04T15:55:01+00:00",
+      "checked_at": "2026-10-04T17:14:35+00:00",
       "query": "RCSB Protein Data Bank Berman 2000 nucleic acids research"
     },
     {
@@ -298,7 +298,7 @@
       "container": "",
       "publisher": "EMBL-EBI",
       "is_preprint": false,
-      "checked_at": "2026-10-04T15:55:01+00:00",
+      "checked_at": "2026-10-04T17:14:35+00:00",
       "query": "PDBe Protein Data Bank in Europe deposition and annotation"
     },
     {
@@ -318,7 +318,7 @@
       "container": "Nucleic Acids Research",
       "publisher": "Oxford University Press (OUP)",
       "is_preprint": false,
-      "checked_at": "2026-10-04T15:55:01+00:00",
+      "checked_at": "2026-10-04T17:14:35+00:00",
       "query": "Europe PMC a full-text literature database for the life sciences"
     },
     {
@@ -338,7 +338,7 @@
       "container": "RCSB Protein Data Bank",
       "publisher": "Worldwide Protein Data Bank",
       "is_preprint": false,
-      "checked_at": "2026-10-04T15:55:01+00:00",
+      "checked_at": "2026-10-04T17:14:35+00:00",
       "query": "Chemical Component Dictionary PDB chemical reference data small molecules"
     },
     {
@@ -358,7 +358,7 @@
       "container": "Science",
       "publisher": "American Association for the Advancement of Science (AAAS)",
       "is_preprint": false,
-      "checked_at": "2026-10-04T15:55:01+00:00",
+      "checked_at": "2026-10-04T17:14:35+00:00",
       "query": "Lenalidomide causes selective degradation of IKZF1 and IKZF3 in multiple myeloma cells"
     },
     {
@@ -378,7 +378,7 @@
       "container": "Nature",
       "publisher": "Springer Science and Business Media LLC",
       "is_preprint": false,
-      "checked_at": "2026-10-04T15:55:01+00:00",
+      "checked_at": "2026-10-04T17:14:35+00:00",
       "query": "Structure of the DDB1-CRBN E3 ubiquitin ligase in complex with thalidomide"
     },
     {
@@ -398,7 +398,7 @@
       "container": "Cancer Discovery",
       "publisher": "American Association for Cancer Research (AACR)",
       "is_preprint": false,
-      "checked_at": "2026-10-04T15:55:01+00:00",
+      "checked_at": "2026-10-04T17:14:35+00:00",
       "query": "Lenalidomide induces ubiquitination and degradation of CK1 alpha in del(5q) MDS"
     },
     {
@@ -418,7 +418,7 @@
       "container": "Science",
       "publisher": "American Association for the Advancement of Science (AAAS)",
       "is_preprint": false,
-      "checked_at": "2026-10-04T15:55:01+00:00",
+      "checked_at": "2026-10-04T17:14:35+00:00",
       "query": "Anticancer sulfonamides target splicing by inducing RBM39 degradation via recruitment to DCAF15"
     },
     {
@@ -438,7 +438,7 @@
       "container": "Nature",
       "publisher": "Springer Science and Business Media LLC",
       "is_preprint": false,
-      "checked_at": "2026-10-04T15:55:01+00:00",
+      "checked_at": "2026-10-04T17:14:35+00:00",
       "query": "The CDK inhibitor CR8 acts as a molecular glue degrader that depletes cyclin K"
     },
     {
@@ -458,7 +458,7 @@
       "container": "RCSB Protein Data Bank",
       "publisher": "Worldwide Protein Data Bank",
       "is_preprint": false,
-      "checked_at": "2026-10-04T15:55:01+00:00",
+      "checked_at": "2026-10-04T17:14:35+00:00",
       "query": "Mechanism of auxin perception by the TIR1 ubiquitin ligase"
     },
     {
@@ -478,7 +478,7 @@
       "container": "Science",
       "publisher": "American Association for the Advancement of Science (AAAS)",
       "is_preprint": false,
-      "checked_at": "2026-10-04T15:55:01+00:00",
+      "checked_at": "2026-10-04T17:14:35+00:00",
       "query": "Structure of the FKBP12-rapamycin complex interacting with binding domain of human FRAP"
     },
     {
@@ -498,7 +498,7 @@
       "container": "Cell",
       "publisher": "Elsevier BV",
       "is_preprint": false,
-      "checked_at": "2026-10-04T15:55:01+00:00",
+      "checked_at": "2026-10-04T17:14:35+00:00",
       "query": "The eukaryotic proteome is shaped by E3 ubiquitin ligases targeting C-terminal degrons"
     },
     {
@@ -518,8 +518,28 @@
       "container": "Science",
       "publisher": "American Association for the Advancement of Science (AAAS)",
       "is_preprint": false,
-      "checked_at": "2026-10-04T15:55:01+00:00",
+      "checked_at": "2026-10-04T17:14:35+00:00",
       "query": "Defining the human C2H2 zinc finger degrome targeted by thalidomide analogs through CRBN"
+    },
+    {
+      "key": "zf_glutarimide_screen",
+      "type": "paper",
+      "doi": "10.1016/j.molcel.2025.07.019",
+      "url": "https://doi.org/10.1016/j.molcel.2025.07.019",
+      "licence": "publisher terms",
+      "used_for": "per-compound zinc-finger degradation, alanine scan and the 29-analog validation panel",
+      "version": "",
+      "repo": "",
+      "verified": true,
+      "verification": "Crossref verified",
+      "title": "Expanding the druggable zinc-finger proteome defines properties of drug-induced degradation",
+      "authors": "S\u0142abicki, Miko\u0142aj and Park, Jiho and Nowak, Rados\u0142aw P. and Roy Burman, Shourya S. and Pellman, Jesse and Zou, Charles and Razumkov, Hlib and Carreiro, Jeannie and Rastogi, Simran and Goldstein, Anna and Nagiec, Marek M. and Donovan, Katherine A.",
+      "year": "2025",
+      "container": "Molecular Cell",
+      "publisher": "Elsevier BV",
+      "is_preprint": false,
+      "checked_at": "2026-10-04T17:14:35+00:00",
+      "query": "Expanding the druggable zinc-finger proteome defines properties of drug-induced degradation"
     },
     {
       "key": "tien_sasa",
@@ -538,7 +558,7 @@
       "container": "PLoS ONE",
       "publisher": "Public Library of Science (PLoS)",
       "is_preprint": false,
-      "checked_at": "2026-10-04T15:55:01+00:00",
+      "checked_at": "2026-10-04T17:14:36+00:00",
       "query": "Maximum allowed solvent accessibilites of residues in proteins"
     },
     {
@@ -558,7 +578,7 @@
       "container": "Molecular Cell",
       "publisher": "Elsevier BV",
       "is_preprint": false,
-      "checked_at": "2026-10-04T15:55:01+00:00",
+      "checked_at": "2026-10-04T17:14:36+00:00",
       "query": "Systematic and quantitative assessment of the ubiquitin-modified proteome diGly"
     },
     {
@@ -578,7 +598,7 @@
       "container": "F1000Research",
       "publisher": "F1000 Research Ltd",
       "is_preprint": false,
-      "checked_at": "2026-10-04T15:55:01+00:00",
+      "checked_at": "2026-10-04T17:14:36+00:00",
       "query": "FreeSASA an open source C library for solvent accessible surface area calculations"
     },
     {
@@ -598,7 +618,7 @@
       "container": "Biopolymers",
       "publisher": "Wiley",
       "is_preprint": false,
-      "checked_at": "2026-10-04T15:55:01+00:00",
+      "checked_at": "2026-10-04T17:14:36+00:00",
       "query": "Dictionary of protein secondary structure pattern recognition of hydrogen-bonded and geometrical features"
     },
     {
@@ -618,7 +638,7 @@
       "container": "Journal of Open Source Software",
       "publisher": "The Open Journal",
       "is_preprint": false,
-      "checked_at": "2026-10-04T15:55:01+00:00",
+      "checked_at": "2026-10-04T17:14:36+00:00",
       "query": "GEMMI library macromolecular crystallography structural bioinformatics Wojdyr"
     },
     {
@@ -638,7 +658,7 @@
       "container": "",
       "publisher": "",
       "is_preprint": false,
-      "checked_at": "2026-10-04T15:55:01+00:00",
+      "checked_at": "2026-10-04T17:14:36+00:00",
       "query": ""
     },
     {
@@ -658,7 +678,7 @@
       "container": "BMC Bioinformatics",
       "publisher": "Springer Science and Business Media LLC",
       "is_preprint": false,
-      "checked_at": "2026-10-04T15:55:01+00:00",
+      "checked_at": "2026-10-04T17:14:36+00:00",
       "query": "Fpocket an open source platform for ligand pocket detection"
     },
     {
@@ -678,7 +698,7 @@
       "container": "Journal of Cheminformatics",
       "publisher": "Springer Science and Business Media LLC",
       "is_preprint": false,
-      "checked_at": "2026-10-04T15:55:01+00:00",
+      "checked_at": "2026-10-04T17:14:36+00:00",
       "query": "P2Rank machine learning based tool for rapid and accurate prediction of ligand binding sites"
     },
     {
@@ -698,7 +718,7 @@
       "container": "Nucleic Acids Research",
       "publisher": "Oxford University Press (OUP)",
       "is_preprint": false,
-      "checked_at": "2026-10-04T15:55:01+00:00",
+      "checked_at": "2026-10-04T17:14:36+00:00",
       "query": "PLIP 2021 expanding the scope of the protein-ligand interaction profiler"
     },
     {
@@ -718,7 +738,7 @@
       "container": "Nucleic Acids Research",
       "publisher": "Oxford University Press (OUP)",
       "is_preprint": false,
-      "checked_at": "2026-10-04T15:55:01+00:00",
+      "checked_at": "2026-10-04T17:14:36+00:00",
       "query": "Mol* Viewer modern web app for 3D visualization and analysis of large biomolecular structures"
     },
     {
@@ -738,7 +758,7 @@
       "container": "BMC Bioinformatics",
       "publisher": "Springer Science and Business Media LLC",
       "is_preprint": false,
-      "checked_at": "2026-10-04T15:55:01+00:00",
+      "checked_at": "2026-10-04T17:14:36+00:00",
       "query": "Biotite a unifying open source computational biology framework in Python"
     },
     {
@@ -758,7 +778,7 @@
       "container": "Journal of Cheminformatics",
       "publisher": "Springer Science and Business Media LLC",
       "is_preprint": false,
-      "checked_at": "2026-10-04T15:55:01+00:00",
+      "checked_at": "2026-10-04T17:14:36+00:00",
       "query": "Open Babel an open chemical toolbox"
     },
     {
@@ -778,7 +798,7 @@
       "container": "Proceedings of the VLDB Endowment",
       "publisher": "Association for Computing Machinery (ACM)",
       "is_preprint": false,
-      "checked_at": "2026-10-04T15:55:01+00:00",
+      "checked_at": "2026-10-04T17:14:36+00:00",
       "query": "DuckDB an embeddable analytical database"
     },
     {
@@ -798,7 +818,7 @@
       "container": "",
       "publisher": "",
       "is_preprint": false,
-      "checked_at": "2026-10-04T15:55:01+00:00",
+      "checked_at": "2026-10-04T17:14:36+00:00",
       "query": ""
     },
     {
@@ -818,7 +838,7 @@
       "container": "IEEE Transactions on Visualization and Computer Graphics",
       "publisher": "Institute of Electrical and Electronics Engineers (IEEE)",
       "is_preprint": false,
-      "checked_at": "2026-10-04T15:55:01+00:00",
+      "checked_at": "2026-10-04T17:14:36+00:00",
       "query": "D3 data-driven documents Bostock Ogievetsky Heer"
     },
     {
@@ -838,7 +858,7 @@
       "container": "",
       "publisher": "",
       "is_preprint": false,
-      "checked_at": "2026-10-04T15:55:01+00:00",
+      "checked_at": "2026-10-04T17:14:36+00:00",
       "query": ""
     },
     {
@@ -858,7 +878,7 @@
       "container": "",
       "publisher": "",
       "is_preprint": false,
-      "checked_at": "2026-10-04T15:55:01+00:00",
+      "checked_at": "2026-10-04T17:14:36+00:00",
       "query": ""
     },
     {
@@ -878,7 +898,7 @@
       "container": "",
       "publisher": "",
       "is_preprint": false,
-      "checked_at": "2026-10-04T15:55:01+00:00",
+      "checked_at": "2026-10-04T17:14:36+00:00",
       "query": ""
     },
     {
@@ -898,13 +918,13 @@
       "container": "",
       "publisher": "",
       "is_preprint": false,
-      "checked_at": "2026-10-04T15:55:01+00:00",
+      "checked_at": "2026-10-04T17:14:36+00:00",
       "query": ""
     }
   ],
-  "verified": 39,
+  "verified": 40,
   "preprints": 0,
-  "total": 45,
+  "total": 46,
   "unverified": [
     "rdkit",
     "mlx",

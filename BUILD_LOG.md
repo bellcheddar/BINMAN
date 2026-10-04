@@ -610,3 +610,9 @@ One line per meaningful event, timestamped UTC (spec Section 0 rule 5).
 | 2026-10-04T16:26:25+00:00 | 5.2 | imid_degradation_score written for 4,650 degron candidates; 17,067 carry no C2H2 motif and are left NULL. |
 | 2026-10-04T16:27:38+00:00 | 9 | Validation run against binman.sqlite: 0 metric(s) not computed (dataset unavailable), 2 measured floor(s) missed. |
 | 2026-10-04T16:27:39+00:00 | 9 | Validation run against binman.sqlite: 4 metric(s) not computed (dataset unavailable), 5 measured floor(s) missed. |
+| 2026-10-04T17:11:21+00:00 | 9.2 | Glutarimide panel: the pomalidomide model transfers to 24 of 24 compounds gene-disjoint, mean AUC 0.7789, permutation p=0.0005. Breadth against AUC Spearman 0.1751 (p=0.4131). |
+| 2026-10-04T17:14:36+00:00 | 12.3 | references.bib: 46 references, 40 Crossref matched by search (0 preprints), 6 unmatched, 6 with no DOI, 0 with licence not determined. |
+| 2026-10-04T17:14:47+00:00 | 4.1b | About tab generated: 53 references, 11/13 datasets resolved, worked example selected, 1 value(s) not recorded. |
+| 2026-10-04T17:14:48+00:00 | 9 | Validation run against binman.sqlite: 0 metric(s) not computed (dataset unavailable), 2 measured floor(s) missed. |
+| 2026-10-04T17:14:49+00:00 | 9 | Validation run against binman.sqlite: 4 metric(s) not computed (dataset unavailable), 5 measured floor(s) missed. |
+| 2026-10-04T17:15:00+00:00 | 4.1b | About tab generated: 53 references, 11/13 datasets resolved, worked example selected, 1 value(s) not recorded. |

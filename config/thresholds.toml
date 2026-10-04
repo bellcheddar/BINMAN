@@ -140,6 +140,17 @@ lm_baseline_skip_finetune_at = 0.85   # spec 3.0: do not fine-tune Task A above 
 sievers_fdr                  = 0.05
 degron_overlap_residues      = 1
 
+# Spec 9.2's cross-compound transfer test, on the Slabicki validation panel
+# (NIHMS2104733 supplement 5): 57 validated degron constructs assayed against
+# all 29 glutarimide analogs. The FDR cut and the depletion direction are the
+# ones the paper's own analysis uses. A compound needs enough constructs on
+# both sides of its label for an AUC to mean anything, hence the floor.
+panel_fdr                    = 0.05
+panel_min_class_size         = 3      # constructs needed in the smaller class
+panel_permutation_draws      = 2000   # shuffles of the sequence score vector
+panel_subsample_draws        = 200    # size-matched controls for core-disjointness
+panel_seed                   = 20261004
+
 [atlas]
 # spec 6.5 budgets.
 max_bundle_gb                = 2.5
