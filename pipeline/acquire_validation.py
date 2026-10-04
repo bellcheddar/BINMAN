@@ -351,9 +351,9 @@ def parse_sievers_zf_screen(raw: bytes, route: Route) -> list[dict]:
     libraries and the user's instruction was to treat each as unique data
     rather than intersect down to the smallest:
 
-    * data file S2, sheet `pval_FDR` -- 5,609 zinc fingers, thalidomide,
+    * data file S2, sheet `pval_FDR`: 5,609 zinc fingers, thalidomide,
       lenalidomide and pomalidomide, t-test FDR.
-    * data file S6, sheet `POM_CC122_CC220_Results_bootstr` -- 3,206 zinc
+    * data file S6, sheet `POM_CC122_CC220_Results_bootstr`: 3,206 zinc
       fingers, pomalidomide, CC-122 and CC-220, bootstrap FDR with fold
       change. Keyed by `GENE_start_stop`, so the UniProt accession is joined
       back through S2's `zflibrary` sheet.

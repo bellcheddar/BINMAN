@@ -251,7 +251,7 @@ def sievers_matched_sets(connection: sqlite3.Connection, config) -> dict | None:
     model shares at least `validation.degron_overlap_residues` residues with the
     assayed window. Its score is the best `degron_geometry_score` among the
     overlapping candidates, and zero when the protein was scanned and nothing
-    overlapped -- which is what makes a matched negative measurable at all.
+    overlapped, which is what makes a matched negative measurable at all.
 
     A zinc finger whose protein never reached the scan (no AlphaFold model, or
     outside the reviewed human proteome the scan covers) is excluded and
@@ -370,8 +370,8 @@ def section_92(connection: sqlite3.Connection, config) -> dict:
             f"against {matched['matched_total']} assayed in the same screens and "
             "not depleted. Spec 9.2 names the Molecular Cell 2025 and Nature "
             "Communications 2025 screens; neither resolved, and this is the same "
-            "experimental design -- one flow-cytometry screen supplying both arms "
-            "-- from a source that did."
+            "experimental design (one flow-cytometry screen supplying both arms) "
+            "from a source that did."
         )
         out["sensitivity"] = computed(
             round(matched["sensitivity"], 4),
@@ -408,7 +408,7 @@ def section_92(connection: sqlite3.Connection, config) -> dict:
                 "Over degron_geometry_score, taking the best overlapping candidate "
                 "per zinc finger and zero where the protein was scanned and nothing "
                 "overlapped. The score is therefore heavily tied at zero, which "
-                "caps the AUC achievable by ranking alone -- read it with the "
+                "caps the AUC achievable by ranking alone: read it with the "
                 "contingency table, not instead of it."
             ),
         }
@@ -421,7 +421,7 @@ def section_92(connection: sqlite3.Connection, config) -> dict:
             "computed": True, "reason": "", "floor": None, "value": sweep,
             "note": (
                 "Spec 9.6 allows one documented threshold adjustment before G6, "
-                "and D-010 already spent it -- on five documented degrons, with no "
+                "and D-010 already spent it on five documented degrons, with no "
                 "matched negative set in existence at the time. This sweep asks "
                 "whether a second adjustment could even help: if no cut on "
                 "degron_geometry_score clears both floors together, the cut is not "

@@ -134,8 +134,8 @@ classifier**, which is what spec 9.2 instructs for exactly this case.
 
 The screens spec 9.2 names (Molecular Cell 2025, Nature Communications 2025)
 never resolved. Sievers et al. 2018 ([10.1126/science.aat0572](https://doi.org/10.1126/science.aat0572))
-is the same experimental design — one flow-cytometry screen supplying both arms,
-which is the entire point of the test — and its supplementary data are open.
+is the same experimental design (one flow-cytometry screen supplying both arms,
+which is the entire point of the test) and its supplementary data are open.
 Data files S2 and S6 are **pooled rather than intersected**, so each screen
 contributes its own domains:
 
@@ -172,15 +172,15 @@ floors together.** The best Youden's J over the whole curve is **0.022**.
 
 To reach the 0.60 specificity floor the filter gives up all but a quarter of the
 positives. Spec 9.6 allows one documented threshold adjustment before G6 and
-D-010 already spent it — calibrated on the five documented degrons below, with
+D-010 already spent it: calibrated on the five documented degrons below, with
 no matched negative set in existence at the time, which is precisely how a
 filter with no specificity gets built. A second adjustment is not made: on this
 curve it would be tuning against the test set for two points of J.
 
 ### Why: a C2H2 zinc finger *is* a short hairpin with an exposed turn
 
-The AUC of 0.441 is the diagnostic. It is *below* chance — the score ranks
-degraded zinc fingers marginally worse than non-degraded ones — while the
+The AUC of 0.441 is the diagnostic. It is *below* chance (the score ranks
+degraded zinc fingers marginally worse than non-degraded ones) while the
 canonical IMiD neosubstrates are nonetheless recovered:
 
 | Gene | Window | Score | Degraded by |
@@ -193,13 +193,13 @@ canonical IMiD neosubstrates are nonetheless recovered:
 
 Twelve *non-degraded* zinc fingers score above IKZF3, E4F1 and ZFP91. Recovering
 the textbook cases while ranking at chance is the signature of a filter keyed to
-the domain family: the geometry spec 5.2 describes — a two-residue antiparallel
-hairpin with an exposed glycine-bearing turn — is a description of C2H2 itself.
+the domain family. The geometry spec 5.2 describes, a two-residue antiparallel
+hairpin with an exposed glycine-bearing turn, is a description of C2H2 itself.
 All 3,544 false positives carry the hairpin glycine, so requiring it harder
 changes nothing.
 
 Of the 11 misses, 9 have at least one degron candidate elsewhere on the same
-protein (ZN526 has 7, ZN501 has 6) — the filter fired, in the wrong place. Only
+protein (ZN526 has 7, ZN501 has 6): the filter fired, in the wrong place. Only
 ZN292 1947–1973 has no candidate anywhere on its protein.
 
 ### The calibration history, which stands
@@ -263,7 +263,7 @@ because on a six-residue turn those are two residues apart.
 
 The calibration established that the filter can find the geometry it is meant to
 find, and that the spec's literal thresholds could not. It established nothing
-about specificity — and the concern recorded at the time, that relaxing the
+about specificity, and the concern recorded at the time, that relaxing the
 strand floor from 3 to 2 "admits far more hairpins proteome-wide, and the cost is
 unmeasured", is now measured: the cost is 3,544 false positives on 5,476 matched
 negatives. `calibration_validated = false` in `config/thresholds.toml` was the
@@ -273,7 +273,7 @@ right flag, and it stays set.
 feature that separates degraded from non-degraded zinc fingers *within* the C2H2
 family: degron sequence context, complementarity to the CRBN interface, or
 Zn-coordination geometry. The matched set is now wired in as
-`sievers_zf_screen`, so that test is one command away —
+`sievers_zf_screen`, so that test is one command away:
 `pixi run python -m pipeline.validate --section 9.2`.
 
 ## Section 9.3 E3 Triage validation

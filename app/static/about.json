@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-04T00:18:03+00:00",
+  "generated_at": "2026-10-04T00:37:14+00:00",
   "generator": "pipeline/build_about.py",
   "note": "Every value on this page is read from a build artefact. Nothing here is typed by hand, and a value that could not be read says 'not recorded' rather than showing a plausible guess.",
   "schematic_description": "The pipeline runs left to right in four stages. Two kinds of input enter on the left: the primary data sources (RCSB, AlphaFold DB, UniProt, InterPro), and separately the validation datasets that serve as ground truth, of which 10 of 12 resolved. Stage 1, acquisition, catalogued 52,821 entries into priority tiers using httpx and tenacity. Stage 2, geometry, analysed 52,586 entries with gemmi and FreeSASA and found 239,485 bridges, with 235 entries failing. Stage 3, scan and triage, used DSSP and fpocket to produce 21,717 degron candidates, 650 triaged ligases and 1,650 scored lysines. Stage 4 trains BINMAN-LM with mlx-lm, which does text work only and never emits a number. Four modules leave on the right: Glue Atlas, Degron Scan, E3 Triage and Degradability.",
@@ -1476,7 +1476,7 @@
     "honest_note": "This record was chosen because every stage that has run worked on it. A reader should look at the misses list and the novel-bridge set in FINDINGS.md for the cases where stages did not."
   },
   "validation": {
-    "generated_at": "2026-10-04T00:16:07+00:00",
+    "generated_at": "2026-10-04T00:36:59+00:00",
     "atlas": "/Users/dellboy/Documents/Vibe_Coding/BINMAN/data/atlas/binman.sqlite",
     "atlas_bytes": 149442560,
     "note": "A metric whose dataset is unavailable is reported as computed: false with the reason. Nothing here is estimated, and no hand-written control was substituted for a missing published one (spec 4.1b).",
@@ -1488,7 +1488,7 @@
         "floor": 0.7,
         "reason": "",
         "passes": false,
-        "source": "Sievers et al. 2018 (10.1126/science.aat0572), supplementary data files S2 and S6 pooled: 32 zinc fingers depleted under IMiD treatment at FDR < 0.05 against 5476 assayed in the same screens and not depleted. Spec 9.2 names the Molecular Cell 2025 and Nature Communications 2025 screens; neither resolved, and this is the same experimental design -- one flow-cytometry screen supplying both arms -- from a source that did.",
+        "source": "Sievers et al. 2018 (10.1126/science.aat0572), supplementary data files S2 and S6 pooled: 32 zinc fingers depleted under IMiD treatment at FDR < 0.05 against 5476 assayed in the same screens and not depleted. Spec 9.2 names the Molecular Cell 2025 and Nature Communications 2025 screens; neither resolved, and this is the same experimental design (one flow-cytometry screen supplying both arms) from a source that did.",
         "n": 32
       },
       "specificity": {
@@ -1497,7 +1497,7 @@
         "floor": 0.6,
         "reason": "",
         "passes": false,
-        "source": "Sievers et al. 2018 (10.1126/science.aat0572), supplementary data files S2 and S6 pooled: 32 zinc fingers depleted under IMiD treatment at FDR < 0.05 against 5476 assayed in the same screens and not depleted. Spec 9.2 names the Molecular Cell 2025 and Nature Communications 2025 screens; neither resolved, and this is the same experimental design -- one flow-cytometry screen supplying both arms -- from a source that did.",
+        "source": "Sievers et al. 2018 (10.1126/science.aat0572), supplementary data files S2 and S6 pooled: 32 zinc fingers depleted under IMiD treatment at FDR < 0.05 against 5476 assayed in the same screens and not depleted. Spec 9.2 names the Molecular Cell 2025 and Nature Communications 2025 screens; neither resolved, and this is the same experimental design (one flow-cytometry screen supplying both arms) from a source that did.",
         "n": 5476
       },
       "contingency_table": {
@@ -1516,7 +1516,7 @@
         "reason": "",
         "floor": null,
         "value": 0.4407,
-        "note": "Over degron_geometry_score, taking the best overlapping candidate per zinc finger and zero where the protein was scanned and nothing overlapped. The score is therefore heavily tied at zero, which caps the AUC achievable by ranking alone -- read it with the contingency table, not instead of it."
+        "note": "Over degron_geometry_score, taking the best overlapping candidate per zinc finger and zero where the protein was scanned and nothing overlapped. The score is therefore heavily tied at zero, which caps the AUC achievable by ranking alone: read it with the contingency table, not instead of it."
       },
       "threshold_sweep": {
         "computed": true,
@@ -1659,7 +1659,7 @@
             }
           ]
         },
-        "note": "Spec 9.6 allows one documented threshold adjustment before G6, and D-010 already spent it -- on five documented degrons, with no matched negative set in existence at the time. This sweep asks whether a second adjustment could even help: if no cut on degron_geometry_score clears both floors together, the cut is not what is wrong and moving it would be tuning against the test set."
+        "note": "Spec 9.6 allows one documented threshold adjustment before G6, and D-010 already spent it on five documented degrons, with no matched negative set in existence at the time. This sweep asks whether a second adjustment could even help: if no cut on degron_geometry_score clears both floors together, the cut is not what is wrong and moving it would be tuning against the test set."
       },
       "recovered_zinc_fingers": {
         "computed": true,

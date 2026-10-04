@@ -34,7 +34,7 @@ work and none of the arithmetic.
 | Module | Question | Method |
 |---|---|---|
 | **Glue Atlas** | Which deposited ligands bridge two protein chains? | ΔSASA against each chain, heavy-atom contacts, bridging balance, PLIP interaction typing at both half-interfaces |
-| **Degron Scan** | Which human proteins carry the β-hairpin-with-exposed-glycine geometry that CRBN reads? | DSSP over the AlphaFold human proteome, found by geometry rather than by sequence motif. **Validated and failed:** against a matched published screen it scores AUC 0.44, so it ships as a hypothesis generator, not a classifier — see [FINDINGS](FINDINGS.md#section-92-degron-scan-validation) |
+| **Degron Scan** | Which human proteins carry the β-hairpin-with-exposed-glycine geometry that CRBN reads? | DSSP over the AlphaFold human proteome, found by geometry rather than by sequence motif. **Validated and failed:** against a matched published screen it scores AUC 0.44, so it ships as a hypothesis generator, not a classifier (see [FINDINGS](FINDINGS.md#section-92-degron-scan-validation)) |
 | **E3 Triage** | Which E3 ligases are under-exploited and worth a ligand campaign? | InterPro family assignment, fpocket druggability, expression selectivity, substrate counts, ranked by a transparent weighted sum with every component visible |
 | **Degradability** | Does this target have a usable lysine near the binding site? | Lysine NZ accessibility and Cβ–Cβ geometry relative to a chosen site, against a reach window fitted to observed ubiquitylation sites rather than assumed |
 
