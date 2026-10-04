@@ -795,3 +795,48 @@ metric can be iterated on, which is the case where the damage is likeliest.
 
 **Reversal.** None wanted. If a section ever needs clearing deliberately,
 delete `results.json` and run the full validation.
+
+## D-027: the 9.1 recall deficit is the contact criterion, and the one permitted adjustment is not spent on it
+
+**Decision.** `bridging.min_heavy_atom_contacts` stays at **3**, the value spec
+5.1 criterion 2 mandates. Recall stays at 0.772 against a floor of 0.85, Gate
+G6 carries it, and the diagnosis goes in `FINDINGS.md` with the sweep that
+justifies leaving the threshold alone.
+
+**Context.** Each of the 73 recall misses was traced. 20 are not in the
+catalogue (coverage, not sensitivity), 7 carry bridges classed as something
+other than a glue candidate, and 46 ran through geometry and produced no bridge
+at all. `data/interim/halves.jsonl` records every half-interface considered, so
+the rejection of each can be read off rather than inferred: of the ligand
+instances in those 46 that contacted two chains, **48 of 48 were rejected on
+the contact count alone, and none on ΔSASA**. The weak side buries 55 to 145
+Å², two to six times the 25 Å² floor, at minimum distances of 3.2 to 4.0 Å.
+
+The affected set is not random. It is dominated by the 14-3-3 fusicoccin and
+cotylenin glues (3P1O, 3SML, 3SMM, 3SMO, 4FR3, 6HN2, 8AXE, 8BWJ, 8BWX, 8BX3,
+8BX4, 8BXI, 8BYF, 8BYO, 8BYY, 8C0K and others), with coronatine at COI1-ASK1
+(3OGK) alongside. These are glues that stabilise shallow protein-protein
+interfaces over a wide, loose contact area, which is precisely the geometry a
+three-atoms-under-4 Å gate rejects.
+
+**Why the adjustment is not spent.** Sweeping the criterion over the recorded
+half-interfaces gives recall 0.8469 at a floor of 1, 0.8219 at 2 and 0.7719 at
+3. A floor of 1 is the loosest the criterion can take and **still misses 0.85**,
+while taking the bridge count from 239,485 to 337,347. Spending spec 9.6's one
+adjustment would therefore fail to rescue the metric and would add 97,862
+bridges whose false-positive cost cannot be measured, because the
+packing-specificity metric that would measure it is the one ProtCID does not
+publish (D-023). An adjustment that cannot make the metric pass is not a
+fallback, it is just a looser headline number.
+
+**Alternatives considered.** (a) Drop the contact criterion and rely on ΔSASA
+alone, which is the physically meaningful quantity: rejected for the same
+reason, with the added problem that it deviates from spec 5.1 without a
+measurement to justify it. (b) Make the criterion adaptive, requiring three
+contacts only where ΔSASA is marginal: rejected as an unvalidated invention
+of this project rather than a published rule, which spec 4.1b forbids.
+
+**Reversal.** If ProtCID or an equivalent ever supplies bulk interface
+classifications, run the sweep again with packing specificity measured at each
+floor. That turns the question from "how much recall do we buy" into "what does
+it cost", which is the form in which it can actually be decided.

@@ -151,10 +151,20 @@ as such rather than guessed.
 
 ## Current state
 
-Phase 1 of four. See [`PROGRESS.md`](PROGRESS.md) for the live checklist,
-[`BUILD_LOG.md`](BUILD_LOG.md) for the event log and
+All four phases are built and QC'd. See [`PROGRESS.md`](PROGRESS.md) for the
+live checklist, [`BUILD_LOG.md`](BUILD_LOG.md) for the event log and
 [`DECISIONS.md`](DECISIONS.md) for every judgement call with its reasoning and
 how to reverse it.
+
+**52,821 entries, 239,485 bridges, 14,260 of them novel** (appearing in none of
+the three curated glue databases), 21,717 degron candidates, 650 E3 ligases.
+Section 9: four floors measured and passed, four measured and missed, four not
+computed for want of a dataset. Every miss is diagnosed rather than hidden, and
+two of them are worth more than a pass would have been: the degron geometry
+filter scores AUC 0.44 against a matched published screen and is therefore
+relabelled a hypothesis generator (D-024), and the glue recall deficit is
+traced to a single spec criterion that no permitted adjustment can rescue
+(D-027).
 
 An early result worth stating: the bridging filter recovers five of six
 canonical glues with literature-consistent interface residues, and it shows

@@ -103,19 +103,75 @@ nevirapine, IBMX, kainic acid and an antifolate. Reaching 0.95 would mean
 deliberately misclassifying approved drugs as crystallisation furniture. Gate G6
 carries the decision.
 
-### Recall, the misses list and the novel-bridge set: not computed
+### Recall: 0.772 against a floor of 0.85, and the whole deficit is one criterion
 
-All three curated glue databases (MGDB, MolGlueDB, MGTbind) publish through
-JavaScript front ends with no documented bulk-export endpoint, and none resolved
-(Gate G7). Spec 4.1b forbids substituting a hand-written positive set, so none
-was made.
+All three curated glue databases resolved after the bulk routes were found, so
+recall is measured rather than suppressed: **247 of 320** curated PDB entries
+carry a glue-candidate bridge in the atlas. Spec 4.1b forbids substituting a
+hand-written positive set and none was made.
 
-**This suppresses the headline result.** A novel bridge is defined as one
-appearing in *none* of the three databases, so the set is undeterminable. The
-`novel_bridge` column reads 0 throughout the atlas, and both the UI and the
-atlas builder state in words that this is not a real zero.
+The 73 misses were traced one by one, and they are not alike:
 
-Packing specificity is also not computed: ProtCID did not resolve.
+| Where it is lost | Entries | What it means |
+|---|---|---|
+| In the catalogue, geometry ran, **no bridge** | 46 | the sensitivity bug, below |
+| Not in the catalogue | 20 | coverage, not sensitivity |
+| Has bridges, none classed `glue_candidate` | 7 | classification: 4 cofactor, 2 detergent, 1 peptide-like |
+
+**Every one of the 46 was rejected by the contact-count criterion, and not one
+by ΔSASA.** `data/interim/halves.jsonl` records every half-interface the
+pipeline considered, so each rejection can be read off directly. Of the ligand
+instances in those entries that touched two chains at all, 48 were rejected;
+48 of 48 failed only on contacts.
+
+| Entry | Ligand | Weak-side ΔSASA | Contacts | Min distance |
+|---|---|---|---|---|
+| 3SML | FW1 | 145.3 Å² | 2 | 3.92 Å |
+| 3P1O | FSC (fusicoccin) | 138.8 Å² | 2 | 3.96 Å |
+| 8BWX | RZT | 133.9 Å² | 2 | 3.78 Å |
+| 6HN2 | GF8 | 109.8 Å² | 2 | 3.44 Å |
+| 3OGK | OGK (coronatine) | 87.4 Å² | 1 | 3.69 Å |
+
+The weak side buries 55 to 145 Å², which is two to six times the 25 Å² floor,
+at minimum distances of 3.2 to 4.0 Å. These are broad, shallow, long contacts:
+the ligand lies against the second chain over a wide area without packing tight
+against it. **That is what a glue stabilising a shallow protein-protein
+interface looks like**, and the list is dominated by the 14-3-3 fusicoccin and
+cotylenin family, the largest published glue class after the IMiDs. Spec 5.1
+criterion 2 requires three heavy-atom contacts under 4.0 Å to *each* chain, and
+it is that second gate, not ΔSASA, that excludes them.
+
+### Loosening it does not rescue the floor, so the one permitted adjustment is not spent
+
+Because `halves.jsonl` holds every half-interface, the criterion can be swept
+exactly, without re-running the geometry:
+
+| Contact floor | Recall | Total bridges | Verdict |
+|---|---|---|---|
+| 1 | 0.8469 | 337,347 | misses |
+| 2 | 0.8219 | 280,239 | misses |
+| **3** (spec) | **0.7719** | **239,485** | **misses** |
+| 4 | 0.7125 | 211,684 | misses |
+| 5 | 0.6594 | 188,013 | misses |
+
+A floor of 1 is the loosest setting the criterion can take, and it still reaches
+only 0.847 against a floor of 0.85, while inflating the bridge count by 41%.
+Spec 9.6 allows one documented threshold adjustment before Gate G6. It is **not
+spent here**, because the sweep shows it cannot make the metric pass: it would
+buy 7.5 points of recall, still miss, and add 97,862 bridges whose
+false-positive cost cannot be priced, since the packing-specificity metric that
+would price it is the one ProtCID does not publish. Gate G6 carries the
+decision (DECISIONS D-027).
+
+The residual 20 not-in-catalogue entries and the 35 ligand instances that
+contact only one chain are a different problem. The latter are largely
+water-mediated: in the abscisic acid receptors (3KB3, 3JRQ, 3UJL) the hormone
+sits in the PYL pocket and reaches the phosphatase through an ordered water,
+so a direct-contact definition will never see it. BINMAN measures direct
+contact and says so.
+
+Packing specificity is also not computed: ProtCID does not publish bulk
+interface data (DECISIONS D-023).
 
 ## Section 9.2 Degron Scan validation
 

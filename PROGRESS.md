@@ -10,10 +10,10 @@ See `BUILD_LOG.md` for the timestamped event log.
 | Phases complete | 1, 2 and 3 built; 4 built and QC'd |
 | Atlas | 52,821 entries, 239,485 bridges, 21,717 degrons, 650 ligases, 30,057 edges, 142.5 MB |
 | Section 9 floors measured and passed | E3 enrichment p = 0.0024, pocket coverage 0.982, LM set equality 0.98, LM fabrication rate 0.00 |
-| Section 9 floors measured and missed | artefact precision 0.945 against 0.95; LM parse rate 0.987 against 0.99 (both Gate G6, both diagnosed) |
-| Section 9 metrics not computed | 10, each with the dataset that is missing (Gate G7) |
+| Section 9 floors measured and missed | 4, all Gate G6 and all diagnosed: glue recall 0.772 against 0.85 (D-027), artefact precision 0.939 against 0.95, degron sensitivity 0.656 against 0.70 and specificity 0.353 against 0.60 (D-024) |
+| Section 9 metrics not computed | 4, each with the dataset that is missing (Gate G7): packing specificity, substrate Spearman, degradability AUC and its split assertion |
 | QC | 24 screenshots, 0 console errors, 0 serious or critical axe violations |
-| Tests | 73 passing |
+| Tests | 77 passing |
 | Trimmed structures | 3,839 files, 553 MB, inside the 2.5 GB budget |
 | Repository | public at github.com/bellcheddar/BINMAN |
 
@@ -24,7 +24,7 @@ See `BUILD_LOG.md` for the timestamped event log.
 | 1.0 Hardware probe | **done** | M2 Ultra, 16P/8E cores, 60 GPU cores, 128 GB. MPS and MLX pass. |
 | 1.0 Environments | **done** | pixi compute, uv app. gemmi, freesasa, mkdssp 4.6.1, fpocket 4.2.3, plip, rdkit, mlx. |
 | 1.0 Vendored front-end | **done** | Mol* 5.12.0, D3 7.9.0, Plotly 2.35.2, Tabulator 6.3.1, 3 self-hosted fonts. |
-| 1.0 Validation datasets | **partial** | 4 of 10 resolved. G7 open, non-blocking. |
+| 1.0 Validation datasets | **partial** | 10 of 12 resolved. Outstanding: DEGRONOPEDIA and ProtCID, neither of which publishes a bulk route (D-023). G7 open, non-blocking. |
 | 1.0 Smoke test and budget | **done** | 5.1 entries/s measured, 2.9 h projected against a 96 h budget. No G1. |
 | 1.1 Catalogue | **done** | 52,821 entries. Tier 1 902, tier 2 34,539, tier 3 17,380. |
 | 1.2 Download and prepare | **done** | 52,821 entries; 235 skipped by the work cap (D-017). |
