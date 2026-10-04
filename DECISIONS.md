@@ -1483,12 +1483,35 @@ counter reads. `deploy/provision.sh` to run it.
 should be confirmed free before the first run; the check could not be made
 because SSH stopped answering (below).
 
-**SSH is currently refused and that is probably my doing.** The first attempt
-used `deploy@mdeller.com`, taken from the spec's own example line, and failed
-authentication. Two `root@45.55.102.228` connections then succeeded, and every
-attempt since has timed out while both `mdeller.com` and `podium.mdeller.com`
-serve HTTP 200. That is what fail2ban looks like from outside. Retrying would
-extend the ban, so it stopped at three attempts and nothing further was tried.
+**SSH is intermittently unusable from the Studio, and the cause is not
+established.** Two claims were made here and both were wrong. The first was
+fail2ban, inferred from a failed `deploy@mdeller.com` attempt followed by
+timeouts; Marc confirmed fail2ban is not installed and nothing is firewalled.
+The second was an implied network block, which the evidence contradicts.
 
-**Reversal.** The ban expires on its own, typically in minutes to an hour.
-Everything is staged, so the deploy is one command when it does.
+What is actually measured:
+
+* TCP to port 22 **connects**: `ssh -v` reports "Connection established", then
+  the session dies with `ssh_dispatch_run_fatal: Operation timed out`. The
+  failure is in the handshake, not the connect.
+* Two complete SSH sessions succeeded earlier, returning real output from
+  `systemctl` and `cat`.
+* Outbound port 22 from this machine is fine: `ssh -T git@github.com`
+  authenticates over port 22 in the same minutes the droplet stalls.
+* The droplet is healthy: `mdeller.com` and `podium.mdeller.com` both serve
+  HTTP 200 throughout.
+* `IPQoS=none`, `IPQoS=throughput` and forcing `aes128-ctr`, the usual
+  middlebox workarounds, change nothing.
+* It is not data-volume dependent: `ssh root@host true`, with no output at all,
+  fails the same way.
+* `en0` is at the standard 1500 MTU.
+
+Marc's own observation is the most useful datum and is recorded rather than
+explained away: these deploys worked from his MacBook and have only misbehaved
+since moving to the Studio. That points at something machine- or path-specific
+rather than anything on the droplet, which is consistent with everything above
+and is as far as the evidence goes.
+
+**Reversal.** Everything is staged. When SSH is usable, the deploy is
+`BINMAN_DEPLOY_CONFIRM=yes ./deploy/provision.sh`, which is idempotent and
+safe to retry.
