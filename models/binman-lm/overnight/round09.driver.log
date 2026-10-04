@@ -1,1 +1,6 @@
 [06:42:26] START round09-32layers-rank32 :: 32 layers, rank 32, 14152 iters
+[08:56:09] TRAINED round09-32layers-rank32 in 133 min
+[08:56:09] EVAL round09-32layers-rank32
+[09:01:20] EVALUATED round09-32layers-rank32
+recorded round09-32layers-rank32
+[09:01:20] === round 09 finished ===

@@ -25,8 +25,8 @@ RESULTS = ROOT / "models" / "binman-lm" / "overnight" / "results.jsonl"
 # The three numbers that decide the shipped adapter, with the direction that
 # counts as better and the floor spec 9.5 sets where it sets one.
 METRICS = [
-    ("task_a", "set_equality", "Task A set equality", 0.90),
-    ("task_a", "parse_rate", "Task A parse rate", 0.99),
+    ("task_a_synthetic", "set_equality", "Task A set equality", 0.90),
+    ("task_a_synthetic", "parse_rate", "Task A parse rate", 0.99),
     ("task_b", "macro_f1", "Task B macro-F1", 0.85),
     ("task_c", "abstention_rate", "Task C abstention", None),
     ("task_c", "fabrication_rate", "Task C fabrication", None),

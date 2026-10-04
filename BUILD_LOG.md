@@ -549,3 +549,11 @@ One line per meaningful event, timestamped UTC (spec Section 0 rule 5).
 | 2026-10-04T10:42:28+00:00 | 3.7 | SFT corpus assembled: 28,304 train (oversampling {'task_a': 2, 'task_c': 4}), task mix abstain 11%, query 34%, triage 55% |
 | 2026-10-04T10:42:28+00:00 | 3.7 | Stage 1 LoRA SFT starting: 28,304 train / 2,386 valid examples, rank 32, 32 layers, lr 1e-05, batch 2, 14152 iterations. |
 | 2026-10-04T10:47:42+00:00 | 3.9 | MLX adapter converted to PEFT: 448 tensors, rank 8, alpha 160, 32 layers. |
+| 2026-10-04T12:55:52+00:00 | 3.7 | Stage 1 complete in 133.2 min. Best validation loss 0.0 at iteration 3500. |
+| 2026-10-04T12:56:07+00:00 | 3.7 | Fuse succeeded: models/binman-lm/fused |
+| 2026-10-04T12:56:09+00:00 | 3.8 | round09-32layers-rank32: loading mlx-community/Qwen2.5-3B-Instruct-4bit with adapters at models/binman-lm/adapters |
+| 2026-10-04T12:56:56+00:00 | 3.8 | round09-32layers-rank32 synthetic: 25/120 evaluated (0.59/s), parse 1.000, set equality 1.000. |
+| 2026-10-04T12:57:35+00:00 | 3.8 | round09-32layers-rank32 synthetic: 50/120 evaluated (0.61/s), parse 1.000, set equality 1.000. |
+| 2026-10-04T12:58:14+00:00 | 3.8 | round09-32layers-rank32 synthetic: 75/120 evaluated (0.62/s), parse 1.000, set equality 1.000. |
+| 2026-10-04T12:58:53+00:00 | 3.8 | round09-32layers-rank32 synthetic: 100/120 evaluated (0.63/s), parse 1.000, set equality 1.000. |
+| 2026-10-04T13:01:20+00:00 | 3.8 | round09-32layers-rank32: parse rate 1.0, set equality 1.0 on 120 synthetic queries. |

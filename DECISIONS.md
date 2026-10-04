@@ -1237,3 +1237,48 @@ look at the ZeroGPU quota page, which is a daylight task.
 **Reversal.** Round 05's 16-layer adapter did serve from this Space. Restoring
 it would give a working demo of a worse model, which is the wrong trade: the
 repository and the model card carry the real numbers.
+
+## D-038: the capacity knobs do not compound, and round 07 ships
+
+**Decision.** **Round 07 (32 layers, rank 8) is the shipped adapter.** The
+sweep is closed. The 32B round is not run.
+
+**The sweep, all on the same balanced 240-sample triage set and seed:**
+
+| round | config | Task B macro-F1 | glue F1 | Task A set eq | train |
+|---|---|---|---|---|---|
+| 06 | 16 layers, rank 8, batch 4 | 0.8862 | 0.849 | 0.9833 | ~170 min |
+| **07** | **32 layers, rank 8, batch 4** | **0.9336** | 0.958 | **1.000** | 221 min |
+| 08 | 16 layers, rank 32, batch 4 | 0.9293 | 0.967 | 0.9917 | 173 min |
+| 09 | 32 layers, rank 32, **batch 2** | **0.8711** | 0.869 | **1.000** | 133 min |
+
+Either knob alone lifts macro-F1 by about 0.045. **Both together lose 0.015
+against the control**, and the loss is concentrated exactly where the single
+knobs gained: `molecular_glue` F1 falls from 0.958 and 0.967 back to 0.869, and
+`protac_called_glue` jumps from 1 and 3 to 9.
+
+**The comparison is confounded and that has to be said.** Round 09 ran at batch
+2 with gradient checkpointing because at batch 4 it exhausted swap and fell to
+roughly three iterations a minute. So it differs from rounds 07 and 08 in two
+ways, not one: more capacity and a smaller batch. 14,152 iterations at batch 2
+is one epoch where the others saw two, though round 06 had already shown that
+eight times the exposure changes nothing, which makes batch size rather than
+epochs the likelier confound. Smaller batches mean noisier gradients, and a
+model with four times the trainable parameters is the one least able to absorb
+that.
+
+**Why it is not re-run clean.** A batch-4 round at this capacity needs memory
+the machine does not have, which is what the first attempt demonstrated. The
+honest options were a confounded result or no result, and a confounded result
+that is labelled is worth more. Task A reached 1.000 in round 09 as it did in
+round 07, so the extra capacity was not simply wasted; it did not help the task
+that still had headroom.
+
+**What ships.** Round 07: Task B macro-F1 0.9336, Task A set equality 1.000,
+Task C abstention 1.00 with fabrication 0.00. It takes every metric that moves,
+clears the 0.85 Task B floor and the 0.90 Task A floor, and its PEFT conversion
+is verified against the held-out questions (D-037).
+
+**Reversal.** Round 09 is on disk. If the machine ever has the memory for a
+batch-4 run at 32 layers and rank 32, that is the clean experiment and it is
+one command.
