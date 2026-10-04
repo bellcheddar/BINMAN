@@ -53,3 +53,8 @@ qc/reports/
 
 # macOS
 .DS_Store
+
+# Converted adapter weights staged for HuggingFace upload. The Hub is the
+# distribution channel for these, not git: the repo carries the card and the
+# licence, not 50 MB of safetensors.
+deploy/hf-adapter/*.safetensors
