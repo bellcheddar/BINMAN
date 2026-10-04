@@ -1,0 +1,24 @@
+{
+  "tensors": 224,
+  "rank": 8,
+  "scale": 20.0,
+  "lora_alpha": 160.0,
+  "targets": [
+    "down_proj",
+    "gate_proj",
+    "k_proj",
+    "o_proj",
+    "q_proj",
+    "up_proj",
+    "v_proj"
+  ],
+  "layers": 16,
+  "layer_range": [
+    20,
+    35
+  ],
+  "source_adapter": "models/binman-lm/adapters",
+  "mlx_base": "mlx-community/Qwen2.5-3B-Instruct-4bit",
+  "cuda_base": "Qwen/Qwen2.5-3B-Instruct",
+  "out": "/private/tmp/claude-501/-Users-dellboy-Documents-Vibe-Coding-BINMAN/02d5f083-d26f-4b61-8c6c-1bb61949dddf/scratchpad/hf-adapter-dryrun"
+}

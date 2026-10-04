@@ -24,6 +24,12 @@ degradability built from the PDB.
 
 Try it: [**Dellboy/binman-lm**](https://huggingface.co/spaces/Dellboy/binman-lm)
 
+> **Provisional adapter.** The weights currently published here are from
+> training round 05, uploaded to validate the serving path end to end. An
+> overnight ablation over LoRA depth, rank and base-model size is running, and
+> this repository will be updated with whichever round measures best. The
+> metrics in `FINDINGS.md` are the authority on performance, not this note.
+
 ## What it does, and what it must never do
 
 Three text jobs:
