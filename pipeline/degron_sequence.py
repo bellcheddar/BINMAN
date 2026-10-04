@@ -272,6 +272,84 @@ def evaluate_regression(features, labels, genes, keys, targets,
     return np.asarray(scores), int(usable.sum())
 
 
+def per_compound_labels() -> dict[str, set[tuple[str, int, int]]]:
+    """Which zinc fingers each compound degrades, kept separate.
+
+    The pooled "degraded by any IMiD" label mixes compounds that recruit
+    different zinc fingers. Sievers assayed thalidomide, lenalidomide and
+    pomalidomide in data file S2 and pomalidomide, CC-122 and CC-220 in S6, and
+    the whole point of the later literature is that subtle changes to the
+    glutarimide reprogram which substrates are recruited. Pooling them asks the
+    model to learn a union of incompatible classes.
+    """
+    import openpyxl
+
+    sig: dict[str, set] = {}
+    s2 = VALIDATION / "raw" / "aat0572_sievers_data-file-s2.xlsx"
+    if s2.exists():
+        book = openpyxl.load_workbook(s2, read_only=True, data_only=True)
+        stream = book["pval_FDR"].iter_rows(values_only=True)
+        index = {name: i for i, name in enumerate(list(next(stream)))}
+        for row in stream:
+            if not row or not row[index["Gene"]]:
+                continue
+            key = (str(row[index["Gene"]]), int(row[index["AA.Start"]]),
+                   int(row[index["AA.Stop"]]))
+            for drug in ("THAL", "LEN", "POM"):
+                value = row[index.get(f"{drug}.FDR", -1)] if f"{drug}.FDR" in index else None
+                if isinstance(value, (int, float)) and value < 0.05:
+                    sig.setdefault(drug, set()).add(key)
+
+    s6 = VALIDATION / "raw" / "aat0572_sievers_data-file-s6.xlsx"
+    if s6.exists():
+        book = openpyxl.load_workbook(s6, read_only=True, data_only=True)
+        stream = book["POM_CC122_CC220_Results_bootstr"].iter_rows(values_only=True)
+        index = {name: i for i, name in enumerate(list(next(stream)))}
+        for row in stream:
+            if not row or not row[index["ZnF_gene_AApos"]]:
+                continue
+            parts = str(row[index["ZnF_gene_AApos"]]).rsplit("_", 2)
+            if len(parts) != 3 or not parts[1].isdigit():
+                continue
+            key = (parts[0], int(parts[1]), int(parts[2]))
+            for drug in ("CC122", "CC220"):
+                fdr = row[index.get(f"{drug}.FDR", -1)] if f"{drug}.FDR" in index else None
+                fold = row[index.get(f"FoldChange_{drug}", -1)] if f"FoldChange_{drug}" in index else None
+                if (isinstance(fdr, (int, float)) and fdr < 0.05
+                        and isinstance(fold, (int, float)) and fold > 1):
+                    sig.setdefault(drug, set()).add(key)
+    return sig
+
+
+def evaluate_per_compound(features, genes, keys, repeats: int = 20,
+                          permutations: int = 120, min_positives: int = 8) -> dict:
+    """Fit and score one model per compound rather than one for all of them."""
+    import numpy as np
+
+    out: dict = {}
+    for drug, positives in sorted(per_compound_labels().items()):
+        labels = np.asarray([1 if k in positives else 0 for k in keys])
+        if labels.sum() < min_positives:
+            out[drug] = {"n_positive": int(labels.sum()),
+                         "skipped": f"fewer than {min_positives} positives"}
+            continue
+        scores = evaluate(features, labels, genes, repeats=repeats)
+        null = permutation_null(features, labels, genes, rounds=permutations)
+        points = out_of_fold_operating_points(features, labels, genes)
+        observed = float(scores.mean())
+        out[drug] = {
+            "n_positive": int(labels.sum()),
+            "auc_mean": round(observed, 4),
+            "auc_std": round(float(scores.std()), 4),
+            "permutation_null": null,
+            "beats_null_by_sd": (round((observed - null["null_mean"]) / null["null_std"], 2)
+                                 if null.get("null_std") else None),
+            "best_youden": points.get("best_youden"),
+            "clears_spec_92_floors": points.get("any_cut_clears_spec_92_floors"),
+        }
+    return out
+
+
 def run(repeats: int = 25, permutations: int = 200) -> dict:
     path = VALIDATION / "sievers_zf_screen.tsv"
     if not path.exists():
@@ -319,6 +397,15 @@ def run(repeats: int = 25, permutations: int = 200) -> dict:
                      "labels. Uses the whole experiment rather than its 32 "
                      "significant calls."),
         },
+        "per_compound": evaluate_per_compound(features, genes, keys),
+        "per_compound_note": (
+            "One model per compound instead of one for the union. The AUC is "
+            "threshold-free and is the solid number. The operating points are "
+            "optimistic: the predictions are out-of-fold, so no model saw its "
+            "own gene, but the CUT is chosen by scanning those same held-out "
+            "predictions. A genuinely held-out threshold needs nested "
+            "cross-validation, which 8 to 14 positives cannot support."
+        ),
         "permutation_null": null,
         "operating_points": out_of_fold_operating_points(features, labels, genes),
         "beats_null_by_sd": (

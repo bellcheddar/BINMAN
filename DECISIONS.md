@@ -1607,3 +1607,50 @@ config, a floor of 150 seconds between retries, `ssh -T git@github.com` as the
 control for "is outbound 22 working", and the warning that `nc -z` is not a
 reliable probe from a sandboxed shell. Alongside it, the lesson from the Space:
 a diagnostic cannot clear a dependency it shares with the thing it diagnoses.
+
+## D-046: the pooled label was the mistake; pomalidomide clears the 9.2 floors
+
+**Decision.** Degron prediction is reported **per compound**. Pomalidomide
+reaches AUC 0.826 and an operating point satisfying both spec 9.2 floors. Gate
+G6 stays open and the shipped `degron_geometry_score` is unchanged, for the
+reasons below.
+
+**The finding.** Every earlier attempt asked which zinc fingers are degraded by
+*any* IMiD. The compounds do not share substrates, so the union label asks a
+model to learn incompatible classes at once. Splitting it:
+
+| label | positives | AUC | vs null | Youden J | clears floors |
+|---|---:|---:|---:|---:|---|
+| pooled | 32 | 0.636 | +1.7 sd | 0.214 | no |
+| **pomalidomide** | 14 | **0.826** | **+2.91 sd** | **0.571** | **yes** |
+| lenalidomide | 8 | 0.823 | +1.98 sd | 0.511 | yes |
+| CC-122 | 17 | 0.708 | +2.12 sd | 0.362 | yes |
+| CC-220 | 17 | 0.664 | +1.70 sd | 0.307 | no |
+
+The same features and the same grouped, permutation-tested harness throughout.
+Only the label changed.
+
+**Three things that were tested and did not help**, recorded so they are not
+retried: regressing on continuous fold depletion (0.605, worse, D-042); adding
+the geometry score as a feature (0.638, +0.0015, D-042); and removing
+ambiguous negatives in case hidden positives were depressing the score
+(0.642 at the strictest cut, inside one standard deviation). The ceiling was
+never the label noise or the feature set. It was the question.
+
+**Why the module is still not re-based.** The operating points are optimistic:
+predictions are out-of-fold so no model scored a gene it trained on, but the
+cut is chosen by scanning those same predictions, and 8 to 14 positives cannot
+support the nested cross-validation that would fix it. "Clears the floors"
+means a cut exists that clears them, not that the threshold is validated. A
+shipped score needs a threshold that survives a split it has never seen.
+
+**What would settle it.** The Słabicki 2025 Molecular Cell screen
+(10.1016/j.molcel.2025.07.019), which is the study spec 9.2 named: 9,097
+reporters against 29 glutarimide analogs, 38 degraded. Per-compound labels with
+an order of magnitude more positives per compound would make the nested
+validation possible. Its supplementary tables are free on PMC but sit behind a
+JavaScript interstitial that defeats both curl and Playwright, so they need a
+hand download like the Sievers files did.
+
+**Reversal.** `pipeline/degron_sequence.py` now computes the per-compound
+result as part of its normal run, so adding a screen means adding labels.

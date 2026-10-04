@@ -322,6 +322,48 @@ and ZN565 carry almost exactly ZFP30's motif and both are degraded. Separating
 those needs the CRBN interface, not the substrate alone, and that is a ternary
 complex calculation this project does not do.
 
+### The pooled label was the mistake: per-compound models clear the floors
+
+The three routes above all asked one question: which zinc fingers are degraded
+by **any** IMiD. That question has no clean answer, because the compounds do
+not share substrates. Sievers assayed thalidomide, lenalidomide and
+pomalidomide in one screen and pomalidomide, CC-122 and CC-220 in another, and
+the union label asks a model to learn a set of incompatible classes at once.
+
+Fitting one model per compound, same features and same grouped evaluation:
+
+| label | positives | AUC | vs null | best Youden J | clears spec 9.2 floors |
+|---|---:|---:|---:|---:|---|
+| pooled, any IMiD | 32 | 0.636 | +1.7 sd | 0.214 | no |
+| **pomalidomide** | 14 | **0.826** | **+2.91 sd** | **0.571** | **yes**, 0.857 / 0.600 |
+| lenalidomide | 8 | 0.823 | +1.98 sd | 0.511 | yes, 0.750 / 0.600 |
+| CC-122 | 17 | 0.708 | +2.12 sd | 0.362 | yes |
+| CC-220 | 17 | 0.664 | +1.70 sd | 0.307 | no |
+| thalidomide | 7 | — | — | — | too few positives to fit |
+
+**Pomalidomide is the clean case**: AUC 0.826 against a permutation null of
+0.509, clearing it by 2.91 standard deviations, and an operating point at
+sensitivity 0.857 and specificity 0.600 that satisfies both spec 9.2 floors
+together. The shipped geometry reaches 0.656 and 0.353 and no cut clears both.
+
+**Two caveats, because 14 positives is not many.**
+
+The AUC is threshold-free and is the number to trust. The operating points are
+optimistic: every prediction is out-of-fold, so no model scored a gene it was
+trained on, but the **cut** is chosen by scanning those same held-out
+predictions. A genuinely held-out threshold needs nested cross-validation, and
+8 to 14 positives cannot support it. Read "clears the floors" as "a cut exists
+that clears the floors", not as a validated operating point.
+
+Lenalidomide clears the null by 1.98 standard deviations and CC-220 by 1.70,
+which is weak. Pomalidomide at 2.91 is the only one comfortably clear.
+
+**What it means for the module.** Degradability is compound-specific and the
+project had been asking a question with no answer. That is a result about the
+biology rather than about the model, and it is consistent with the direction
+the field has taken: the 2025 Molecular Cell screen exists precisely because
+subtle changes to the glutarimide reprogram degron selectivity.
+
 ### The calibration history, which stands
 
 What follows is the method sanity check that preceded the matched set. It
