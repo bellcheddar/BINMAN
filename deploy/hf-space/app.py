@@ -58,9 +58,24 @@ def _load():
     if _model is not None:
         return _model, _tokenizer
     _tokenizer = AutoTokenizer.from_pretrained(BASE_MODEL)
-    model = AutoModelForCausalLM.from_pretrained(
-        BASE_MODEL, torch_dtype=torch.float16, device_map="cuda")
-    _model = PeftModel.from_pretrained(model, ADAPTER_REPO, token=HF_TOKEN).eval()
+    # transformers 5 renamed torch_dtype to dtype; accept either so the Space
+    # does not break on a routine SDK bump.
+    try:
+        model = AutoModelForCausalLM.from_pretrained(
+            BASE_MODEL, dtype=torch.float16, device_map="cuda")
+    except TypeError:
+        model = AutoModelForCausalLM.from_pretrained(
+            BASE_MODEL, torch_dtype=torch.float16, device_map="cuda")
+    try:
+        _model = PeftModel.from_pretrained(model, ADAPTER_REPO, token=HF_TOKEN).eval()
+    except Exception as error:  # noqa: BLE001
+        _model = None
+        raise gr.Error(
+            f"The adapter at {ADAPTER_REPO} could not be loaded, so there is "
+            "nothing to serve yet. If this Space was just created the weights "
+            "may still be uploading. Underlying error: "
+            f"{type(error).__name__}: {error}"
+        ) from error
     return _model, _tokenizer
 
 
