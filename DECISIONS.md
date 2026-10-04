@@ -1327,3 +1327,46 @@ ternary-complex calculation BINMAN does not do.
 **Reversal.** `pipeline/degron_sequence.py` takes the matched set and a feature
 matrix. Adding CRBN-interface features to it is the experiment, and the
 grouped, permutation-tested harness is already there to judge them.
+
+## D-040: ZeroGPU grants this Space no GPU, and the fault is not in the model path
+
+**Decision.** The Space stays on ZeroGPU and stays non-functional until Marc
+decides between waiting for quota, paying for dedicated hardware, or dropping
+to CPU. Nothing further is changed in the application code, because the
+application code is not what is failing.
+
+**How it was isolated.** Three configurations each failed differently and each
+looked like a code problem (D-037). The decisive test was a `@spaces.GPU`
+function that does nothing but report `torch.cuda.is_available()`. It fails
+with the same `event: error, data: null` as the model endpoints. A no-op cannot
+have a model bug, a quantisation bug or a peft version problem, so the fault is
+the GPU allocation itself.
+
+Along the way the GPU worker was made to return its own traceback as the
+answer, because a failure inside it reaches the caller as a null error and
+never appears in the Space log. Even that did not fire, which places the
+failure before any user code runs.
+
+**What it is not.** Not the adapter: the same artefact answers correctly on
+this machine and round 05's smaller adapter served from this same Space earlier
+in the session. Not quantisation transfer: that was separately verified in
+D-037. Not the ZeroGPU code pattern: a no-op fails too.
+
+**What it probably is.** A ZeroGPU quota consumed by the night's repeated
+restarts and probes, which resets on a cycle this project cannot see from the
+API. The `whoami-v2` endpoint returns no quota field for this token.
+
+**The options, which are Marc's.**
+
+1. Wait for the quota cycle. Costs nothing, fixes itself, unknown delay.
+2. Dedicated hardware. `t4-small` is $0.40/hour and would serve this model
+   comfortably. It is his account and his money, so it is not switched without
+   asking.
+3. `cpu-basic`, which is free. A 3B model in float16 fits in 16 GB but
+   generates at a few tokens a second: triage and abstention would answer in
+   seconds, Task A's longer outputs in minutes. A usable demo of two tabs out
+   of three.
+
+**Reversal.** The diagnostic GPU endpoint stays in the Space until it is known
+good, because it distinguishes "no GPU" from "model broken" in one click, which
+is the distinction that cost the most time here.

@@ -96,6 +96,19 @@ def _load():
 
 @spaces.GPU(duration=120)
 def _answer(question: str, system: str, max_new_tokens: int) -> str:
+    # The GPU worker's exceptions do not reach the Space log: a failure here
+    # surfaces to the caller as `event: error, data: null` and nothing else.
+    # Returning the traceback as the answer is ugly and is the only way to see
+    # it from outside, so it stays until the Space is known good.
+    try:
+        return _generate(question, system, max_new_tokens)
+    except Exception as error:  # noqa: BLE001
+        import traceback
+        return ("DIAGNOSTIC, not an answer:\n"
+                + "".join(traceback.format_exception(error))[-1500:])
+
+
+def _generate(question: str, system: str, max_new_tokens: int) -> str:
     model, tokenizer = _load()
     text = tokenizer.apply_chat_template(
         [{"role": "system", "content": system},
@@ -139,6 +152,19 @@ def task_c(question: str) -> str:
     if not question.strip():
         return ""
     return pretty(_answer(question, ABSTAIN_SYSTEM, 220))
+
+
+@spaces.GPU(duration=30)
+def _gpu_smoke() -> str:
+    """Does ZeroGPU hand this Space a GPU at all?
+
+    If the model-serving endpoints fail while this one does too, the fault is
+    the allocation rather than anything in the model path.
+    """
+    import torch as _t
+    return (f"cuda available={_t.cuda.is_available()} "
+            f"device_count={_t.cuda.device_count()} "
+            f"name={_t.cuda.get_device_name(0) if _t.cuda.is_available() else 'none'}")
 
 
 INTRO = """
@@ -195,6 +221,11 @@ with gr.Blocks(title="BINMAN-LM") as demo:
             "Polyethylene glycol fragment modelled at a lattice contact.",
             "Flavin adenine dinucleotide bound in the canonical Rossmann pocket.",
         ], description)
+
+    with gr.Tab("Diagnostics"):
+        gr.Markdown("Checks whether ZeroGPU grants this Space a GPU at all.")
+        out_d = gr.Textbox(label="GPU")
+        gr.Button("Check GPU").click(_gpu_smoke, None, out_d)
 
     with gr.Tab("Abstention"):
         gr.Markdown(
