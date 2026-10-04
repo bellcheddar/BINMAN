@@ -2677,3 +2677,46 @@ geometry, an hour across the configured workers.
 attempted, never which bridges qualify, so it is not a spec 9.6 adjustment and
 needs no authorisation. The contact floor (D-064) is the only science change in
 this rebuild, which keeps the measurement attributable to one cause.
+
+## D-067: with assayed negatives the metric clears its floor, and the shipped criterion dies
+
+**Finding.** D-054 closed the degradability metric on a stated obstacle: the
+negatives were assumed rather than assayed. That obstacle is removed (D-066's
+sibling work), and refitting on the same features and the same proteins with
+only the labels changed gives a different answer in both directions.
+
+**How wrong the old negatives were.** Over the 10,082 lysines that appear in
+both sets, the old labelling called 950 positive and the rest negative. The
+assayed data says **4,350 are ubiquitylated and 5,732 are true negatives**. The
+two labellings **disagree on 41% of the lysines**. Nearly every disagreement is
+a lysine the old set called negative because nobody had annotated it, which is
+precisely the bias the metric's own caveat warned about.
+
+**What clears, and what does not.** Within protein, which is the only figure
+that cannot be flattered by annotation prevalence (D-054):
+
+| feature set | within-protein AUC |
+|---|---:|
+| exposure alone, the shipped criterion | **0.5020** |
+| every per-lysine feature, boosted | **0.6778** |
+| everything including protein-level terms | 0.6834 |
+
+**The shipped criterion is dead, not rescued.** `min_nz_rel_sasa` is a single
+exposure threshold, and against assayed negatives lysine exposure is at chance.
+Its old 0.546 was partly the biased negative set flattering it: unannotated
+lysines skew buried, because buried lysines are also harder to detect by mass
+spectrometry, so the old negative set was enriched for exactly the thing the
+feature measures.
+
+**And the floor is cleared honestly.** 0.6778 uses per-lysine features only, with
+whole proteins held out and the AUC computed inside each protein. The
+protein-level terms that carried the old pooled figure add 0.006 now instead of
+0.09: with real negatives there is no annotation prevalence left to exploit.
+
+**What this does not yet license.** Spec 5.4's reach window is four numbers, one
+exposure threshold and three Cb-Cb boundaries, and this fits none of them. It
+shows a *model* clears the floor where a *threshold* cannot. Shipping a verdict
+on that basis is a change to what the module emits, not a fit of what the spec
+describes, and the three reach boundaries still have no ligand site to be
+measured from except in the 89 ternary complexes. Both halves are the next step;
+neither is done, and the notice stays until they are.
