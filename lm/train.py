@@ -72,12 +72,13 @@ RUN_STEM = f"binman-{MODEL_SLUG}"
 ROUND_PATTERN = re.compile(r"-round(\d+)$")
 
 
-def next_round(stem: str = RUN_STEM) -> int:
+def next_round(stem: str | None = None) -> int:
     """The next round number for this project, read from W&B.
 
     Falls back to a local counter file when W&B cannot be reached, so an offline
     run still increments rather than colliding on round01.
     """
+    stem = stem or RUN_STEM
     highest = 0
     try:
         import wandb
@@ -105,8 +106,14 @@ def next_round(stem: str = RUN_STEM) -> int:
     return nxt
 
 
-def run_name(round_number: int | None = None, stem: str = RUN_STEM) -> str:
-    """`binman-qwen-2.5-3b-4bit-roundNN`, matching the other projects."""
+def run_name(round_number: int | None = None, stem: str | None = None) -> str:
+    """`binman-<model>-roundNN`, matching the other projects.
+
+    `stem` resolves at call time. As a default argument it bound RUN_STEM at
+    definition, so a --base-model override produced run directories and W&B
+    names carrying the wrong model. See DECISIONS D-044.
+    """
+    stem = stem or RUN_STEM
     number = round_number if round_number is not None else next_round(stem)
     return f"{stem}-round{number:02d}"
 
@@ -237,7 +244,11 @@ def wandb_available() -> bool:
         return False
 
 
-def stage_one(iters: int, batch_size: int, model: str = BASE_MODEL,
+# `model=BASE_MODEL` as a default binds the module global at DEFINITION time, so
+# --base-model reassigning it in main() never reached the training command and
+# two "32B" rounds silently trained the 3B. The default is None and resolved at
+# call time instead. See DECISIONS D-044.
+def stage_one(iters: int, batch_size: int, model: str | None = None,
               round_number: int | None = None) -> dict:
     counts = prepare_sft_data()
 
@@ -246,6 +257,7 @@ def stage_one(iters: int, batch_size: int, model: str = BASE_MODEL,
     # into a directory named after the run, and the result is copied to the
     # stable `adapters/` path afterwards. The run is then named correctly while
     # it is live, rather than being renamed after the fact.
+    model = model or BASE_MODEL
     name = run_name(round_number) if round_number else "adapters"
     work_dir = (MODELS / "runs" / name) if round_number else ADAPTERS
     work_dir.mkdir(parents=True, exist_ok=True)

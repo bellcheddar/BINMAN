@@ -1515,3 +1515,39 @@ and is as far as the evidence goes.
 **Reversal.** Everything is staged. When SSH is usable, the deploy is
 `BINMAN_DEPLOY_CONFIRM=yes ./deploy/provision.sh`, which is idempotent and
 safe to retry.
+
+## D-044: two "32B" rounds silently trained the 3B
+
+**Decision.** `stage_one`, `run_name` and `next_round` resolve the base model
+and run stem at **call time** rather than taking them as default arguments.
+
+**The bug.** `def stage_one(iters, batch_size, model: str = BASE_MODEL, ...)`
+binds `BASE_MODEL` when the function is **defined**, not when it is called.
+`main()` reassigns the module global in response to `--base-model`, and the
+default had already captured the old value, so the override never reached the
+training command. `run_name(stem: str = RUN_STEM)` and
+`next_round(stem: str = RUN_STEM)` had the same defect, which is why the run
+directory was named `binman-qwen-2.5-3b-4bit-round13` for a 32B round.
+
+**What it cost.** Rounds 12 and 13 both ran `--model
+mlx-community/Qwen2.5-3B-Instruct-4bit` while reporting themselves as 32B.
+Round 12 was killed for other reasons; round 13 reached 4,200 iterations before
+the discrepancy was noticed. About 35 minutes of training, and a result that
+would have been reported as "32B is no better than 3B" when no 32B had run.
+
+**How it surfaced.** Arithmetic, not an error. The run was doing roughly 130
+iterations a minute when `lm/measure_throughput.py` had measured the 32B at
+13.03. A tenfold gap between the measured rate and the observed one is not a
+variance; it is a different model. The run directory carrying the `3b` slug
+confirmed it, and the process command line settled it.
+
+**Why the throughput measurement did not catch it.**
+`lm/measure_throughput.py` builds its own command and passes `--model`
+explicitly, so it genuinely measured the 32B. Only the training path had the
+defect, which is exactly the shape that defeats a pre-flight check: the thing
+that measures and the thing that runs took different routes to the same
+setting.
+
+**Reversal.** None wanted. The guard is the arithmetic: a round whose observed
+iterations-per-minute does not match its measured throughput is not running the
+model it claims.
