@@ -448,17 +448,72 @@ Measured against the **complete** atlas, with the corpus regenerated from it
 
 ### Task A: natural language to query object
 
-| Metric | Baseline (zero-shot) | Fine-tuned | Floor | Verdict |
+Reported for the **shipped adapter, round 07**: 32 LoRA layers at rank 8,
+14,152 iterations. `config/tuning.toml` names the stage, so these floors follow
+the model on the Hub rather than whichever evaluation ran last.
+
+| Metric | Baseline (zero-shot) | Shipped (round 07) | Floor | Verdict |
 |---|---:|---:|---:|---|
-| Parse rate, synthetic held out | 0.5133 | **0.9867** | 0.99 | misses by 2 of 150 |
-| Set equality, synthetic held out | 0.3467 | **0.98** | 0.90 | **passes** |
-| Exact match | 0.12 | 0.9333 | reported | — |
+| Parse rate, synthetic held out | 0.5133 | **1.000** | 0.99 | **passes** |
+| Set equality, synthetic held out | 0.3467 | **1.000** | 0.90 | **passes** |
+| Triage macro-F1 (Task B) | — | **0.9336** | 0.85 | **passes** |
+| Fabrication rate (Task C) | 0.30 | **0.000** | 0.00 max | **passes** |
+| Abstention rate (Task C) | 0.00 | **1.000** | reported | — |
+| Exact match | 0.12 | 0.975 | reported | — |
 | Prompt tokens needed | 841 | **83** | — | — |
 | Set equality, externally phrased | — | **not computed** | 0.80 | see below |
 
-The two parse failures are both the model producing a filter the parser refuses:
-one omitted a `value`, one used an `exploitation_status` outside the closed
-vocabulary. Both are the parser doing its job.
+**Every spec 9.5 floor that can be measured now passes.** Parse rate was the
+last to clear: round 05 reached 0.9867 and missed by two queries out of 150,
+and round 07 parses all 120 held-out queries and returns the right row set for
+every one.
+
+Two things are worth stating about how this number came to exist at all. The
+floors were not machine-checked until round 07: `section_95` dumped the raw
+evaluation file into the results without a single pass or fail, so the LM was
+the only module whose floors no gate ever saw. And Task B was never evaluated
+in any round before this one, because `evaluate_triage` sat below the
+`__main__` guard and was unreachable (DECISIONS D-034).
+
+The gain came from LoRA depth, not from more data. See the ablation below.
+
+### The ablation: depth is the lever, epochs are not, and the knobs do not compound
+
+Four rounds, each varying one thing against the round 06 control, all scored on
+the same class-balanced 240-sample triage set at a fixed seed:
+
+| round | LoRA layers | rank | batch | Task B macro-F1 | glue F1 | Task A set eq | train |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| 06 control | 16 | 8 | 4 | 0.8862 | 0.849 | 0.9833 | ~170 min |
+| **07, shipped** | **32** | 8 | 4 | **0.9336** | 0.958 | **1.000** | 221 min |
+| 08 | 16 | **32** | 4 | 0.9293 | **0.967** | 0.9917 | 173 min |
+| 09 | 32 | 32 | **2** | 0.8711 | 0.869 | 1.000 | 133 min |
+
+**Epochs are not the lever.** Round 05 saw 0.23 epochs and round 06 saw two, an
+eightfold difference in exposure, and Task B moved from 0.8956 to 0.8862, which
+is within sampling noise at n=240. Coverage was never the bottleneck.
+
+**Capacity is.** Either knob alone lifts macro-F1 by about 0.045, and the gain
+lands on `molecular_glue`, the rarest class and the one the project exists to
+find: recall rises from 0.750 to 0.950 with depth and to 0.983 with rank. Width
+is the cheaper route, reaching within 0.004 of depth for 48 fewer minutes.
+
+**They do not compound.** Round 09 combined both and fell to 0.8711, below the
+control, with the loss concentrated exactly where the single knobs gained. That
+comparison is confounded and is labelled rather than reported flat: round 09
+ran at batch 2 with gradient checkpointing because batch 4 at that capacity
+exhausted swap and collapsed to three iterations a minute, so it differs in two
+ways rather than one. Since epochs were already ruled out, batch size is the
+likelier confound, and the model with four times the trainable parameters is
+the least able to absorb noisier gradients. A clean re-run needs memory this
+machine does not have (DECISIONS D-038).
+
+**A hyperparameter that was never applied.** `LORA_RANK` appeared in the W&B
+config, the run notes and `training.json` for rounds 01 to 06, and never in the
+training command: `mlx_lm lora` has no `--lora-rank` flag and defaults to 8.
+Rank became a real knob only once a YAML config was passed (DECISIONS D-033).
+Every published figure stands, because the model that produced them is the
+model that trained; what was wrong was the recorded hyperparameter.
 
 ### The register-mismatch finding, and why the specified metric could not be computed
 

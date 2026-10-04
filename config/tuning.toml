@@ -17,6 +17,9 @@ model_instances = 1
 mlx_batch_size = 4
 mlx_available = true
 gate_g1_candidate = false
+# The evaluation stage describing the shipped adapter, so Section 9.5 floors
+# report the model on the Hub rather than the last evaluation that ran.
+shipped_stage = "round07-32layers"
 
 [io]
 rcsb_rate_limit_per_sec = 8
@@ -34,3 +37,4 @@ free_gb_at_probe = 1513.7
 PYTORCH_ENABLE_MPS_FALLBACK = "1"
 TOKENIZERS_PARALLELISM = "false"
 OMP_NUM_THREADS = "14"
+

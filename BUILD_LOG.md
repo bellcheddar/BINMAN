@@ -557,3 +557,7 @@ One line per meaningful event, timestamped UTC (spec Section 0 rule 5).
 | 2026-10-04T12:58:14+00:00 | 3.8 | round09-32layers-rank32 synthetic: 75/120 evaluated (0.62/s), parse 1.000, set equality 1.000. |
 | 2026-10-04T12:58:53+00:00 | 3.8 | round09-32layers-rank32 synthetic: 100/120 evaluated (0.63/s), parse 1.000, set equality 1.000. |
 | 2026-10-04T13:01:20+00:00 | 3.8 | round09-32layers-rank32: parse rate 1.0, set equality 1.0 on 120 synthetic queries. |
+| 2026-10-04T13:09:29+00:00 | 9 | Validation run against binman.sqlite: 2 metric(s) not computed (dataset unavailable), 5 measured floor(s) missed. |
+| 2026-10-04T13:09:58+00:00 | 9 | Validation run against binman.sqlite: 4 metric(s) not computed (dataset unavailable), 5 measured floor(s) missed. |
+| 2026-10-04T13:10:49+00:00 | 9 | Validation run against binman.sqlite: 0 metric(s) not computed (dataset unavailable), 2 measured floor(s) missed. |
+| 2026-10-04T13:10:50+00:00 | 9 | Validation run against binman.sqlite: 4 metric(s) not computed (dataset unavailable), 5 measured floor(s) missed. |

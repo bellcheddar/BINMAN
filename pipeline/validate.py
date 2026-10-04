@@ -15,6 +15,7 @@ from __future__ import annotations
 import argparse
 import csv
 import json
+import re
 import math
 import sqlite3
 import sys
@@ -750,9 +751,87 @@ def section_95(config) -> dict:
             out[key] = not_computed(reason, floor)
         return out
     try:
-        out.update(json.loads(report.read_text()))
+        blob = json.loads(report.read_text())
     except json.JSONDecodeError:
         out["error"] = "lm_eval.json could not be parsed"
+        return out
+
+    # The file is keyed by stage. Prefer the stage named in the model card, then
+    # the newest round, so the floors describe the adapter that actually ships
+    # rather than whichever evaluation happened to run last.
+    stages = [k for k in blob if isinstance(blob.get(k), dict)]
+    shipped = config.u("model").get("shipped_stage", "")
+    # Sort by round NUMBER, not lexically: "round_with_task_b" sorts after
+    # "round09-..." because underscore outranks digits in ASCII, which silently
+    # selected an old ad-hoc evaluation as the shipped one.
+    numbered = []
+    for key in stages:
+        match = re.match(r"round(\d+)", key)
+        if match:
+            numbered.append((int(match.group(1)), key))
+    numbered.sort()
+    stage = shipped if shipped in stages else (numbered[-1][1] if numbered else None)
+    if stage is None:
+        out["error"] = "lm_eval.json holds no stage to report"
+        return out
+
+    report_blob = blob[stage]
+    out["stage_reported"] = stage
+    out["available_stages"] = sorted(stages)
+    out.update(report_blob)
+
+    # Spec 9.5 floors. These were never checked: section_95 dumped the raw file
+    # and the LM was the only module whose floors no gate ever saw.
+    synthetic = report_blob.get("task_a_synthetic") or {}
+    external = report_blob.get("task_a_external") or {}
+    triage = report_blob.get("task_b") or {}
+    abstain = report_blob.get("task_c") or {}
+
+    out["parse_rate"] = computed(
+        synthetic.get("parse_rate"), floors["lm_parse_rate_floor"],
+        n=synthetic.get("n"), source=f"{stage}, synthetic held-out query set")
+    out["set_equality_synthetic"] = computed(
+        synthetic.get("set_equality"), floors["lm_set_equality_synthetic_floor"],
+        n=synthetic.get("n"), source=f"{stage}, synthetic held-out query set")
+
+    if external.get("computed") is False:
+        out["set_equality_external"] = not_computed(
+            external.get("reason", "no externally phrased query set"),
+            floors["lm_set_equality_external_floor"])
+    else:
+        out["set_equality_external"] = computed(
+            external.get("set_equality"),
+            floors["lm_set_equality_external_floor"], n=external.get("n"))
+
+    if triage.get("macro_f1") is None:
+        out["triage_macro_f1"] = not_computed(
+            "Task B was not evaluated for this stage.",
+            floors["lm_triage_macro_f1_floor"])
+    else:
+        out["triage_macro_f1"] = computed(
+            triage.get("macro_f1"), floors["lm_triage_macro_f1_floor"],
+            n=triage.get("n"),
+            note=("Class-balanced sample, 60 per class at a fixed seed. The test "
+                  "file is unbalanced and a head slice flatters the rare classes "
+                  "(DECISIONS D-034)."))
+
+    # Fabrication is a ceiling, not a floor: lower is better and the spec sets
+    # the maximum at zero, so computed()'s >= comparison would read backwards.
+    fabrication = abstain.get("fabrication_rate")
+    ceiling = floors["lm_fabrication_rate_max"]
+    out["fabrication_rate"] = {
+        "computed": fabrication is not None,
+        "value": fabrication, "floor": ceiling, "reason": "",
+        "passes": None if fabrication is None else bool(fabrication <= ceiling),
+        "n": abstain.get("n"),
+        "note": ("A maximum rather than a minimum: any fabricated number is a "
+                 "defect, so the bar is zero and the comparison is <=."),
+    }
+    out["abstention_rate"] = {
+        "computed": abstain.get("abstention_rate") is not None,
+        "value": abstain.get("abstention_rate"), "floor": None, "reason": "",
+        "n": abstain.get("n"),
+    }
     return out
 
 
