@@ -48,9 +48,9 @@ def _stats() -> list[dict]:
 def _weights() -> list[dict]:
     """The ranking weights, read from thresholds.toml so the UI cannot drift."""
     try:
-        from pipeline.common import load_config
+        from app.thresholds import table as _table
 
-        table = load_config().thresholds.get("e3_triage", {})
+        table = _table("e3_triage")
     except Exception:  # noqa: BLE001
         return []
     return [

@@ -1,126 +1,126 @@
 {
-  "generated_at": "2026-10-04T15:47:40Z",
-  "base_url": "http://127.0.0.1:8796",
+  "generated_at": "2026-10-04T16:05:13Z",
+  "base_url": "http://127.0.0.1:8800",
   "browser": "system Google Chrome via playwright channel=chrome",
   "pages": {
     "atlas.light.desktop": {
       "status": 200,
-      "load_ms": 1315,
+      "load_ms": 1345,
       "screenshot": "qc/screenshots/atlas.light.desktop.png"
     },
     "degron.light.desktop": {
       "status": 200,
-      "load_ms": 674,
+      "load_ms": 686,
       "screenshot": "qc/screenshots/degron.light.desktop.png"
     },
     "e3.light.desktop": {
       "status": 200,
-      "load_ms": 619,
+      "load_ms": 632,
       "screenshot": "qc/screenshots/e3.light.desktop.png"
     },
     "degradability.light.desktop": {
       "status": 200,
-      "load_ms": 637,
+      "load_ms": 638,
       "screenshot": "qc/screenshots/degradability.light.desktop.png"
     },
     "lens.light.desktop": {
       "status": 200,
-      "load_ms": 608,
+      "load_ms": 623,
       "screenshot": "qc/screenshots/lens.light.desktop.png"
     },
     "about.light.desktop": {
       "status": 200,
-      "load_ms": 978,
+      "load_ms": 1058,
       "screenshot": "qc/screenshots/about.light.desktop.png"
     },
     "atlas.light.phone": {
       "status": 200,
-      "load_ms": 1273,
+      "load_ms": 1297,
       "screenshot": "qc/screenshots/atlas.light.phone.png"
     },
     "degron.light.phone": {
       "status": 200,
-      "load_ms": 667,
+      "load_ms": 679,
       "screenshot": "qc/screenshots/degron.light.phone.png"
     },
     "e3.light.phone": {
       "status": 200,
-      "load_ms": 623,
+      "load_ms": 622,
       "screenshot": "qc/screenshots/e3.light.phone.png"
     },
     "degradability.light.phone": {
       "status": 200,
-      "load_ms": 620,
+      "load_ms": 617,
       "screenshot": "qc/screenshots/degradability.light.phone.png"
     },
     "lens.light.phone": {
       "status": 200,
-      "load_ms": 624,
+      "load_ms": 628,
       "screenshot": "qc/screenshots/lens.light.phone.png"
     },
     "about.light.phone": {
       "status": 200,
-      "load_ms": 987,
+      "load_ms": 1675,
       "screenshot": "qc/screenshots/about.light.phone.png"
     },
     "atlas.dark.desktop": {
       "status": 200,
-      "load_ms": 1279,
+      "load_ms": 1311,
       "screenshot": "qc/screenshots/atlas.dark.desktop.png"
     },
     "degron.dark.desktop": {
       "status": 200,
-      "load_ms": 668,
+      "load_ms": 687,
       "screenshot": "qc/screenshots/degron.dark.desktop.png"
     },
     "e3.dark.desktop": {
       "status": 200,
-      "load_ms": 610,
+      "load_ms": 618,
       "screenshot": "qc/screenshots/e3.dark.desktop.png"
     },
     "degradability.dark.desktop": {
       "status": 200,
-      "load_ms": 619,
+      "load_ms": 644,
       "screenshot": "qc/screenshots/degradability.dark.desktop.png"
     },
     "lens.dark.desktop": {
       "status": 200,
-      "load_ms": 606,
+      "load_ms": 616,
       "screenshot": "qc/screenshots/lens.dark.desktop.png"
     },
     "about.dark.desktop": {
       "status": 200,
-      "load_ms": 988,
+      "load_ms": 1351,
       "screenshot": "qc/screenshots/about.dark.desktop.png"
     },
     "atlas.dark.phone": {
       "status": 200,
-      "load_ms": 1262,
+      "load_ms": 1277,
       "screenshot": "qc/screenshots/atlas.dark.phone.png"
     },
     "degron.dark.phone": {
       "status": 200,
-      "load_ms": 674,
+      "load_ms": 686,
       "screenshot": "qc/screenshots/degron.dark.phone.png"
     },
     "e3.dark.phone": {
       "status": 200,
-      "load_ms": 622,
+      "load_ms": 619,
       "screenshot": "qc/screenshots/e3.dark.phone.png"
     },
     "degradability.dark.phone": {
       "status": 200,
-      "load_ms": 612,
+      "load_ms": 615,
       "screenshot": "qc/screenshots/degradability.dark.phone.png"
     },
     "lens.dark.phone": {
       "status": 200,
-      "load_ms": 634,
+      "load_ms": 631,
       "screenshot": "qc/screenshots/lens.dark.phone.png"
     },
     "about.dark.phone": {
       "status": 200,
-      "load_ms": 994,
+      "load_ms": 1146,
       "screenshot": "qc/screenshots/about.dark.phone.png"
     }
   },
@@ -128,40 +128,40 @@
   "axe_violations": [],
   "performance": {
     "atlas": {
-      "light.desktop_ms": 1315,
-      "light.phone_ms": 1273,
-      "dark.desktop_ms": 1279,
-      "dark.phone_ms": 1262
+      "light.desktop_ms": 1345,
+      "light.phone_ms": 1297,
+      "dark.desktop_ms": 1311,
+      "dark.phone_ms": 1277
     },
     "degron": {
-      "light.desktop_ms": 674,
-      "light.phone_ms": 667,
-      "dark.desktop_ms": 668,
-      "dark.phone_ms": 674
+      "light.desktop_ms": 686,
+      "light.phone_ms": 679,
+      "dark.desktop_ms": 687,
+      "dark.phone_ms": 686
     },
     "e3": {
-      "light.desktop_ms": 619,
-      "light.phone_ms": 623,
-      "dark.desktop_ms": 610,
-      "dark.phone_ms": 622
+      "light.desktop_ms": 632,
+      "light.phone_ms": 622,
+      "dark.desktop_ms": 618,
+      "dark.phone_ms": 619
     },
     "degradability": {
-      "light.desktop_ms": 637,
-      "light.phone_ms": 620,
-      "dark.desktop_ms": 619,
-      "dark.phone_ms": 612
+      "light.desktop_ms": 638,
+      "light.phone_ms": 617,
+      "dark.desktop_ms": 644,
+      "dark.phone_ms": 615
     },
     "lens": {
-      "light.desktop_ms": 608,
-      "light.phone_ms": 624,
-      "dark.desktop_ms": 606,
-      "dark.phone_ms": 634
+      "light.desktop_ms": 623,
+      "light.phone_ms": 628,
+      "dark.desktop_ms": 616,
+      "dark.phone_ms": 631
     },
     "about": {
-      "light.desktop_ms": 978,
-      "light.phone_ms": 987,
-      "dark.desktop_ms": 988,
-      "dark.phone_ms": 994
+      "light.desktop_ms": 1058,
+      "light.phone_ms": 1675,
+      "dark.desktop_ms": 1351,
+      "dark.phone_ms": 1146
     }
   },
   "selection_propagation": {
@@ -179,7 +179,7 @@
     "pages_captured": 24,
     "console_errors": 0,
     "axe_serious_or_critical": 0,
-    "slowest_page_ms": 1315,
+    "slowest_page_ms": 1675,
     "passes": true
   }
 }

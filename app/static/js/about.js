@@ -115,9 +115,14 @@
           } },
         { title: 'Used for', field: 'used_for', widthGrow: 3 },
         { title: 'Licence', field: 'licence', widthGrow: 2, headerFilter: 'input',
+          /* The pill says "not determined"; the full note says what was checked
+             and why it could not be determined, which is the useful part. */
+          tooltip: function (event, cell) { return cell.getValue() || ''; },
           formatter: function (cell) {
             var value = cell.getValue();
-            return (!value || value === 'not determined')
+            /* "not determined: <what was checked>" is still undetermined, and
+               the explanation belongs in the tooltip rather than the pill. */
+            return (!value || value.indexOf('not determined') === 0)
               ? Util.pill('not determined', 'warn')
               : Util.escape(value);
           } },

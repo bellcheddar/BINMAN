@@ -1803,3 +1803,57 @@ being true substrates. For a protein with many zinc fingers the scorer takes
 the first C2H2 motif in the window around the hairpin, which need not be the
 degron-bearing finger. Scoring every finger and keeping the maximum would fix
 it and is the obvious next improvement.
+
+## D-050: the live audit, and a QC check that could not fail
+
+**Decision.** Six live defects fixed. The QC viewer check is rewritten, because
+it was green throughout and could not have caught the main one.
+
+**The viewer, which was never broken.** `.viewer__empty` sets
+`display: flex`, and an explicit `display` beats the user-agent rule that the
+`hidden` attribute relies on. `hideEmpty()` set `hidden=true` correctly and the
+overlay stayed on screen, on top of a structure that had loaded. The symptom
+was "viewers do not load"; the cause was a placeholder covering them.
+
+A global `[hidden] { display: none !important; }` now guards every element
+toggled that way, because fourteen other classes set an explicit `display` and
+`plddt-legend` is toggled with `hidden` too.
+
+**The QC check could not fail.** It read
+`!!document.querySelector('[data-role="empty"]')`, which tests whether the
+element exists. It always exists. The check therefore reported `empty: true`
+whether the viewer was working or not, and `PASS: True` alongside it. It now
+tests `offsetParent !== null`, which is visibility.
+
+**The app imported the build pipeline.** `app/routes/{api,degradability,e3}.py`
+each did `from pipeline.common import load_config` inside a bare
+`except Exception`. `pipeline/` is not deployed, so on the droplet every one of
+them fell through to a default: the Degradability page said "thresholds could
+not be read", the Lens graph silently used a 400-node cap instead of the
+configured one, and the E3 page lost its triage weights. Nothing crashed, which
+is why it survived. `app/thresholds.py` reads the TOML directly and the app no
+longer imports the pipeline at all.
+
+**Structures were served as raw gzip.** nginx sent `.cif.gz` as
+`application/octet-stream` with no `Content-Encoding`, so the browser handed
+Mol* compressed bytes. Flask sets that header automatically for a `.gz`, which
+is exactly why local QC passed and the live site did not.
+
+**The lens graph had no bounds.** A force layout with up to 400 nodes and a
+charge of -120 spreads well past the viewBox and nothing refit the view, so the
+user saw an empty canvas with the network off-screen. It now fits to the
+laid-out extent once the simulation cools; manual zoom still works.
+
+**The schematic.** Stage 4 said "BINMAN-LM: not trained". Its canvas was
+hardcoded at 1060x460, which rendered 1380x600 in a desktop panel and left a
+third of the height empty. The canvas is now computed from the content, which
+also fixes the two pixels the module column was being clipped by: 1380x275.
+
+**Licences.** DEGRONOPEDIA states CC BY on its own site, so it is recorded.
+UbiBrowser states no terms anywhere and its NAR paper's CC BY-NC-4.0 covers the
+article rather than the database, so it stays undetermined with that
+explanation attached. Writing the explanation into the field broke an
+exact-match count that read `== "not determined"`, which made one unknown
+licence read as zero; both the counter and the UI pill now match on the prefix.
+
+**Still open.** Making the metric cards filter the lists.

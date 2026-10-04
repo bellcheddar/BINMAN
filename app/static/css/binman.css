@@ -362,6 +362,11 @@ code, kbd, samp, .mono { font-family: var(--data); font-size: 0.86em; }
   position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
   text-align: center; padding: 2rem 1.2rem; color: var(--muted); font-size: 0.88rem;
 }
+/* An explicit `display` beats the user-agent rule that `[hidden]` relies on, so
+   hideEmpty() set hidden=true and the overlay stayed on screen over a viewer
+   that had in fact loaded. That is the whole "viewers do not load" symptom: the
+   structure was there, behind this. */
+.viewer__empty[hidden] { display: none; }
 .viewer__overlay {
   position: absolute; bottom: 0.4rem; left: 0.4rem; z-index: 5;
   background: color-mix(in srgb, var(--surface) 90%, transparent);
@@ -477,3 +482,10 @@ code, kbd, samp, .mono { font-family: var(--data); font-size: 0.86em; }
   .rail, .app-nav, .theme-toggle, .viewer__bar { display: none; }
   body { background: #fff; color: #000; }
 }
+
+/* Defensive, and last so it wins on equal specificity: any element carrying the
+   `hidden` attribute stays hidden. A class that sets an explicit `display`
+   silently overrides the user-agent rule behind `[hidden]`, which is how the
+   viewer's empty overlay stayed on top of a structure that had loaded. Anything
+   toggled with `hidden` in JS is exposed to the same trap. */
+[hidden] { display: none !important; }

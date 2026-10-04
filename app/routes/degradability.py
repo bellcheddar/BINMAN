@@ -47,10 +47,10 @@ def _window() -> dict:
     Spec 5.4 requires the held-out AUC to be shown beside the verdict column so
     the user knows how much weight it carries. An unfitted window says so.
     """
-    try:
-        from pipeline.common import load_config
+    from app.thresholds import table as _table
 
-        table = load_config().thresholds.get("degradability", {}).get("reach_window", {})
-    except Exception:  # noqa: BLE001
-        return {"fitted": False, "fit_status": "thresholds could not be read"}
-    return dict(table)
+    window = _table("degradability").get("reach_window", {})
+    if not window:
+        return {"fitted": False,
+                "fit_status": "config/thresholds.toml is missing or unreadable"}
+    return dict(window)

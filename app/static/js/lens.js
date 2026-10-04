@@ -77,9 +77,32 @@
     }
 
     var container = svg.append('g');
-    svg.call(global.d3.zoom().scaleExtent([0.2, 6]).on('zoom', function (event) {
+    var zoom = global.d3.zoom().scaleExtent([0.2, 6]).on('zoom', function (event) {
       container.attr('transform', event.transform);
-    }));
+    });
+    svg.call(zoom);
+
+    /* The force layout has no bounds: with a few hundred nodes and a charge of
+       -120 the graph spreads well past the viewBox and the user sees an empty
+       canvas with the network somewhere off-screen. Nothing refit the view, so
+       this measures the laid-out extent and scales it to fit once the
+       simulation has cooled. Manual zoom still works afterwards. */
+    function fitToContent() {
+      if (!state.nodes.length) { return; }
+      var xs = state.nodes.map(function (d) { return d.x; }).filter(Number.isFinite);
+      var ys = state.nodes.map(function (d) { return d.y; }).filter(Number.isFinite);
+      if (!xs.length || !ys.length) { return; }
+      var pad = 40;
+      var minX = Math.min.apply(null, xs), maxX = Math.max.apply(null, xs);
+      var minY = Math.min.apply(null, ys), maxY = Math.max.apply(null, ys);
+      var spanX = Math.max(1, maxX - minX), spanY = Math.max(1, maxY - minY);
+      var scale = Math.min((width - pad * 2) / spanX, (height - pad * 2) / spanY, 4);
+      var tx = width / 2 - scale * (minX + maxX) / 2;
+      var ty = height / 2 - scale * (minY + maxY) / 2;
+      svg.transition().duration(400).call(
+        zoom.transform,
+        global.d3.zoomIdentity.translate(tx, ty).scale(scale));
+    }
 
     var link = container.append('g').selectAll('line')
       .data(state.links).enter().append('line')
@@ -122,7 +145,8 @@
           .attr('y2', function (d) { return d.target.y; });
         node.attr('cx', function (d) { return d.x; }).attr('cy', function (d) { return d.y; });
         label.attr('x', function (d) { return d.x; }).attr('y', function (d) { return d.y; });
-      });
+      })
+      .on('end', fitToContent);
 
     node.call(global.d3.drag()
       .on('start', function (event, d) {

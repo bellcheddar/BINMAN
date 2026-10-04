@@ -184,7 +184,14 @@ def run(port: int = 8777, skip_axe: bool = False) -> dict:
             molstar = page.evaluate(
                 "() => ({ loaded: typeof window.molstar !== 'undefined',"
                 " mounted: !!window.BINMAN.getViewer('viewer-glue'),"
-                " empty: !!document.querySelector('#viewer-glue [data-role=\"empty\"]') })"
+                # Visibility, not existence. The placeholder is always in the
+                # DOM and is hidden with the `hidden` attribute, so testing for
+                # the element reported "empty" forever and this check stayed
+                # green while a CSS `display` override kept the overlay on top
+                # of a structure that had loaded.
+                " empty: (() => { const e = document.querySelector("
+                "'#viewer-glue [data-role=\"empty\"]');"
+                " return !!(e && e.offsetParent !== null); })() })"
             )
             report["molstar"] = molstar
             context.close()

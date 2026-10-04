@@ -597,3 +597,11 @@ One line per meaningful event, timestamped UTC (spec Section 0 rule 5).
 | 2026-10-04T15:46:48+00:00 | 5.2 | imid_degradation_score written for 4,650 degron candidates; 17,067 carry no C2H2 motif and are left NULL. |
 | 2026-10-04T15:47:34+00:00 | 9 | Validation run against binman.sqlite: 0 metric(s) not computed (dataset unavailable), 2 measured floor(s) missed. |
 | 2026-10-04T15:47:35+00:00 | 9 | Validation run against binman.sqlite: 4 metric(s) not computed (dataset unavailable), 5 measured floor(s) missed. |
+| 2026-10-04T15:53:15+00:00 | 9 | Validation run against binman.sqlite: 0 metric(s) not computed (dataset unavailable), 2 measured floor(s) missed. |
+| 2026-10-04T15:53:16+00:00 | 9 | Validation run against binman.sqlite: 4 metric(s) not computed (dataset unavailable), 5 measured floor(s) missed. |
+| 2026-10-04T15:55:01+00:00 | 12.3 | references.bib: 45 references, 39 Crossref matched by search (0 preprints), 6 unmatched, 6 with no DOI, 0 with licence not determined. |
+| 2026-10-04T15:55:22+00:00 | 4.1b | About tab generated: 52 references, 11/13 datasets resolved, worked example selected, 1 value(s) not recorded. |
+| 2026-10-04T15:56:48+00:00 | 4.1b | About tab generated: 52 references, 11/13 datasets resolved, worked example selected, 1 value(s) not recorded. |
+| 2026-10-04T15:57:42+00:00 | 4.1b | About tab generated: 52 references, 11/13 datasets resolved, worked example selected, 1 value(s) not recorded. |
+| 2026-10-04T16:07:50+00:00 | 9 | Validation run against binman.sqlite: 0 metric(s) not computed (dataset unavailable), 2 measured floor(s) missed. |
+| 2026-10-04T16:07:51+00:00 | 9 | Validation run against binman.sqlite: 4 metric(s) not computed (dataset unavailable), 5 measured floor(s) missed. |

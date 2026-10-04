@@ -1,41 +1,42 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1060 460" class="schematic" preserveAspectRatio="xMidYMid meet" role="img" aria-labelledby="wf-title wf-desc">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1194 238" class="schematic" preserveAspectRatio="xMidYMid meet" role="img" aria-labelledby="wf-title wf-desc">
 <title id="wf-title">BINMAN pipeline schematic</title>
 <desc id="wf-desc">Described in the text below the figure.</desc>
 <style>.wf-box{fill:var(--surface);stroke:var(--line);stroke-width:1.5}.wf-ds{fill:var(--accent-soft);stroke:var(--accent);stroke-width:1.5;stroke-dasharray:4 3}.wf-t{fill:var(--ink);font:600 13px var(--display),sans-serif}.wf-s{fill:var(--muted);font:10px var(--data),monospace}.wf-n{fill:var(--ink);font:11px var(--data),monospace}.wf-bad{fill:var(--bad);font:11px var(--data),monospace}.wf-arrow{stroke:var(--line);stroke-width:1.5;fill:none}.wf-head{fill:var(--muted);font:600 10px var(--display),sans-serif;letter-spacing:.06em;text-transform:uppercase}</style>
 <marker id="wf-tip" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7Z" fill="var(--line)"/></marker>
-<text class="wf-head" x="12" y="88">Inputs</text>
-<rect class="wf-box" x="12" y="112" width="108" height="58" rx="2"/><text class="wf-t" x="22" y="134">Sources</text><text class="wf-s" x="22" y="150">RCSB, AFDB,</text><text class="wf-s" x="22" y="162">UniProt</text>
-<rect class="wf-ds" x="12" y="188" width="108" height="58" rx="2"/><text class="wf-t" x="22" y="210">Ground truth</text><text class="wf-s" x="22" y="226">11 of 13</text><text class="wf-s" x="22" y="238">resolved</text>
-<g class="wf-node" data-stage="1" tabindex="0"><rect class="wf-box" x="136" y="112" width="186" height="150" rx="2"/><text class="wf-t" x="148" y="136">1 · Acquisition</text><text class="wf-s" x="148" y="152">httpx, tenacity</text>
-<text class="wf-n" x="148" y="176">52,821 entries</text>
-<text class="wf-n" x="148" y="192">tier 1  902</text>
-<text class="wf-n" x="148" y="208">tier 2  34,539</text>
-<text class="wf-n" x="148" y="224">tier 3  17,380</text>
+<text class="wf-head" x="12" y="50">Inputs</text>
+<rect class="wf-box" x="12" y="74" width="108" height="58" rx="2"/><text class="wf-t" x="22" y="96">Sources</text><text class="wf-s" x="22" y="112">RCSB, AFDB,</text><text class="wf-s" x="22" y="124">UniProt</text>
+<rect class="wf-ds" x="12" y="150" width="108" height="58" rx="2"/><text class="wf-t" x="22" y="172">Ground truth</text><text class="wf-s" x="22" y="188">11 of 13</text><text class="wf-s" x="22" y="200">resolved</text>
+<g class="wf-node" data-stage="1" tabindex="0"><rect class="wf-box" x="128" y="74" width="196" height="148" rx="2"/><text class="wf-t" x="140" y="98">1 · Acquisition</text><text class="wf-s" x="140" y="114">httpx, tenacity</text>
+<text class="wf-n" x="140" y="138">52,821 entries</text>
+<text class="wf-n" x="140" y="154">tier 1  902</text>
+<text class="wf-n" x="140" y="170">tier 2  34,539</text>
+<text class="wf-n" x="140" y="186">tier 3  17,380</text>
 </g>
-<path class="wf-arrow" d="M322,187.0 L346,187.0" marker-end="url(#wf-tip)"/>
-<g class="wf-node" data-stage="2" tabindex="0"><rect class="wf-box" x="352" y="112" width="186" height="150" rx="2"/><text class="wf-t" x="364" y="136">2 · Geometry</text><text class="wf-s" x="364" y="152">gemmi, FreeSASA</text>
-<text class="wf-n" x="364" y="176">52,586 entries analysed</text>
-<text class="wf-n" x="364" y="192">239,485 bridges found</text>
-<text class="wf-bad" x="364" y="248">235 failed</text>
+<path class="wf-arrow" d="M324,148.0 L352,148.0" marker-end="url(#wf-tip)"/>
+<g class="wf-node" data-stage="2" tabindex="0"><rect class="wf-box" x="358" y="74" width="196" height="148" rx="2"/><text class="wf-t" x="370" y="98">2 · Geometry</text><text class="wf-s" x="370" y="114">gemmi, FreeSASA</text>
+<text class="wf-n" x="370" y="138">52,586 entries analysed</text>
+<text class="wf-n" x="370" y="154">239,485 bridges found</text>
+<text class="wf-bad" x="370" y="208">235 failed</text>
 </g>
-<path class="wf-arrow" d="M538,187.0 L562,187.0" marker-end="url(#wf-tip)"/>
-<g class="wf-node" data-stage="3" tabindex="0"><rect class="wf-box" x="568" y="112" width="186" height="150" rx="2"/><text class="wf-t" x="580" y="136">3 · Scan and triage</text><text class="wf-s" x="580" y="152">DSSP, fpocket</text>
-<text class="wf-n" x="580" y="176">21,717 degrons scanned</text>
-<text class="wf-n" x="580" y="192">650 ligases triaged</text>
-<text class="wf-n" x="580" y="208">1,650 lysines scored</text>
-<text class="wf-bad" x="580" y="248">582 failed</text>
+<path class="wf-arrow" d="M554,148.0 L582,148.0" marker-end="url(#wf-tip)"/>
+<g class="wf-node" data-stage="3" tabindex="0"><rect class="wf-box" x="588" y="74" width="196" height="148" rx="2"/><text class="wf-t" x="600" y="98">3 · Scan and triage</text><text class="wf-s" x="600" y="114">DSSP, fpocket</text>
+<text class="wf-n" x="600" y="138">21,717 degrons scanned</text>
+<text class="wf-n" x="600" y="154">650 ligases triaged</text>
+<text class="wf-n" x="600" y="170">1,650 lysines scored</text>
+<text class="wf-bad" x="600" y="208">582 failed</text>
 </g>
-<path class="wf-arrow" d="M754,187.0 L778,187.0" marker-end="url(#wf-tip)"/>
-<g class="wf-node" data-stage="4" tabindex="0"><rect class="wf-box" x="784" y="112" width="186" height="150" rx="2"/><text class="wf-t" x="796" y="136">4 · Model</text><text class="wf-s" x="796" y="152">mlx-lm</text>
-<text class="wf-n" x="796" y="176">BINMAN-LM: see model card</text>
-<text class="wf-n" x="796" y="192">never emits a number</text>
+<path class="wf-arrow" d="M784,148.0 L812,148.0" marker-end="url(#wf-tip)"/>
+<g class="wf-node" data-stage="4" tabindex="0"><rect class="wf-box" x="818" y="74" width="196" height="148" rx="2"/><text class="wf-t" x="830" y="98">4 · Model</text><text class="wf-s" x="830" y="114">mlx-lm, LoRA</text>
+<text class="wf-n" x="830" y="138">BINMAN-LM 3B, 32 layers</text>
+<text class="wf-n" x="830" y="154">query, triage, abstain</text>
+<text class="wf-n" x="830" y="170">never emits a number</text>
 </g>
-<path class="wf-arrow" d="M120,141 L130,162" marker-end="url(#wf-tip)"/>
-<path class="wf-arrow" d="M120,217 L130,202" marker-end="url(#wf-tip)"/>
-<text class="wf-head" x="1010" y="88">Modules</text>
-<rect class="wf-box" x="1010" y="112" width="124" height="26" rx="2"/><text class="wf-n" x="1020" y="130">Glue Atlas</text>
-<rect class="wf-box" x="1010" y="146" width="124" height="26" rx="2"/><text class="wf-n" x="1020" y="164">Degron Scan</text>
-<rect class="wf-box" x="1010" y="180" width="124" height="26" rx="2"/><text class="wf-n" x="1020" y="198">E3 Triage</text>
-<rect class="wf-box" x="1010" y="214" width="124" height="26" rx="2"/><text class="wf-n" x="1020" y="232">Degradability</text>
-<path class="wf-arrow" d="M970,187.0 L1004,187.0" marker-end="url(#wf-tip)"/>
+<path class="wf-arrow" d="M120,103 L122,124" marker-end="url(#wf-tip)"/>
+<path class="wf-arrow" d="M120,179 L122,164" marker-end="url(#wf-tip)"/>
+<text class="wf-head" x="1058" y="50">Modules</text>
+<rect class="wf-box" x="1058" y="74" width="124" height="26" rx="2"/><text class="wf-n" x="1068" y="92">Glue Atlas</text>
+<rect class="wf-box" x="1058" y="108" width="124" height="26" rx="2"/><text class="wf-n" x="1068" y="126">Degron Scan</text>
+<rect class="wf-box" x="1058" y="142" width="124" height="26" rx="2"/><text class="wf-n" x="1068" y="160">E3 Triage</text>
+<rect class="wf-box" x="1058" y="176" width="124" height="26" rx="2"/><text class="wf-n" x="1068" y="194">Degradability</text>
+<path class="wf-arrow" d="M1014,148.0 L1052,148.0" marker-end="url(#wf-tip)"/>
 </svg>

@@ -502,21 +502,30 @@ def workflow_svg(stages: dict, atlas: dict, datasets: list[dict]) -> tuple[str, 
         },
         {
             "title": "4 · Model",
-            "software": "mlx-lm",
+            "software": "mlx-lm, LoRA",
             "lines": [
-                "BINMAN-LM: not trained"
-                if not (VALIDATION / "results.json").exists()
-                else "BINMAN-LM: see model card",
+                "BINMAN-LM 3B, 32 layers",
+                "query, triage, abstain",
                 "never emits a number",
             ],
             "failed": 0,
         },
     ]
 
-    width, height = 1060, 460
-    box_w, box_h, gap = 186, 150, 30
-    left_margin = 136
-    top = 112
+    box_w, box_h, gap = 196, 148, 34
+    left_margin = 128
+    top = 74
+    module_w, module_h, module_step = 124, 26, 34
+    modules = ("Glue Atlas", "Degron Scan", "E3 Triage", "Degradability")
+
+    # The canvas is COMPUTED from the layout rather than fixed. A hardcoded
+    # 1060x460 left a third of the height empty and, once widened by hand, cut
+    # two pixels off the module column. Deriving both from the content means a
+    # layout change cannot silently clip or pad the figure again.
+    out_x = left_margin + (len(columns) - 1) * (box_w + gap) + box_w + gap + 10
+    width = out_x + module_w + 12
+    height = max(top + box_h,
+                 top + (len(modules) - 1) * module_step + module_h) + 16
 
     parts = [
         f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {width} {height}" '
@@ -588,18 +597,18 @@ def workflow_svg(stages: dict, atlas: dict, datasets: list[dict]) -> tuple[str, 
         f'marker-end="url(#wf-tip)"/>'
     )
 
-    # Modules leaving on the right.
-    out_x = left_margin + 3 * (box_w + gap) + box_w + gap + 10
+    # Modules leaving on the right. `out_x` is computed above, with the canvas.
     parts.append(f'<text class="wf-head" x="{out_x}" y="{top - 24}">Modules</text>')
-    for index, label in enumerate(("Glue Atlas", "Degron Scan", "E3 Triage", "Degradability")):
-        y = top + index * 34
+    for index, label in enumerate(modules):
+        y = top + index * module_step
         parts.append(
-            f'<rect class="wf-box" x="{out_x}" y="{y}" width="124" height="26" rx="2"/>'
+            f'<rect class="wf-box" x="{out_x}" y="{y}" width="{module_w}" '
+            f'height="{module_h}" rx="2"/>'
             f'<text class="wf-n" x="{out_x + 10}" y="{y + 18}">{label}</text>'
         )
     # The arrow into the module column starts at the last stage box, not at a
     # notional gap beyond it, which previously ran off the canvas.
-    last_box_right = left_margin + 3 * (box_w + gap) + box_w
+    last_box_right = left_margin + (len(columns) - 1) * (box_w + gap) + box_w
     parts.append(
         f'<path class="wf-arrow" d="M{last_box_right},{top + box_h / 2} '
         f'L{out_x - 6},{top + box_h / 2}" marker-end="url(#wf-tip)"/>'
@@ -642,7 +651,10 @@ def build() -> dict:
 
     unrecorded: list[str] = []
     for row in references:
-        if row["licence"] in {"not determined", "", NOT_RECORDED}:
+        # A licence may say "not determined: <what was checked>", which is more
+        # useful than a bare "not determined" and must still count as unknown.
+        if (not row["licence"] or row["licence"] == NOT_RECORDED
+                or row["licence"].startswith("not determined")):
             unrecorded.append(f"licence for reference '{row['key']}'")
         if not row["doi"] and not row["home"]:
             unrecorded.append(f"DOI and URL both missing for '{row['key']}'")
@@ -667,7 +679,8 @@ def build() -> dict:
             "verified": sum(1 for r in references if r["verified"]),
             "unverified": sum(1 for r in references if not r["verified"]),
             "licence_not_determined": sum(
-                1 for r in references if r["licence"] in {"not determined", ""}),
+                1 for r in references
+                if not r["licence"] or r["licence"].startswith("not determined")),
         },
         "model_card": model_card(),
         "worked_example": example,

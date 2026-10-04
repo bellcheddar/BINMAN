@@ -128,11 +128,9 @@ def lens():
         depth = max(1, min(3, int(request.args.get("depth", 2))))
     except ValueError:
         depth = 2
-    try:
-        from pipeline.common import load_config
-        max_nodes = int(load_config().t("atlas.lens_graph_max_nodes"))
-    except Exception:  # noqa: BLE001
-        max_nodes = 400
+    from app.thresholds import value as _threshold
+
+    max_nodes = int(_threshold("atlas.lens_graph_max_nodes", 400))
 
     if not focus:
         rows = db.many(
