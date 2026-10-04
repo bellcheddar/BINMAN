@@ -36,7 +36,9 @@ printf '\n== 1. service user and directory ==\n'
 ssh "$DROPLET" bash -s <<REMOTE
 set -euo pipefail
 id -u binman >/dev/null 2>&1 || useradd --system --home-dir $APP_DIR --shell /usr/sbin/nologin binman
-mkdir -p $APP_DIR
+# rsync does not create nested parents, so every destination directory it will
+# write into has to exist first.
+mkdir -p $APP_DIR/app $APP_DIR/config $APP_DIR/data/atlas
 chown -R binman:binman $APP_DIR
 REMOTE
 

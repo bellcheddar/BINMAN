@@ -1483,6 +1483,11 @@ counter reads. `deploy/provision.sh` to run it.
 should be confirmed free before the first run; the check could not be made
 because SSH stopped answering (below).
 
+**RESOLVED, see the end of this entry.** The cause was self-inflicted
+connection pressure and the fix is multiplexing. What follows is the
+investigation as it stood before that, kept because two of its conclusions were
+wrong and the shape of the error is worth keeping.
+
 **SSH is intermittently unusable from the Studio, and the cause is not
 established.** Two claims were made here and both were wrong. The first was
 fail2ban, inferred from a failed `deploy@mdeller.com` attempt followed by
@@ -1551,3 +1556,54 @@ setting.
 **Reversal.** None wanted. The guard is the arithmetic: a round whose observed
 iterations-per-minute does not match its measured throughput is not running the
 model it claims.
+
+## D-045: the SSH failure was self-inflicted, and BINMAN is deployed
+
+**Decision.** `~/.ssh/config` multiplexes connections to the mdeller.com
+droplet. BINMAN is live at **https://binman.mdeller.com** and listed on the
+mdeller.com launcher. Gate G3 is closed.
+
+**The cause.** Not fail2ban (D-043's first claim), not a network block (its
+second), not MTU. A deploy opens many short ssh sessions; each timed-out
+attempt leaves a half-open **unauthenticated** connection for `LoginGraceTime`,
+120 seconds by default, and sshd's `MaxStartups` of `10:30:100` then drops new
+connections while those sit there. Retrying refills the queue faster than it
+drains, so the outage sustains itself. Every "failure" after the first few was
+produced by the attempt to diagnose the failure.
+
+**The evidence that settled it.** 200 seconds of complete silence, then a
+single attempt: connected immediately, `uptime` reporting the droplet had been
+up 11 weeks. Nothing was ever wrong with the host.
+
+**Measured, same host, same minutes:**
+
+| configuration | success |
+|---|---|
+| defaults, retrying hard | 0/15 |
+| defaults | 0/6 |
+| forced small handshake (ed25519, curve25519, chacha20) | 2/6 |
+| **ControlMaster multiplexing** | **10/10** |
+
+The small-handshake result is why MTU looked plausible and is the trap: smaller
+packets occupy a `MaxStartups` slot for less time, so they succeed more often
+without the cause having anything to do with packet size.
+
+**The deploy.** The droplet's convention is `/opt/<name>` with a dedicated
+service user, a `.venv`, a `<name>-web.service` unit and nginx proxying a local
+port, not the `/srv` layout `deploy/` assumed (D-043). `deploy/provision.sh`
+does it idempotently: user, directories, rsync, venv, systemd, nginx, certbot.
+Two workers rather than three, because the host has 3.8 GB across thirteen
+other apps; BINMAN added about 100 MB and every neighbour stayed up.
+
+Verified live: `/`, `/degron/`, `/e3/`, `/about/` and `/lens/` all 200, TLS
+issued to 2027-01-02, `binman-web` active.
+
+**One real bug found by the first run.** `rsync` does not create nested parent
+directories, so `/opt/binman/data/atlas` failed until `provision.sh` created
+the parents up front.
+
+**Carried into the skill.** `marcs-vibe-coding` now holds the multiplexing
+config, a floor of 150 seconds between retries, `ssh -T git@github.com` as the
+control for "is outbound 22 working", and the warning that `nc -z` is not a
+reliable probe from a sandboxed shell. Alongside it, the lesson from the Space:
+a diagnostic cannot clear a dependency it shares with the thing it diagnoses.

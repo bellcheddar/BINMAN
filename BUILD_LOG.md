@@ -579,3 +579,5 @@ One line per meaningful event, timestamped UTC (spec Section 0 rule 5).
 | 2026-10-04T14:21:26+00:00 | 3.7 | Stage 1 FAILED with exit -15. See data/interim/lm_stage1.log. |
 | 2026-10-04T14:21:51+00:00 | 3.7 | SFT corpus assembled: 28,304 train (oversampling {'task_a': 2, 'task_c': 4}), task mix abstain 11%, query 34%, triage 55% |
 | 2026-10-04T14:21:51+00:00 | 3.7 | Stage 1 LoRA SFT starting: 28,304 train / 2,386 valid examples, rank 8, 32 layers, lr 1e-05, batch 2, 14152 iterations. |
+| 2026-10-04T14:32:22+00:00 | 9 | Validation run against binman.sqlite: 0 metric(s) not computed (dataset unavailable), 2 measured floor(s) missed. |
+| 2026-10-04T14:32:23+00:00 | 9 | Validation run against binman.sqlite: 4 metric(s) not computed (dataset unavailable), 5 measured floor(s) missed. |
