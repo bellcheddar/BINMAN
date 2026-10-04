@@ -442,3 +442,7 @@ One line per meaningful event, timestamped UTC (spec Section 0 rule 5).
 | 2026-10-04T00:18:03+00:00 | 4.1b | About tab generated: 51 references, 10/12 datasets resolved, worked example selected, 2 value(s) not recorded. |
 | 2026-10-04T00:37:00+00:00 | 9 | Validation run against binman.sqlite: 0 metric(s) not computed (dataset unavailable), 2 measured floor(s) missed. |
 | 2026-10-04T00:37:14+00:00 | 4.1b | About tab generated: 51 references, 10/12 datasets resolved, worked example selected, 2 value(s) not recorded. |
+| 2026-10-04T00:46:04+00:00 | 12.3 | references.bib: 45 references, 39 Crossref matched by search (0 preprints), 6 unmatched, 6 with no DOI, 2 with licence not determined. |
+| 2026-10-04T00:46:48+00:00 | 12.3 | references.bib: 45 references, 39 Crossref matched by search (0 preprints), 6 unmatched, 6 with no DOI, 2 with licence not determined. |
+| 2026-10-04T00:46:50+00:00 | 4.1b | About tab generated: 52 references, 10/12 datasets resolved, worked example selected, 2 value(s) not recorded. |
+| 2026-10-04T00:50:16+00:00 | 4.1b | About tab generated: 52 references, 10/12 datasets resolved, worked example selected, 2 value(s) not recorded. |

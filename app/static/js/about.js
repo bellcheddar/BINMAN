@@ -86,8 +86,33 @@
         { title: 'Name', field: 'name', widthGrow: 3, headerFilter: 'input' },
         { title: 'Type', field: 'type', width: 110, headerFilter: 'list',
           headerFilterParams: { values: true } },
+        { title: 'Citation', field: 'authors', widthGrow: 3, headerFilter: 'input',
+          /* First author et al., year, journal: enough to recognise the paper
+             without leaving the table. The DOI column carries the link. */
+          formatter: function (cell) {
+            var row = cell.getRow().getData();
+            var authors = cell.getValue() || '';
+            var first = authors ? authors.split(' and ')[0] : '';
+            var surname = first.indexOf(',') > -1 ? first.split(',')[0] : first;
+            var parts = [];
+            if (surname) {
+              parts.push(Util.escape(surname) +
+                (authors.indexOf(' and ') > -1 ? ' <em>et al.</em>' : ''));
+            }
+            if (row.year) { parts.push(Util.escape(row.year)); }
+            if (row.container) { parts.push(Util.escape(row.container)); }
+            /* A DOI with no author metadata is still a citeable paper: say the
+               author is missing, not that the paper is. */
+            if (parts.length) { return parts.join(', '); }
+            return Util.pill(row.doi ? 'no author listed' : 'no paper', 'warn');
+          } },
         { title: 'Version', field: 'version', width: 150 },
-        { title: 'Retrieved', field: 'retrieved', width: 160 },
+        { title: 'Retrieved', field: 'retrieved', width: 112,
+          /* The date is the provenance; the time of day is noise at this width. */
+          formatter: function (cell) {
+            var value = cell.getValue() || '';
+            return Util.escape(value.split('T')[0]);
+          } },
         { title: 'Used for', field: 'used_for', widthGrow: 3 },
         { title: 'Licence', field: 'licence', widthGrow: 2, headerFilter: 'input',
           formatter: function (cell) {

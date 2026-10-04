@@ -753,3 +753,23 @@ separates degraded from non-degraded zinc fingers *within* the C2H2 family:
 the degron sequence context, CRBN-interface complementarity, or the
 Zn-coordination geometry, validated on this same matched set. The set is now
 wired in as `sievers_zf_screen`, so that test is one command away.
+
+## D-025: MGTbind added to the reference set, and its DOI corrected
+
+**Decision.** MGTbind is now a Crossref-verified reference rather than an
+uncited dataset, and its DOI is corrected from `10.1093/nar/gkaf1013` to
+`10.1093/nar/gkaf1075`.
+
+**Context.** The acquisition registry carried MGTbind with a citation that
+`pipeline/references.py` had never checked, because MGTbind had no Candidate
+entry. Adding one and running the Crossref title search returned "MGTbind: a
+comprehensive database of molecular glue ternary interactome", Zhu et al.
+2025, Nucleic Acids Research, at a different DOI from the one recorded.
+
+**Reason.** The same failure mode as D-014: a DOI string that was never
+resolved against the paper it claims to cite. Three of the three curated glue
+databases now carry a verified reference, which matters because the Task B
+glue label is their intersection.
+
+**Reversal.** None needed. If MGTbind issues a corrected DOI, update the
+Candidate and re-run `pipeline.references`.

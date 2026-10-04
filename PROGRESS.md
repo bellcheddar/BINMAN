@@ -15,7 +15,7 @@ See `BUILD_LOG.md` for the timestamped event log.
 | QC | 24 screenshots, 0 console errors, 0 serious or critical axe violations |
 | Tests | 73 passing |
 | Trimmed structures | 3,839 files, 553 MB, inside the 2.5 GB budget |
-| Repository | public at github.com/bellcheddar/binman |
+| Repository | public at github.com/bellcheddar/BINMAN |
 
 ## Phase 1: Foundations and the Glue Atlas
 

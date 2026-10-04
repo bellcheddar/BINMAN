@@ -280,7 +280,7 @@ class Fetcher:
 
     USER_AGENT = (
         "BINMAN/0.1 (academic structural bioinformatics; "
-        "https://github.com/bellcheddar/binman; marc@marcdeller.com)"
+        "https://github.com/bellcheddar/BINMAN; marc@marcdeller.com)"
     )
 
     def __init__(

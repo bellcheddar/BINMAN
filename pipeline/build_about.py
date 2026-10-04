@@ -680,7 +680,7 @@ def build() -> dict:
         "citation": {
             "project": "Deller, M. C. BINMAN: Blind-spot INventory of Molecular "
                        "Adhesives and Neosubstrates.",
-            "repository": "https://github.com/bellcheddar/binman",
+            "repository": "https://github.com/bellcheddar/BINMAN",
             "instruction": (
                 "Cite BINMAN for the atlas itself, and cite every underlying "
                 "resource separately: the atlas is a derivative of the databases "

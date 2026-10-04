@@ -658,7 +658,7 @@ def registry() -> list[Dataset]:
                      "set, the misses list and the novel-bridge determination"),
             licence="open access; no redistribution terms stated",
             redistributable=False,
-            citation="10.1093/nar/gkaf1013",
+            citation="10.1093/nar/gkaf1075",
             homepage="https://mgtbind.pkumdl.cn/download",
             version_note="web release, pinned by retrieval date",
             routes=[
@@ -674,7 +674,7 @@ def registry() -> list[Dataset]:
             purpose="LM Task B `molecular_glue` labels, with InChIKeys for CCD matching",
             licence="open access; no redistribution terms stated",
             redistributable=False,
-            citation="10.1093/nar/gkaf1013",
+            citation="10.1093/nar/gkaf1075",
             homepage="https://mgtbind.pkumdl.cn/download",
             version_note="web release, pinned by retrieval date",
             routes=[
