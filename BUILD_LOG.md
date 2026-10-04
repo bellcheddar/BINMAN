@@ -651,3 +651,5 @@ One line per meaningful event, timestamped UTC (spec Section 0 rule 5).
 | 2026-10-04T20:26:18+00:00 | 2.1b | Zinc-finger table: 7,452 C2H2 motifs over 1,123 proteins, of which 2,792 (37.5%) carry no hairpin candidate and were unreachable by the per-candidate column. |
 | 2026-10-04T20:27:25+00:00 | 9 | Validation run against binman.sqlite: 0 metric(s) not computed (dataset unavailable), 2 measured floor(s) missed. |
 | 2026-10-04T20:27:26+00:00 | 9 | Validation run against binman.sqlite: 4 metric(s) not computed (dataset unavailable), 5 measured floor(s) missed. |
+| 2026-10-04T20:39:25+00:00 | 9 | Validation run against binman.sqlite: 0 metric(s) not computed (dataset unavailable), 2 measured floor(s) missed. |
+| 2026-10-04T20:39:26+00:00 | 9 | Validation run against binman.sqlite: 4 metric(s) not computed (dataset unavailable), 5 measured floor(s) missed. |

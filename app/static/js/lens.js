@@ -15,6 +15,10 @@
 
   var state = { nodes: [], links: [], simulation: null, lens: 'family', viewer: null };
 
+  /* Enough ticks for a few hundred nodes to stop moving. d3's own default
+   * cooling schedule reaches alphaMin in about this many. */
+  var SETTLE_TICKS = 320;
+
   /* Categorical colours drawn from the Depot tokens, read off the live
    * computed style so both themes work without a second palette. */
   function token(name, fallback) {
@@ -104,6 +108,39 @@
         global.d3.zoomIdentity.translate(tx, ty).scale(scale));
     }
 
+    /* Once the layout settles, put the selected node in the middle.
+     *
+     * Fitting the whole graph is the right default with nothing selected, but
+     * a 344-node layout fitted to the canvas leaves the selected node as one
+     * dot somewhere, and often off the visible part of a canvas taller than
+     * the window. A default entry nobody can find is not a default entry.
+     * The scale keeps its neighbourhood in frame rather than filling the
+     * canvas with one node, and manual zoom still works afterwards.
+     */
+    function settle() {
+      var selection = Selection.get();
+      var picked = state.nodes.filter(function (d) {
+        return d.id === selection.e3 || d.id === selection.target;
+      })[0];
+      if (!picked || !Number.isFinite(picked.x) || !Number.isFinite(picked.y)) {
+        fitToContent();
+        return;
+      }
+      /* Zoom in on the selection, but never past what the layout can fill:
+       * a tight scale on a sparse neighbourhood shows an empty canvas. */
+      var xs = state.nodes.map(function (d) { return d.x; }).filter(Number.isFinite);
+      var ys = state.nodes.map(function (d) { return d.y; }).filter(Number.isFinite);
+      var spanX = Math.max(1, Math.max.apply(null, xs) - Math.min.apply(null, xs));
+      var spanY = Math.max(1, Math.max.apply(null, ys) - Math.min.apply(null, ys));
+      var fitScale = Math.min((width - 80) / spanX, (height - 80) / spanY);
+      var scale = Math.min(Math.max(fitScale * 2.2, 0.6), 2.5);
+      svg.transition().duration(400).call(
+        zoom.transform,
+        global.d3.zoomIdentity
+          .translate(width / 2 - scale * picked.x, height / 2 - scale * picked.y)
+          .scale(scale));
+    }
+
     var link = container.append('g').selectAll('line')
       .data(state.links).enter().append('line')
       .attr('class', 'link')
@@ -112,7 +149,7 @@
     var node = container.append('g').selectAll('circle')
       .data(state.nodes).enter().append('circle')
       .attr('class', 'node')
-      .attr('r', function (d) { return d.kind === 'ligase' ? 7 : 4.5; })
+      .attr('r', baseRadius)
       .attr('fill', lensColour)
       .attr('tabindex', 0)
       .on('click', function (event, d) { pick(d); })
@@ -132,21 +169,52 @@
       .attr('text-anchor', 'middle')
       .text(function (d) { return d.gene || d.id; });
 
+    function positionAll() {
+      link.attr('x1', function (d) { return d.source.x; })
+        .attr('y1', function (d) { return d.source.y; })
+        .attr('x2', function (d) { return d.target.x; })
+        .attr('y2', function (d) { return d.target.y; });
+      node.attr('cx', function (d) { return d.x; }).attr('cy', function (d) { return d.y; });
+      label.attr('x', function (d) { return d.x; }).attr('y', function (d) { return d.y; });
+    }
+
     state.simulation = global.d3.forceSimulation(state.nodes)
       .force('link', global.d3.forceLink(state.links).id(function (d) { return d.id; })
         .distance(60).strength(0.4))
       .force('charge', global.d3.forceManyBody().strength(-120))
       .force('centre', global.d3.forceCenter(width / 2, height / 2))
       .force('collide', global.d3.forceCollide(10))
-      .on('tick', function () {
-        link.attr('x1', function (d) { return d.source.x; })
-          .attr('y1', function (d) { return d.source.y; })
-          .attr('x2', function (d) { return d.target.x; })
-          .attr('y2', function (d) { return d.target.y; });
-        node.attr('cx', function (d) { return d.x; }).attr('cy', function (d) { return d.y; });
-        label.attr('x', function (d) { return d.x; }).attr('y', function (d) { return d.y; });
-      })
-      .on('end', fitToContent);
+      /* Hold the layout together. This graph is mostly small disconnected
+       * components, and many-body repulsion pushes those apart without limit:
+       * 344 nodes sprawled over roughly 10,000 units, so fitting them to the
+       * canvas landed on a scale of 0.1 and the graph read as dust. A weak
+       * pull toward the centre bounds the sprawl without flattening the
+       * clusters. */
+      .force('x', global.d3.forceX(width / 2).strength(0.06))
+      .force('y', global.d3.forceY(height / 2).strength(0.06))
+      .on('tick', positionAll)
+      .on('end', settle);
+
+    /* Settle the layout synchronously instead of animating into it.
+     *
+     * The fit and the centring were wired to the simulation's `end` event,
+     * and with 344 nodes that event does not arrive: the rendered graph
+     * carried no transform at all, so it was never fitted and the selected
+     * node could sit anywhere, including off a canvas taller than the window.
+     * Ticking to completion here makes the layout deterministic and present on
+     * the first frame. Dragging still restarts the simulation, and `end` still
+     * re-settles afterwards.
+     */
+    state.simulation.stop();
+    for (var tick = 0; tick < SETTLE_TICKS; tick += 1) { state.simulation.tick(); }
+    positionAll();
+    /* Kept so the view can be re-settled once a node has been picked. Fitting
+     * 344 nodes to the canvas lands on a scale of about 0.1, which is the
+     * "zoomed out until nothing is visible" state; centring on the selection
+     * is the useful view, and the selection does not exist yet at this point
+     * in the first render. */
+    state.settle = settle;
+    settle();
 
     node.call(global.d3.drag()
       .on('start', function (event, d) {
@@ -162,12 +230,19 @@
     highlight();
   }
 
+  function baseRadius(d) { return d.kind === 'ligase' ? 7 : 4.5; }
+
   function highlight() {
     var selection = Selection.get();
+    function picked(d) {
+      return d.id === selection.e3 || d.id === selection.target;
+    }
+    /* Outlining a 4.5px dot does not make it findable among 344 of them, and
+     * a default entry nobody can locate is not much of a default. The selected
+     * node grows as well, which is what actually reads at this density. */
     global.d3.selectAll('#lens-canvas .node')
-      .classed('is-selected', function (d) {
-        return d.id === selection.e3 || d.id === selection.target;
-      });
+      .classed('is-selected', picked)
+      .attr('r', function (d) { return picked(d) ? baseRadius(d) + 4 : baseRadius(d); });
   }
 
   function pick(node) {
@@ -212,6 +287,46 @@
     }
   }
 
+  var autoPicked = false;
+
+  /* Pick a node on first load, so the graph opens with a protein in the viewer
+   * and a filled detail table rather than an empty frame beside it.
+   *
+   * The focus node when the page was asked for one, otherwise the most
+   * connected node in the graph, which is the one worth looking at first and
+   * is also the one the layout puts near the middle. Once only, and never over
+   * a selection that is already pinned: arriving from the E3 page with a
+   * ligase pinned should keep that ligase.
+   */
+  function autoPickFirstNode(focus) {
+    if (autoPicked || !state.nodes.length) { return; }
+    autoPicked = true;
+    var selection = Selection.get();
+    if (selection.e3 || selection.target) { return; }
+
+    var wanted = String(focus || '').trim().toUpperCase();
+    var chosen = null;
+    if (wanted) {
+      chosen = state.nodes.filter(function (node) {
+        return String(node.id).toUpperCase() === wanted ||
+          String(node.gene || '').toUpperCase() === wanted;
+      })[0] || null;
+    }
+    if (!chosen) {
+      var degree = {};
+      state.links.forEach(function (link) {
+        var a = link.source && link.source.id !== undefined ? link.source.id : link.source;
+        var b = link.target && link.target.id !== undefined ? link.target.id : link.target;
+        degree[a] = (degree[a] || 0) + 1;
+        degree[b] = (degree[b] || 0) + 1;
+      });
+      chosen = state.nodes.slice().sort(function (x, y) {
+        return (degree[y.id] || 0) - (degree[x.id] || 0);
+      })[0];
+    }
+    if (chosen) { pick(chosen); }
+  }
+
   function load(focus, depth) {
     var url = '/api/lens?focus=' + encodeURIComponent(focus || '') +
       '&depth=' + encodeURIComponent(depth || 2);
@@ -231,6 +346,8 @@
           (result.data.truncated ? ' · pruned at ' + result.data.max_nodes : '');
       }
       render();
+      autoPickFirstNode(focus);
+      if (state.settle) { state.settle(); }
     });
   }
 

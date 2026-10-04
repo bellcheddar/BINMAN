@@ -487,9 +487,18 @@ code, kbd, samp, .mono { font-family: var(--data); font-size: 0.86em; }
 .lens__canvas {
   background: var(--surface); border: 1px solid var(--line);
   border-radius: var(--radius); min-height: 560px;
+  /* An inline SVG with no width is 300px wide by the replaced-element default,
+   * whatever its container does. The graph measured itself at 300 and laid 344
+   * nodes out in a 300-wide box, so they flew apart and the fit scaled the
+   * whole thing down to 0.05. The background filled the column, which is what
+   * made it look like a sizing problem somewhere else. */
+  display: block; width: 100%;
 }
 .lens__canvas .node { stroke: var(--surface); stroke-width: 1.5; cursor: pointer; }
-.lens__canvas .node.is-selected { stroke: var(--ink); stroke-width: 2.5; }
+.lens__canvas .node.is-selected {
+  stroke: var(--accent); stroke-width: 3;
+  paint-order: stroke;
+}
 .lens__canvas .link { stroke: var(--line); stroke-opacity: 0.75; }
 .lens__canvas .node-label { font-family: var(--data); font-size: 9px; fill: var(--muted); pointer-events: none; }
 

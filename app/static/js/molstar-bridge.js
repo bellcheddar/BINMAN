@@ -66,6 +66,10 @@
        * shows a glowing dot in a void, so it is pulled back far enough to show
        * the pocket it sits in. */
       minRadius: 7, minRadiusInferred: 28,
+      /* Below 1 tightens the whole-structure framing, which is the branch a
+       * lens node lands in: no ligand and no named residues, so there is
+       * nothing to zoom to and the default reset leaves a monomer small. */
+      wholeRadiusFactor: 0.85,
       durationMs: 0, resetDurationMs: 250
     }
   };
@@ -602,6 +606,10 @@
     }
     this.root.setAttribute('data-ligand-focus', 'none');
     this._resetWholeStructure();
+    /* Again after the next draw, for the same reason the ligand branch does
+     * it: Mol*'s own queued camera reset lands after this one and would undo
+     * the orientation. */
+    this._afterNextDraw(function () { self._resetWholeStructure(); });
     return Promise.resolve(false);
   };
 
@@ -624,13 +632,35 @@
     return null;
   };
 
+  /* Frame the whole model, oriented to its own principal axes.
+   *
+   * This is the branch a lens node lands in: an AlphaFold monomer with no
+   * ligand and no named residue window. A plain camera reset frames it from
+   * whatever direction the file happens to be written in, which for an
+   * elongated protein is usually end-on and reads as a blob. Orienting first
+   * and framing second lays the longest axis across the viewport.
+   */
   Viewer.prototype._resetWholeStructure = function () {
+    var plugin = this._plugin();
     try {
-      var plugin = this._plugin();
-      if (plugin && plugin.managers && plugin.managers.camera) {
+      if (!plugin || !plugin.managers || !plugin.managers.camera) { return; }
+      if (plugin.managers.camera.orientAxes) {
+        /* No argument: it selects the root structures itself. */
+        plugin.managers.camera.orientAxes(undefined, 0);
+      }
+      if (plugin.managers.camera.focusObject) {
+        /* Frame the whole scene a little tighter than a plain reset, which
+         * leaves a monomer sitting small in the middle of the panel. */
+        plugin.managers.camera.focusObject({
+          targets: [{ radiusFactor: LIGAND.focus.wholeRadiusFactor }],
+          durationMs: 0
+        });
+      } else {
         plugin.managers.camera.reset();
       }
-    } catch (e) { /* nothing to reset */ }
+    } catch (e) {
+      try { plugin.managers.camera.reset(); } catch (e2) { /* nothing to reset */ }
+    }
   };
 
   /* Reset returns to the ligand, not to the whole structure: the ligand is

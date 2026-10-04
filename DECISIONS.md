@@ -2310,3 +2310,51 @@ so it never reached the repository, and `provision.sh` rsyncs `data/atlas/`
 wholesale, so it had been sitting in `/opt/binman` on the live host since the
 first deploy. Nothing opens it: `app/db.py` resolves `binman.sqlite` by name.
 Removed from both, and the site was checked afterwards.
+
+## D-059: the lens graph opens on a node, and why it had never been laid out
+
+**Decision.** The lens graph picks a node on load, centres the layout on it and
+loads its structure in the viewer, so the page opens on something rather than on
+an empty frame beside an empty detail table. The focus node when the URL names
+one, otherwise the most connected node in the graph. Once only, and never over a
+selection that is already pinned, so arriving from the E3 page keeps its ligase.
+
+**Three faults were sitting underneath that, and the first two had been
+invisible for the whole build.**
+
+1. **The canvas measured 300 pixels wide.** An inline `<svg>` with no width is
+   300 px by the replaced-element default, whatever its container does, and
+   `render()` sized the force layout from `clientWidth`. So 344 nodes were laid
+   out in a 300-wide box. The CSS background filled the column, which is what
+   made the page look correctly sized while the graph inside it was not.
+2. **The fit never ran.** `fitToContent` was wired to the simulation's `end`
+   event, and with 344 nodes that event does not arrive: the rendered SVG
+   carried **no transform at all**. The fix recorded for the earlier "pans out
+   so nothing is visible" complaint had therefore never executed once. The
+   layout is now ticked to completion synchronously, which also makes it
+   deterministic and present on the first frame.
+3. **The layout sprawled over roughly 10,000 units.** This graph is mostly small
+   disconnected components, and many-body repulsion pushes those apart without
+   limit, so fitting them landed on a scale of 0.1 and the graph read as dust.
+   A weak `forceX`/`forceY` pull toward the centre bounds it without flattening
+   the clusters.
+
+Each of those alone produces "the graph looks wrong", and fixing any one of them
+alone still produces "the graph looks wrong", which is why the earlier fix
+appeared not to help.
+
+**The selected node had to be findable.** A 4.5 px dot with a dark rim is not
+locatable among 344 of them, so the selection also grows by 4 px and takes the
+accent colour. A default entry nobody can see is not a default entry.
+
+**And the zoom is derived, not fixed.** Centring at a fixed scale showed an empty
+canvas whenever the selection sat in a sparse neighbourhood. The scale is taken
+from the laid-out span and clamped, so it zooms in on the selection without
+passing the point where the layout has anything left to show.
+
+**The viewer side.** A lens node is an AlphaFold monomer with no ligand and no
+named residues, which is the branch that previously did a plain camera reset:
+that frames the model from whatever direction the file was written in, which for
+an elongated protein is end-on. It now orients to the structure's own principal
+axes first and frames second, and re-issues after the next draw for the same
+reason the ligand branch does (D-056).
