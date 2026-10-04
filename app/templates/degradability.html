@@ -17,11 +17,10 @@
     </table>
   {% else %}
     <div class="notice notice--bad">
-      <strong>The reach window has not been fitted.</strong>
-      {{ window.get('fit_status', 'not yet fitted') }}. The starting values in
-      <code>config/thresholds.toml</code> carry no empirical standing and are
-      not used to produce a verdict, so no verdict column is shown until the fit
-      lands. This is deliberate: spec 5.4 forbids shipping the starting values.
+      <strong>No reach verdict is shown.</strong>
+      The window is {{ window.get('fit_status', 'not yet fitted') }}. Its
+      starting values in <code>config/thresholds.toml</code> carry no empirical
+      standing, so the verdict column stays out until a fit clears the floor.
     </div>
   {% endif %}
 </div>

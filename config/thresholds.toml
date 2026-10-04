@@ -102,14 +102,21 @@ expression_breadth_tissue_tpm = 1.0    # a tissue counts as expressing above thi
 # unless the protein-level-split fit independently lands on them. The fitter
 # overwrites this whole table and records the provenance fields below.
 fitted                       = false
-fit_status                   = "not yet fitted"
+# "not yet fitted" would now be wrong. The accessibility fit HAS run: it reached
+# a held-out AUC of 0.546 and missed the 0.65 floor, so it correctly wrote
+# nothing. An eighteen-feature ablation then asked whether exposure was merely
+# the wrong feature, and the best within-protein AUC any monomer-derivable set
+# reaches is 0.626 (D-054, pipeline/degradability_features.py). So these values
+# stay unfitted on evidence rather than on nobody having tried, and no
+# degradability verdict is emitted.
+fit_status                   = "fitted and rejected: held-out AUC 0.5458 misses the 0.65 floor, and no monomer-derivable feature set clears it (D-054)"
 min_nz_rel_sasa              = 0.35
 favourable_cb_cb_min_a       = 5.0
 favourable_cb_cb_max_a       = 18.0
 marginal_cb_cb_max_a         = 24.0
-dataset_version              = "not recorded"
-fit_date                     = "not recorded"
-held_out_auc                 = 0.0
+dataset_version              = "digly_sites, retrieved 2026-10-04"
+fit_date                     = "2026-10-04"
+held_out_auc                 = 0.5458
 held_out_auc_floor           = 0.65   # spec 9.4 floor, not a fitted value
 
 [validation]

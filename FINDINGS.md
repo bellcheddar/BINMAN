@@ -616,12 +616,34 @@ substrate source.
 | Metric | Measured | Floor | Verdict |
 |---|---|---|---|
 | Held-out AUC, accessibility only | **0.5458** | 0.65 | **misses** |
+| Best within-protein AUC, 18 features | **0.6258** | 0.65 | **misses** |
 | Protein-level split honoured | yes, 135 of 403 proteins held out | required | satisfied |
 | Reach window fitted | **no**, and deliberately not written back | | |
 
 **Lysine exposure barely predicts whether a lysine is ubiquitylated.** Training
 Youden's J is 0.09 and the held-out AUC is 0.55, which is a result about the
 feature rather than a failure to fit it.
+
+**And exposure is not uniquely weak.** That left a question worth settling:
+one good feature away from shipping, or unanswerable from a monomer? Eighteen
+features were measured for all 12,705 lysines of the 403 proteins, with whole
+proteins held out. Nothing clears the floor, so the answer is the second.
+
+| feature set | pooled AUC | within-protein AUC |
+|---|---:|---:|
+| exposure only, as shipped | 0.545 | 0.544 |
+| every per-lysine feature, boosted | 0.629 | 0.598 |
+| everything including protein-level, boosted | **0.714** | **0.626** |
+
+**The pooled 0.714 clears the floor and is not usable.** The two strongest
+single features are the protein's lysine count (pooled 0.707) and its chain
+length (pooled 0.692), and both are constant within a protein, so each scores
+exactly 0.500 once the AUC is computed inside one protein. That arithmetic is
+the proof: they rank proteins by the fraction of lysines the catalogue annotates,
+which is annotation prevalence, and the module's question is always within one
+protein. The within-protein column is therefore the one that decides, and
+`pipeline/degradability_features.py` prints both side by side so the pooled
+figure cannot be picked up by accident later.
 
 ### Where the data came from
 

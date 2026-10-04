@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-04T17:15:00+00:00",
+  "generated_at": "2026-10-04T17:31:34+00:00",
   "generator": "pipeline/build_about.py",
   "note": "Every value on this page is read from a build artefact. Nothing here is typed by hand, and a value that could not be read says 'not recorded' rather than showing a plausible guess.",
   "schematic_description": "The pipeline runs left to right in four stages. Two kinds of input enter on the left: the primary data sources (RCSB, AlphaFold DB, UniProt, InterPro), and separately the validation datasets that serve as ground truth, of which 11 of 13 resolved. Stage 1, acquisition, catalogued 52,821 entries into priority tiers using httpx and tenacity. Stage 2, geometry, analysed 52,586 entries with gemmi and FreeSASA and found 239,485 bridges, with 235 entries failing. Stage 3, scan and triage, used DSSP and fpocket to produce 21,717 degron candidates, 650 triaged ligases and 1,650 scored lysines. Stage 4 trains BINMAN-LM with mlx-lm, which does text work only and never emits a number. Four modules leave on the right: Glue Atlas, Degron Scan, E3 Triage and Degradability.",
@@ -37,6 +37,12 @@
     "catalogue_stage": {
       "total": 1,
       "ok": 1,
+      "failed": 0,
+      "failure_reasons": {}
+    },
+    "degradability_features": {
+      "total": 0,
+      "ok": 0,
       "failed": 0,
       "failure_reasons": {}
     },
@@ -2918,14 +2924,14 @@
     "degradability": {
       "reach_window": {
         "fitted": false,
-        "fit_status": "not yet fitted",
+        "fit_status": "fitted and rejected: held-out AUC 0.5458 misses the 0.65 floor, and no monomer-derivable feature set clears it (D-054)",
         "min_nz_rel_sasa": 0.35,
         "favourable_cb_cb_min_a": 5.0,
         "favourable_cb_cb_max_a": 18.0,
         "marginal_cb_cb_max_a": 24.0,
-        "dataset_version": "not recorded",
-        "fit_date": "not recorded",
-        "held_out_auc": 0.0,
+        "dataset_version": "digly_sites, retrieved 2026-10-04",
+        "fit_date": "2026-10-04",
+        "held_out_auc": 0.5458,
         "held_out_auc_floor": 0.65
       }
     },

@@ -18,6 +18,15 @@ starting values have no empirical standing, and spec 5.4 forbids shipping them.
 Where the diGly data is unavailable (Gate G7) every lysine gets its geometry
 measured and `verdict = NULL`, with the reason recorded, rather than a verdict
 produced from numbers nobody fitted.
+
+**The window is unfitted on evidence, not for want of trying.** The fit below
+runs and reaches a held-out AUC of 0.546 against the 0.65 floor, so it writes
+nothing. `pipeline/degradability_features.py` then tested whether exposure was
+simply the wrong feature, over eighteen features and all 12,705 lysines: the
+best within-protein AUC any monomer-derivable set reaches is 0.626, so the
+limit is the question rather than the feature (D-054). Read that module before
+adding a feature here, because it also records the pooled 0.714 that clears the
+floor and must not be used.
 """
 
 from __future__ import annotations
@@ -387,9 +396,12 @@ def fit_accessibility(source: str, write_back: bool = True) -> dict:
             "ubiquitylation site from an unobserved lysine, which is a result "
             "about the feature rather than a failure to fit it."
         )
+        if write_back:
+            record_rejected_fit(f"{source}, retrieved {utcnow()[:10]}", auc, floor)
         log_event("2.3", f"Accessibility fit on {measured_proteins:,} proteins "
                          f"scored held-out AUC {auc:.4f} against a {floor} floor. "
-                         "Nothing written back; no verdict emitted.")
+                         "No boundary written back and no verdict emitted; the "
+                         "measurement is recorded as provenance.")
         return report
 
     if write_back:
@@ -430,6 +442,34 @@ def write_accessibility(cut: float, dataset_version: str, auc: float) -> None:
     for key, value in {
         "fit_status": '"accessibility fitted on a protein-level split; reach unfitted"',
         "min_nz_rel_sasa": f"{cut}",
+        "dataset_version": f'"{dataset_version}"',
+        "fit_date": f'"{utcnow()[:10]}"',
+        "held_out_auc": f"{auc:.4f}",
+    }.items():
+        text = re.sub(rf"^({re.escape(key)}\s*=\s*)\S.*$",
+                      lambda m, v=value: m.group(1) + v, text, count=1, flags=re.M)
+    path.write_text(text)
+
+
+def record_rejected_fit(dataset_version: str, auc: float, floor: float) -> None:
+    """Record that the fit ran and missed, without blessing any boundary.
+
+    A rejected fit used to leave the config reading `held_out_auc = 0.0` and
+    `fit_date = "not recorded"`, which says no measurement was made when one
+    was. The provenance belongs in the config even when the result is a
+    rejection: `fitted` stays false and `min_nz_rel_sasa` and the three reach
+    boundaries keep their unfitted starting values, so nothing gains empirical
+    standing it has not earned. Only the three provenance fields and the status
+    line are touched.
+    """
+    import re
+
+    path = CONFIG_DIR / "thresholds.toml"
+    text = path.read_text()
+    for key, value in {
+        "fit_status": (f'"fitted and rejected: held-out AUC {auc:.4f} misses the '
+                       f'{floor} floor, and no monomer-derivable feature set '
+                       f'clears it (D-054)"'),
         "dataset_version": f'"{dataset_version}"',
         "fit_date": f'"{utcnow()[:10]}"',
         "held_out_auc": f"{auc:.4f}",

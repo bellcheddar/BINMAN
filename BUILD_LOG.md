@@ -616,3 +616,13 @@ One line per meaningful event, timestamped UTC (spec Section 0 rule 5).
 | 2026-10-04T17:14:48+00:00 | 9 | Validation run against binman.sqlite: 0 metric(s) not computed (dataset unavailable), 2 measured floor(s) missed. |
 | 2026-10-04T17:14:49+00:00 | 9 | Validation run against binman.sqlite: 4 metric(s) not computed (dataset unavailable), 5 measured floor(s) missed. |
 | 2026-10-04T17:15:00+00:00 | 4.1b | About tab generated: 53 references, 11/13 datasets resolved, worked example selected, 1 value(s) not recorded. |
+| 2026-10-04T17:28:34+00:00 | 9.5 | Lysine feature ablation over 12,705 lysines in 403 proteins: best within-protein AUC 0.6258 against the 0.65 floor. Misses it. |
+| 2026-10-04T17:29:52+00:00 | 4.1b | About tab generated: 53 references, 11/13 datasets resolved, worked example selected, 1 value(s) not recorded. |
+| 2026-10-04T17:29:53+00:00 | 9 | Validation run against binman.sqlite: 0 metric(s) not computed (dataset unavailable), 2 measured floor(s) missed. |
+| 2026-10-04T17:29:54+00:00 | 9 | Validation run against binman.sqlite: 4 metric(s) not computed (dataset unavailable), 5 measured floor(s) missed. |
+| 2026-10-04T17:31:24+00:00 | 2.3 | Accessibility fit on 403 proteins scored held-out AUC 0.5458 against a 0.65 floor. No boundary written back and no verdict emitted; the measurement is recorded as provenance. |
+| 2026-10-04T17:31:34+00:00 | 4.1b | About tab generated: 53 references, 11/13 datasets resolved, worked example selected, 1 value(s) not recorded. |
+| 2026-10-04T17:31:35+00:00 | 9 | Validation run against binman.sqlite: 0 metric(s) not computed (dataset unavailable), 2 measured floor(s) missed. |
+| 2026-10-04T17:31:36+00:00 | 9 | Validation run against binman.sqlite: 4 metric(s) not computed (dataset unavailable), 5 measured floor(s) missed. |
+| 2026-10-04T17:32:13+00:00 | 9 | Validation run against binman.sqlite: 0 metric(s) not computed (dataset unavailable), 2 measured floor(s) missed. |
+| 2026-10-04T17:32:14+00:00 | 9 | Validation run against binman.sqlite: 4 metric(s) not computed (dataset unavailable), 5 measured floor(s) missed. |

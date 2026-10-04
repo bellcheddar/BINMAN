@@ -2016,3 +2016,68 @@ ligase mutations. Supplement 8 measures only 10 constructs per compound, too few
 for a per-compound sequence AUC, so it cannot extend this test; it would support
 a chemistry-side model, which is a different module. Recorded so the next person
 does not go looking for data that is already here.
+
+## D-054: the reach window stays unfitted, and now on evidence
+
+**Decision.** The degradability reach window stays unfitted and no degradability
+verdict is emitted. What changes is the standing of that decision: it rested on
+one feature having been tried and missed, and it now rests on a measurement
+showing that no feature derivable from an AlphaFold monomer answers the question
+to the spec 9.5 floor. `fit_status` in the config said "not yet fitted", which
+was misleading, and now says what actually happened.
+
+**Why it was worth measuring.** `fit_accessibility` reached a held-out AUC of
+0.546 against the 0.65 floor on lysine exposure alone. That leaves two very
+different readings open: exposure is the wrong feature, or the question is
+unanswerable from a monomer. The first would mean the module is one good feature
+away from shipping a verdict. The second closes it. Those deserve to be
+distinguished rather than left as an open item.
+
+**What was measured.** Eighteen features for all 12,705 lysines of the 403
+proteins carrying a UniProt ubiquitin crosslink: exposure, pLDDT, burial at two
+radii, secondary structure, position in the chain, local sequence composition,
+lysine spacing, and two protein-level terms. Logistic regression and gradient
+boosting, five folds, whole proteins held out.
+
+**The trap, and it is a good one.** Pooled over all lysines the full set reaches
+**0.714** and clears the floor. It should not be believed, and the reason is
+visible in the single-feature table:
+
+| feature | pooled AUC | within-protein AUC |
+|---|---:|---:|
+| protein's lysine count | 0.707 | **0.500** |
+| protein's chain length | 0.692 | **0.500** |
+| nearest other lysine | 0.548 | 0.560 |
+| relative NZ SASA (shipped) | 0.545 | 0.544 |
+
+The two strongest features are constant within a protein, so they score exactly
+0.500 when the AUC is computed inside one protein, which is the arithmetic
+proving they carry no information about *which* lysine. What they rank is
+proteins, by the fraction of their lysines the catalogue happens to annotate.
+That is annotation prevalence. The module's question is always within one
+protein: given this ligand site, is a reachable lysine ubiquitylated.
+
+**The figure that decides it.** Mean AUC inside each of the 393 proteins
+carrying both classes.
+
+| feature set | pooled | within protein |
+|---|---:|---:|
+| exposure only, as shipped | 0.545 | 0.544 |
+| every per-lysine feature, boosted | 0.629 | 0.598 |
+| everything including protein-level, boosted | **0.714** | **0.626** |
+
+Nothing clears 0.65. The best per-lysine set improves on exposure alone by
+0.054 and still misses. The negatives are the other lysines of the same
+proteins, which were never assayed and found unmodified, so each of these
+figures is generous rather than conservative.
+
+**Conclusion.** Exposure is weak and it is not uniquely weak. The limit is the
+question, not the feature: an AlphaFold monomer and a catalogue of observed
+sites cannot say which lysine gets ubiquitylated to the standard spec 9.5 asks
+for. Shipping a verdict would require a dataset of lysines assayed and found
+unmodified, which is a different experiment from the one that exists.
+
+**What was not done, and why.** The pooled 0.714 is a number that would have
+cleared the floor and been wrong to use. It is recorded here so that nobody
+reaches for it later: `pipeline/degradability_features.py` reports both columns
+side by side for exactly that reason.
