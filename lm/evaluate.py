@@ -309,6 +309,41 @@ def evaluate_abstention(model, tokenizer, samples: list[dict],
 # query-set loading
 # --------------------------------------------------------------------------- #
 
+# The Task B test set is 4,087 rows and badly unbalanced: 2,692 native cofactor
+# and 1,242 artefact against 87 PROTACs and 66 glues. Taking the head of the
+# file under-samples exactly the two classes the project exists to find, and a
+# macro-F1 measured that way is not comparable to one measured on a balanced
+# sample. Rounds are compared, so the sample must be fixed: same classes, same
+# count per class, same seed, every time.
+TRIAGE_PER_CLASS = 60
+TRIAGE_SEED = 20261003
+
+
+def stratified_triage_sample(path: Path,
+                             per_class: int = TRIAGE_PER_CLASS) -> list[dict]:
+    """A class-balanced, deterministic sample of the triage test set."""
+    import random
+
+    by_label: dict[str, list[dict]] = {}
+    with path.open(encoding="utf-8") as handle:
+        for line in handle:
+            if not line.strip():
+                continue
+            row = json.loads(line)
+            label = row["messages"][2]["content"].strip()
+            by_label.setdefault(label, []).append(
+                {"messages": row["messages"], "label": label})
+
+    rng = random.Random(TRIAGE_SEED)
+    sample: list[dict] = []
+    for label in sorted(by_label):
+        pool = by_label[label]
+        take = min(per_class, len(pool))
+        sample.extend(rng.sample(pool, take))
+    rng.shuffle(sample)
+    return sample
+
+
 def load_query_set(path: Path, limit: int | None = None) -> list[dict]:
     """Load a chat-format corpus file into (question, gold) pairs."""
     samples: list[dict] = []
@@ -443,6 +478,15 @@ def run(model_path: str = BASE_MODEL, adapter_path: str | None = None,
                 results["preference_win_rates"] = evaluate_preference(
                     model, tokenizer, pairs, schema_text)
 
+        # Task B. evaluate_triage existed but nothing called it, so every round
+        # before this one was compared on Task A and Task C alone while the
+        # macro-F1 that FINDINGS.md reports came from an ad-hoc script. The
+        # overnight sweep turns on this number, so it runs with the rest.
+        triage_path = CORPUS / "task_b_test.jsonl"
+        if triage_path.exists():
+            results["task_b"] = evaluate_triage(
+                model, tokenizer, stratified_triage_sample(triage_path))
+
         abstention = load_query_set(CORPUS / "task_c_test.jsonl")
         if (CORPUS / "task_c_test.jsonl").exists():
             with (CORPUS / "task_c_test.jsonl").open(encoding="utf-8") as handle:
@@ -512,9 +556,6 @@ def main() -> int:
           f"set_equality={summary['set_equality']} exact={summary['exact_match']}")
     return 0
 
-
-if __name__ == "__main__":
-    raise SystemExit(main())
 
 
 # --------------------------------------------------------------------------- #
@@ -588,3 +629,8 @@ def evaluate_triage(model, tokenizer, samples: list[dict]) -> dict:
         "note": ("The corpus is deliberately unbalanced (D-022), so per-class "
                  "figures carry the meaning and the macro-F1 is a summary of them."),
     }
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
+

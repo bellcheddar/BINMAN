@@ -1,0 +1,3 @@
+[23:23:27] === overnight sweep starting ===
+[23:23:27] control is round 06: 16 layers, rank 8, 2 epochs
+[23:23:27] START round07-32layers :: --iters 14152 --layers 32 --rank 8

@@ -483,3 +483,42 @@ One line per meaningful event, timestamped UTC (spec Section 0 rule 5).
 | 2026-10-04T02:08:39+00:00 | 9 | Validation run against binman.sqlite: 2 metric(s) not computed (dataset unavailable), 5 measured floor(s) missed. |
 | 2026-10-04T02:13:43+00:00 | 9 | Validation run against binman.sqlite: 0 metric(s) not computed (dataset unavailable), 2 measured floor(s) missed. |
 | 2026-10-04T02:13:44+00:00 | 9 | Validation run against binman.sqlite: 2 metric(s) not computed (dataset unavailable), 5 measured floor(s) missed. |
+| 2026-10-04T03:03:26+00:00 | 3.7 | Stage 1 complete in 172.0 min. Best validation loss 0.0 at iteration 6500. |
+| 2026-10-04T03:03:34+00:00 | 3.7 | Fuse succeeded: models/binman-lm/fused |
+| 2026-10-04T03:03:49+00:00 | 3.8 | round06: loading mlx-community/Qwen2.5-3B-Instruct-4bit with adapters at models/binman-lm/adapters |
+| 2026-10-04T03:04:22+00:00 | 3.8 | round06 synthetic: 25/120 evaluated (0.90/s), parse 1.000, set equality 1.000. |
+| 2026-10-04T03:04:49+00:00 | 3.8 | round06 synthetic: 50/120 evaluated (0.91/s), parse 0.980, set equality 0.980. |
+| 2026-10-04T03:05:15+00:00 | 3.8 | round06 synthetic: 75/120 evaluated (0.93/s), parse 0.973, set equality 0.973. |
+| 2026-10-04T03:05:41+00:00 | 3.8 | round06 synthetic: 100/120 evaluated (0.93/s), parse 0.980, set equality 0.980. |
+| 2026-10-04T03:06:38+00:00 | 3.8 | round06: parse rate 0.9833, set equality 0.9833 on 120 synthetic queries. |
+| 2026-10-04T03:07:36+00:00 | 3.8 | round06: loading mlx-community/Qwen2.5-3B-Instruct-4bit with adapters at models/binman-lm/adapters |
+| 2026-10-04T03:08:08+00:00 | 3.8 | round06 synthetic: 25/240 evaluated (0.90/s), parse 1.000, set equality 1.000. |
+| 2026-10-04T03:08:35+00:00 | 3.8 | round06 synthetic: 50/240 evaluated (0.91/s), parse 0.980, set equality 0.980. |
+| 2026-10-04T03:09:01+00:00 | 3.8 | round06 synthetic: 75/240 evaluated (0.92/s), parse 0.973, set equality 0.973. |
+| 2026-10-04T03:09:28+00:00 | 3.8 | round06 synthetic: 100/240 evaluated (0.93/s), parse 0.980, set equality 0.980. |
+| 2026-10-04T03:09:55+00:00 | 3.8 | round06 synthetic: 125/240 evaluated (0.93/s), parse 0.984, set equality 0.984. |
+| 2026-10-04T03:10:22+00:00 | 3.8 | round06 synthetic: 150/240 evaluated (0.93/s), parse 0.987, set equality 0.987. |
+| 2026-10-04T03:10:49+00:00 | 3.8 | round06 synthetic: 175/240 evaluated (0.93/s), parse 0.989, set equality 0.989. |
+| 2026-10-04T03:11:15+00:00 | 3.8 | round06 synthetic: 200/240 evaluated (0.93/s), parse 0.990, set equality 0.990. |
+| 2026-10-04T03:11:43+00:00 | 3.8 | round06 synthetic: 225/240 evaluated (0.93/s), parse 0.991, set equality 0.991. |
+| 2026-10-04T03:12:45+00:00 | 3.8 | round06: loading mlx-community/Qwen2.5-3B-Instruct-4bit with adapters at models/binman-lm/adapters |
+| 2026-10-04T03:13:18+00:00 | 3.8 | round06 synthetic: 25/240 evaluated (0.90/s), parse 1.000, set equality 1.000. |
+| 2026-10-04T03:13:45+00:00 | 3.8 | round06 synthetic: 50/240 evaluated (0.91/s), parse 0.980, set equality 0.980. |
+| 2026-10-04T03:14:11+00:00 | 3.8 | round06 synthetic: 75/240 evaluated (0.93/s), parse 0.973, set equality 0.973. |
+| 2026-10-04T03:14:38+00:00 | 3.8 | round06 synthetic: 100/240 evaluated (0.93/s), parse 0.980, set equality 0.980. |
+| 2026-10-04T03:15:05+00:00 | 3.8 | round06 synthetic: 125/240 evaluated (0.93/s), parse 0.984, set equality 0.984. |
+| 2026-10-04T03:15:32+00:00 | 3.8 | round06 synthetic: 150/240 evaluated (0.93/s), parse 0.987, set equality 0.987. |
+| 2026-10-04T03:15:59+00:00 | 3.8 | round06 synthetic: 175/240 evaluated (0.93/s), parse 0.989, set equality 0.989. |
+| 2026-10-04T03:16:25+00:00 | 3.8 | round06 synthetic: 200/240 evaluated (0.93/s), parse 0.990, set equality 0.990. |
+| 2026-10-04T03:16:53+00:00 | 3.8 | round06 synthetic: 225/240 evaluated (0.93/s), parse 0.991, set equality 0.991. |
+| 2026-10-04T03:18:29+00:00 | 3.8 | round06: parse rate 0.9875, set equality 0.9833 on 240 synthetic queries. |
+| 2026-10-04T03:19:13+00:00 | 3.8 | round06: loading mlx-community/Qwen2.5-3B-Instruct-4bit with adapters at models/binman-lm/adapters |
+| 2026-10-04T03:19:46+00:00 | 3.8 | round06 synthetic: 25/120 evaluated (0.90/s), parse 1.000, set equality 1.000. |
+| 2026-10-04T03:20:13+00:00 | 3.8 | round06 synthetic: 50/120 evaluated (0.91/s), parse 0.980, set equality 0.980. |
+| 2026-10-04T03:20:39+00:00 | 3.8 | round06 synthetic: 75/120 evaluated (0.93/s), parse 0.973, set equality 0.973. |
+| 2026-10-04T03:21:06+00:00 | 3.8 | round06 synthetic: 100/120 evaluated (0.93/s), parse 0.980, set equality 0.980. |
+| 2026-10-04T03:22:55+00:00 | 3.8 | round06: parse rate 0.9833, set equality 0.9833 on 120 synthetic queries. |
+| 2026-10-04T03:23:29+00:00 | 3.7 | SFT corpus assembled: 28,304 train (oversampling {'task_a': 2, 'task_c': 4}), task mix abstain 11%, query 34%, triage 55% |
+| 2026-10-04T03:23:29+00:00 | 3.7 | Stage 1 LoRA SFT starting: 28,304 train / 2,386 valid examples, rank 8, 32 layers, lr 1e-05, batch 4, 14152 iterations. |
+| 2026-10-04T03:24:49+00:00 | 9 | Validation run against binman.sqlite: 0 metric(s) not computed (dataset unavailable), 2 measured floor(s) missed. |
+| 2026-10-04T03:24:50+00:00 | 9 | Validation run against binman.sqlite: 2 metric(s) not computed (dataset unavailable), 5 measured floor(s) missed. |

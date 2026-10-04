@@ -1072,3 +1072,38 @@ capacity knob.
 **Reversal.** None wanted. If mlx-lm ever adds a `--lora-rank` flag the YAML
 can go, but the YAML is also a per-run artefact beside the adapter, which is
 better provenance than a flag in a shell history.
+
+## D-034: Task B was never evaluated, and when wired in it sampled the wrong rows
+
+**Decision.** `evaluate_triage` is now reachable and called from `run()`, and
+the triage test set is sampled **stratified at 60 per class with a fixed seed**
+rather than taken from the head of the file.
+
+**Context, first fault.** `evaluate_triage` sat below the
+`if __name__ == "__main__"` guard in `lm/evaluate.py`. Python never reached the
+definition before `main()` ran, so the function was not merely uncalled, it was
+unreachable: wiring it into `run()` raised `NameError`. Every round from 01 to
+06 was therefore evaluated on Task A and Task C alone, and the 0.8956 macro-F1
+in `FINDINGS.md` came from importing the module in a separate script, which is
+why that detour was necessary without it being obvious why.
+
+**Context, second fault.** Once reachable, the first wiring took
+`triage_samples[:limit]`. The test set is 4,087 rows holding 2,692 native
+cofactor and 1,242 artefact against **87 PROTACs and 66 glues**, so the head of
+the file has support 68/5/161/6. Measured that way round 06 scored macro-F1
+**0.9815** against round 05's 0.8956, which reads as a large improvement and is
+an artefact of five glue examples. On the balanced sample it is **0.8862**.
+
+**Reason.** Macro-F1 over an unbalanced slice flatters a model on exactly the
+two classes this project exists to find. The sample is now fixed by seed so
+every round sees the same 240 rows: rounds are compared with each other, and a
+sample that moves between them measures the sample.
+
+**What it changes.** Nothing already published: `FINDINGS.md` carries 0.8956,
+measured on a balanced 240, which is the comparable number. What changes is
+that the comparison is now reproducible from the repository rather than from a
+script that no longer exists.
+
+**Reversal.** None wanted. `TRIAGE_PER_CLASS` and `TRIAGE_SEED` are named
+constants; changing either invalidates comparison with the rounds above and
+should be recorded here if it ever happens.
