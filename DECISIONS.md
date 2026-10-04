@@ -2401,3 +2401,55 @@ the reader to ignore the gap list, which is the same end state as not having one
 The distinction is pinned by tests on `licence_state` directly, so it holds for
 values this repository does not currently contain, plus one test that the built
 page never calls a recorded finding unreadable.
+
+## D-061: two ways to raise the degron AUC, both measured, both worse
+
+**Decision.** The shipped degron configuration stands. Borrowing labels from
+related compounds and dropping low-importance positions were both tried against
+the loop's stated goal of raising the degron AUC, and both lose to it.
+
+**The constraint is 14 positives**, so the two obvious routes are more labels or
+fewer parameters. Each was tested with whole genes held out and scored against
+pomalidomide.
+
+**Borrowing labels costs AUC, and costs more the more is borrowed.**
+
+| trained on | positives | AUC against POM |
+|---|---:|---:|
+| POM (shipped) | 14 | **0.8304** |
+| LEN + POM | 15 | 0.8239 |
+| THAL + LEN + POM | 15 | 0.8239 |
+| POM + CC122 + CC220 | 29 | 0.7762 |
+| all five | 30 | 0.7838 |
+
+Doubling the positives costs 0.054. This looks like it contradicts D-053, and it
+does not: a pomalidomide model *ranks* the other glutarimides above chance
+because the grammar is shared, while their specific positives are noise for the
+pomalidomide question. Transfer out and training in are different directions.
+
+**Dropping positions is the interesting failure, and it is a lesson rather than
+a result.** Sweeping k and keeping the best gives 0.8397 against the shipped
+0.8304, which reads as a small win. It is not one. k was chosen by looking at
+the number being reported, over nine values, on a five-fold estimate whose fold
+sd is 0.08.
+
+Choosing k honestly, on inner folds inside the training half, gives **0.7449**:
+0.086 **worse** than shipped. The inner folds also disagree about k from fold to
+fold (20, 18, 12, 12, 20), which is what no stable signal looks like.
+
+| | AUC |
+|---|---:|
+| sweep, k chosen by looking at the answer | 0.8397 |
+| nested, k chosen inside the training half | **0.7449** |
+| **selection bias** | **0.0948** |
+
+Same data, same code, differing only in whether the choice was allowed to see
+the test fold. That number is worth more than either estimate: it is how much a
+14-positive problem flatters any tuning done against its own test set, and it is
+larger than every improvement this project has reported for the degron metric.
+
+**Conclusion, which answers the loop's goal.** The shipped model is a local
+optimum for the data available. Neither route gets past 14 positives, and the
+honest way to raise this metric is a larger matched screen, not a better fit to
+the one that exists. `pipeline/degron_ablation.py` keeps both results
+reproducible so neither is re-proposed from first principles later.
