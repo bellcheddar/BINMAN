@@ -995,3 +995,47 @@ the weights, rather than being silently dropped.
 **Reversal.** Serving a base whose licence is Apache-2.0 would remove the
 restriction. Qwen2.5-7B-Instruct is Apache-2.0 and would need a retrain rather
 than a relabel, so this is a real choice and not a metadata edit.
+
+## D-032: the MLX-to-PEFT conversion silently randomised 20 of 36 layers
+
+**Decision.** `lm/export_hf.py` writes `layers_to_transform` and
+`layers_pattern` into the PEFT config, derived from the layer indices actually
+present in the adapter, and refuses a non-contiguous range rather than guessing.
+Verification runs in a separate process, and a non-zero exit from it fails the
+export.
+
+**Context.** mlx-lm's `--num-layers 16` trains the **last** 16 layers, so on
+36-layer Qwen2.5-3B the adapter covers layers 20 to 35 and nothing below. PEFT
+matches `target_modules` against every layer, so the first conversion built
+LoRA weights for layers 0 to 19 as well, found nothing for them in the
+checkpoint, and left them **randomly initialised**. PEFT warns and continues:
+the model loads cleanly, reports no error, and generates from twenty layers of
+noise. Nothing downstream would have caught it, and it would have shipped to a
+public Space with the MLX metrics on the card.
+
+**How it surfaced.** Only by running the real held-out questions through the
+converted adapter. The conversion itself reported 224 tensors, rank 8, alpha
+160 and 16 layers, all correct, because the tensors it wrote were right. What
+was wrong was the config describing where they go.
+
+**Two smaller faults found alongside.**
+
+* The first verification run appeared to pass with exit code 0. It had
+  segfaulted: the command was piped through `tail`, so the shell reported
+  `tail`'s status. A pipeline hides the exit code of every stage but the last,
+  which is worth remembering whenever a check "passes" without output.
+* Converting with safetensors' numpy backend and then loading a torch model in
+  the same interpreter segfaults on this machine. Both work alone and in either
+  import order; only the sequence crashes. Verification therefore re-execs, via
+  `--verify-only`, which also means it tests the artefact on disk rather than
+  anything `convert` is still holding.
+
+**Reason this matters beyond the bug.** The quantisation-transfer risk recorded
+in D-029 was the known unknown, and it is not what nearly shipped. The failure
+was a config field that no amount of reading the conversion report would have
+revealed. A conversion is not verified by inspecting what it wrote; it is
+verified by running the model.
+
+**Reversal.** None wanted. If mlx-lm ever trains a non-contiguous layer set,
+the export fails loudly and the config needs a `layers_to_transform` list
+rather than a range.

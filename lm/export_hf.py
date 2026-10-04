@@ -92,6 +92,17 @@ def convert(adapter_dir: Path, out_dir: Path) -> dict:
     out_dir.mkdir(parents=True, exist_ok=True)
     save_file(out, str(out_dir / "adapter_model.safetensors"))
 
+    # mlx-lm's --num-layers trains the LAST N layers, so a 16-layer adapter on a
+    # 36-layer model covers layers 20 to 35 and nothing below. PEFT matches
+    # `target_modules` against EVERY layer, so without this it builds LoRA
+    # weights for layers 0 to 19 too, finds nothing for them in the checkpoint,
+    # and leaves them RANDOMLY INITIALISED while warning rather than failing.
+    # The model then loads cleanly and generates nonsense.
+    layers = sorted({int(key.split(".layers.")[1].split(".")[0])
+                     for key in out if ".layers." in key})
+    if layers != list(range(layers[0], layers[-1] + 1)):
+        raise SystemExit(f"adapter covers a non-contiguous layer range: {layers}")
+
     peft_config = {
         "peft_type": "LORA",
         "task_type": "CAUSAL_LM",
@@ -104,6 +115,8 @@ def convert(adapter_dir: Path, out_dir: Path) -> dict:
         "fan_in_fan_out": False,
         "inference_mode": True,
         "target_modules": sorted(targets),
+        "layers_to_transform": layers,
+        "layers_pattern": "layers",
         "modules_to_save": None,
     }
     (out_dir / "adapter_config.json").write_text(
@@ -115,8 +128,8 @@ def convert(adapter_dir: Path, out_dir: Path) -> dict:
         "scale": scale,
         "lora_alpha": scale * rank,
         "targets": sorted(targets),
-        "layers": len({k.split(".layers.")[1].split(".")[0]
-                       for k in out if ".layers." in k}),
+        "layers": len(layers),
+        "layer_range": [layers[0], layers[-1]],
         "source_adapter": str(adapter_dir),
         "mlx_base": MLX_BASE,
         "cuda_base": BASE_MODEL,
@@ -191,14 +204,49 @@ def verify(out_dir: Path, limit: int = 25) -> dict:
                 "task_a": ev.evaluate_task_a(model, tokenizer, synthetic,
                                              connection, "", "converted"),
             }
-            triage = ev.CORPUS / "task_b_test.jsonl"
-            if triage.exists():
-                report["task_b"] = ev.evaluate_triage(
-                    model, tokenizer, ev.load_query_set(triage, limit))
+            # Task B samples carry a bare class token, not a JSON query, so
+            # load_query_set cannot read them. evaluate_triage also calls mlx_lm
+            # directly rather than going through generate_one, so it cannot be
+            # monkeypatched: Task B is scored here with the sample's own prompt
+            # and a plain accuracy, as a comparison against the MLX run rather
+            # than as the canonical macro-F1 that FINDINGS.md reports.
+            triage_path = ev.CORPUS / "task_b_test.jsonl"
+            if triage_path.exists():
+                samples = []
+                with triage_path.open(encoding="utf-8") as handle:
+                    for line in handle:
+                        row = json.loads(line)
+                        samples.append({
+                            "system": row["messages"][0]["content"],
+                            "question": row["messages"][1]["content"],
+                            "label": row["messages"][2]["content"].strip(),
+                        })
+                        if limit and len(samples) >= limit:
+                            break
+                correct = 0
+                for sample in samples:
+                    predicted = generate_one(
+                        None, None, sample["question"], "", max_tokens=16,
+                        system_override=sample["system"]).strip().split()[0:1]
+                    if predicted and predicted[0] == sample["label"]:
+                        correct += 1
+                report["task_b_accuracy"] = {
+                    "value": round(correct / len(samples), 4) if samples else None,
+                    "n": len(samples),
+                    "note": "accuracy only; FINDINGS.md carries the macro-F1 and matrix",
+                }
+            # evaluate_abstention reads the raw chat rows, not the parsed
+            # query objects load_query_set produces.
             abstain = ev.CORPUS / "task_c_test.jsonl"
             if abstain.exists():
+                rows = []
+                with abstain.open(encoding="utf-8") as handle:
+                    for line in handle:
+                        rows.append(json.loads(line))
+                        if limit and len(rows) >= limit:
+                            break
                 report["task_c"] = ev.evaluate_abstention(
-                    model, tokenizer, ev.load_query_set(abstain, limit), "")
+                    model, tokenizer, rows, "")
         finally:
             connection.close()
     finally:
@@ -214,13 +262,40 @@ def main() -> int:
     parser.add_argument("--out", type=Path, default=DEFAULT_OUT)
     parser.add_argument("--verify", action="store_true",
                         help="run the held-out test questions through the result")
+    parser.add_argument("--verify-only", action="store_true",
+                        help="skip conversion and verify an existing --out directory")
     parser.add_argument("--limit", type=int, default=25)
     args = parser.parse_args()
 
+    if args.verify_only:
+        verify(args.out, limit=args.limit)
+        return 0
+
     report = convert(args.adapter, args.out)
     print(json.dumps(report, indent=2))
+
     if args.verify:
-        verify(args.out, limit=args.limit)
+        # Verification runs in a FRESH PROCESS, deliberately. Converting with
+        # safetensors' numpy backend and then loading a torch model in the same
+        # interpreter segfaults on this machine: both steps work alone and in
+        # either import order, and only the sequence crashes. Re-execing also
+        # means verification exercises the artefact on disk rather than any
+        # state convert() happens to be holding, which is what should be
+        # checked.
+        import subprocess
+
+        completed = subprocess.run(
+            [sys.executable, "-u", str(Path(__file__).resolve()),
+             "--verify-only", "--out", str(args.out), "--limit", str(args.limit)],
+            check=False)
+        if completed.returncode != 0:
+            # A segfault here is a failed verification, not a passed one. The
+            # first run of this script "passed" only because its output was
+            # piped through tail, which reported tail's exit code.
+            print(f"\nVERIFICATION FAILED: exit code {completed.returncode}"
+                  + (" (segmentation fault)" if completed.returncode in (139, -11) else ""),
+                  file=sys.stderr)
+            return completed.returncode
     return 0
 
 
