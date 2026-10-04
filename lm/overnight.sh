@@ -60,13 +60,16 @@ run_round() {
 import json, pathlib, sys
 label, log_dir, results = sys.argv[1], pathlib.Path(sys.argv[2]), pathlib.Path(sys.argv[3])
 row = {"label": label}
-for name in ("data/interim/lm_eval.json",):
-    p = pathlib.Path(name)
-    if p.exists():
-        try:
-            row["eval"] = json.loads(p.read_text())
-        except json.JSONDecodeError:
-            row["eval"] = "unreadable"
+# lm_eval.json is keyed by stage label, so the metrics sit one level down.
+# Writing the whole file put every round's row at the top level and left the
+# comparison reading None for everything.
+p = pathlib.Path("data/interim/lm_eval.json")
+if p.exists():
+    try:
+        blob = json.loads(p.read_text())
+        row["eval"] = blob.get(label) or blob.get(label.split("-")[0]) or {}
+    except json.JSONDecodeError:
+        row["eval"] = {}
 with results.open("a") as handle:
     handle.write(json.dumps(row, default=str) + "\n")
 print(f"recorded {label}")

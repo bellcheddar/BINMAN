@@ -532,3 +532,16 @@ One line per meaningful event, timestamped UTC (spec Section 0 rule 5).
 | 2026-10-04T07:10:22+00:00 | 3.8 | round07-32layers: parse rate 1.0, set equality 1.0 on 120 synthetic queries. |
 | 2026-10-04T07:10:25+00:00 | 3.7 | SFT corpus assembled: 28,304 train (oversampling {'task_a': 2, 'task_c': 4}), task mix abstain 11%, query 34%, triage 55% |
 | 2026-10-04T07:10:25+00:00 | 3.7 | Stage 1 LoRA SFT starting: 28,304 train / 2,386 valid examples, rank 32, 16 layers, lr 1e-05, batch 4, 14152 iterations. |
+| 2026-10-04T10:04:02+00:00 | 3.7 | Stage 1 complete in 173.6 min. Best validation loss 0.001 at iteration 7800. |
+| 2026-10-04T10:04:14+00:00 | 3.7 | Fuse succeeded: models/binman-lm/fused |
+| 2026-10-04T10:04:16+00:00 | 3.8 | round08-rank32: loading mlx-community/Qwen2.5-3B-Instruct-4bit with adapters at models/binman-lm/adapters |
+| 2026-10-04T10:04:48+00:00 | 3.8 | round08-rank32 synthetic: 25/120 evaluated (0.91/s), parse 1.000, set equality 1.000. |
+| 2026-10-04T10:05:15+00:00 | 3.8 | round08-rank32 synthetic: 50/120 evaluated (0.92/s), parse 1.000, set equality 1.000. |
+| 2026-10-04T10:05:41+00:00 | 3.8 | round08-rank32 synthetic: 75/120 evaluated (0.94/s), parse 0.987, set equality 0.987. |
+| 2026-10-04T10:06:07+00:00 | 3.8 | round08-rank32 synthetic: 100/120 evaluated (0.94/s), parse 0.990, set equality 0.990. |
+| 2026-10-04T10:07:54+00:00 | 3.8 | round08-rank32: parse rate 0.9917, set equality 0.9917 on 120 synthetic queries. |
+| 2026-10-04T10:07:56+00:00 | 3.7 | SFT corpus assembled: 28,304 train (oversampling {'task_a': 2, 'task_c': 4}), task mix abstain 11%, query 34%, triage 55% |
+| 2026-10-04T10:07:56+00:00 | 3.7 | Stage 1 LoRA SFT starting: 28,304 train / 2,386 valid examples, rank 32, 16 layers, lr 1e-05, batch 4, 14152 iterations. |
+| 2026-10-04T10:08:52+00:00 | 3.7 | Stage 1 FAILED with exit -15. See data/interim/lm_stage1.log. |
+| 2026-10-04T10:09:39+00:00 | 3.7 | SFT corpus assembled: 28,304 train (oversampling {'task_a': 2, 'task_c': 4}), task mix abstain 11%, query 34%, triage 55% |
+| 2026-10-04T10:09:39+00:00 | 3.7 | Stage 1 LoRA SFT starting: 28,304 train / 2,386 valid examples, rank 32, 32 layers, lr 1e-05, batch 4, 14152 iterations. |

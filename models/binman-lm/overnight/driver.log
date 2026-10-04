@@ -6,3 +6,9 @@
 [03:10:23] EVALUATED round07-32layers
 recorded round07-32layers
 [03:10:23] START round08-rank32 :: --iters 14152 --layers 16 --rank 32
+[06:04:16] TRAINED round08-rank32 in 173 min
+[06:04:16] EVAL round08-rank32
+[06:07:54] EVALUATED round08-rank32
+recorded round08-rank32
+lm/overnight.sh: line 86: st: command not found
+[06:07:54] START round08-rank32 :: --iters 14152 --layers 16 --rank 32

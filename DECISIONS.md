@@ -1151,3 +1151,47 @@ it needs changing mid-run, copy it, change the copy, and start the copy after
 the current run drains.
 
 **Reversal.** None. The capture fix is reapplied once the driver exits.
+
+## D-036: depth and rank buy the same thing, and restoring a running script made it worse
+
+**Decision.** Round 09 combines both knobs, 32 layers at rank 32, and is run
+from a new file rather than from the edited sweep. The 32B round is dropped for
+now: the combination is the higher-expected-value run and fits before morning,
+where 32B does not.
+
+**The result.** Each knob alone lifts Task B macro-F1 by roughly the same
+amount, from the control's 0.8862:
+
+| round | config | macro-F1 | molecular_glue F1 | glue recall | train |
+|---|---|---|---|---|---|
+| 06 | 16 layers, rank 8 | 0.8862 | 0.849 | 0.750 | ~170 min |
+| 07 | **32 layers**, rank 8 | **0.9336** | 0.958 | 0.950 | 221 min |
+| 08 | 16 layers, **rank 32** | **0.9293** | **0.967** | **0.983** | 173 min |
+
+Width is the cheaper route: rank 32 reaches within 0.004 of 32 layers for 48
+fewer minutes, and it has the best `molecular_glue` F1 of any round with zero
+glue-called-protac errors. Neither saturated, so the combination is untested
+and is the obvious next point.
+
+**The process failure, part two.** D-035 recorded that `lm/overnight.sh` was
+edited mid-run and that `git checkout` restored it byte-for-byte. The restore
+was the wrong remedy and caused the thing it was meant to prevent. Bash had
+already read and executed the round 08 line from the 4,419-byte version; when
+that call returned it sought the next command at an offset computed against
+that larger file, and by then the file was 4,210 bytes again. The offset landed
+back inside the round 08 region and the driver re-executed round 08 instead of
+advancing to the 32B section, which it would have done forever.
+
+Caught from the progress log showing `START round08-rank32` twice. The driver
+and its duplicate training were stopped, round 08's completed evaluation was
+backfilled from `data/interim/lm_eval.json`, and round 09 was launched from a
+new file.
+
+**The corrected rule.** Once a shell script is running, neither edit it nor
+restore it. Leave the file completely alone and start any change as a separate
+file. Editing moves every later byte offset; restoring moves them back under an
+interpreter that has already advanced past them, which is just as bad.
+
+**Reversal.** The 32B round is still worth measuring and
+`lm/measure_throughput.py` exists for it. It needs a window where nothing else
+wants the GPU, which is a daytime decision rather than an overnight one.

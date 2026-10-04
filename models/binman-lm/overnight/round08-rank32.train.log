@@ -1,3 +1,74 @@
 wandb: [wandb.Api()] Loaded credentials for https://api.wandb.ai from /Users/dellboy/.netrc.
 [3.7] SFT corpus assembled: 28,304 train (oversampling {'task_a': 2, 'task_c': 4}), task mix abstain 11%, query 34%, triage 55%
 [3.7] Stage 1 LoRA SFT starting: 28,304 train / 2,386 valid examples, rank 32, 16 layers, lr 1e-05, batch 4, 14152 iterations.
+[3.7] Stage 1 FAILED with exit -15. See data/interim/lm_stage1.log.
+{
+  "generated_at": "2026-10-04T10:07:54+00:00",
+  "identity": {
+    "base_model": "mlx-community/Qwen2.5-3B-Instruct-4bit",
+    "quantisation": "4-bit",
+    "adapter_rank": 32,
+    "adapter_layers": 16,
+    "fine_tune_type": "lora",
+    "fused": false,
+    "build_date": "2026-10-04"
+  },
+  "hardware": {
+    "chip": "Apple M2 Ultra",
+    "gpu_cores": 60,
+    "memory_gb": 128.0,
+    "mlx_version": "0.32.3"
+  },
+  "tasks": [
+    {
+      "tag": "<task>query</task>",
+      "description": "natural language to a BINMAN query object"
+    },
+    {
+      "tag": "<task>triage</task>",
+      "description": "evidence-class triage",
+      "status": "NOT TRAINED: three of five classes have no published label source in this build (see lm/corpus/corpus_report.json)"
+    },
+    {
+      "tag": "<task>abstain</task>",
+      "description": "structured abstention naming exactly what is missing"
+    }
+  ],
+  "round": 9,
+  "stage_1": {
+    "iterations_requested": 14152,
+    "batch_size": 4,
+    "rank": 32,
+    "layers": 16,
+    "learning_rate": 1e-05,
+    "wall_clock_seconds": 56.1,
+    "train_examples": 28304,
+    "valid_examples": 2386,
+    "exit_code": -15,
+    "validation_losses": [
+      {
+        "iter": 1,
+        "loss": 2.586
+      }
+    ],
+    "final_train_loss": 0.144,
+    "best_validation_loss": 2.586,
+    "early_stopping_point": 1,
+    "log": "data/interim/lm_stage1.log",
+    "wandb_project": "binman-lm",
+    "wandb_run_name": "binman-qwen-2.5-3b-4bit-round09",
+    "wandb_group": "binman-qwen-2.5-3b-4bit-round09",
+    "reported_to_wandb": true
+  },
+  "stage_2": {
+    "ran": false,
+    "reason": "stage 1 failed"
+  },
+  "fuse": {
+    "fused": false,
+    "reason": "stage 1 failed"
+  }
+}
+[1;34mwandb[0m: 
+[1;34mwandb[0m: 🚀 View run [33mbinman-qwen-2.5-3b-4bit-round09[0m at: [34mhttps://wandb.ai/dellboy-none/binman-lm/runs/lqq57acg[0m
+[1;34mwandb[0m: Find logs at: [1;35mmodels/binman-lm/runs/binman-qwen-2.5-3b-4bit-round09/wandb/run-20261004_060801-lqq57acg/logs[0m
