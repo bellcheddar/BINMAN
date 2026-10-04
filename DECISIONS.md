@@ -2225,3 +2225,50 @@ change has ever reached the live site from this script.** It now restarts
 unconditionally, and the fix was confirmed by watching `class="split"` become
 `class="split split--workbench"` on the live site after a restart and not
 before.
+
+## D-057: the first row loads itself, and the glow was hiding the ligand
+
+**Decision.** Each ledger pins its first row on load, so the viewer opens with a
+structure in it rather than an empty frame and an instruction. Once only, and
+never over an existing pin: a viewer restored from a URL fragment keeps what the
+link asked for, and clearing the stack does not drag the user back to row one.
+
+**"The first entry is unconnected" was a rendering fault, not a data one.** The
+obvious reading is missing bonds. The measurement says otherwise: the first row,
+7PH7 with the lipid EIW, selects 150 atoms carrying **154 bonds**. The bonds were
+always there. Hiding the shell and re-rendering showed the lipid fully connected.
+
+What hid it was the glow. The neon shell ran at emissive 1.0 with `ignoreLight`
+and a bloom pass on top, over sticks only 0.26 Å thick, so it worked as a bright
+screen in front of the molecule and only the brightest atom tips showed through,
+as a scatter of dots. The sticks are 0.34 Å now, the shell is at emissive 0.7
+and alpha 0.09, its probe radius is 2.4 Å so it stands clear of the atoms as a
+halo rather than sitting on them, and bloom is at 1.3 rather than 1.8. **The fix
+was to the thing that was obviously working, found by measuring the thing that
+was obviously broken.**
+
+**Carbons are pinned to one colour.** Mol* colours ligand carbons by chain, so
+7PH7's lipid came out cyan inside a cyan shell and vanished into its own glow
+while 8FY1's came out magenta and read perfectly: the same code looked fine or
+broken depending on which chain the ligand happened to sit beside. Carbons are
+now a fixed vivid magenta through `element-symbol` with a uniform `carbonColor`,
+and oxygen, nitrogen and sulfur keep their standard colours, so the molecule
+still reads chemically.
+
+**Two layout attempts that failed, recorded so they are not retried.**
+
+1. Tabulator's `height` was given `max(520px, calc(100vh - 330px))`. It does not
+   parse `max()`, and the table came out a few hundred pixels short with no
+   error. The value is computed in JavaScript now.
+2. `height: '100%'` then made the table's height depend on the viewer column
+   while the viewer sized itself from the grid row. Mol* initialised onto a
+   zero-height canvas and **rendered nothing at all**, with the toolbar and the
+   identifier still showing, which looks exactly like a loading failure. A
+   number breaks the cycle.
+
+**And a scoping error worth the same note.** Capping the selected-row detail with
+`.split--workbench .panel` also caught the table's own wrapper and capped the
+table at 34% of its column. It is matched by its position after the viewer now.
+The detail panel shares the viewer's column, so it is capped and scrollable:
+without that, pinning a row on load squeezed the viewer down to its min-height,
+which is the opposite of what the height change was for.

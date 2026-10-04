@@ -350,7 +350,12 @@
     var holder = document.getElementById('ledger-table');
     if (!holder || typeof global.Tabulator === 'undefined') { return; }
     state.table = new global.Tabulator(holder, {
-      height: '560px',
+      /* Viewport-relative with a laptop floor, computed here rather than given
+       * to Tabulator as a CSS string: it does not parse `max()`. Nor can this
+       * be '100%': the panel's height then depends on the viewer column while
+       * the viewer sizes itself from the row, and Mol* initialised onto a
+       * zero-height canvas and rendered nothing. A number breaks the cycle. */
+      height: Math.max(520, global.innerHeight - 330) + 'px',
       layout: 'fitDataStretch',
       placeholder: B.atlasAvailable
         ? 'No rows match this query stack.'
@@ -475,6 +480,34 @@
     return base.length ? base : null;
   }
 
+  /* Which selection slot this record type fills, so an existing pin can be
+   * told from an empty one. */
+  var SELECTION_SLOT = {
+    bridge: 'glue', ligase: 'e3', degron: 'target', lysine: 'target'
+  };
+
+  var autoPinned = false;
+
+  /* Pin the first row on first load, so the viewer opens with something in it.
+   *
+   * Once only, and never over an existing pin: a viewer restored from a URL
+   * fragment keeps what the link asked for, and a user who clears the stack is
+   * not dragged back to row one on the next query.
+   */
+  function autoPinFirstRow() {
+    if (autoPinned || !state.lastRows.length) { return; }
+    autoPinned = true;
+    var slot = SELECTION_SLOT[state.recordType];
+    if (slot && Selection.get()[slot]) { return; }
+    var first = state.lastRows[0];
+    state.pinnedRow = first;
+    Selection.fromRecord(state.recordType, first);
+    renderDetail(first);
+    try {
+      if (state.table && first.id !== undefined) { state.table.selectRow(first.id); }
+    } catch (e) { /* the highlight is a nicety, not the point */ }
+  }
+
   var runToken = 0;
 
   function run() {
@@ -494,6 +527,7 @@
       }
       state.lastRows = result.data.rows || [];
       if (state.table) { state.table.replaceData(state.lastRows); }
+      autoPinFirstRow();
       /* Re-apply the selection now that the rows are here.
        *
        * Selection.subscribe fires immediately, so a viewer restored from a URL

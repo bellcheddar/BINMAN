@@ -335,6 +335,16 @@ code, kbd, samp, .mono { font-family: var(--data); font-size: 0.86em; }
  * the workbench so the About page's example viewers keep their own size. */
 .split--workbench > * { display: flex; flex-direction: column; min-height: 0; }
 .split--workbench .viewer { flex: 1 1 auto; }
+/* The table's panel hugs the table rather than stretching, so a taller viewer
+ * column leaves page background below it instead of an empty white panel. */
+.split--workbench .panel { flex: 0 0 auto; }
+/* The selected-row detail shares the viewer's column. Capped and scrollable so
+ * a long row cannot squeeze the viewer down to its min-height, which is what
+ * happened as soon as the first row started being pinned automatically.
+ * Matched by its position after the viewer, because an unqualified `.panel`
+ * here also caught the table's wrapper and capped the table at 34% of the
+ * column. */
+.split--workbench .viewer ~ .panel { flex: 0 0 auto; max-height: 34%; overflow: auto; }
 
 .notice {
   border-left: 3px solid var(--accent); background: var(--accent-soft);

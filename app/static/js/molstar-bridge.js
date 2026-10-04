@@ -31,10 +31,25 @@
    */
   var LIGAND = {
     neon: 0x00F5D4,
-    stick: { sizeFactor: 0.26, aspectRatio: 1, emissive: 0.5 },
-    cloud: { alpha: 0.14, emissive: 1, probeRadius: 1.4, resolution: 0.5 },
+    /* Carbons are pinned to one vivid colour instead of being coloured by
+     * chain. Chain colouring gave 7PH7's lipid cyan carbons inside a cyan
+     * shell, so the ligand vanished into its own glow; the colour a ligand
+     * gets should not depend on which chain it happens to sit next to.
+     * Oxygen, nitrogen and sulfur keep their standard element colours, so the
+     * molecule still reads chemically. */
+    carbon: 0xFF2D9E,
+    /* Thick enough to read through the shell. At 0.26 the sticks were thin
+     * enough that the glow sat over them and the ligand looked like a cloud of
+     * unconnected dots: the bonds were always there (150 atoms, 154 bonds on
+     * 7PH7) and simply could not be seen. */
+    stick: { sizeFactor: 0.34, aspectRatio: 1, emissive: 0.6 },
+    /* A halo, not a fog. The probe radius inflates the surface clear of the
+     * atoms so it reads as a shell around the molecule rather than a sheet in
+     * front of it, and the emissive is well below the sticks' own so the bloom
+     * pass cannot wash them out. */
+    cloud: { alpha: 0.09, emissive: 0.7, probeRadius: 2.4, resolution: 0.5 },
     bloom: {
-      strength: 1.8, radius: 0.65, threshold: 0,
+      strength: 1.3, radius: 0.6, threshold: 0,
       mode: 'emissive', transparency: true
     },
     /* The initial framing is instant. An animated fly-in competes with Mol*'s
@@ -350,6 +365,12 @@
           old.type.params.sizeFactor = LIGAND.stick.sizeFactor;
           old.type.params.aspectRatio = LIGAND.stick.aspectRatio;
           old.type.params.emissive = LIGAND.stick.emissive;
+          old.colorTheme = {
+            name: 'element-symbol',
+            params: {
+              carbonColor: { name: 'uniform', params: { value: LIGAND.carbon } }
+            }
+          };
         });
       });
     });
