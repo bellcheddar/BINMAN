@@ -2,13 +2,13 @@
 title: BINMAN-LM
 emoji: 🗑️
 colorFrom: gray
-colorTo: orange
+colorTo: yellow
 sdk: gradio
 sdk_version: 4.44.0
 app_file: app.py
 pinned: false
 license: apache-2.0
-short_description: Query translation, evidence triage and abstention for the BINMAN atlas
+short_description: "Molecular glue atlas LM: query, triage, abstain"
 ---
 
 # BINMAN-LM

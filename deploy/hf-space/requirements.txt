@@ -1,6 +1,11 @@
-torch==2.4.0
-transformers==4.44.2
-peft==0.12.0
-accelerate==0.33.0
+# ZeroGPU accepts only certain torch builds and rejects the Space at config
+# time otherwise: 2.13.0, 2.12.1, 2.11.0, 2.10.0, 2.9.1, 2.8.0 as of this
+# writing. 2.8.0 is the most conservative of those.
+torch==2.8.0
+# gradio is NOT pinned here on purpose: the Spaces runtime installs the version
+# named by sdk_version in README.md, and pinning it again invites a conflict.
+spaces
+transformers>=4.44,<5
+peft>=0.12,<1
+accelerate>=0.33
 safetensors>=0.4.3
-gradio==4.44.0

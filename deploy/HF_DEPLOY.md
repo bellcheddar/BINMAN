@@ -51,22 +51,32 @@ route and needs doing once.
 
 ## 3. Create and upload both repositories
 
-Once authenticated, these can run unattended:
+The CLI changed in huggingface_hub 2.x: it is `hf repos create`, not
+`hf repo create`, and hardware is settable from the CLI rather than only the
+web UI, so there is no manual step left.
 
 ```bash
-hf repo create binman-lm-adapter --repo-type model
-hf upload Dellboy/binman-lm-adapter models/binman-lm/hf-adapter . --repo-type model
+hf repos create Dellboy/binman-lm-adapter --type model --public
+hf repos create Dellboy/binman-lm --type space --sdk gradio --public
+hf spaces settings Dellboy/binman-lm --hardware zero-a10g
 
-hf repo create binman-lm --repo-type space --space_sdk gradio
 hf upload Dellboy/binman-lm deploy/hf-space . --repo-type space
+hf upload Dellboy/binman-lm-adapter models/binman-lm/hf-adapter . --repo-type model
 ```
 
-Then in the Space settings:
+Three things the Hub rejects that are worth knowing before you hit them:
 
-- **Hardware**: ZeroGPU (the account is PRO, so this is available)
-- **Variable** `BINMAN_ADAPTER_REPO`: only if the repo name differs from
-  `Dellboy/binman-lm-adapter`
-- No `HF_TOKEN` secret is needed while the adapter repository is public
+- **Space card colours** are a fixed list. `orange` is not on it; `yellow` is
+  the nearest to the Depot sodium amber.
+- **`short_description`** is capped at 60 characters, and a colon inside it
+  must be quoted or the YAML front matter fails to parse.
+- **torch must be a ZeroGPU-supported build** (2.8.0 and up at the time of
+  writing). An older pin fails at config time with `CONFIG_ERROR` before the
+  Space ever builds. `gradio` is deliberately absent from `requirements.txt`:
+  the runtime installs the version named by `sdk_version` in the Space card.
+
+Verify with `hf spaces info Dellboy/binman-lm`, which reports the runtime stage
+and any `errorMessage`.
 
 ## 4. What the Space serves
 
