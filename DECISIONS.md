@@ -2488,11 +2488,56 @@ atlas *is*, and spec 1.1 and 5.1 both say "distinct". **Gate: Marc's call.**
 sigma, 5GWO and 5ZCG are the abscisic-acid receptor and PP2C, 7JUR is KSR2 with
 MEK1. All passed the catalogue and all were rejected by the dSASA test.
 
-**And the project cannot currently answer why.** The `bridge` table holds 239,485
-rows and every one of them is `status = 'ok'`: **rejections are not recorded at
-all.** There is no artefact saying which ligand was considered and failed, or on
-which criterion, so "why did 14-3-3 sigma miss" cannot be answered from the
-build's own outputs, only by re-running the geometry by hand. Every other stage
-in this project records its failures. This one records only its successes, which
-is the one shape that cannot be audited, and it is why the 46 are a list of PDB
-codes rather than a list of reasons.
+**Correction, same session.** This entry first said rejections are not recorded
+at all, on the evidence that every one of the `bridge` table's 239,485 rows is
+`status = 'ok'`. That was wrong, and wrong in the direction that flatters the
+finding. `data/interim/halves.jsonl` holds 92 MB of exactly the missing record:
+every half-interface considered, with its dSASA, its contact count and its
+entity, written by `run_bridges` for precisely this purpose. The build does
+record its rejections. What it does not do is **consult them when reporting the
+misses**, which is why the misses arrive as 73 PDB codes rather than 73 reasons.
+The gap is in the reporting, not the recording, and the diagnosis below came
+straight out of that file.
+
+## D-063: the recall miss is one threshold, and it is worth 0.078
+
+**Finding, with the decision left open.** Read out of `halves.jsonl`, the 73
+curated misses decompose cleanly, and the largest controllable cause is a single
+criterion: spec 5.1's floor of **three** heavy-atom contacts under 4.0 A.
+
+| recovered at | recall | n=320 |
+|---|---:|---:|
+| shipped: dSASA >= 25 A2 and contacts >= 3 | 0.7719 | |
+| contacts >= 2 | **0.8250** | +17 entries |
+| contacts >= 1, dSASA alone | **0.8500** | +25 entries |
+
+The floor is 0.85. Relaxing the contact count alone reaches it exactly.
+
+**What the 17 are.** Canonical 14-3-3 glues, among others: 3SML, 3SMM and 3SMO
+(14-3-3 sigma), **3P1O, which is fusicoccin**, plus 3OGK, 4FR3 and eight of the
+8Bxx series. Their geometry is not marginal. In 3SML the ligand buries 628 A2
+against 14-3-3 and 145 A2 against the phosphopeptide; in 3P1O fusicoccin buries
+965 A2 and 139 A2. Both clear the 25 A2 dSASA floor five-fold on the weaker
+side. Both are rejected for making **2** heavy-atom contacts to that second
+chain instead of 3.
+
+So the criterion that rejects them is not measuring whether the ligand touches
+two proteins. It is measuring how many atoms happen to fall inside 4.0 A, and a
+glue that lies flat against a shallow peptide groove buries a lot of surface
+with few close contacts. dSASA and contact count are not two independent checks
+here: the second one is overruling the first on exactly the geometry the module
+exists to find.
+
+**Why this is not being changed now.** Spec 9.6 permits one documented threshold
+adjustment and it is already spent, on the degron geometry thresholds
+(`calibration_date = 2026-10-03`). Relaxing a bridging criterion also has a
+specificity cost that is not yet measured: artefact precision is already under
+its own floor at 0.9391, and admitting 2-contact interfaces can only move it
+down. The honest package for a decision is the recall gain **and** the precision
+cost, measured on the same change, and the second half does not exist yet.
+
+**Also in the decomposition**, from the same file: 20 misses are never ingested
+at all (the homo-oligomeric scope hole, D-062), 7 bridge correctly at the
+shipped thresholds and are missed because their CCD was classed as a cofactor,
+cryoprotectant, detergent or peptide-like, and the remainder never reach a
+qualifying second chain and look like correct rejections.
