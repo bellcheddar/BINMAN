@@ -197,6 +197,46 @@
       });
     }
 
+    /* Headline figures filter the table. Clicking a card pushes its filter onto
+       the stack, clicking it again removes it, so the number above and the rows
+       below always describe the same set. Without this the cards state a count
+       the table cannot be made to show, which is the obvious thing to try. */
+    [].slice.call(document.querySelectorAll('[data-stat-filter]')).forEach(function (card) {
+      var spec;
+      try { spec = JSON.parse(card.getAttribute('data-stat-filter')); } catch (e) { return; }
+      var wanted = [].concat(spec);
+      function matches(f) {
+        return wanted.some(function (w) {
+          return w.field === f.field && w.op === f.op && String(w.value) === String(f.value);
+        });
+      }
+      function sync() {
+        var on = wanted.every(function (w) { return state.filters.some(function (f) {
+          return w.field === f.field && w.op === f.op && String(w.value) === String(f.value); }); });
+        card.setAttribute('aria-pressed', on ? 'true' : 'false');
+        return on;
+      }
+      sync();
+      card.addEventListener('click', function () {
+        if (sync()) {
+          state.filters = state.filters.filter(function (f) { return !matches(f); });
+        } else {
+          wanted.forEach(function (w) {
+            if (!state.filters.some(function (f) { return matches(f); })) { state.filters.push(w); }
+          });
+        }
+        saveStack();
+        renderStack();
+        run();
+        [].slice.call(document.querySelectorAll('[data-stat-filter]')).forEach(function (other) {
+          var s2; try { s2 = [].concat(JSON.parse(other.getAttribute('data-stat-filter'))); } catch (e) { return; }
+          var on2 = s2.every(function (w) { return state.filters.some(function (f) {
+            return w.field === f.field && w.op === f.op && String(w.value) === String(f.value); }); });
+          other.setAttribute('aria-pressed', on2 ? 'true' : 'false');
+        });
+      });
+    });
+
     var clearButton = document.getElementById('stack-clear');
     if (clearButton) {
       clearButton.addEventListener('click', function () {

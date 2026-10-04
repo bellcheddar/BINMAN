@@ -1,46 +1,46 @@
 {
-  "generated_at": "2026-10-04T16:05:13Z",
-  "base_url": "http://127.0.0.1:8800",
+  "generated_at": "2026-10-04T16:21:19Z",
+  "base_url": "http://127.0.0.1:8802",
   "browser": "system Google Chrome via playwright channel=chrome",
   "pages": {
     "atlas.light.desktop": {
       "status": 200,
-      "load_ms": 1345,
+      "load_ms": 1331,
       "screenshot": "qc/screenshots/atlas.light.desktop.png"
     },
     "degron.light.desktop": {
       "status": 200,
-      "load_ms": 686,
+      "load_ms": 664,
       "screenshot": "qc/screenshots/degron.light.desktop.png"
     },
     "e3.light.desktop": {
       "status": 200,
-      "load_ms": 632,
+      "load_ms": 623,
       "screenshot": "qc/screenshots/e3.light.desktop.png"
     },
     "degradability.light.desktop": {
       "status": 200,
-      "load_ms": 638,
+      "load_ms": 623,
       "screenshot": "qc/screenshots/degradability.light.desktop.png"
     },
     "lens.light.desktop": {
       "status": 200,
-      "load_ms": 623,
+      "load_ms": 627,
       "screenshot": "qc/screenshots/lens.light.desktop.png"
     },
     "about.light.desktop": {
       "status": 200,
-      "load_ms": 1058,
+      "load_ms": 999,
       "screenshot": "qc/screenshots/about.light.desktop.png"
     },
     "atlas.light.phone": {
       "status": 200,
-      "load_ms": 1297,
+      "load_ms": 1268,
       "screenshot": "qc/screenshots/atlas.light.phone.png"
     },
     "degron.light.phone": {
       "status": 200,
-      "load_ms": 679,
+      "load_ms": 669,
       "screenshot": "qc/screenshots/degron.light.phone.png"
     },
     "e3.light.phone": {
@@ -50,62 +50,62 @@
     },
     "degradability.light.phone": {
       "status": 200,
-      "load_ms": 617,
+      "load_ms": 619,
       "screenshot": "qc/screenshots/degradability.light.phone.png"
     },
     "lens.light.phone": {
       "status": 200,
-      "load_ms": 628,
+      "load_ms": 630,
       "screenshot": "qc/screenshots/lens.light.phone.png"
     },
     "about.light.phone": {
       "status": 200,
-      "load_ms": 1675,
+      "load_ms": 1025,
       "screenshot": "qc/screenshots/about.light.phone.png"
     },
     "atlas.dark.desktop": {
       "status": 200,
-      "load_ms": 1311,
+      "load_ms": 1265,
       "screenshot": "qc/screenshots/atlas.dark.desktop.png"
     },
     "degron.dark.desktop": {
       "status": 200,
-      "load_ms": 687,
+      "load_ms": 662,
       "screenshot": "qc/screenshots/degron.dark.desktop.png"
     },
     "e3.dark.desktop": {
       "status": 200,
-      "load_ms": 618,
+      "load_ms": 616,
       "screenshot": "qc/screenshots/e3.dark.desktop.png"
     },
     "degradability.dark.desktop": {
       "status": 200,
-      "load_ms": 644,
+      "load_ms": 625,
       "screenshot": "qc/screenshots/degradability.dark.desktop.png"
     },
     "lens.dark.desktop": {
       "status": 200,
-      "load_ms": 616,
+      "load_ms": 612,
       "screenshot": "qc/screenshots/lens.dark.desktop.png"
     },
     "about.dark.desktop": {
       "status": 200,
-      "load_ms": 1351,
+      "load_ms": 1066,
       "screenshot": "qc/screenshots/about.dark.desktop.png"
     },
     "atlas.dark.phone": {
       "status": 200,
-      "load_ms": 1277,
+      "load_ms": 1308,
       "screenshot": "qc/screenshots/atlas.dark.phone.png"
     },
     "degron.dark.phone": {
       "status": 200,
-      "load_ms": 686,
+      "load_ms": 661,
       "screenshot": "qc/screenshots/degron.dark.phone.png"
     },
     "e3.dark.phone": {
       "status": 200,
-      "load_ms": 619,
+      "load_ms": 620,
       "screenshot": "qc/screenshots/e3.dark.phone.png"
     },
     "degradability.dark.phone": {
@@ -115,12 +115,12 @@
     },
     "lens.dark.phone": {
       "status": 200,
-      "load_ms": 631,
+      "load_ms": 626,
       "screenshot": "qc/screenshots/lens.dark.phone.png"
     },
     "about.dark.phone": {
       "status": 200,
-      "load_ms": 1146,
+      "load_ms": 987,
       "screenshot": "qc/screenshots/about.dark.phone.png"
     }
   },
@@ -128,40 +128,40 @@
   "axe_violations": [],
   "performance": {
     "atlas": {
-      "light.desktop_ms": 1345,
-      "light.phone_ms": 1297,
-      "dark.desktop_ms": 1311,
-      "dark.phone_ms": 1277
+      "light.desktop_ms": 1331,
+      "light.phone_ms": 1268,
+      "dark.desktop_ms": 1265,
+      "dark.phone_ms": 1308
     },
     "degron": {
-      "light.desktop_ms": 686,
-      "light.phone_ms": 679,
-      "dark.desktop_ms": 687,
-      "dark.phone_ms": 686
+      "light.desktop_ms": 664,
+      "light.phone_ms": 669,
+      "dark.desktop_ms": 662,
+      "dark.phone_ms": 661
     },
     "e3": {
-      "light.desktop_ms": 632,
+      "light.desktop_ms": 623,
       "light.phone_ms": 622,
-      "dark.desktop_ms": 618,
-      "dark.phone_ms": 619
+      "dark.desktop_ms": 616,
+      "dark.phone_ms": 620
     },
     "degradability": {
-      "light.desktop_ms": 638,
-      "light.phone_ms": 617,
-      "dark.desktop_ms": 644,
+      "light.desktop_ms": 623,
+      "light.phone_ms": 619,
+      "dark.desktop_ms": 625,
       "dark.phone_ms": 615
     },
     "lens": {
-      "light.desktop_ms": 623,
-      "light.phone_ms": 628,
-      "dark.desktop_ms": 616,
-      "dark.phone_ms": 631
+      "light.desktop_ms": 627,
+      "light.phone_ms": 630,
+      "dark.desktop_ms": 612,
+      "dark.phone_ms": 626
     },
     "about": {
-      "light.desktop_ms": 1058,
-      "light.phone_ms": 1675,
-      "dark.desktop_ms": 1351,
-      "dark.phone_ms": 1146
+      "light.desktop_ms": 999,
+      "light.phone_ms": 1025,
+      "dark.desktop_ms": 1066,
+      "dark.phone_ms": 987
     }
   },
   "selection_propagation": {
@@ -179,7 +179,7 @@
     "pages_captured": 24,
     "console_errors": 0,
     "axe_serious_or_critical": 0,
-    "slowest_page_ms": 1675,
+    "slowest_page_ms": 1331,
     "passes": true
   }
 }

@@ -2,34 +2,14 @@
 {% set record_count_key = 'degron' %}
 
 {% block module_panels %}
-<div class="notice">
-  <strong>Two scores, two questions.</strong> Both are shown; neither replaces
-  the other.
-  <table style="margin:0.6rem 0 0.4rem;border-collapse:collapse;font-size:0.92em">
-    <tr>
-      <td style="padding:0.2rem 0.9rem 0.2rem 0;vertical-align:top">
-        <code>degron_geometry_score</code></td>
-      <td style="padding:0.2rem 0">
-        hairpin geometry. Measured against the Sievers screen at
-        <strong>AUC 0.44</strong>, below chance: a C2H2 zinc finger
-        <em>is</em> a hairpin with an exposed glycine, so this largely detects
-        the fold. A hypothesis generator, not a classifier.</td>
-    </tr>
-    <tr>
-      <td style="padding:0.2rem 0.9rem 0.2rem 0;vertical-align:top">
-        <code>imid_degradation_score</code></td>
-      <td style="padding:0.2rem 0">
-        predicted probability of degradation by <strong>pomalidomide</strong>.
-        Nested held-out <strong>AUC 0.830</strong>, sensitivity 0.867 at
-        specificity 0.613, which clears the spec 9.2 floors.
-        Empty for 17,067 of 21,717 rows by design: those carry no zinc finger.</td>
-    </tr>
-  </table>
-  Degradability is compound-specific, which is a finding rather than a
-  limitation: the same features predict lenalidomide well and the promiscuous
-  analogs barely at all. Contingency tables and the threshold sweep are on the
-  <a href="/about/#validation">About tab</a>.
-</div>
+<p class="caveat">
+  <code>degron_geometry_score</code> ranks hairpin geometry and scores
+  <strong>below chance</strong> against a matched screen, so it generates
+  hypotheses rather than triaging. <code>imid_degradation_score</code> predicts
+  degradation by pomalidomide and clears the spec floors, and is empty where a
+  candidate carries no zinc finger.
+  <a href="/about/#validation">How both were measured</a>.
+</p>
 
 {% endblock %}
 

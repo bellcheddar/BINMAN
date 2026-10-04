@@ -1857,3 +1857,40 @@ exact-match count that read `== "not determined"`, which made one unknown
 licence read as zero; both the counter and the UI pill now match on the prefix.
 
 **Still open.** Making the metric cards filter the lists.
+
+## D-051: headline figures filter the table, and deploys stopped being invisible
+
+**Decision.** Each headline stat that can be expressed as a filter is a button
+that applies it. The brand subtitle is the backronym. The degron page's
+121-word notice is one caveat line. App CSS and JS revalidate instead of
+sitting in a browser cache for an hour.
+
+**The cards.** Stating a number the table cannot be made to show is a dead end:
+clicking the figure is the obvious thing to try. Each card now carries the
+predicate it was counted with, toggles on and off, and shows its state through
+`aria-pressed`. Verified against the live API, card against filter: glue
+candidates 24,204, balanced glues 10,579, symmetry mediated 28,780, novel
+bridges 14,260, all exact.
+
+**Furniture has no filter and stays a plain figure.** It is counted through a
+join on `ligand.is_furniture`, which is not a bridge field. The obvious
+substitute, `evidence_class = furniture`, returns **zero**, because that column
+is NULL throughout. A card whose filter shows a different number from the card
+is worse than one that does not click, so it does not click.
+
+**Rotation was a stale cache, and that was a deployment defect.** Dragging the
+viewer in a fresh browser rotates it. `/static/` was served with
+`max-age=3600`, so every deploy was invisible for up to an hour to anyone who
+had already loaded the page: the CSS fix for the overlay shipped and the
+reporter still saw the old behaviour. App CSS and JS now send `no-cache`, which
+means revalidate rather than do not store, so the ETag still saves the
+transfer. Vendored libraries keep `immutable`, because they are version-pinned.
+
+One hard refresh is still needed to clear what a browser already holds; after
+that a deploy is visible immediately.
+
+**The notice boxes.** A full-width box at the top of every page turns the
+caveat into furniture people stop reading. The degron page's two boxes had
+already become one 121-word table; it is now a one-line caveat beside the data
+with a link to the About tab, where the contingency tables and sweeps already
+live.

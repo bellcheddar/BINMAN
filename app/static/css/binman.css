@@ -162,7 +162,31 @@ code, kbd, samp, .mono { font-family: var(--data); font-size: 0.86em; }
   font-family: var(--display); font-weight: 700; font-size: 1.05rem;
   text-transform: uppercase; letter-spacing: 0.1em;
 }
-.brand__sub { color: var(--muted); font-size: 0.72rem; letter-spacing: 0.04em; }
+.brand__sub { color: var(--muted); font-size: 0.68rem; letter-spacing: 0.02em; }
+
+/* A stat that carries a filter is a real button: it has to look pressable and
+   keep the same box as a plain stat so the row does not jump. */
+/* A one-line caveat under a page blurb. A full notice box at the top of every
+   page turns the caveat into furniture people stop reading; this keeps the
+   warning adjacent to the data and sends the detail to the About tab. */
+.caveat {
+  max-width: 72ch; margin: 0 0 1rem; color: var(--muted);
+  font-size: 0.84rem; line-height: 1.45;
+  border-left: 2px solid var(--line); padding-left: 0.7rem;
+}
+.caveat code { font-size: 0.95em; }
+
+.stat--action {
+  cursor: pointer; text-align: left; font: inherit;
+  display: flex; flex-direction: column; gap: 0.1rem;
+  transition: border-color 0.12s ease, background 0.12s ease;
+}
+.stat--action:hover, .stat--action:focus-visible {
+  border-color: var(--accent); background: var(--accent-soft);
+}
+.stat--action[aria-pressed="true"] {
+  border-color: var(--accent); background: var(--accent-soft);
+}
 
 .app-nav { display: flex; gap: 0.15rem; flex-wrap: wrap; }
 .app-nav a {

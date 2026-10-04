@@ -48,14 +48,25 @@ def _headline_stats() -> list[dict]:
         "SELECT COUNT(*) FROM bridge WHERE status = 'ok' AND bridging_balance >= 0.5 "
         "AND ccd_class = 'glue_candidate'"
     )
+    # `filter` makes a card clickable: it applies exactly the predicate the
+    # figure was counted with, so the number above and the rows below describe
+    # the same set. A card without one is a plain figure, because "bridges" and
+    # "entries" are the unfiltered total and filtering to them is a no-op.
     return [
         {"label": "bridges", "value": total, "tone": ""},
         {"label": "entries", "value": entries, "tone": ""},
-        {"label": "glue candidates", "value": glue, "tone": "good"},
+        {"label": "glue candidates", "value": glue, "tone": "good",
+         "filter": {"field": "ccd_class", "op": "eq", "value": "glue_candidate"}},
         {"label": "balanced glues", "value": balanced, "tone": "good",
-         "note": "balance ≥ 0.5"},
+         "note": "balance ≥ 0.5",
+         "filter": [{"field": "ccd_class", "op": "eq", "value": "glue_candidate"},
+                    {"field": "bridging_balance", "op": "gte", "value": 0.5}]},
+        # No filter: furniture is counted through a join on ligand.is_furniture,
+        # which is not a bridge field. A card whose filter shows a different
+        # number from the card is worse than a card that does not click.
         {"label": "furniture", "value": furniture, "tone": "warn"},
-        {"label": "symmetry mediated", "value": symmetry, "tone": "warn"},
+        {"label": "symmetry mediated", "value": symmetry, "tone": "warn",
+         "filter": {"field": "symmetry_mediated", "op": "eq", "value": 1}},
         {"label": "novel bridges", "value": novel, "tone": "bad",
-         "note": "not determinable until a curated glue database resolves"},
+         "filter": {"field": "novel_bridge", "op": "eq", "value": 1}},
     ]
