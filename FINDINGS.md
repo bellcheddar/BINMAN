@@ -292,6 +292,29 @@ specificity 0.60 together. The best operating point trades almost all
 sensitivity for specificity: 0.344 and 0.870. Gate G6 stays open and the module
 keeps its label.
 
+Three routes were tried and they converge on the same ceiling:
+
+| approach | AUC | note |
+|---|---|---|
+| geometry alone (shipped score) | 0.441 | below chance |
+| sequence, classifying the 32 FDR-significant labels | **0.636** (sd 0.082) | best |
+| sequence, regressing on continuous fold depletion | 0.605 (sd 0.124) | worse, and noisier |
+| sequence plus the geometry score as a feature | 0.638 (sd 0.085) | adds nothing |
+| permutation null | 0.515 | p95 0.610 |
+
+The regression result is worth stating because it is counter-intuitive. The
+binary labels use 32 of 5,663 domains and the continuous depletion uses all of
+them, so the regression should have more to learn from. It does worse. Most
+domains sit at noise around a fold depletion of 1.0, and the FDR labels have
+already done the statistical work of separating signal from that noise;
+regressing on the raw values mostly fits the noise.
+
+Adding the geometry score to the sequence features moves the AUC by 0.0015,
+which is a fifth of a standard deviation. A score that ranks at chance
+contributes nothing even as one feature among 184, which is the cleanest
+statement of D-024 available: the geometry is not weakly informative, it is
+uninformative.
+
 Why this is the honest ceiling for now: the classic IMiD G-loop is necessary
 and not sufficient, and the counterexamples are not subtle. IKZF3 reads
 `FQCNQC-G-ASF` and is degraded. ZFP30 reads `YECKEC-G-KAF` and is not. ZN184

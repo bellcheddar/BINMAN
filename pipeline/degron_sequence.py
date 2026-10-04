@@ -201,6 +201,77 @@ def out_of_fold_operating_points(features, labels, genes,
             "n_positive": n_pos, "n_negative": n_neg}
 
 
+def fold_depletion_targets() -> dict[tuple[str, int, int], float]:
+    """Mean fold depletion per zinc finger, straight from Sievers data file S2.
+
+    The binary labels throw most of the screen away: 32 positives out of 5,663,
+    when the experiment measured a continuous depletion for every domain across
+    three drugs and three replicates. Regressing on that signal and then ranking
+    by the prediction uses the whole experiment, and the binary labels are kept
+    only to score the ranking.
+    """
+    import statistics
+
+    import openpyxl
+
+    path = VALIDATION / "raw" / "aat0572_sievers_data-file-s2.xlsx"
+    if not path.exists():
+        return {}
+    workbook = openpyxl.load_workbook(path, read_only=True, data_only=True)
+    sheet = workbook["Folddepletion"]
+    stream = sheet.iter_rows(values_only=True)
+    header = list(next(stream))
+    index = {name: position for position, name in enumerate(header)}
+
+    targets: dict[tuple[str, int, int], float] = {}
+    for row in stream:
+        if not row or not row[index["Gene"]]:
+            continue
+        replicates = [row[index[f"{drug}.REP{n}"]]
+                      for drug in ("THAL", "LEN", "POM") for n in (1, 2, 3)
+                      if f"{drug}.REP{n}" in index]
+        replicates = [v for v in replicates if isinstance(v, (int, float))]
+        if not replicates:
+            continue
+        key = (str(row[index["Gene"]]), int(row[index["AA.Start"]]),
+               int(row[index["AA.Stop"]]))
+        # The mean across drugs and replicates, not the max: the max is the
+        # noisiest statistic in the table and would chase single bad wells.
+        targets[key] = float(statistics.mean(replicates))
+    return targets
+
+
+def evaluate_regression(features, labels, genes, keys, targets,
+                        repeats: int = 25, seed: int = 20261004):
+    """Fit on continuous depletion, score the ranking against the binary labels."""
+    import numpy as np
+    from sklearn.linear_model import Ridge
+    from sklearn.metrics import roc_auc_score
+    from sklearn.model_selection import StratifiedGroupKFold
+
+    depletion = np.asarray([targets.get(k, np.nan) for k in keys], dtype=float)
+    usable = ~np.isnan(depletion)
+    if usable.sum() < 100:
+        return np.asarray([]), int(usable.sum())
+
+    features, labels = features[usable], labels[usable]
+    genes = [g for g, keep in zip(genes, usable) if keep]
+    depletion = depletion[usable]
+
+    scores = []
+    for repeat in range(repeats):
+        splitter = StratifiedGroupKFold(n_splits=4, shuffle=True,
+                                        random_state=seed + repeat)
+        for train_index, test_index in splitter.split(features, labels, groups=genes):
+            if labels[test_index].sum() == 0:
+                continue
+            model = Ridge(alpha=50.0)
+            model.fit(features[train_index], depletion[train_index])
+            predicted = model.predict(features[test_index])
+            scores.append(roc_auc_score(labels[test_index], predicted))
+    return np.asarray(scores), int(usable.sum())
+
+
 def run(repeats: int = 25, permutations: int = 200) -> dict:
     path = VALIDATION / "sievers_zf_screen.tsv"
     if not path.exists():
@@ -213,6 +284,13 @@ def run(repeats: int = 25, permutations: int = 200) -> dict:
 
     features, labels, genes, columns, kept = featurise(rows)
     scores = evaluate(features, labels, genes, repeats=repeats)
+
+    # The same features, fitted to the continuous depletion instead of the
+    # 32 binary positives.
+    targets = fold_depletion_targets()
+    keys = [(r["gene"], int(r["zf_start"]), int(r["zf_stop"])) for r in kept]
+    regression_scores, n_with_target = evaluate_regression(
+        features, labels, genes, keys, targets, repeats=repeats)
 
     null = permutation_null(features, labels, genes, rounds=permutations)
     observed = float(scores.mean()) if len(scores) else float("nan")
@@ -229,6 +307,18 @@ def run(repeats: int = 25, permutations: int = 200) -> dict:
         "auc_min": round(float(scores.min()), 4) if len(scores) else None,
         "auc_max": round(float(scores.max()), 4) if len(scores) else None,
         "geometry_auc_for_comparison": 0.4407,
+        "regression_on_fold_depletion": {
+            "n_domains_with_a_depletion_value": n_with_target,
+            "splits_scored": int(len(regression_scores)),
+            "auc_mean": (round(float(regression_scores.mean()), 4)
+                         if len(regression_scores) else None),
+            "auc_std": (round(float(regression_scores.std()), 4)
+                        if len(regression_scores) else None),
+            "note": ("Ridge on the mean fold depletion across three drugs and "
+                     "three replicates, ranked and scored against the binary "
+                     "labels. Uses the whole experiment rather than its 32 "
+                     "significant calls."),
+        },
         "permutation_null": null,
         "operating_points": out_of_fold_operating_points(features, labels, genes),
         "beats_null_by_sd": (

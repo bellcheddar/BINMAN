@@ -15,3 +15,6 @@
 [08:56:09] EVAL round09-32layers-rank32
 [09:01:20] EVALUATED round09-32layers-rank32
 [09:01:20] === round 09 finished ===
+[09:40:00] === round12-32b: measuring 32B throughput before committing ===
+[09:40:20] throughput: 24.40 iters/min on mlx-community/Qwen2.5-32B-Instruct-4bit
+[09:40:20] round12-32b budget: 4636 iterations (~190 min)

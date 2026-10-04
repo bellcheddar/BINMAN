@@ -568,3 +568,8 @@ One line per meaningful event, timestamped UTC (spec Section 0 rule 5).
 | 2026-10-04T13:14:31+00:00 | 9 | Validation run against binman.sqlite: 0 metric(s) not computed (dataset unavailable), 2 measured floor(s) missed. |
 | 2026-10-04T13:14:32+00:00 | 9 | Validation run against binman.sqlite: 4 metric(s) not computed (dataset unavailable), 5 measured floor(s) missed. |
 | 2026-10-04T13:14:49+00:00 | 4.1b | About tab generated: 52 references, 11/13 datasets resolved, worked example selected, 2 value(s) not recorded. |
+| 2026-10-04T13:40:22+00:00 | 3.7 | SFT corpus assembled: 28,304 train (oversampling {'task_a': 2, 'task_c': 4}), task mix abstain 11%, query 34%, triage 55% |
+| 2026-10-04T13:40:22+00:00 | 3.7 | Stage 1 LoRA SFT starting: 28,304 train / 2,386 valid examples, rank 8, 32 layers, lr 1e-05, batch 1, 4636 iterations. |
+| 2026-10-04T13:41:48+00:00 | 5.2 | Sequence model over 5,663 zinc fingers: held-out AUC 0.6363 (sd 0.0822) against the geometry's 0.4407. |
+| 2026-10-04T13:43:00+00:00 | 9 | Validation run against binman.sqlite: 0 metric(s) not computed (dataset unavailable), 2 measured floor(s) missed. |
+| 2026-10-04T13:43:01+00:00 | 9 | Validation run against binman.sqlite: 4 metric(s) not computed (dataset unavailable), 5 measured floor(s) missed. |

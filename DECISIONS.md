@@ -1418,3 +1418,41 @@ and round 07 does not, which is worth watching if more cases appear.
 **Reversal.** The diagnostic GPU endpoint stays, and so does the CPU fallback
 in `_device_and_dtype`, because neither costs anything and both are now
 correct rather than load-bearing.
+
+## D-042: three routes to the degron AUC, one ceiling at 0.64
+
+**Decision.** The degron ceiling is reported as measured and the module is not
+re-based. Gate G6 stays open.
+
+**What was tried, beyond D-039's classifier.**
+
+| approach | AUC | sd |
+|---|---|---|
+| geometry alone, the shipped score | 0.441 | — |
+| sequence, classifying the 32 FDR-significant labels | **0.636** | 0.082 |
+| sequence, regressing on continuous fold depletion | 0.605 | 0.124 |
+| sequence plus geometry as a feature | 0.638 | 0.085 |
+| permutation null | 0.515 | p95 0.610 |
+
+**The regression result is the informative one.** It should have won: the
+binary labels use 32 of 5,663 domains where the continuous depletion uses all
+of them, across three drugs and three replicates. It loses, and with half again
+the variance. Most domains sit at noise around a fold depletion of 1.0, and the
+FDR labels have already separated signal from that noise. Regressing on the raw
+values mostly fits the noise, so more data was less information.
+
+**Geometry contributes nothing even as a feature.** Adding it to 184 sequence
+columns moves the AUC by 0.0015, a fifth of one standard deviation. That is a
+stronger statement of D-024 than the original: the geometry is not weakly
+informative about degradability, it is uninformative, and it survives in the
+atlas only as a descriptor of the C2H2 fold.
+
+**Where the remaining signal is.** Not in the substrate. The G-loop is
+necessary and not sufficient, and the counterexamples differ by one or two
+residues. What separates IKZF3 from ZFP30 is how each sits against the CRBN
+surface, which is a ternary-complex calculation. Any further gain needs that,
+or needs the matched screen to grow well beyond 32 positives.
+
+**Reversal.** `pipeline/degron_sequence.py` holds the matched set, the feature
+builder, the grouped splitter and the permutation null. A CRBN-interface
+feature drops into it as another column.
