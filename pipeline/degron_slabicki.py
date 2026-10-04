@@ -159,7 +159,8 @@ def featurise(names, sequence, width: int = 23):
     return np.asarray(matrix, dtype=float).T, [n for n, _f, _s in kept], columns
 
 
-def nested_evaluate(features, labels, genes, seed: int = 20261004):
+def nested_evaluate(features, labels, genes, seed: int = 20261004,
+                    objective: str = "youden", spec_floor: float = 0.60):
     """Outer folds score a threshold chosen on inner folds only.
 
     This is what D-046 could not do. The cut is selected by Youden's J on an
@@ -188,15 +189,28 @@ def nested_evaluate(features, labels, genes, seed: int = 20261004):
         inner_scores = np.asarray(inner_scores)
         inner_truth = np.asarray(inner_truth)
 
-        # Choose the cut on the inner predictions only.
-        cut, best_j = 0.0, -1.0
+        # Choose the cut on the inner predictions only. Two objectives:
+        #
+        #   youden    maximise sensitivity + specificity, the usual default
+        #   floors    maximise sensitivity subject to specificity >= the spec
+        #             floor, which is what spec 9.2 actually asks for
+        #
+        # Youden spends the budget symmetrically and leaves specificity well
+        # above its floor while sensitivity sits below its own. The objective
+        # should match the acceptance criterion, and the criterion is fixed by
+        # the spec rather than chosen after seeing a result.
         pos, neg = inner_truth.sum(), (1 - inner_truth).sum()
+        cut, best = 0.0, -1.0
         for candidate in np.unique(inner_scores):
             called = inner_scores >= candidate
-            j = ((called & (inner_truth == 1)).sum() / pos
-                 - (called & (inner_truth == 0)).sum() / neg)
-            if j > best_j:
-                cut, best_j = float(candidate), float(j)
+            sensitivity = (called & (inner_truth == 1)).sum() / pos
+            specificity = ((~called) & (inner_truth == 0)).sum() / neg
+            if objective == "floors":
+                score = sensitivity if specificity >= spec_floor else -1.0
+            else:
+                score = sensitivity + specificity - 1.0
+            if score > best:
+                cut, best = float(candidate), float(score)
 
         model = LogisticRegression(C=0.05, max_iter=5000,
                                    class_weight="balanced", solver="liblinear")

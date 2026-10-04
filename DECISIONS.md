@@ -1705,3 +1705,51 @@ conclusion it proves, and it is the most useful thing the larger screen gave.
 directly, by ranking compounds on breadth against predictability. They are in
 the paper and not in the distributed file. The lead contact offers reanalysis
 data on request, which is a human-to-human ask rather than a download.
+
+## D-048: the threshold objective was wrong, and the grammar transfers
+
+**Decision.** Pomalidomide and lenalidomide **clear both spec 9.2 floors** under
+nested validation when the threshold is chosen with the objective the spec
+states. Gate G6 remains open on whether to re-base the shipped module, which is
+Marc's call, but the metric now has a validated operating point.
+
+**The method error.** D-047 withdrew D-046's floor claim because the nested cut
+gave sensitivity 0.600. That cut was chosen by Youden's J, which maximises
+sensitivity plus specificity symmetrically. Spec 9.2 asks for something
+asymmetric: sensitivity at least 0.70 **subject to** specificity at least 0.60.
+Youden left specificity at 0.691, nine points of unspent slack, while
+sensitivity sat below its floor. Selecting the inner-fold cut against the spec's
+own criterion:
+
+| compound | Youden | spec 9.2 objective |
+|---|---|---|
+| pomalidomide | 0.600 / 0.691, fails | **0.800 / 0.614, passes** |
+| lenalidomide | 0.500 / 0.803, fails | **0.800 / 0.612, passes** |
+
+AUC is unchanged at 0.832 and 0.820, because no threshold can move it.
+
+**Why this is not tuning to a result.** The criterion is in the spec and
+predates the project. The threshold is still chosen on inner folds the outer
+fold never sees. Both objectives are reported, because the second was adopted
+after seeing the first and that flexibility should be visible. What changed is
+that the selection rule now matches the acceptance rule; using Youden was a
+default, not a decision.
+
+**Independent validation.** A model trained only on the Slabicki ALV1 degrome
+predicts the Sievers pomalidomide degrome at **AUC 0.757**, and lenalidomide at
+0.757, with no shared rows, a different laboratory, a different library design
+and a different reporter construct. That is the strongest evidence in this
+investigation that the degron grammar is real rather than an artefact of one
+screen's structure.
+
+ALV1 transfers to another screen better than it fits its own, which is only
+contradictory on the surface: its 316 positives carry a promiscuous tail that
+is hard to fit, while the core grammar it learns is what the selective
+compounds use. 4-Ac-Phe-Glm transfers at 0.436, consistent with a different
+substrate set rather than a failure of the method.
+
+**What remains open.** The shipped `degron_geometry_score` is still the
+geometry, which is uninformative (D-042). Replacing it with a compound-specific
+sequence model would mean the atlas column answers "degraded by pomalidomide"
+rather than "has degron geometry", which is a different and better question but
+also a different column. That is Gate G6.

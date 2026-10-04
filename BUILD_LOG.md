@@ -590,3 +590,5 @@ One line per meaningful event, timestamped UTC (spec Section 0 rule 5).
 | 2026-10-04T15:25:24+00:00 | 5.2 | Ace.4.Ph.Glu.Amide: nested AUC 0.5352, sensitivity 0.4076, specificity 0.6447 on 147 positives. |
 | 2026-10-04T15:27:05+00:00 | 9 | Validation run against binman.sqlite: 0 metric(s) not computed (dataset unavailable), 2 measured floor(s) missed. |
 | 2026-10-04T15:27:06+00:00 | 9 | Validation run against binman.sqlite: 4 metric(s) not computed (dataset unavailable), 5 measured floor(s) missed. |
+| 2026-10-04T15:37:49+00:00 | 9 | Validation run against binman.sqlite: 0 metric(s) not computed (dataset unavailable), 2 measured floor(s) missed. |
+| 2026-10-04T15:37:50+00:00 | 9 | Validation run against binman.sqlite: 4 metric(s) not computed (dataset unavailable), 5 measured floor(s) missed. |
