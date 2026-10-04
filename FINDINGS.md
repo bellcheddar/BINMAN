@@ -346,14 +346,22 @@ Fitting one model per compound, same features and same grouped evaluation:
 sensitivity 0.857 and specificity 0.600 that satisfies both spec 9.2 floors
 together. The shipped geometry reaches 0.656 and 0.353 and no cut clears both.
 
-**Two caveats, because 14 positives is not many.**
+**The operating points above did not survive nested validation, and the
+discrimination did.** The caveat flagged when they were first reported was the
+right one. Choosing the cut on an inner split and measuring it on an outer fold
+the model and the threshold have both never seen:
 
-The AUC is threshold-free and is the number to trust. The operating points are
-optimistic: every prediction is out-of-fold, so no model scored a gene it was
-trained on, but the **cut** is chosen by scanning those same held-out
-predictions. A genuinely held-out threshold needs nested cross-validation, and
-8 to 14 positives cannot support it. Read "clears the floors" as "a cut exists
-that clears the floors", not as a validated operating point.
+| | non-nested | **nested** |
+|---|---|---|
+| pomalidomide AUC | 0.826 | **0.832** |
+| pomalidomide sensitivity | 0.857 | **0.600** |
+| pomalidomide specificity | 0.600 | 0.691 |
+| clears both 9.2 floors | yes | **no** |
+
+The AUC holds, so the discrimination is real. The operating point does not, so
+**no compound yields a validated threshold clearing both floors**. Gate G6
+stays open on the measurement that survives scrutiny rather than the one that
+flattered.
 
 Lenalidomide clears the null by 1.98 standard deviations and CC-220 by 1.70,
 which is weak. Pomalidomide at 2.91 is the only one comfortably clear.
@@ -363,6 +371,36 @@ project had been asking a question with no answer. That is a result about the
 biology rather than about the model, and it is consistent with the direction
 the field has taken: the 2025 Molecular Cell screen exists precisely because
 subtle changes to the glutarimide reprogram degron selectivity.
+
+### The 2025 screen: more data, and the signal disappears
+
+The study spec 9.2 actually named, Slabicki et al. 2025 Molecular Cell
+(10.1016/j.molcel.2025.07.019), is a 9,097-reporter library against 29
+glutarimide analogs. Its primary-screen table is **truncated at 65,535 rows**,
+the legacy Excel limit, so 2 compounds survive in the distributed file. Those
+two still give 257 and 316 positives after Benjamini-Hochberg correction,
+against pomalidomide's 14, which is finally enough for nested validation.
+
+| compound | source | degraded | nested AUC |
+|---|---|---:|---:|
+| pomalidomide | Sievers | 14 (0.2%) | **0.832** |
+| lenalidomide | Sievers | 8 (0.1%) | **0.820** |
+| ALV1 | Slabicki | 316 (4.3%) | 0.565 |
+| 4-Ac-Phe-Glm | Slabicki | 257 (2.8%) | 0.535 |
+
+The labels are not the problem: ALV1's positives include IKZF1, IKZF3, SALL4,
+ZFP91, PATZ1, ZNF276 and ZNF653, which are the canonical neosubstrates. Nor is
+the encoding: these are 58-residue tandem constructs and 5,201 of 9,097 carry
+two C2H2 motifs, so both fingers are encoded separately, which lifted the AUC
+by about 0.02 and no more.
+
+**The pattern that fits is promiscuity.** The two compounds where sequence
+predicts degradation degrade 0.1% and 0.2% of the library. The two where it
+does not degrade 2.8% and 4.3%, twenty times as many. A selective degrader
+picks substrates by a readable sequence feature; a promiscuous one appears not
+to, and what decides its substrate set is something this encoding does not see.
+That is a hypothesis the data supports rather than a conclusion it proves, and
+it is the most useful thing the larger screen contributed.
 
 ### The calibration history, which stands
 

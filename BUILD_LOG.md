@@ -584,3 +584,9 @@ One line per meaningful event, timestamped UTC (spec Section 0 rule 5).
 | 2026-10-04T15:11:37+00:00 | 5.2 | Sequence model over 5,663 zinc fingers: held-out AUC 0.6363 (sd 0.0822) against the geometry's 0.4407. |
 | 2026-10-04T15:12:17+00:00 | 9 | Validation run against binman.sqlite: 0 metric(s) not computed (dataset unavailable), 2 measured floor(s) missed. |
 | 2026-10-04T15:12:18+00:00 | 9 | Validation run against binman.sqlite: 4 metric(s) not computed (dataset unavailable), 5 measured floor(s) missed. |
+| 2026-10-04T15:24:37+00:00 | 5.2 | ALV1: nested AUC 0.5566, sensitivity 0.3777, specificity 0.6873 on 212 positives. |
+| 2026-10-04T15:24:38+00:00 | 5.2 | Ace.4.Ph.Glu.Amide: nested AUC 0.5098, sensitivity 0.4078, specificity 0.6317 on 147 positives. |
+| 2026-10-04T15:25:23+00:00 | 5.2 | ALV1: nested AUC 0.5648, sensitivity 0.5430, specificity 0.5296 on 212 positives. |
+| 2026-10-04T15:25:24+00:00 | 5.2 | Ace.4.Ph.Glu.Amide: nested AUC 0.5352, sensitivity 0.4076, specificity 0.6447 on 147 positives. |
+| 2026-10-04T15:27:05+00:00 | 9 | Validation run against binman.sqlite: 0 metric(s) not computed (dataset unavailable), 2 measured floor(s) missed. |
+| 2026-10-04T15:27:06+00:00 | 9 | Validation run against binman.sqlite: 4 metric(s) not computed (dataset unavailable), 5 measured floor(s) missed. |

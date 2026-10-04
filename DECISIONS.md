@@ -1654,3 +1654,54 @@ hand download like the Sievers files did.
 
 **Reversal.** `pipeline/degron_sequence.py` now computes the per-compound
 result as part of its normal run, so adding a screen means adding labels.
+
+## D-047: nested validation keeps the AUC and kills the operating point
+
+**Decision.** D-046's claim that pomalidomide "clears the spec 9.2 floors" is
+**withdrawn**. The discrimination is real and the threshold was not validated.
+Gate G6 stays open.
+
+**What changed.** D-046 flagged its own operating points as optimistic because
+the cut was chosen by scanning the same held-out predictions it was scored on,
+and said 14 positives could not support the nested cross-validation that would
+settle it. The Slabicki screen provided enough positives to build the nested
+harness, and it was then applied to Sievers as well:
+
+| | non-nested | nested |
+|---|---|---|
+| pomalidomide AUC | 0.826 | **0.832** |
+| sensitivity | 0.857 | **0.600** |
+| specificity | 0.600 | 0.691 |
+| clears both floors | yes | **no** |
+
+The AUC is unchanged, so the sequence signal is real. The operating point
+collapses, so no compound gives a validated threshold. The caveat was correct
+and the headline it qualified was not.
+
+**The new screen, and what it cost to use.** Slabicki et al. 2025
+(10.1016/j.molcel.2025.07.019) is the study spec 9.2 named. Its primary-screen
+table is truncated at 65,535 rows, the legacy Excel limit, so 2 of 29 compounds
+survive in the distributed file. Two bugs were found getting it in: the library
+sheet keys as `GENE_start-end;Category` where the ratio table keys as
+`GENE_start-end`, and `ZnF.Sequence` holds DNA where the amino acids are in
+`Construct_AA`. Both produced zero positives rather than a wrong answer, which
+is the good kind of failure.
+
+**The result.** ALV1 reaches nested AUC 0.565 and 4-Ac-Phe-Glm 0.535, against
+pomalidomide's 0.832, despite having twenty times the positives. The labels are
+sound: ALV1's positives include IKZF1, IKZF3, SALL4, ZFP91, PATZ1, ZNF276 and
+ZNF653. The encoding was fixed along the way, since these are 58-residue tandem
+constructs and 5,201 of 9,097 carry two C2H2 motifs, so anchoring on the first
+was describing half the library by the wrong finger; encoding both lifted the
+AUC by about 0.02.
+
+**The pattern.** The compounds where sequence predicts degradation degrade 0.1%
+and 0.2% of the library. The ones where it does not degrade 2.8% and 4.3%. A
+selective degrader appears to pick substrates by a readable sequence feature
+and a promiscuous one does not. That is a hypothesis the data supports, not a
+conclusion it proves, and it is the most useful thing the larger screen gave.
+
+**Reversal.** The other 27 compounds would test the promiscuity hypothesis
+directly, by ranking compounds on breadth against predictability. They are in
+the paper and not in the distributed file. The lead contact offers reanalysis
+data on request, which is a human-to-human ask rather than a download.

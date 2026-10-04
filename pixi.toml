@@ -63,6 +63,9 @@ mlx-lm = "*"
 # Needed only by lm/export_hf.py, to load the converted adapter the way the
 # HuggingFace Space will. Training and serving locally stay on mlx-lm.
 peft = "*"
+# The Slabicki 2025 primary screen ships as a legacy .xls, which openpyxl
+# cannot read.
+xlrd = "*"
 
 [activation.env]
 # plip and pydssp both pull an OpenMP runtime that collides with the one
