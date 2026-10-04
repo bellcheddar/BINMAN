@@ -1,0 +1,46 @@
+# systemd unit for BINMAN (gunicorn behind nginx), matching the convention the
+# mdeller.com droplet already uses for its other Flask apps: /opt/<name>, a
+# dedicated user, a .venv inside the app directory, and a <name>-web.service.
+#
+# This supersedes deploy/binman.service, which assumed /srv/binman and port
+# 8080. Nothing on the droplet is laid out that way: alphafraud, boltzmaker,
+# chatmcd and the rest all live under /opt with their own service user.
+#
+# Install to /etc/systemd/system/binman-web.service.
+[Unit]
+Description=BINMAN atlas (gunicorn)
+After=network.target
+
+[Service]
+Type=simple
+User=binman
+Group=binman
+WorkingDirectory=/opt/binman
+EnvironmentFile=-/opt/binman/.env
+Environment="BINMAN_DB=/opt/binman/data/atlas/binman.sqlite"
+Environment="PYTHONUNBUFFERED=1"
+# The natural-language box is optional and the app is fully functional without
+# it. Point this at the HuggingFace Space only if that endpoint is wired to
+# speak the app's LM protocol; it is a Gradio app, not a drop-in, so it stays
+# unset until that adapter exists.
+# Environment="BINMAN_LM_URL="
+ExecStart=/opt/binman/.venv/bin/gunicorn \
+  --workers 3 \
+  --threads 2 \
+  --bind 127.0.0.1:8090 \
+  --timeout 90 \
+  --access-logfile - \
+  --error-logfile - \
+  wsgi:app
+Restart=on-failure
+RestartSec=3
+
+# Hardening, matching the other apps on this host.
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=true
+ReadWritePaths=/opt/binman
+
+[Install]
+WantedBy=multi-user.target

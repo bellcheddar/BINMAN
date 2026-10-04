@@ -18,3 +18,4 @@
 [09:40:00] === round12-32b: measuring 32B throughput before committing ===
 [09:40:20] throughput: 24.40 iters/min on mlx-community/Qwen2.5-32B-Instruct-4bit
 [09:40:20] round12-32b budget: 4636 iterations (~190 min)
+[09:48:50] START round13-32b-1epoch :: 32B, 32 layers, rank 8, batch 2, 14152 iters (one epoch)

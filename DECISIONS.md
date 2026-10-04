@@ -1456,3 +1456,39 @@ or needs the matched screen to grow well beyond 32 positives.
 **Reversal.** `pipeline/degron_sequence.py` holds the matched set, the feature
 builder, the grouped splitter and the permutation null. A CRBN-interface
 feature drops into it as another column.
+
+## D-043: the droplet's convention is not the one deploy/ assumed
+
+**Decision.** BINMAN deploys to `/opt/binman` with a dedicated `binman` service
+user, a `binman-web.service` unit and nginx proxying `binman.mdeller.com` to
+127.0.0.1:8090. `deploy/provision.sh` does the whole thing idempotently and
+refuses without `BINMAN_DEPLOY_CONFIRM=yes`, like `rsync.sh`.
+
+**Context.** `deploy/binman.service` and `deploy/rsync.sh` were written from
+the spec against `/srv/binman` on port 8080, before anyone had looked at the
+host. The host does not work that way. Its seventeen other apps live under
+`/opt/<name>`, each with its own system user, a `.venv` inside the app
+directory, a `<name>-web.service` unit and an nginx vhost proxying to a local
+port. Deploying to `/srv` would have worked and would have left BINMAN as the
+one app nobody else's tooling understands.
+
+**What was added.** `wsgi.py`, because the unit convention is `wsgi:app` and
+`app/__init__.py` only exposes a module-level `app`.
+`deploy/binman-web.service` and `deploy/nginx-binman.conf` matching the house
+layout, with the vendored front-end served immutable, trimmed structures
+revalidating daily, and the shared `vhost` access-log format the launcher's hit
+counter reads. `deploy/provision.sh` to run it.
+
+**Port 8090** was chosen to sit clear of the range the existing apps use. It
+should be confirmed free before the first run; the check could not be made
+because SSH stopped answering (below).
+
+**SSH is currently refused and that is probably my doing.** The first attempt
+used `deploy@mdeller.com`, taken from the spec's own example line, and failed
+authentication. Two `root@45.55.102.228` connections then succeeded, and every
+attempt since has timed out while both `mdeller.com` and `podium.mdeller.com`
+serve HTTP 200. That is what fail2ban looks like from outside. Retrying would
+extend the ban, so it stopped at three attempts and nothing further was tried.
+
+**Reversal.** The ban expires on its own, typically in minutes to an hour.
+Everything is staged, so the deploy is one command when it does.
