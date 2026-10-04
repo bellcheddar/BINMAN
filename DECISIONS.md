@@ -1107,3 +1107,47 @@ script that no longer exists.
 **Reversal.** None wanted. `TRIAGE_PER_CLASS` and `TRIAGE_SEED` are named
 constants; changing either invalidates comparison with the rounds above and
 should be recorded here if it ever happens.
+
+## D-035: 32 LoRA layers is the lever; and never edit a running bash script
+
+**Decision.** Depth is the capacity knob that matters. Round 07 at 32 layers
+beats the 16-layer control on every Task B class and reaches a perfect Task A.
+The shipped adapter should be a 32-layer one unless rank 32 or the combination
+beats it.
+
+**Result.** Balanced 240-sample triage set, same seed both rounds:
+
+| | round 06, 16 layers | round 07, 32 layers |
+|---|---|---|
+| Task B macro-F1 | 0.8862 | **0.9336** |
+| molecular_glue F1 | 0.849 | **0.958** |
+| molecular_glue recall | 0.750 | **0.950** |
+| protac F1 | 0.944 | 0.975 |
+| glue called protac | 6 | 1 |
+| Task A set equality | 0.9833 | **1.000** |
+
+The gain concentrates on `molecular_glue`, the rarest class in the corpus and
+the one the project exists to find. Round 06 had already shown that eight times
+the data exposure changed nothing, so the bottleneck was never coverage: 16
+layers at rank 8 could not represent the decision boundary, and 32 layers can.
+Training cost 221 minutes against roughly 170 for 16 layers.
+
+**The process failure.** `lm/overnight.sh` was edited **while bash was
+executing it**, to fix how results were captured. Bash parses a function body
+once but reads top-level commands lazily by byte offset, so growing the file
+from 4,210 to 4,419 bytes left the interpreter holding a stale offset into a
+file that had moved underneath it. The next top-level command after the round
+08 call would have been read from the wrong position, which would have lost the
+32B round and possibly executed a fragment of a line as a command.
+
+Caught before that point and fixed exactly: `git checkout lm/overnight.sh`
+restored the file byte-for-byte to its launch state, realigning every offset.
+The capture fix is kept out of tree until the sweep ends, and the affected rows
+are backfilled from `data/interim/lm_eval.json` by hand, which costs nothing
+because the evaluations themselves are on disk.
+
+**The rule.** A long-running shell script is not a file to improve in place. If
+it needs changing mid-run, copy it, change the copy, and start the copy after
+the current run drains.
+
+**Reversal.** None. The capture fix is reapplied once the driver exits.
