@@ -3445,7 +3445,7 @@ A1R	cofactor	structure:nucleobase_or_nucleotide	5'-O-[(S)-{[(S)-{[(2R,3R,4S)-3,4
 A1U	unknown	no_rule_matched	3,5-dimethylpyrazin-2-ol	C6 H8 N2 O	124.141	9	non-polymer	Cc1cnc(c(n1)C)O	0
 A20	buffer	structure:sulfonic_acid_buffer	3-aminopropane-1-sulfonic acid	C3 H9 N O3 S	139.173	8	non-polymer	C(CN)CS(=O)(=O)O	1
 A23	cofactor	structure:nucleobase_or_nucleotide	ADENOSINE-5'-PHOSPHATE-2',3'-CYCLIC PHOSPHATE	C10 H13 N5 O9 P2	409.186	26	RNA linking	c1nc(c2c(n1)n(cn2)[C@H]3[C@H]4[C@@H]([C@H](O3)COP(=O)(O)O)O[P@@](=O)(O4)O)N	0
-A2G	sugar	seed_set:sugar				13			1
+A2G	sugar	seed_set:sugar	2-acetamido-2-deoxy-alpha-D-galactopyranose	C8 H15 N O6	221.208	15	D-saccharide, alpha linking	CC(=O)N[C@@H]1[C@H]([C@H]([C@H](O[C@@H]1O)CO)O)O	1
 A2M	cofactor	structure:nucleobase_or_nucleotide	2'-O-methyladenosine 5'-(dihydrogen phosphate)	C11 H16 N5 O7 P	361.248	24	RNA linking	CO[C@@H]1[C@@H]([C@H](O[C@H]1n2cnc3c2ncnc3N)COP(=O)(O)O)O	0
 A2O	glue_candidate	size_and_no_furniture_signal:25_heavy	N-(2-oxo-1-propyl-1,2,3,4-tetrahydroquinolin-6-yl)-1-phenylmethanesulfonamide	C19 H22 N2 O3 S	358.455	25	non-polymer	CCCN1c2ccc(cc2CCC1=O)NS(=O)(=O)Cc3ccccc3	0
 A2P	cofactor	structure:nucleobase_or_nucleotide	ADENOSINE-2'-5'-DIPHOSPHATE	C10 H15 N5 O10 P2	427.201	27	non-polymer	c1nc(c2c(n1)n(cn2)[C@H]3[C@@H]([C@@H]([C@H](O3)COP(=O)(O)O)O)OP(=O)(O)O)N	0
@@ -3818,7 +3818,7 @@ BFW	glue_candidate	size_and_no_furniture_signal:14_heavy	4-N-Furfurylcytosine	C9
 BG0	glue_candidate	size_and_no_furniture_signal:26_heavy	(4R)-2,7,8-triamino-4-(3-bromo-4,5-dimethoxyphenyl)-4H-1-benzopyran-3-carbonitrile	C18 H17 Br N4 O3	417.257	26	non-polymer	COc1cc(cc(c1OC)Br)[C@@H]2c3ccc(c(c3OC(=C2C#N)N)N)N	0
 BG6	cofactor	structure:small_phosphorylated_metabolite	6-O-phosphono-beta-D-glucopyranose	C6 H13 O9 P	260.136	16	D-saccharide, beta linking	C([C@@H]1[C@H]([C@@H]([C@H]([C@@H](O1)O)O)O)O)OP(=O)(O)O	0
 BG9	glue_candidate	size_and_no_furniture_signal:16_heavy	(2E,2'E)-3,3'-(1,2-phenylene)di(prop-2-enoic acid)	C12 H10 O4	218.205	16	non-polymer	c1cc(c(cc1)/C=C/C(=O)O)/C=C/C(=O)O	0
-BGC	sugar	seed_set:sugar				11			1
+BGC	sugar	seed_set:sugar	beta-D-glucopyranose	C6 H12 O6	180.156	12	D-saccharide, beta linking	C([C@@H]1[C@H]([C@@H]([C@H]([C@@H](O1)O)O)O)O)O	1
 BGL	detergent	seed_set:detergent	2-O-octyl-beta-D-glucopyranose	C14 H28 O6	292.369	20	D-saccharide, beta linking	CCCCCCCCO[C@@H]1[C@H]([C@@H]([C@H](O[C@H]1O)CO)O)O	1
 BGN	sugar	name_rule:sugar	2-(butanoylamino)-2-deoxy-beta-D-glucopyranose	C10 H19 N O6	249.261	17	D-saccharide, beta linking	CCCC(=O)N[C@@H]1[C@H]([C@@H]([C@H](O[C@H]1O)CO)O)O	1
 BGV	glue_candidate	size_and_no_furniture_signal:22_heavy	(3aR,4S,4aR,7aR,8R,9aS)-4a,8-dimethyl-3-methylidene-2,5-dioxo-2,3,3a,4,4a,5,7a,8,9,9a-decahydroazuleno[6,5-b]furan-4-yl acetate	C17 H20 O5	304.338	22	non-polymer	C[C@@H]1C[C@H]2[C@H]([C@@H]([C@]3([C@H]1C=CC3=O)C)OC(=O)C)C(=C)C(=O)O2	0
@@ -4967,7 +4967,7 @@ FPS	glue_candidate	size_and_no_furniture_signal:24_heavy	S-[(2E,6E)-3,7,11-TRIME
 FPT	glue_candidate	size_and_no_furniture_signal:24_heavy	N-[[3-FLUORO-4-ETHOXY-PYRID-2-YL]ETHYL]-N'-[5-NITRILOMETHYL-PYRIDYL]-THIOUREA	C16 H16 F N5 O S	345.395	24	non-polymer	CCOc1ccnc(c1F)CCNC(=S)Nc2ccc(cn2)C#N	0
 FQI	unknown	no_rule_matched	5-CHLORO-2-THIOPHENECARBOXAMIDE	C5 H4 Cl N O S	161.609	9	non-polymer	c1cc(sc1C(=O)N)Cl	0
 FRA	glue_candidate	size_and_no_furniture_signal:31_heavy	[4-(4-ACETYLAMINO-PHENYL)-3,5-DIOXO-4-AZA-TRICYCLO[5.2.2.0 2,6]UNDEC-1-YLCARBAMOYLOXY]-ACETIC ACID	C21 H23 N3 O7	429.423	31	non-polymer	CC(=O)Nc1ccc(cc1)N2C(=O)[C@@H]3C4CCC([C@@H]3C2=O)(CC4)NC(=O)OCC(=O)O	0
-FRU	sugar	seed_set:sugar	beta-D-fructofuranose	C6 H12 O6	180.156	12	D-saccharide, beta linking	C([C@@H]1[C@H]([C@@H]([C@](O1)(CO)O)O)O)O	1
+FRU	sugar	seed_set:sugar				12			1
 FRZ	glue_candidate	size_and_no_furniture_signal:25_heavy	5-(2-PHENYLPYRAZOLO[1,5-A]PYRIDIN-3-YL)-1H-PYRAZOLO[3,4-C]PYRIDAZIN-3-AMINE	C18 H13 N7	327.343	25	non-polymer	c1ccc(cc1)c2c(c3ccccn3n2)c4cc5c(n[nH]c5nn4)N	0
 FSC	glue_candidate	size_and_no_furniture_signal:48_heavy	FUSICOCCIN	C36 H56 O12	680.823	48	non-polymer	C[C@@H]1[C@@H]\2CC[C@@H](/C2=C/[C@]3([C@H](CC(=C3[C@H]([C@@H]1O)O[C@@H]4[C@@H]([C@H]([C@@H]([C@H](O4)COC(C)(C)C=C)O)OC(=O)C)O)[C@H](C)COC(=O)C)O)C)COC	0
 FSD	glue_candidate	size_and_no_furniture_signal:44_heavy	amicetin	C29 H42 N6 O9	618.679	44	non-polymer	C[C@@H]1[C@H](CC[C@@H](O1)N2C=CC(=NC2=O)NC(=O)c3ccc(cc3)NC(=O)[C@](C)(CO)N)O[C@@H]4[C@@H]([C@H]([C@@H]([C@H](O4)C)N(C)C)O)O	0
@@ -5121,7 +5121,7 @@ GA4	glue_candidate	size_and_no_furniture_signal:24_heavy	GIBBERELLIN A4	C19 H24 
 GAH	peptide_like	ccd_type:PEPTIDE-LIKE	N-{[(2S)-1-(N-{[4-({[AMINO(IMINO)METHYL]AMINO}METHYL)CYCLOHEXYL]CARBONYL}-3-CYCLOHEXYL-L-ALANYL)AZETIDIN-2-YL]CARBONYL}-L-TYROSYL-N~6~-[AMINO(IMINO)METHYL]-L-LYSINAMIDE	C38 H61 N11 O6	767.961	55	peptide-like	[H]/N=C(\N)/NCCCC[C@@H](C(=O)N)NC(=O)[C@@H](Cc1ccc(cc1)O)NC(=O)[C@@H]2CCN2C(=O)[C@@H](CC3CCCCC3)NC(=O)C4CCC(CC4)CN/C(=N/[H])/N	0
 GAI	buffer	seed_set:buffer	GUANIDINE	C H5 N3	59.070	4	non-polymer	C(=N)(N)N	1
 GAK	unknown	no_rule_matched	[2Ga-2S] cluster	Ga2 S2	203.576	4	non-polymer	S1[Ga]S[Ga]1	0
-GAL	sugar	seed_set:sugar				11			1
+GAL	sugar	seed_set:sugar	beta-D-galactopyranose	C6 H12 O6	180.156	12	D-saccharide, beta linking	C([C@@H]1[C@@H]([C@@H]([C@H]([C@@H](O1)O)O)O)O)O	1
 GAM	peptide_like	ccd_type:L-PEPTIDE LINKING	ALPHA-METHYL-L-GLUTAMIC ACID	C6 H11 N O4	161.156	11	L-peptide linking	C[C@](CCC(=O)O)(C(=O)O)N	0
 GAP	cofactor	structure:nucleobase_or_nucleotide	GLYCYL-ADENOSINE-5'-PHOSPHATE	C12 H17 N6 O8 P	404.273	27	non-polymer	c1nc(c2c(n1)n(cn2)[C@H]3[C@@H]([C@@H]([C@H](O3)CO[P@@](=O)([O-])OC(=O)C[NH3+])O)O)N	0
 GAS	glue_candidate	size_and_no_furniture_signal:29_heavy	N-(P-CYANOPHENYL)-N'-DIPHENYLMETHYL-GUANIDINE-ACETIC ACID	C23 H20 N4 O2	384.431	29	non-polymer	c1ccc(cc1)C(c2ccccc2)NC(=NCC(=O)O)Nc3ccc(cc3)C#N	0
@@ -5206,7 +5206,7 @@ GKS	glue_candidate	size_and_no_furniture_signal:32_heavy	1-[2-amino-5-(formylami
 GKZ	glue_candidate	size_and_no_furniture_signal:32_heavy	1-[2-[4-[4-(4-chlorophenyl)-3-methyl-1~{H}-pyrazol-5-yl]-3-oxidanyl-phenoxy]ethyl]piperidin-1-ium-4-carboxamide	C24 H28 Cl N4 O3	455.957	32	non-polymer	Cc1c(c([nH]n1)c2ccc(cc2O)OCC[NH+]3CCC(CC3)C(=O)N)c4ccc(cc4)Cl	0
 GL0	glue_candidate	size_and_no_furniture_signal:11_heavy				11			0
 GLA	sugar	seed_set:sugar	alpha-D-galactopyranose	C6 H12 O6	180.156	12	D-saccharide, alpha linking	C([C@@H]1[C@@H]([C@@H]([C@H]([C@H](O1)O)O)O)O)O	1
-GLC	sugar	seed_set:sugar	alpha-D-glucopyranose	C6 H12 O6	180.156	12	D-saccharide, alpha linking	C([C@@H]1[C@H]([C@@H]([C@H]([C@H](O1)O)O)O)O)O	1
+GLC	sugar	seed_set:sugar				11			1
 GLJ	peptide_like	ccd_type:L-PEPTIDE LINKING	5,5-dihydroxy-L-norvaline	C5 H11 N O4	149.145	10	L-peptide linking	C(CC(O)O)[C@@H](C(=O)O)N	0
 GLN	peptide_like	ccd_type:L-PEPTIDE LINKING	GLUTAMINE	C5 H10 N2 O3	146.144	10	L-peptide linking	C(CC(=O)N)[C@@H](C(=O)O)N	0
 GLP	cofactor	structure:small_phosphorylated_metabolite	2-amino-2-deoxy-6-O-phosphono-alpha-D-glucopyranose	C6 H14 N O8 P	259.151	16	D-saccharide, alpha linking	C([C@@H]1[C@H]([C@@H]([C@H]([C@H](O1)O)N)O)O)OP(=O)(O)O	0
@@ -6811,7 +6811,7 @@ NA3	glue_candidate	size_and_no_furniture_signal:17_heavy	(3S)-3-{[(5-BROMOPYRIDI
 NA4	glue_candidate	size_and_no_furniture_signal:25_heavy	4-[5-(2-CARBOXY-1-FORMYL-ETHYLCARBAMOYL)-PYRIDIN-3-YL]-BENZOIC ACID	C17 H14 N2 O6	342.303	25	non-polymer	c1cc(ccc1c2cc(cnc2)C(=O)N[C@@H](CC(=O)O)C=O)C(=O)O	0
 NA9	glue_candidate	size_and_no_furniture_signal:32_heavy	N-(CARBOXYMETHYL)-3-CYCLOHEXYL-D-ALANYL-N-({6-[AMINO(IMINO)METHYL]PYRIDIN-3-YL}METHYL)-N~2~-METHYL-L-ALANINAMIDE	C22 H34 N6 O4	446.543	32	non-polymer	[H]/N=C(\c1ccc(cn1)CNC(=O)[C@H](C)N(C)C(=O)[C@@H](CC2CCCCC2)NCC(=O)O)/N	0
 NAD	cofactor	seed_set:cofactor	NICOTINAMIDE-ADENINE-DINUCLEOTIDE	C21 H27 N7 O14 P2	663.425	44	non-polymer	c1cc(c[n+](c1)[C@H]2[C@@H]([C@@H]([C@H](O2)CO[P@@](=O)([O-])O[P@@](=O)(O)OC[C@@H]3[C@H]([C@H]([C@@H](O3)n4cnc5c4ncnc5N)O)O)O)O)C(=O)N	0
-NAG	sugar	seed_set:sugar	2-acetamido-2-deoxy-beta-D-glucopyranose	C8 H15 N O6	221.208	15	D-saccharide, beta linking	CC(=O)N[C@@H]1[C@H]([C@@H]([C@H](O[C@H]1O)CO)O)O	1
+NAG	sugar	seed_set:sugar				14			1
 NAI	cofactor	seed_set:cofactor	1,4-DIHYDRONICOTINAMIDE ADENINE DINUCLEOTIDE	C21 H29 N7 O14 P2	665.441	44	non-polymer	c1nc(c2c(n1)n(cn2)[C@H]3[C@@H]([C@@H]([C@H](O3)CO[P@](=O)(O)O[P@@](=O)(O)OC[C@@H]4[C@H]([C@H]([C@@H](O4)N5C=CCC(=C5)C(=O)N)O)O)O)O)N	0
 NAJ	cofactor	seed_set:cofactor	NICOTINAMIDE-ADENINE-DINUCLEOTIDE (ACIDIC FORM)	C21 H27 N7 O14 P2	663.425	44	non-polymer	c1cc(c[n+](c1)[C@H]2[C@@H]([C@@H]([C@H](O2)COP(=O)([O-])OP(=O)([O-])OC[C@@H]3[C@H]([C@H]([C@@H](O3)n4cnc5c4nc[nH+]c5N)O)O)O)O)C(=O)N	0
 NAK	unknown	no_rule_matched	AMINO-ACRYLATE	C3 H5 N O2	87.077	6	non-polymer	CC(=[NH2+])C(=O)[O-]	0
@@ -9730,9 +9730,9 @@ XXR	glue_candidate	size_and_no_furniture_signal:11_heavy				11			0
 XY6	glue_candidate	size_and_no_furniture_signal:18_heavy				18			0
 XY9	glue_candidate	size_and_no_furniture_signal:21_heavy				21			0
 XYL	cryoprotectant	seed_set:cryoprotectant	Xylitol	C5 H12 O5	152.146	10	D-saccharide	C([C@@H](C([C@@H](CO)O)O)O)O	1
-XYP	sugar	seed_set:sugar	beta-D-xylopyranose	C5 H10 O5	150.130	10	D-saccharide, beta linking	C1[C@H]([C@@H]([C@H]([C@@H](O1)O)O)O)O	1
+XYP	sugar	seed_set:sugar				9			1
 XYQ	cofactor	structure:nucleobase_or_nucleotide	(2R,3R,4S,5R)-5-({[(R)-{[(R)-{[(2R,3S,4R,5R)-5-(6-AMINO-9H-PURIN-9-YL)-3,4-DIHYDROXYTETRAHYDROFURAN-2-YL]METHOXY}(HYDROXY)PHOSPHORYL]OXY}(HYDROXY)PHOSPHORYL]OXY}METHYL)-3,4-DIHYDROXYTETRAHYDROFURAN-2-YL ACETATE	C17 H25 N5 O15 P2	601.352	39	non-polymer	CC(=O)O[C@@H]1[C@@H]([C@@H]([C@H](O1)CO[P@@](=O)(O)O[P@](=O)(O)OC[C@@H]2[C@H]([C@H]([C@@H](O2)n3cnc4c3ncnc4N)O)O)O)O	0
-XYS	sugar	seed_set:sugar				10			1
+XYS	sugar	seed_set:sugar				9			1
 XYU	glue_candidate	size_and_no_furniture_signal:65_heavy	(3S,5R,6R,7E,9R,10R,12R,14S,15E,17E,19E,21S,23S,26R,27R,30R,34aS)-5,9,27-trihydroxy-3-{(2R)-1-[(1S,3R,4R)-4-hydroxy-3-methoxycyclohexyl]propan-2-yl}-10,21-dimethoxy-6,8,12,14,20,26-hexamethyl-5,6,9,10,12,13,14,21,22,23,24,25,26,27,32,33,34,34a-octadecahydro-3H-23,27-epoxypyrido[2,1-c][1,4]oxazacyclohentriacontine-1,11,28,29(4H,31H)-tetrone	C51 H81 N O13	916.188	65	non-polymer	C[C@@H]1CC[C@H]2C[C@@H](/C(=C/C=C/C=C/[C@H](C[C@H](C(=O)[C@@H]([C@@H](/C(=C/[C@H]([C@@H](C[C@H](OC(=O)[C@@H]3CCCCN3C(=O)C(=O)[C@@]1(O2)O)[C@H](C)C[C@@H]4CC[C@H]([C@@H](C4)OC)O)O)C)/C)O)OC)C)C)/C)OC	0
 XYZ	sugar	name_rule:sugar	beta-D-xylofuranose	C5 H10 O5	150.130	10	D-saccharide, beta linking	C([C@@H]1[C@@H]([C@H]([C@@H](O1)O)O)O)O	1
 XZ2	glue_candidate	size_and_no_furniture_signal:27_heavy	2-(3-chloro-4-fluorobenzyl)-6,7-dihydroxy-N,N-dimethyl-1-oxo-2,3-dihydro-1H-isoindole-4-sulfonamide	C17 H16 Cl F N2 O5 S	414.836	27	non-polymer	CN(C)S(=O)(=O)c1cc(c(c2c1CN(C2=O)Cc3ccc(c(c3)Cl)F)O)O	0

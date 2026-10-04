@@ -671,3 +671,18 @@ One line per meaningful event, timestamped UTC (spec Section 0 rule 5).
 | 2026-10-04T22:24:31+00:00 | 1.3 | 25,164/52,821 entries, 39,433 bridges, 26 failed, 16.8 entries/s, ~0.5 h remaining. |
 | 2026-10-04T22:29:31+00:00 | 1.3 | 27,242/52,821 entries, 45,294 bridges, 26 failed, 15.1 entries/s, ~0.5 h remaining. |
 | 2026-10-04T22:34:31+00:00 | 1.3 | 28,961/52,821 entries, 55,668 bridges, 26 failed, 13.8 entries/s, ~0.5 h remaining. |
+| 2026-10-04T22:39:31+00:00 | 1.3 | 30,640/52,821 entries, 66,132 bridges, 27 failed, 12.8 entries/s, ~0.5 h remaining. |
+| 2026-10-04T22:44:33+00:00 | 1.3 | 31,621/52,821 entries, 84,173 bridges, 29 failed, 11.7 entries/s, ~0.5 h remaining. |
+| 2026-10-04T22:49:33+00:00 | 1.3 | 32,132/52,821 entries, 110,087 bridges, 32 failed, 10.7 entries/s, ~0.5 h remaining. |
+| 2026-10-04T22:54:33+00:00 | 1.3 | 32,652/52,821 entries, 127,923 bridges, 37 failed, 9.9 entries/s, ~0.6 h remaining. |
+| 2026-10-04T22:59:35+00:00 | 1.3 | 33,042/52,821 entries, 154,156 bridges, 79 failed, 9.2 entries/s, ~0.6 h remaining. |
+| 2026-10-04T23:04:35+00:00 | 1.3 | 33,266/52,821 entries, 183,596 bridges, 110 failed, 8.5 entries/s, ~0.6 h remaining. |
+| 2026-10-04T23:09:35+00:00 | 1.3 | 33,865/52,821 entries, 196,723 bridges, 196 failed, 8.1 entries/s, ~0.7 h remaining. |
+| 2026-10-04T23:14:35+00:00 | 1.3 | 34,772/52,821 entries, 215,766 bridges, 521 failed, 7.7 entries/s, ~0.6 h remaining. |
+| 2026-10-04T23:14:49+00:00 | 9.4 | Assayed ubiquitylome: requesting 100 accessions in batches of 50. |
+| 2026-10-04T23:14:49+00:00 | 9.4 | batch 0 failed: OSError: [Errno 63] File name too long: '/Users/dellboy/Documents/Vibe_Coding/BINMAN/data/cache/ebi_proteins/proteomics:A0A024R1R8.cif,A0A024RBG |
+| 2026-10-04T23:14:49+00:00 | 9.4 | batch 1 failed: OSError: [Errno 63] File name too long: '/Users/dellboy/Documents/Vibe_Coding/BINMAN/data/cache/ebi_proteins/proteomics:A0A075B759.cif,A0A075B76 |
+| 2026-10-04T23:14:49+00:00 | 9.4 | Assayed ubiquitylome: 0 lysines over 0 proteins, 0 ubiquitylated, 0 matched negatives. |
+| 2026-10-04T23:15:11+00:00 | 9.4 | Assayed ubiquitylome: requesting 100 accessions in batches of 50. |
+| 2026-10-04T23:15:13+00:00 | 9.4 | Assayed ubiquitylome: 253 lysines over 70 proteins, 18 ubiquitylated, 235 matched negatives. |
+| 2026-10-04T23:15:29+00:00 | 9.4 | Assayed ubiquitylome: requesting 20,279 accessions in batches of 50. |
