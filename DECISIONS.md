@@ -1039,3 +1039,36 @@ verified by running the model.
 **Reversal.** None wanted. If mlx-lm ever trains a non-contiguous layer set,
 the export fails loudly and the config needs a `layers_to_transform` list
 rather than a range.
+
+## D-033: LoRA rank never reached mlx, so every round so far trained at rank 8
+
+**Decision.** `lm/train.py` now writes a `lora_config.yaml` per run and passes
+it with `--config`, so `LORA_RANK` changes the training rather than only the
+label. The constant is corrected to **8**, which is what rounds 01 to 06
+actually used, and rank, layers, base model and batch size are exposed as CLI
+arguments for the overnight sweep.
+
+**Context.** `mlx_lm lora` has no `--lora-rank` flag. Rank, scale and dropout
+are only reachable through a YAML config file given to `-c/--config`, and the
+default rank is 8. `LORA_RANK = 16` appeared in the W&B config, in the run
+notes and in `training.json`, and never in the training command. Confirmed
+directly: the round 05 adapter's own `adapter_config.json` records
+`"rank": 8`, and a two-iteration smoke test with `rank: 32` in a YAML config
+produced `lora_a` of shape `[11008, 32]`.
+
+**Consequence.** Every published figure stands, because the model that produced
+them is the model that was trained. What was wrong is the recorded
+hyperparameter: W&B says rank 16 for rounds 01 to 06 and the truth is 8. The
+W&B configs are not rewritten, because editing a logged config to match a later
+discovery is worse than a note that says which value was real.
+
+**Why it matters tonight.** Marc asked whether more layers would help. Rank is
+the other half of LoRA capacity and it was pinned at the library default the
+whole time. Rank 8 over 16 layers is a very small number of trainable
+parameters for three tasks, one of which has four classes, so the overnight
+sweep varies rank as its own round rather than treating depth as the only
+capacity knob.
+
+**Reversal.** None wanted. If mlx-lm ever adds a `--lora-rank` flag the YAML
+can go, but the YAML is also a per-run artefact beside the adapter, which is
+better provenance than a flag in a shell history.

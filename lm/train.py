@@ -123,7 +123,14 @@ def wandb_env(name: str, group: str, notes: str, tags: list[str]) -> dict:
     }
 
 # Spec 3.7 hyperparameters.
-LORA_RANK = 16
+# LORA_RANK reaches mlx only through a YAML config: `mlx_lm lora` has no
+# --lora-rank flag and silently defaults to rank 8. Rounds 01 to 06 therefore
+# trained at rank 8 while this constant said 16 and that 16 went into W&B and
+# training.json. See DECISIONS.md D-033. Changing this number now changes the
+# training rather than only the label.
+LORA_RANK = 8
+LORA_SCALE = 20.0
+LORA_DROPOUT = 0.0
 LORA_LAYERS = 16
 LEARNING_RATE = 1e-5
 MIN_ITERS = 600
@@ -244,12 +251,23 @@ def stage_one(iters: int, batch_size: int, model: str = BASE_MODEL,
     work_dir.mkdir(parents=True, exist_ok=True)
     ADAPTERS.mkdir(parents=True, exist_ok=True)
 
+    # The only route to lora_parameters is a YAML config file, so one is written
+    # per run and kept beside the adapter as part of the run's provenance.
+    config_path = work_dir / "lora_config.yaml"
+    config_path.write_text(
+        "lora_parameters:\n"
+        f"  rank: {LORA_RANK}\n"
+        f"  scale: {LORA_SCALE}\n"
+        f"  dropout: {LORA_DROPOUT}\n"
+    )
+
     command = [
         sys.executable, "-m", "mlx_lm", "lora",
         "--model", model,
         "--train",
         "--data", str(TRAIN_DATA),
         "--fine-tune-type", "lora",
+        "--config", str(config_path),
         "--num-layers", str(LORA_LAYERS),
         "--batch-size", str(batch_size),
         "--iters", str(iters),
@@ -686,9 +704,9 @@ def fuse(adapter_path: Path) -> dict:
 # --------------------------------------------------------------------------- #
 
 def run(iters: int | None = None, skip_stage_two: bool = False,
-        dpo_limit: int | None = 600) -> dict:
+        dpo_limit: int | None = 600, batch_size: int | None = None) -> dict:
     config = load_config()
-    batch_size = int(config.u("model.mlx_batch_size"))
+    batch_size = batch_size or int(config.u("model.mlx_batch_size"))
     hardware = config.hardware
 
     iters = iters or MAX_ITERS
@@ -785,13 +803,41 @@ def run(iters: int | None = None, skip_stage_two: bool = False,
 
 
 def main() -> int:
+    # Declared up front: the help strings below read these names, and Python
+    # rejects a global statement that follows a use in the same scope.
+    global LORA_LAYERS, LORA_RANK, BASE_MODEL, MODEL_SLUG, RUN_STEM
+
     parser = argparse.ArgumentParser(description="Train BINMAN-LM")
     parser.add_argument("--iters", type=int, default=None)
     parser.add_argument("--skip-stage-two", action="store_true")
     parser.add_argument("--dpo-limit", type=int, default=600)
+    # The ablation knobs. Each overrides a module constant for this run only, so
+    # an overnight sweep can vary one at a time without editing the file between
+    # runs and losing track of which round used what.
+    parser.add_argument("--layers", type=int, default=None,
+                        help=f"LoRA layers, counted from the last (default {LORA_LAYERS})")
+    parser.add_argument("--rank", type=int, default=None,
+                        help=f"LoRA rank (default {LORA_RANK})")
+    parser.add_argument("--base-model", default=None,
+                        help=f"mlx base model (default {BASE_MODEL})")
+    parser.add_argument("--batch-size", type=int, default=None)
     args = parser.parse_args()
+
+    if args.layers is not None:
+        LORA_LAYERS = args.layers
+    if args.rank is not None:
+        LORA_RANK = args.rank
+    if args.base_model is not None:
+        BASE_MODEL = args.base_model
+        # The run name carries the model, so a 32B round cannot be mistaken for
+        # a 3B one in W&B after the fact.
+        MODEL_SLUG = (args.base_model.rsplit("/", 1)[-1]
+                      .replace("Qwen2.5-", "qwen-2.5-").replace("-Instruct", "")
+                      .lower())
+        RUN_STEM = f"binman-{MODEL_SLUG}"
+
     report = run(iters=args.iters, skip_stage_two=args.skip_stage_two,
-                 dpo_limit=args.dpo_limit)
+                 dpo_limit=args.dpo_limit, batch_size=args.batch_size)
     print(json.dumps(report, indent=2, default=str))
     return 0
 
