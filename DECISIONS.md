@@ -2590,3 +2590,53 @@ originals were then truncated for the clean re-run. It cost nothing, because
 every row of the lost file is in the preserved atlas, but it was luck rather
 than care: two paths differing only by directory went into one flat backup
 without checking. The backup is named by content now.
+
+## D-065: the atlas classed two PROTACs as detergents
+
+**Finding.** `RN3` and `RN6` are bifunctional degraders. Their names carry
+`2,6-dioxopiperidin-3-yl` and `1,3-dioxo-isoindol`, which is thalidomide's
+glutarimide and phthalimide, joined through an eight-carbon linker to a
+`thieno[3,2-f][1,2,4]triazolo[4,3-a][1,4]diazepine` with a 4-chlorophenyl,
+which is JQ1. A CRBN-recruiting BET degrader, twice.
+
+BINMAN classed both as **detergent** and set `is_furniture = 1`, because the
+linker put the substring "octyl" in the IUPAC name and a name rule matches
+`lauryl|dodecyl|octyl|decyl|nonyl|undecyl` anywhere in it.
+
+A Blind-spot INventory of Molecular Adhesives and Neosubstrates filed two
+CRBN-recruiting degraders as crystallisation detergent, on a substring of a
+linker. That is the most on-the-nose false negative the project could produce,
+and nothing failed: furniture is excluded quietly and by design.
+
+**How wide it goes.** 59 CCDs carry `name_rule:detergent`. Splitting them on
+aromatic ring count, which is what separates an amphiphile from a drug:
+
+| aromatic rings | n | what they are |
+|---:|---:|---|
+| 0 | 34 | sugar-head detergents, alkyl chains: correct |
+| 1 | 14 | Triton-like: correct |
+| 2 or more | **10** | RN3, RN6, 7ED, XKE, RUW, YUX, 8WF, QNO, EVP, TDS |
+
+The ten are PROTACs, alkyl-chain natural products and quinolone signal
+molecules. None is a detergent. Genuine detergents are amphiphiles with a simple
+head: the largest correctly classed here, a 1,165 Da maltoside, has **zero**
+aromatic rings, so size is not the discriminator and ring count is.
+
+**The fix, deferred deliberately.** The alkyl tokens should not fire on a
+molecule with two or more aromatic rings. It is not applied yet because the
+bridge stage is mid-re-run and classifies as it goes: changing the rule now
+would leave entries processed before and after the change classified by
+different rules, which is the kind of inconsistency that is very hard to see
+later. It goes in once that run finishes.
+
+**And it needs no second geometry run.** Classification depends only on the CCD,
+never on the structure, so the classifier can be re-applied on its own and the
+`bridge.ccd_class` column updated in place. A 50-minute geometry re-run would
+buy nothing.
+
+**Why this one matters beyond its size.** The contact floor (D-064) was rejecting
+real glues on a defensible criterion set slightly too tight. This is different:
+it is a string match on a chemical name deciding that a degrader is laboratory
+plastic. The two metrics it moves, recall and artefact precision, are the two
+that were already failing, and both are moved by the same rule in the same
+direction.

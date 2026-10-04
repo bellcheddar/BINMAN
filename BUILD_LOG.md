@@ -664,3 +664,10 @@ One line per meaningful event, timestamped UTC (spec Section 0 rule 5).
 | 2026-10-04T21:32:54+00:00 | 9 | Validation run against binman.sqlite: 0 metric(s) not computed (dataset unavailable), 2 measured floor(s) missed. |
 | 2026-10-04T21:32:55+00:00 | 9 | Validation run against binman.sqlite: 4 metric(s) not computed (dataset unavailable), 5 measured floor(s) missed. |
 | 2026-10-04T21:59:31+00:00 | 1.3 | Bridge run starting: 52,821 entries pending of 52,822 catalogued (tiers 1 to 3), 16 IO workers, 14 geometry workers. |
+| 2026-10-04T22:04:31+00:00 | 1.3 | 9,160/52,821 entries, 9,157 bridges, 26 failed, 30.5 entries/s, ~0.4 h remaining. |
+| 2026-10-04T22:09:31+00:00 | 1.3 | 15,207/52,821 entries, 16,152 bridges, 26 failed, 25.3 entries/s, ~0.4 h remaining. |
+| 2026-10-04T22:14:31+00:00 | 1.3 | 20,205/52,821 entries, 24,351 bridges, 26 failed, 22.4 entries/s, ~0.4 h remaining. |
+| 2026-10-04T22:19:31+00:00 | 1.3 | 22,959/52,821 entries, 31,672 bridges, 26 failed, 19.1 entries/s, ~0.4 h remaining. |
+| 2026-10-04T22:24:31+00:00 | 1.3 | 25,164/52,821 entries, 39,433 bridges, 26 failed, 16.8 entries/s, ~0.5 h remaining. |
+| 2026-10-04T22:29:31+00:00 | 1.3 | 27,242/52,821 entries, 45,294 bridges, 26 failed, 15.1 entries/s, ~0.5 h remaining. |
+| 2026-10-04T22:34:31+00:00 | 1.3 | 28,961/52,821 entries, 55,668 bridges, 26 failed, 13.8 entries/s, ~0.5 h remaining. |
