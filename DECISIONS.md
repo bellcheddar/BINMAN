@@ -2358,3 +2358,46 @@ that frames the model from whatever direction the file was written in, which for
 an elongated protein is end-on. It now orients to the structure's own principal
 axes first and frames second, and re-issues after the next draw for the same
 reason the ligand branch does (D-056).
+
+## D-060: "could not be read" was itself the wrong value
+
+**Decision.** The About page separates a value the build failed to produce from
+a value that records a finding. The UbiBrowser 2.0 licence is the latter, and
+reporting it as the former was a false statement about this project's own
+provenance, on the one page whose entire claim is that every number on it comes
+from an artefact.
+
+**What the page was saying.** "1 value(s) could not be read from an artefact and
+are shown as 'not recorded' rather than guessed: licence for reference
+'ubibrowser2'." Every clause of that is wrong for this entry. The value was read.
+It is not shown as "not recorded". And nothing was skipped.
+
+**What the artefact actually holds.** `not determined: the project site states
+no terms, and the NAR paper's CC BY-NC-4.0 covers the article rather than the
+database.` Somebody checked both and wrote down what they found.
+
+**Both halves re-checked before changing anything**, because the right fix for a
+wrong licence is to record the right licence, not to reword the complaint:
+
+* `http://ubibrowser.bio-it.cn/ubibrowser_v3/` returns HTTP 200 and its pages
+  carry no licence, terms, copyright or usage text at all.
+* Crossref gives 10.1093/nar/gkab962 a single licence,
+  `creativecommons.org/licenses/by-nc/4.0/`, with `content-version: vor`. That
+  is the article, not the database behind it.
+
+So the recorded finding is accurate and stays. The defect was entirely in the
+reporting.
+
+**The fix.** `licence_state()` returns one of three things rather than two:
+`missing` when the build produced nothing, which still counts as unreadable and
+still needs fixing; `not_published` when the source was checked and publishes no
+terms; `stated` otherwise. The page gives each its own sentence, and the second
+one reads "1 source(s) publish no licence. This was checked and recorded, not
+skipped", followed by the reason. Unreadable values are now 0, which is the
+honest count.
+
+**Why this was worth the care.** A build that over-reports its own gaps trains
+the reader to ignore the gap list, which is the same end state as not having one.
+The distinction is pinned by tests on `licence_state` directly, so it holds for
+values this repository does not currently contain, plus one test that the built
+page never calls a recorded finding unreadable.

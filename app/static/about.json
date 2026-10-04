@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-04T17:31:34+00:00",
+  "generated_at": "2026-10-04T20:51:16+00:00",
   "generator": "pipeline/build_about.py",
   "note": "Every value on this page is read from a build artefact. Nothing here is typed by hand, and a value that could not be read says 'not recorded' rather than showing a plausible guess.",
   "schematic_description": "The pipeline runs left to right in four stages. Two kinds of input enter on the left: the primary data sources (RCSB, AlphaFold DB, UniProt, InterPro), and separately the validation datasets that serve as ground truth, of which 11 of 13 resolved. Stage 1, acquisition, catalogued 52,821 entries into priority tiers using httpx and tenacity. Stage 2, geometry, analysed 52,586 entries with gemmi and FreeSASA and found 239,485 bridges, with 235 entries failing. Stage 3, scan and triage, used DSSP and fpocket to produce 21,717 degron candidates, 650 triaged ligases and 1,650 scored lysines. Stage 4 trains BINMAN-LM with mlx-lm, which does text work only and never emits a number. Four modules leave on the right: Glue Atlas, Degron Scan, E3 Triage and Degradability.",
@@ -142,11 +142,17 @@
       "failure_reasons": {
         "all_routes_exhausted": 2
       }
+    },
+    "zinc_finger_scan": {
+      "total": 0,
+      "ok": 0,
+      "failed": 0,
+      "failure_reasons": {}
     }
   },
   "atlas": {
     "available": true,
-    "size_mb": 142.8,
+    "size_mb": 143.7,
     "entry": 52821,
     "entry_failed": 235,
     "bridge": 239485,
@@ -1380,6 +1386,12 @@
     "unverified": 13,
     "licence_not_determined": 1
   },
+  "licences_not_published": [
+    {
+      "key": "ubibrowser2",
+      "reason": "the project site states no terms, and the NAR paper's CC BY-NC-4.0 covers the article rather than the database"
+    }
+  ],
   "model_card": {
     "trained": true,
     "status_note": "",
@@ -3060,9 +3072,7 @@
       "excerpt": "2 validation dataset(s) could not be obtained automatically: degronopedia, protcid_interfaces.\n\nEach publishes through a JavaScript front end with no documented bulk-export endpoint, or sits behind registration. Spec 4.1b forbids substituting a hand-written control, so the metrics that depend on these are reported as not computed.\n\nSee data/validation/MANIFEST.md for the homepage and citation of each, and the exact outcome of every route tried.\n\n## What unblocks it\n\n```bash\n# download each file by hand from its homepage, then:\n#   mv <file> data/validation/raw/<dataset_name>\npixi run python pipeline/acquire_validation.py --refresh\n```\n\n## Already done\n\n11 dataset(s) resolved and parsed: biolip2_annotations, biolip2_artefacts, digly_sites, mgdb_glues, mgtbind_compounds, mgtbind_ternary, molgluedb_glues, protacdb_protacs, sievers_zf_screen, ubibrowser_literature_e3, ubibrowser_predicted_e3"
     }
   ],
-  "unrecorded": [
-    "licence for reference 'ubibrowser2'"
-  ],
+  "unrecorded": [],
   "citation": {
     "project": "Deller, M. C. BINMAN: Blind-spot INventory of Molecular Adhesives and Neosubstrates.",
     "repository": "https://github.com/bellcheddar/BINMAN",

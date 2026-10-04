@@ -649,13 +649,31 @@ def build() -> dict:
     example = worked_example()
     results = _json(VALIDATION / "results.json", {}) or {}
 
+    # Two different things were being counted as one, and the page said the
+    # wrong one about both.
+    #
+    # "Could not be read from an artefact" means the build produced no value:
+    # a gap to go and fix. A licence reading "not determined: <what was
+    # checked>" is the opposite of that. It was read from the artefact, and it
+    # records a finding about the world: somebody checked the source and it
+    # publishes no terms. UbiBrowser 2.0 is the live case. Its site states
+    # nothing, and its NAR paper is CC BY-NC-4.0 on the version of record,
+    # which covers the article and not the database.
+    #
+    # Reporting that as "could not be read" is a false statement about this
+    # project's own provenance, on the one page whose whole claim is that every
+    # value comes from an artefact. They are separated here, and the page says
+    # a different sentence about each.
     unrecorded: list[str] = []
+    undetermined: list[dict] = []
     for row in references:
-        # A licence may say "not determined: <what was checked>", which is more
-        # useful than a bare "not determined" and must still count as unknown.
-        if (not row["licence"] or row["licence"] == NOT_RECORDED
-                or row["licence"].startswith("not determined")):
+        state = licence_state(row["licence"])
+        if state == "missing":
             unrecorded.append(f"licence for reference '{row['key']}'")
+        elif state == "not_published":
+            licence = row["licence"]
+            reason = licence.split(":", 1)[1].strip() if ":" in licence else ""
+            undetermined.append({"key": row["key"], "reason": reason})
         if not row["doi"] and not row["home"]:
             unrecorded.append(f"DOI and URL both missing for '{row['key']}'")
 
@@ -682,6 +700,7 @@ def build() -> dict:
                 1 for r in references
                 if not r["licence"] or r["licence"].startswith("not determined")),
         },
+        "licences_not_published": undetermined,
         "model_card": model_card(),
         "worked_example": example,
         "validation": results,
@@ -716,8 +735,33 @@ def build() -> dict:
     log_event("4.1b", f"About tab generated: {len(references)} references, "
                       f"{about['datasets_resolved']}/{len(datasets)} datasets resolved, "
                       f"worked example {'selected' if example.get('available') else 'unavailable'}, "
-                      f"{len(about['unrecorded'])} value(s) not recorded.")
+                      f"{len(about['unrecorded'])} value(s) not recorded, "
+                      f"{len(about['licences_not_published'])} source(s) publish "
+                      "no licence.")
     return about
+
+
+def licence_state(licence: str | None) -> str:
+    """Which of three things a reference's licence field is saying.
+
+    `missing`       the build produced no value: a gap to go and fix.
+    `not_published` the source was checked and publishes no terms. This is a
+                    finding about the world, recorded in the artefact, and the
+                    opposite of a value that could not be read.
+    `stated`        a licence was found and recorded.
+
+    The first two were counted as one, so the About page reported "could not be
+    read from an artefact" about a value that had been read and that records a
+    deliberate finding. That is a false statement about this project's own
+    provenance, on the page whose whole claim is that every value comes from an
+    artefact. See D-060.
+    """
+    text = (licence or "").strip()
+    if not text or text == NOT_RECORDED:
+        return "missing"
+    if text.startswith("not determined"):
+        return "not_published"
+    return "stated"
 
 
 def _gate_state() -> list[dict]:

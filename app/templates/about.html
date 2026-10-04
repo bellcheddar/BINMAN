@@ -41,6 +41,22 @@
     </div>
   {% endif %}
 
+  {# A licence nobody published is a finding about the source, not a gap in
+     this build, so it gets its own sentence. Saying "could not be read" about
+     it would be untrue on the one page that claims every value comes from an
+     artefact. #}
+  {% if about.licences_not_published %}
+    <div class="notice">
+      <strong>{{ about.licences_not_published | length }} source(s) publish no licence.</strong>
+      This was checked and recorded, not skipped:
+      <ul style="margin:0.4rem 0 0">
+        {% for item in about.licences_not_published %}
+          <li><code>{{ item.key }}</code>{% if item.reason %}: {{ item.reason }}{% endif %}</li>
+        {% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+
   {# ---------------------------------------------------------- 6.6.1 ------- #}
   <h2 id="workflow">Workflow</h2>
   <div class="panel">
