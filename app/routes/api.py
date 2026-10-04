@@ -38,6 +38,12 @@ def run_query():
     try:
         rows = execute(connection, query, columns)
         total = query_count(connection, query)
+    except QueryError as exc:
+        # An unselectable column is the caller's mistake, like a rejected
+        # query above, so it is a 400 with the reason. It was reaching the
+        # client as a 500 and a stack trace, because only sqlite3.Error was
+        # caught here and column validation happens inside execute().
+        return jsonify({"error": str(exc), "rows": [], "total": 0}), 400
     except sqlite3.Error as exc:
         return jsonify({"error": f"query failed: {exc}", "rows": [], "total": 0}), 500
 

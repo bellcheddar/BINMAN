@@ -23,7 +23,8 @@
     sortDirection: B.defaultDirection || 'desc',
     table: null,
     viewer: null,
-    lastRows: []
+    lastRows: [],
+    pinnedRow: null
   };
 
   function fields() {
@@ -394,6 +395,10 @@
     });
     state.table.on('rowClick', function (event, row) {
       var data = row.getData();
+      /* Kept so the viewer can frame this row's own feature. The shared
+       * selection deliberately carries only identifiers, and widening it
+       * would change the URL fragment contract. */
+      state.pinnedRow = data;
       Selection.fromRecord(state.recordType, data);
       renderDetail(data);
     });
@@ -438,13 +443,47 @@
     };
   }
 
+  /* Columns the viewer needs that are not columns the table shows.
+   *
+   * `default_columns` is the schema's contract for what is *displayed*, and
+   * the query returns exactly that set unless asked otherwise. The resolvers
+   * below read `structure_file` and `best_structure`, neither of which is in
+   * any default set, so both arrived undefined: every bridge viewer silently
+   * fell back to fetching the entry from RCSB rather than serving the trimmed
+   * file, which is why 3,839 local structures were never read, and the E3
+   * viewer got `url: null` and `pdbId: null` together and could never load
+   * anything at all.
+   *
+   * Requested here rather than added to `default_columns`, because that set is
+   * also what /api/schema publishes and what the table renders from.
+   */
+  var VIEWER_COLUMNS = {
+    bridge: ['structure_file'],
+    ligase: ['structure_file', 'best_structure'],
+    degron: ['structure_file'],
+    /* The lysine table has no structure_file: that viewer builds an AlphaFold
+     * URL from the accession, so asking for one is a SQL error. */
+    lysine: []
+  };
+
+  function queryColumns() {
+    var spec = state.schema[state.recordType] || {};
+    var base = (spec.default_columns || []).slice();
+    (VIEWER_COLUMNS[state.recordType] || []).forEach(function (name) {
+      if (base.indexOf(name) === -1) { base.push(name); }
+    });
+    return base.length ? base : null;
+  }
+
   var runToken = 0;
 
   function run() {
     if (!B.atlasAvailable) { return Promise.resolve(); }
     var token = ++runToken;
     var started = performance.now();
-    return Util.post('/api/query', { query: queryObject() }).then(function (result) {
+    return Util.post('/api/query', {
+      query: queryObject(), columns: queryColumns()
+    }).then(function (result) {
       if (token !== runToken) { return; }
       var countEl = document.getElementById('result-count');
       if (!result.ok) {
@@ -455,6 +494,17 @@
       }
       state.lastRows = result.data.rows || [];
       if (state.table) { state.table.replaceData(state.lastRows); }
+      /* Re-apply the selection now that the rows are here.
+       *
+       * Selection.subscribe fires immediately, so a viewer restored from a URL
+       * fragment resolves its spec before this query has returned, and the
+       * residue window it needs to frame a hairpin comes from a row it cannot
+       * see yet. The viewer's load() short-circuits on an unchanged spec, so
+       * this reloads nothing unless the frame has actually become available.
+       */
+      if (state.viewer && state.resolveSpec) {
+        B.applySelection(state.viewer, Selection.get(), state.resolveSpec);
+      }
       var elapsed = Math.round(performance.now() - started);
       if (countEl) {
         countEl.textContent = Util.num(result.data.total) + ' rows match, showing ' +
@@ -466,6 +516,30 @@
   }
 
   /* --------------------------------------------------------------- viewer --- */
+
+  /* How far either side of the feature to frame, in residues. A hairpin is two
+   * short strands and a turn, so the tip plus six covers it; a lysine needs
+   * only enough neighbours to sit in context rather than fill the frame. */
+  var HAIRPIN_PAD = 6;
+  var LYSINE_PAD = 4;
+
+  /* The row the user actually clicked, when it is the one the selection names.
+   *
+   * The shared selection carries an accession, and a protein can hold many
+   * degron candidates, so the accession alone cannot say which row is pinned.
+   * The clicked row is stashed on click and used when it matches. Arriving by
+   * URL fragment leaves nothing stashed, so it falls back to the first
+   * matching row, which under the default sort is that protein's top-scoring
+   * candidate: a defensible frame rather than a wrong one.
+   */
+  function pinnedRowFor(field, value) {
+    if (state.pinnedRow && state.pinnedRow[field] === value) {
+      return state.pinnedRow;
+    }
+    return state.lastRows.filter(function (row) {
+      return row[field] === value;
+    })[0] || null;
+  }
 
   function resolverFor(recordType) {
     return function (selection) {
@@ -489,6 +563,11 @@
             ? '/api/structures/' + row.structure_file
             : null,
           pdbId: (row && row.structure_file) ? null : pdbId,
+          /* The viewer frames this ligand specifically. A trimmed entry keeps
+           * whatever else sat near the interface, so without the CCD the
+           * camera would split the difference between the bridge and a
+           * neighbouring zinc. */
+          ccdId: (row && row.ccd_id) || ccdId,
           identifier: pdbId + ' · ' + ccdId,
           identifierHref: 'https://www.rcsb.org/structure/' + pdbId,
           overlay: overlay
@@ -496,10 +575,18 @@
       }
       if (recordType === 'degron') {
         if (!selection.target) { return null; }
+        var hairpin = pinnedRowFor('uniprot_acc', selection.target);
         return {
           role: 'degron',
           url: B.afdbCifUrl(selection.target),
           format: 'mmcif',
+          /* No ligand on an AlphaFold monomer, so the viewer frames the
+           * hairpin instead. HAIRPIN_PAD either side of the tip covers the
+           * two strands and the turn, which is what the row describes. */
+          focusResidues: (hairpin && hairpin.tip_res)
+            ? [{ start: hairpin.tip_res - HAIRPIN_PAD,
+                 end: hairpin.tip_res + HAIRPIN_PAD }]
+            : null,
           identifier: 'AF-' + selection.target,
           identifierHref: 'https://alphafold.ebi.ac.uk/entry/' + selection.target,
           plddt: true
@@ -525,10 +612,17 @@
       }
       if (recordType === 'lysine') {
         if (!selection.target) { return null; }
+        var lysine = pinnedRowFor('uniprot_acc', selection.target);
         return {
           role: 'degradability',
           url: B.afdbCifUrl(selection.target),
           format: 'mmcif',
+          /* The lysine itself, with a little context either side so it is not
+           * a single residue filling the frame. */
+          focusResidues: (lysine && lysine.res_num)
+            ? [{ start: lysine.res_num - LYSINE_PAD,
+                 end: lysine.res_num + LYSINE_PAD }]
+            : null,
           identifier: selection.target + (selection.site ? ' · ' + selection.site : ''),
           identifierHref: 'https://www.uniprot.org/uniprotkb/' + selection.target
         };
@@ -545,9 +639,9 @@
     var element = document.getElementById(ids[state.recordType]);
     if (!element) { return; }
     state.viewer = B.mountViewer(element, { role: state.recordType });
-    var resolve = resolverFor(state.recordType);
+    state.resolveSpec = resolverFor(state.recordType);
     Selection.subscribe(function () {
-      B.applySelection(state.viewer, Selection.get(), resolve);
+      B.applySelection(state.viewer, Selection.get(), state.resolveSpec);
     });
   }
 

@@ -425,9 +425,14 @@ def build_sql(query: Query, columns: Sequence[str] | None = None) -> tuple[str, 
     spec = query.spec
     chosen = list(columns) if columns else list(spec.default_columns)
     for name in chosen:
+        # Columns that are selectable but are not displayed fields: the viewer
+        # needs them to find a structure, and the table never renders them.
+        # `best_structure` was missing from this set, so the E3 viewer's
+        # resolver read it as undefined and produced a spec with neither a url
+        # nor a PDB id, which loads nothing.
         if name not in spec.fields and name not in spec.identity_columns \
                 and name not in {"id", "chain_a", "chain_b", "ligand_name",
-                                 "structure_file", "title"}:
+                                 "structure_file", "best_structure", "title"}:
             raise QueryError(f"column {name!r} is not selectable for {spec.name}")
     select = ", ".join(["id"] if "id" in spec.identity_columns else list(spec.identity_columns))
     for name in chosen:

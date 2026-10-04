@@ -175,3 +175,69 @@ def test_schema_summary_covers_every_record_type_and_field():
         for field_name, described in summary[name]["fields"].items():
             assert described["kind"] in {"number", "text", "enum", "bool"}
             assert described["label"]
+
+
+# --------------------------------------------------------------------------- #
+# Columns the viewer needs but the table never shows.
+#
+# These are not in any record type's `default_columns`, because that set is the
+# contract for what is displayed and what /api/schema publishes. They still
+# have to be *selectable*, because the viewer resolvers read them to find a
+# structure. `best_structure` was not, so the E3 viewer's resolver read it as
+# undefined and built a spec with neither a url nor a PDB id, which loads
+# nothing at all. Nothing failed: the viewer just sat on its empty state.
+# --------------------------------------------------------------------------- #
+
+VIEWER_COLUMNS = {
+    "bridge": ("structure_file",),
+    "degron": ("structure_file",),
+    "ligase": ("structure_file", "best_structure"),
+}
+
+
+@pytest.mark.parametrize("record_type,column", [
+    (record_type, column)
+    for record_type, columns in VIEWER_COLUMNS.items()
+    for column in columns
+])
+def test_the_columns_the_viewer_needs_are_selectable(record_type, column):
+    query = parse({"record_type": record_type})
+    sql, _params = build_sql(query, [*RECORD_TYPES[record_type].default_columns, column])
+    assert column in sql
+
+
+def test_a_column_outside_the_schema_is_still_rejected():
+    """The allowlist above must not have become a way in for anything."""
+    query = parse({"record_type": "bridge"})
+    with pytest.raises(QueryError):
+        build_sql(query, ["pdb_id", "'; DROP TABLE bridge; --"])
+    with pytest.raises(QueryError):
+        build_sql(query, ["pdb_id", "triage_score"])
+
+
+def test_the_lysine_table_has_no_structure_file():
+    """Asking for one is a SQL error, not a validation error, so it is excluded
+    from VIEWER_COLUMNS by hand. This pins that reason down."""
+    assert "structure_file" not in RECORD_TYPES["lysine"].fields
+    # It passes validation, because the allowlist is global, and then fails in
+    # SQLite. That is exactly why the viewer must not request it.
+    query = parse({"record_type": "lysine"})
+    sql, _params = build_sql(query, ["uniprot_acc", "structure_file"])
+    assert "structure_file" in sql
+
+
+def test_an_unselectable_column_is_a_400_not_a_500():
+    """Column validation happens inside execute(), so the route has to catch
+    QueryError there too. It only caught sqlite3.Error, and a rejected column
+    reached the client as a 500 and a stack trace."""
+    from app import create_app
+
+    client = create_app().test_client()
+    response = client.post("/api/query", json={
+        "query": {"record_type": "bridge", "limit": 1},
+        "columns": ["pdb_id", "not_a_column"],
+    })
+    if response.status_code == 503:
+        pytest.skip("the atlas has not been built")
+    assert response.status_code == 400
+    assert "not_a_column" in (response.get_json() or {}).get("error", "")

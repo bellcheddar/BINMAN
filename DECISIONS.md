@@ -2148,3 +2148,68 @@ wrong answer, which is the good kind of failure again.
 all 21,717 rows and has never been populated. The new table carries
 `screen_degraded` instead, which is sourced, per finger and auditable. The old
 column should either be populated from a documented list or dropped.
+
+## D-056: every viewer frames its ligand, and three viewer bugs that hid behind it
+
+**Decision.** Every viewer now frames the thing its row is about, renders it as
+sticks and wraps it in an emissive neon shell that Mol*'s bloom pass turns into
+a glow. Bloom runs in `emissive` mode, so only that geometry blooms and the
+protein behind it stays readable.
+
+**How the ligand is named, which is the part that matters.** A trimmed entry
+keeps whatever sat near the interface: 10MF carries 42T, 1N7, a zinc and a
+magnesium, and only 42T is the bridge. Framing "every non-polymer" would centre
+the midpoint of four things and show none of them. The resolver now passes the
+row's `ccd_id`, and the viewer selects on it through Mol*'s query API, reached
+via the `lib` namespace the viewer bundle exports. Verified: the query returns
+exactly 112 atoms for 8FY1, which is exactly YF8's atom count.
+
+**Three bugs this uncovered, none of which announced itself.**
+
+1. **`structure_file` was never requested.** `default_columns` is the contract
+   for what is displayed, and the query returns exactly that set. The bridge
+   resolver read `row.structure_file` to choose between the local trimmed file
+   and RCSB, and it was always undefined, so **every viewer fetched from RCSB
+   and the 3,839 trimmed structures on disk were never read once**. 18,508
+   bridge rows have one.
+2. **The E3 viewer could never load anything.** Its resolver reads
+   `best_structure`, which was not in any default set *and* not selectable at
+   all. So `url` was null and `pdbId` was null together, and the viewer sat on
+   its empty state for all 650 ligases. It was not failing: it was being handed
+   nothing and displaying that correctly.
+3. **`cycleRepresentation` never changed a representation.** It called
+   `updateRepresentations(components, {type})`, and that method takes
+   (components, pivot, params), so the type object arrived as the pivot and the
+   params as undefined. The overlay said the representation had changed.
+
+**The camera, which needed two goes.** `focusLoci` with an animated duration is
+issued from the load promise, and Mol* queues its own camera reset when the
+first object commits. That reset lands afterwards, so the framing silently did
+not happen. The framing is now instant, re-issued once after the next draw, and
+only the explicit Reset button animates. This was caught by screenshotting a
+headless browser, not by reasoning: the DOM said the ligand had been found and
+the camera had not moved.
+
+**Where it does not apply, stated rather than faked.** An AlphaFold monomer has
+no ligand, so the degron and degradability viewers frame their row's residues
+instead: the hairpin tip plus six either side, or the lysine plus four. Those
+get Mol*'s own focus representation, which is ball-and-stick, but **not** the
+neon shell: attaching a custom representation needs a component built from a
+selection expression, and the viewer bundle exports the query API but not the
+expression builder. The lens viewer shows a protein node with neither a ligand
+nor a named site, so it frames the whole model. The root carries
+`data-ligand-focus` as `ligand`, `residues` or `none`, so which branch ran is
+visible rather than inferred.
+
+**A judgement call on the E3 page.** A ligase row names no ligand, so the
+viewer falls back to any non-furniture non-polymer. Framing that as tightly as
+a named glue showed a glowing dot in a void, so an inferred ligand is framed at
+a 28 Å minimum radius and a named one at 7 Å. Metals are deliberately not
+treated as furniture: a zinc can be the whole point, as it is in every C2H2
+degron in this atlas.
+
+**Also.** The viewer now fills its half of the workbench instead of stopping at
+its own min-height, so it ends on the same line as the table beside it. A
+rejected column reached the client as a 500 and a stack trace, because the
+route caught only `sqlite3.Error` and column validation happens inside
+`execute()`; it is a 400 with the reason now.

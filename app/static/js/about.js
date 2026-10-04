@@ -213,6 +213,7 @@
       B.mountViewer(first, {
         role: 'glue',
         pdbId: example.pdb_id,
+        ccdId: example.ccd_id,
         identifier: example.pdb_id + ' · ' + example.ccd_id,
         identifierHref: 'https://www.rcsb.org/structure/' + example.pdb_id,
         overlay: 'ΔSASA ' + Util.num(example.dsasa_a) + ' / ' +

@@ -328,6 +328,14 @@ code, kbd, samp, .mono { font-family: var(--data); font-size: 0.86em; }
 
 .split { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 0.9rem; }
 
+/* The table and the viewer are the two halves of the workbench, so they should
+ * end on the same line. The grid already stretches both cells to the taller of
+ * the two; the viewer stopped at its own min-height instead of filling the cell
+ * it was given, which left it floating short of the table beside it. Scoped to
+ * the workbench so the About page's example viewers keep their own size. */
+.split--workbench > * { display: flex; flex-direction: column; min-height: 0; }
+.split--workbench .viewer { flex: 1 1 auto; }
+
 .notice {
   border-left: 3px solid var(--accent); background: var(--accent-soft);
   color: var(--ink); padding: 0.6rem 0.75rem; border-radius: var(--radius);
