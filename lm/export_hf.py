@@ -144,8 +144,14 @@ def verify(out_dir: Path, limit: int = 25) -> dict:
     dtype = torch.float16 if device != "cpu" else torch.float32
 
     tokenizer = AutoTokenizer.from_pretrained(BASE_MODEL)
-    model = AutoModelForCausalLM.from_pretrained(
-        BASE_MODEL, torch_dtype=dtype, device_map=None).to(device)
+    # transformers 5 renamed `torch_dtype` to `dtype`; 4.x only knows the old
+    # name. Try the new one and fall back rather than pinning the library.
+    try:
+        model = AutoModelForCausalLM.from_pretrained(
+            BASE_MODEL, dtype=dtype, device_map=None).to(device)
+    except TypeError:
+        model = AutoModelForCausalLM.from_pretrained(
+            BASE_MODEL, torch_dtype=dtype, device_map=None).to(device)
     model = PeftModel.from_pretrained(model, str(out_dir)).eval()
 
     import sqlite3

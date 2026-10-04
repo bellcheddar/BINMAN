@@ -180,5 +180,6 @@ with gr.Blocks(title="BINMAN-LM") as demo:
             "What is the melting temperature of the complex?",
         ], unanswerable)
 
-if __name__ == "__main__":
-    demo.launch()
+# Spaces runs this file as __main__, so launch() is called either way. It is
+# unguarded because the Space is the only place this app runs.
+demo.launch()
