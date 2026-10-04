@@ -33,12 +33,22 @@ behind it carry licences that do not permit redistribution.
 
 | Secret or variable | Purpose |
 |---|---|
-| `HF_TOKEN` (secret) | read access to the private adapter repository |
 | `BINMAN_ADAPTER_REPO` (variable) | defaults to `Dellboy/binman-lm-adapter` |
+| `HF_TOKEN` (secret) | not needed for a public adapter; read if present |
 
-The adapter repository is **private**. The adapter is a derivative of training
-data whose licence permits internal use but not redistribution, so the weights
-are not published. See `DECISIONS.md` D-021 and D-029 in the repository.
+## Training data and licences
+
+The adapter is trained on data derived from BioLiP2, MGDB, MolGlueDB, MGTbind
+and PROTAC-DB, all cited with DOIs in the
+[repository README](https://github.com/bellcheddar/BINMAN#-source-data) and in
+`data/validation/MANIFEST.md`. **No source dataset is redistributed here**: the
+Space serves inference only.
+
+PROTAC-DB's terms permit internal use including derivatives and prohibit
+redistribution. Publishing these weights is a decision the author made
+explicitly, recorded as `DECISIONS.md` D-030, on the basis that the work is
+non-commercial and the source is credited. Anyone reusing the adapter should
+read that entry and form their own view.
 
 ## Reported performance
 

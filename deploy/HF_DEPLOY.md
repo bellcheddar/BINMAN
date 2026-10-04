@@ -3,18 +3,19 @@
 Everything here is scaffolded and tested as far as it can be without a CUDA
 machine. The steps needing your account are marked **you**.
 
-## Why the adapter repository is private
+## The adapter repository is public, by your decision
 
-Gate G4 authorised a public code repository. It did not authorise publishing
-the model, and your licence decision for PROTAC-DB was explicit: *"we are not
-distributing the model, just using it"* (DECISIONS D-021). The adapter is
-trained on Task B data derived from PROTAC-DB, whose terms permit internal use
-including derivatives but prohibit redistribution. A public weights repository
-would be redistribution.
+Recorded as D-030. The one thing it runs against, stated once so it is on the
+record rather than buried: PROTAC-DB's terms read "internal use only,
+derivatives included; redistribution prohibited", and a trained adapter is a
+derivative. That clause covers the weights whether or not the source data is
+shared, so "the input data is not shared" does not by itself clear it.
 
-A **private** adapter repository that only the Space can read keeps that
-position intact: the Space serves inference, the weights are not published, and
-the sources are cited. See D-029.
+Your call, made with the reasoning in D-030: non-commercial, source credited,
+no dataset redistributed. If you later want it airtight rather than defensible,
+rebuilding Task B's `protac` class from a redistributable source would remove
+the question entirely, at the cost of the glue-against-PROTAC confusion the
+confusion matrix exists to expose.
 
 ## 1. Convert the MLX adapter to PEFT
 
@@ -31,31 +32,41 @@ adapter that loads cleanly but answers badly is exactly the failure that
 produced D-016. Without a CUDA box the verification runs on MPS, which is the
 same numerics the Space will use (float16) on different hardware.
 
-## 2. Create the private adapter repository (**you**)
+## 2. Authenticate (**you**, once)
 
-The session token has `contribute-repos` but repository creation is not exposed
-through the connector, so this is yours to run:
+This is the only step that needs you. Run it in the Claude Code session with a
+leading `!` so the output lands in the conversation:
 
-```bash
-pip install -U "huggingface_hub[cli]"
-hf auth login
-hf repo create binman-lm-adapter --repo-type model --private
-hf upload Dellboy/binman-lm-adapter models/binman-lm/hf-adapter . --repo-type model
+```
+!pip install -U "huggingface_hub[cli]" && hf auth login
 ```
 
-## 3. Create the Space (**you**)
+Paste a token with **write** scope when prompted. It is stored in the
+HuggingFace CLI's own credential store, which means the rest of the deployment
+can run without the token ever being read, printed or committed.
+
+Searching your other projects for a token was blocked by the sandbox's
+credential guard, which is the right behaviour: `hf auth login` is the safer
+route and needs doing once.
+
+## 3. Create and upload both repositories
+
+Once authenticated, these can run unattended:
 
 ```bash
+hf repo create binman-lm-adapter --repo-type model
+hf upload Dellboy/binman-lm-adapter models/binman-lm/hf-adapter . --repo-type model
+
 hf repo create binman-lm --repo-type space --space_sdk gradio
 hf upload Dellboy/binman-lm deploy/hf-space . --repo-type space
 ```
 
 Then in the Space settings:
 
-- **Hardware**: ZeroGPU (your account is PRO, so this is available)
-- **Secret** `HF_TOKEN`: a read token with access to the private adapter repo
-- **Variable** `BINMAN_ADAPTER_REPO`: `Dellboy/binman-lm-adapter` (only if the
-  name differs from the default)
+- **Hardware**: ZeroGPU (the account is PRO, so this is available)
+- **Variable** `BINMAN_ADAPTER_REPO`: only if the repo name differs from
+  `Dellboy/binman-lm-adapter`
+- No `HF_TOKEN` secret is needed while the adapter repository is public
 
 ## 4. What the Space serves
 

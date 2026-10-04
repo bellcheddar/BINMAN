@@ -27,9 +27,9 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 
 BASE_MODEL = "Qwen/Qwen2.5-3B-Instruct"
 ADAPTER_REPO = os.environ.get("BINMAN_ADAPTER_REPO", "Dellboy/binman-lm-adapter")
-# The adapter repo is private: the trained weights are a derivative of data
-# whose licence does not permit redistribution, so the Space reads it with a
-# token rather than the repo being public. See DECISIONS D-021 and D-029.
+# The adapter repository is public by Marc's decision (DECISIONS D-030), which
+# records the reasoning and the one term it runs against. No token is needed,
+# but one is still read if present so a private repo keeps working unchanged.
 HF_TOKEN = os.environ.get("HF_TOKEN")
 
 TRAINED_SYSTEM = (

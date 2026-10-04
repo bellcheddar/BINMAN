@@ -927,3 +927,36 @@ beside the MLX numbers is not one of them.
 redistribution, or dropped, the adapter could be published. Task B would then
 be three classes rather than four, and the glue-against-PROTAC confusion that
 the confusion matrix exists to expose would no longer be measurable.
+
+## D-030: the adapter is published, and the term it runs against is named
+
+**Decision.** The BINMAN-LM adapter is published to a **public** HuggingFace
+model repository and served from a public ZeroGPU Space. This supersedes D-029,
+which had it private.
+
+**Context.** Marc: "the huggingface can go public as the input data source is
+not shared." That premise is correct as far as it goes, and it is not the thing
+the restriction turns on, which is worth recording rather than smoothing over.
+
+**The term.** PROTAC-DB ships under "internal use only, **derivatives
+included**; redistribution prohibited" (Hou group terms, 2024-09-29). A LoRA
+adapter trained on Task B data derived from PROTAC-DB is a derivative. The
+clause therefore reaches the weights whether or not the source CSV is shared,
+so not sharing the data does not by itself clear it. D-021 accepted the data on
+the basis "we are not distributing the model, just using it"; publishing the
+model is a change to that basis, not an application of it.
+
+**Reason it proceeds anyway.** This is Marc's project, his licence call, and he
+made it after the term was put in front of him twice. The work is
+non-commercial, every source is credited with a DOI in the repository README,
+the Space card and `data/validation/MANIFEST.md`, and no source dataset is
+redistributed. The exposure is his to carry and he has chosen to carry it.
+
+**What would remove the question.** Rebuilding Task B's `protac` class from a
+source that permits redistribution, or dropping it. Task B would become three
+classes, and the glue-against-PROTAC confusion that the confusion matrix exists
+to expose would stop being measurable, which is a real cost rather than a
+formality: that cell is where the model's errors concentrate.
+
+**Reversal.** Making the repository private again restores D-029 exactly. The
+Space reads `HF_TOKEN` if it is present, so nothing in the code changes.
