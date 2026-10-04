@@ -1,0 +1,20 @@
+Qwen is licensed under the Qwen RESEARCH LICENSE AGREEMENT, Copyright (c)
+Alibaba Cloud. All Rights Reserved.
+
+This repository contains a LoRA adapter for Qwen/Qwen2.5-3B-Instruct. It does
+not contain the base model weights. The adapter was trained by Marc C. Deller
+as part of the BINMAN project (https://github.com/bellcheddar/BINMAN) and is a
+modification within the meaning of section 3 of that Agreement.
+
+Modifications, stated as section 3(b) requires:
+
+  * LoRA factors of rank 8 were trained over 16 layers of the base model,
+    targeting q_proj, k_proj, v_proj, o_proj, gate_proj, up_proj and down_proj.
+    The base model weights themselves are unchanged and are not redistributed
+    here.
+  * The adapter was trained with mlx-lm against the 4-bit quantisation
+    mlx-community/Qwen2.5-3B-Instruct-4bit, then converted to PEFT layout by
+    lm/export_hf.py in the BINMAN repository. The conversion transposes both
+    LoRA factors and restates the MLX scale as PEFT's lora_alpha.
+
+Use is NON-COMMERCIAL ONLY, as section 2(a) of the Agreement requires.

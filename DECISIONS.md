@@ -960,3 +960,38 @@ formality: that cell is where the model's errors concentrate.
 
 **Reversal.** Making the repository private again restores D-029 exactly. The
 Space reads `HF_TOKEN` if it is present, so nothing in the code changes.
+
+## D-031: the base model is Qwen Research licensed, not Apache-2.0
+
+**Decision.** The Space card and the adapter model card both declare
+`license: other` with `license_name: qwen-research`, the adapter repository
+ships the Agreement as `LICENSE` and the required attribution as `NOTICE`, and
+both cards state that use is non-commercial only.
+
+**Context.** The deployment scaffold declared `license: apache-2.0` on the
+Space. That was wrong. Most Qwen2.5 sizes are Apache-2.0, but **3B and 72B are
+not**: `Qwen/Qwen2.5-3B-Instruct` carries `license: other` on the Hub and ships
+the **Qwen RESEARCH LICENSE AGREEMENT**, which grants rights "FOR
+NON-COMMERCIAL PURPOSES ONLY" (section 2a). The error was caught by checking
+the base model's own metadata before writing the model card rather than by
+assuming the family licence.
+
+**What section 3 requires of a redistributed derivative**, all now satisfied:
+give recipients a copy of the Agreement (3a, `LICENSE`); carry prominent
+notices of what was changed (3b, `NOTICE` names the LoRA rank, layers, targets
+and the MLX-to-PEFT conversion); retain the attribution string "Qwen is
+licensed under the Qwen RESEARCH LICENSE AGREEMENT, Copyright (c) Alibaba
+Cloud. All Rights Reserved." in a Notice file (3c); own copyright may be added
+(3d).
+
+**Reason it is compatible.** The Agreement permits distributing derivative
+works, so publishing the adapter is allowed where publishing it under a claimed
+Apache-2.0 would have misrepresented the terms to anyone downstream. The
+non-commercial restriction matches Marc's own stated basis for the project,
+"we are not for profit" (D-021, D-030), so nothing about the project changes.
+What changes is that the restriction is now stated to people who might reuse
+the weights, rather than being silently dropped.
+
+**Reversal.** Serving a base whose licence is Apache-2.0 would remove the
+restriction. Qwen2.5-7B-Instruct is Apache-2.0 and would need a retrain rather
+than a relabel, so this is a real choice and not a metadata edit.

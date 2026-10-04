@@ -7,7 +7,11 @@ sdk: gradio
 sdk_version: 4.44.0
 app_file: app.py
 pinned: false
-license: apache-2.0
+license: other
+license_name: qwen-research
+license_link: https://huggingface.co/Qwen/Qwen2.5-3B-Instruct/blob/main/LICENSE
+models:
+  - Dellboy/binman-lm-adapter
 short_description: "Molecular glue atlas LM: query, triage, abstain"
 ---
 
@@ -35,6 +39,14 @@ behind it carry licences that do not permit redistribution.
 |---|---|
 | `BINMAN_ADAPTER_REPO` (variable) | defaults to `Dellboy/binman-lm-adapter` |
 | `HF_TOKEN` (secret) | not needed for a public adapter; read if present |
+
+## Licence
+
+The base model is `Qwen/Qwen2.5-3B-Instruct` under the **Qwen Research License
+Agreement**: non-commercial use only. Qwen2.5 is Apache-2.0 at most sizes but
+**not at 3B**, which is the size used here. The adapter is redistributed under
+the same terms, with the Agreement and the required attribution notice in the
+[adapter repository](https://huggingface.co/Dellboy/binman-lm-adapter).
 
 ## Training data and licences
 
