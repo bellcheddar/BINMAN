@@ -663,3 +663,4 @@ One line per meaningful event, timestamped UTC (spec Section 0 rule 5).
 | 2026-10-04T21:32:28+00:00 | 9.2 | Degron ablation: pooling and position selection both lose to the shipped model (0.8304); nested position selection scores 0.7449. |
 | 2026-10-04T21:32:54+00:00 | 9 | Validation run against binman.sqlite: 0 metric(s) not computed (dataset unavailable), 2 measured floor(s) missed. |
 | 2026-10-04T21:32:55+00:00 | 9 | Validation run against binman.sqlite: 4 metric(s) not computed (dataset unavailable), 5 measured floor(s) missed. |
+| 2026-10-04T21:59:31+00:00 | 1.3 | Bridge run starting: 52,821 entries pending of 52,822 catalogued (tiers 1 to 3), 16 IO workers, 14 geometry workers. |

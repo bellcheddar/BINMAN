@@ -2541,3 +2541,52 @@ at all (the homo-oligomeric scope hole, D-062), 7 bridge correctly at the
 shipped thresholds and are missed because their CCD was classed as a cofactor,
 cryoprotectant, detergent or peptide-like, and the remainder never reach a
 qualifying second chain and look like correct rejections.
+
+## D-064: the contact floor drops to 2, on Marc's authorisation
+
+**Decision.** `bridging.min_heavy_atom_contacts` goes from 3 to 2. Marc
+authorised it after being shown the measured cost and benefit together. The
+homo-oligomeric scope change (D-062) is authorised separately and runs after the
+32B training finishes, as a second change measured on its own.
+
+**This is the second threshold adjustment in the build and spec 9.6 allows one.**
+The first is spent on the degron geometry thresholds
+(`calibration_date = 2026-10-03`). So this is a deviation taken on an explicit
+decision, not on the spec's allowance, and it is recorded as a deviation rather
+than dressed up as one of the permitted kind.
+
+**What was measured before the change, not after.**
+
+| | contacts >= 3 | contacts >= 2 |
+|---|---:|---:|
+| recall against the curated set | 0.7719 | **0.8250** |
+| bridge instances atlas-wide | 110,372 | 122,048 |
+| glue_candidate share of bridges | 12.7% | 12.9% |
+| artefact precision | 0.9391 | unchanged |
+
+Artefact precision does not move because it is computed over CCD classifications
+in the `ligand` table and never consults this floor. The glue share of the
+11,676 newly admitted instances is 14.9%, which is richer than the 12.7% already
+there, so the relaxation is not a furniture flood: it admits a slightly better
+mix than the atlas already carries.
+
+**Recall still misses the floor at 0.8250.** This change alone does not fix 9.1,
+and it was not chosen as a way to reach a number. It was chosen because
+rejecting fusicoccin is wrong on the merits: 965 A^2 buried against 14-3-3 and
+139 A^2 against the phosphopeptide is a bridge by any reading of spec 5.1's
+intent, and it failed on a count of close approaches. The remaining gap needs
+the homo-oligomeric entries (20) and the misclassified CCDs (7).
+
+**Running it.** The bridge stage re-runs in full, 52,821 entries, because the
+bridge rows carry interface residues, PLIP types and buried fractions that are
+not in `halves.jsonl` and cannot be reconstructed from it. The contacts=3 state
+is preserved in `data/interim/prev-contacts3/` as the comparison baseline and
+the rollback, including the whole atlas as it shipped.
+
+**A mistake worth recording.** The first backup copied
+`data/interim/bridges.jsonl` and `data/manifests/bridges.jsonl` into one
+directory. They share a basename, so the second overwrote the first, and the
+originals were then truncated for the clean re-run. It cost nothing, because
+every row of the lost file is in the preserved atlas, but it was luck rather
+than care: two paths differing only by directory went into one flat backup
+without checking. The backup is named by content now.

@@ -8,7 +8,30 @@
 [bridging]
 # spec 5.1: a non-polymer entity bridges chains A and B when all of these hold.
 min_dsasa_per_chain_a2       = 25.0   # buried area against each chain, Angstrom^2
-min_heavy_atom_contacts      = 3      # heavy-atom contacts under the cutoff below
+# ADJUSTED 2026-10-04 from 3 to 2, authorised by Marc. This is the SECOND
+# documented threshold adjustment in the build; spec 9.6 allows one, so this one
+# is a deviation taken on an explicit decision rather than on the spec's
+# allowance, and it is recorded as such in DECISIONS.md D-064.
+#
+# WHAT IT COSTS AND WHAT IT BUYS, both measured before the change:
+#
+#   recall       0.7719 -> 0.8250   (+17 curated entries, floor 0.85)
+#   bridges     110,372 -> 122,048  (+10.6% of instances)
+#   glue share     12.7% ->  12.9%  (the admitted mix is 14.9% glue, which is
+#                                    richer than the existing 12.7%, so this
+#                                    does not flood the atlas with furniture)
+#   artefact precision   unchanged: it is computed over CCD classifications in
+#                        the `ligand` table and does not depend on this floor.
+#
+# WHY 3 WAS WRONG. The criterion is meant to stop a ligand being called a bridge
+# when it merely passes near a second chain. At 3 it was rejecting the opposite
+# case: a glue lying flat in a shallow groove, burying a lot of surface through
+# few close approaches. In 3SML the ligand buries 628 A^2 against 14-3-3 sigma
+# and 145 A^2 against the phosphopeptide, five times the 25 A^2 floor on the
+# weaker side, with 2 contacts. In 3P1O fusicoccin buries 965 and 139. Both were
+# rejected. dSASA and contact count are not independent checks on that geometry:
+# the second was overruling the first on exactly what the module exists to find.
+min_heavy_atom_contacts      = 2      # was 3; see the measured note above
 contact_cutoff_a             = 4.0    # Angstrom
 min_ligand_heavy_atoms       = 10     # ~150 Da, waived for prior glue_candidate CCDs
 sasa_probe_radius_a          = 1.4
