@@ -1753,3 +1753,53 @@ geometry, which is uninformative (D-042). Replacing it with a compound-specific
 sequence model would mean the atlas column answers "degraded by pomalidomide"
 rather than "has degron geometry", which is a different and better question but
 also a different column. That is Gate G6.
+
+## D-049: the alanine scan, and the atlas gains a second degron column
+
+**Decision.** The Slabicki alanine scan weights the sequence features, and the
+atlas gains `imid_degradation_score` beside `degron_geometry_score`. Both ship.
+
+**The alanine scan.** Slabicki Table S4 is 174,640 measurements: every position
+of eight degron-bearing constructs mutated to alanine against twenty
+glutarimide analogs, **including POM, LEN and THAL**, so it measures importance
+for the compounds being modelled rather than for a proxy. Unlike the primary
+screen it is not truncated. Every construct is 58 residues with its two C2H2
+motifs at offsets 6 and 34, consistently across all eight genes, so `id - start`
+maps straight onto the anchored coordinates the model already uses.
+
+Weighting the features by measured importance, nested validation throughout:
+
+| compound | features | AUC | sensitivity | specificity |
+|---|---|---:|---:|---:|
+| pomalidomide | unweighted | 0.832 | 0.800 | 0.614 |
+| **pomalidomide** | **alanine-weighted** | 0.830 | **0.867** | 0.613 |
+| lenalidomide | unweighted | 0.820 | 0.800 | 0.612 |
+| **lenalidomide** | **alanine-weighted** | 0.823 | **0.900** | 0.608 |
+
+The AUC does not move and the sensitivity does, which is the metric spec 9.2
+turns on. The result is stable across nine floor and power settings for the
+weighting, so it is not a tuned artefact; the default is kept.
+
+**The new column.** `imid_degradation_score` is the predicted probability that
+a C2H2 zinc finger is degraded by pomalidomide. 4,650 of 21,717 candidates are
+scored and the remaining 17,067 are **NULL on purpose**: they carry no C2H2
+motif, the model is a zinc-finger model, and a number there would be invented.
+
+**Why it does not replace the geometry score.** They answer different
+questions, "has degron shape" against "is degraded by pomalidomide", and the
+geometry column is what the UI has always explained. Overwriting it would
+change what a column means without changing its name, which is the kind of
+quiet redefinition this project exists to avoid. The degron page now carries a
+notice distinguishing them.
+
+**The sanity check is a sanity check, not evidence.** ZFP91 scores 0.991,
+ZNF276 0.959, IKZF1 and IKZF3 0.907, PATZ1 0.873, and the top of the table is
+dominated by genuine Sievers positives. Those genes are in the training set, so
+this only shows the model is not broken. The nested AUC of 0.830 is the
+evidence.
+
+**A real limitation it exposed.** ZNF653 scores 0.106 and ZNF692 0.046 despite
+being true substrates. For a protein with many zinc fingers the scorer takes
+the first C2H2 motif in the window around the hairpin, which need not be the
+degron-bearing finger. Scoring every finger and keeping the maximum would fix
+it and is the obvious next improvement.

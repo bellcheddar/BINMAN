@@ -592,3 +592,8 @@ One line per meaningful event, timestamped UTC (spec Section 0 rule 5).
 | 2026-10-04T15:27:06+00:00 | 9 | Validation run against binman.sqlite: 4 metric(s) not computed (dataset unavailable), 5 measured floor(s) missed. |
 | 2026-10-04T15:37:49+00:00 | 9 | Validation run against binman.sqlite: 0 metric(s) not computed (dataset unavailable), 2 measured floor(s) missed. |
 | 2026-10-04T15:37:50+00:00 | 9 | Validation run against binman.sqlite: 4 metric(s) not computed (dataset unavailable), 5 measured floor(s) missed. |
+| 2026-10-04T15:42:09+00:00 | 5.2 | Alanine scan: 59,570 measurements over 31 genes and 20 compounds mapped to anchored positions. |
+| 2026-10-04T15:43:56+00:00 | 5.2 | imid_degradation_score written for 9 degron candidates; 391 carry no C2H2 motif and are left NULL. |
+| 2026-10-04T15:46:48+00:00 | 5.2 | imid_degradation_score written for 4,650 degron candidates; 17,067 carry no C2H2 motif and are left NULL. |
+| 2026-10-04T15:47:34+00:00 | 9 | Validation run against binman.sqlite: 0 metric(s) not computed (dataset unavailable), 2 measured floor(s) missed. |
+| 2026-10-04T15:47:35+00:00 | 9 | Validation run against binman.sqlite: 4 metric(s) not computed (dataset unavailable), 5 measured floor(s) missed. |

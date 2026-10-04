@@ -15,6 +15,24 @@
   largely detects the fold. Use it to generate hypotheses, not to triage. Full
   contingency table and threshold sweep on the About tab.
 </div>
+
+<div class="notice">
+  <strong>Two scores, two questions.</strong>
+  <code>degron_geometry_score</code> ranks hairpin geometry and is the one that
+  scores below chance above. <code>imid_degradation_score</code> is a different
+  question: the predicted probability that a <em>C2H2 zinc finger</em> is
+  degraded by <strong>pomalidomide</strong>, from a sequence model validated on
+  the Sievers degrome with features weighted by the Slabicki alanine scan. It
+  reaches a nested held-out AUC of <strong>0.830</strong> at sensitivity
+  <strong>0.867</strong> and specificity <strong>0.613</strong>, which clears
+  the spec 9.2 floors that the geometry misses.
+  <br><br>
+  It is <strong>empty for most rows on purpose</strong>: 4,650 of 21,717
+  candidates carry a zinc finger, and the model has nothing to say about the
+  rest. It is also specific to pomalidomide. The same features predict
+  lenalidomide well and the promiscuous analogs barely at all, which is a
+  finding rather than a limitation: degradability is compound-specific.
+</div>
 {% endblock %}
 
 {% block module_viewer %}

@@ -161,6 +161,10 @@ def _degron_fields() -> dict[str, FieldSpec]:
         FieldSpec("tip_rel_sasa", "number", "Tip relative SASA", description="0 to 1"),
         FieldSpec("degron_geometry_score", "number", "Degron geometry score",
                   description="a geometric filter rank, not a calibrated probability"),
+        FieldSpec("imid_degradation_score", "number", "IMiD degradation score",
+                  description=("predicted probability that this C2H2 zinc finger "
+                               "is degraded by pomalidomide; empty where the "
+                               "candidate carries no zinc finger")),
         FieldSpec("motif_family", "text", "Motif family"),
         FieldSpec("is_known_neosubstrate", "bool", "Known neosubstrate"),
     ]
@@ -232,6 +236,7 @@ RECORD_TYPES: dict[str, RecordType] = {
         default_columns=(
             "uniprot_acc", "gene", "tip_res", "tip_aa", "turn_length",
             "mean_plddt", "tip_rel_sasa", "degron_geometry_score",
+            "imid_degradation_score",
         ),
         identity_columns=("id",),
     ),
