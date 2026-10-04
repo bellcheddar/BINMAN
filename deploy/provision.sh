@@ -72,7 +72,13 @@ rsync -az deploy/binman-web.service "$DROPLET:/etc/systemd/system/binman-web.ser
 ssh "$DROPLET" bash -s <<'REMOTE'
 set -euo pipefail
 systemctl daemon-reload
-systemctl enable --now binman-web.service
+systemctl enable binman-web.service
+# `enable --now` starts the service only when it is stopped, so on every
+# redeploy of an already-running app it did nothing. Flask caches templates in
+# the worker processes, so the new HTML sat on disk while gunicorn kept serving
+# the old: a template change has never reached the live site from this script.
+# Static files were fine, which is what made it hard to see. Restart always.
+systemctl restart binman-web.service
 sleep 3
 systemctl is-active --quiet binman-web.service || { journalctl -u binman-web -n 30 --no-pager; exit 1; }
 curl -fsS -o /dev/null -w 'local gunicorn: HTTP %{http_code}\n' http://127.0.0.1:8090/ || exit 1

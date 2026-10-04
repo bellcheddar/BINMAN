@@ -2213,3 +2213,15 @@ its own min-height, so it ends on the same line as the table beside it. A
 rejected column reached the client as a 500 and a stack trace, because the
 route caught only `sqlite3.Error` and column validation happens inside
 `execute()`; it is a 400 with the reason now.
+
+**A fourth bug, found while deploying this one.** `provision.sh` ran
+`systemctl enable --now binman-web.service`. `--now` starts a stopped service
+and does nothing to a running one, so the app was never restarted on redeploy.
+Flask caches templates inside the worker processes, so new HTML landed on disk
+while gunicorn kept serving the old. Static files updated normally, which is
+what made it invisible: CSS and JavaScript changes appeared live and template
+changes did not, from the same deploy, with no error anywhere. **No template
+change has ever reached the live site from this script.** It now restarts
+unconditionally, and the fix was confirmed by watching `class="split"` become
+`class="split split--workbench"` on the live site after a restart and not
+before.
