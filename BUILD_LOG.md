@@ -454,3 +454,14 @@ One line per meaningful event, timestamped UTC (spec Section 0 rule 5).
 | 2026-10-04T01:11:00+00:00 | 9 | Validation run against binman.sqlite: 4 metric(s) not computed (dataset unavailable), 4 measured floor(s) missed. |
 | 2026-10-04T01:18:25+00:00 | 9 | Validation run against binman.sqlite: 0 metric(s) not computed (dataset unavailable), 2 measured floor(s) missed. |
 | 2026-10-04T01:18:26+00:00 | 9 | Validation run against binman.sqlite: 4 metric(s) not computed (dataset unavailable), 4 measured floor(s) missed. |
+| 2026-10-04T01:21:30+00:00 | 1.0 | Validation datasets: 11/13 resolved (biolip2_annotations, biolip2_artefacts, digly_sites, mgdb_glues, mgtbind_compounds, mgtbind_ternary, molgluedb_glues, protacdb_protacs, sievers_zf_screen, ubibrowser_literature_e3, ubibrowser_predicted_e3). Manifest at data/validation/MANIFEST.md. |
+| 2026-10-04T01:21:30+00:00 | gate | G7 opened: 2 validation dataset(s) could not be obtained automatically: degronopedia, protcid_interfaces. |
+| 2026-10-04T01:23:33+00:00 | 2.3 | Accessibility fitted on 403 proteins: min_nz_rel_sasa 0.241, held-out AUC 0.5458 over 338 observed sites. Reach stays unfitted. |
+| 2026-10-04T01:24:36+00:00 | 2.3 | Accessibility fit on 403 proteins scored held-out AUC 0.5458 against a 0.65 floor. Nothing written back; no verdict emitted. |
+| 2026-10-04T01:25:39+00:00 | 2.3 | Accessibility fit on 403 proteins scored held-out AUC 0.5458 against a 0.65 floor. Nothing written back; no verdict emitted. |
+| 2026-10-04T01:25:46+00:00 | 9 | Validation run against binman.sqlite: 2 metric(s) not computed (dataset unavailable), 5 measured floor(s) missed. |
+| 2026-10-04T01:25:48+00:00 | 9 | Validation run against binman.sqlite: 0 metric(s) not computed (dataset unavailable), 2 measured floor(s) missed. |
+| 2026-10-04T01:25:49+00:00 | 9 | Validation run against binman.sqlite: 2 metric(s) not computed (dataset unavailable), 5 measured floor(s) missed. |
+| 2026-10-04T01:26:29+00:00 | 4.1b | About tab generated: 52 references, 11/13 datasets resolved, worked example selected, 2 value(s) not recorded. |
+| 2026-10-04T01:26:31+00:00 | 9 | Validation run against binman.sqlite: 0 metric(s) not computed (dataset unavailable), 2 measured floor(s) missed. |
+| 2026-10-04T01:26:32+00:00 | 9 | Validation run against binman.sqlite: 2 metric(s) not computed (dataset unavailable), 5 measured floor(s) missed. |

@@ -31,6 +31,13 @@ STAGE = "validate"
 DEFAULT_DB = ATLAS / "binman.sqlite"
 
 
+def _json_file(path: Path) -> dict:
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return {}
+
+
 def not_computed(reason: str, floor=None) -> dict:
     return {"computed": False, "reason": reason, "floor": floor, "value": None}
 
@@ -659,16 +666,48 @@ def section_94(connection: sqlite3.Connection, config) -> dict:
     window = config.thresholds["degradability"]["reach_window"]
     out: dict = {"title": "Degradability"}
 
-    out["held_out_auc"] = not_computed(
-        "Observed diGly ubiquitylation sites are unavailable: PhosphoSitePlus "
-        "requires registration and the ProteomeXchange diGly datasets did not "
-        "resolve (Gate G7). The reach window is therefore unfitted, no verdict is "
-        "emitted, and the AUC is not computed.",
-        floors["degradability_auc_floor"])
+    report = _json_file(INTERIM / "degradability_fit.json")
+    if not report:
+        out["held_out_auc"] = not_computed(
+            "No observed ubiquitylation site table is available, so the window is "
+            "unfitted, no verdict is emitted and the AUC is not computed.",
+            floors["degradability_auc_floor"])
+        out["protein_level_split_honoured"] = not_computed(
+            "No fit has run, so there is no split to assert.")
+    else:
+        out["held_out_auc"] = computed(
+            report.get("held_out_auc"), floors["degradability_auc_floor"],
+            source=(
+                "UniProt CROSSLNK ubiquitin isopeptide annotations for the "
+                f"reviewed human proteome ({report.get('n_positive')} observed "
+                f"sites on {report.get('n_proteins')} proteins, "
+                f"{report.get('n_negative')} unannotated lysines as negatives), "
+                "measured on a protein-level split with "
+                f"{report.get('n_held_out_positive')} observed sites held out."
+            ),
+            note=(
+                "**Accessibility only.** This is the AUC of lysine NZ relative "
+                "accessibility as a predictor of whether a lysine carries an "
+                "observed ubiquitylation site. The three Cb-Cb reach boundaries "
+                "are unfitted and no reach verdict is emitted: an AlphaFold "
+                "monomer carrying an observed site has no ligand site for the "
+                "distance to be measured from. The negatives are lysines with no "
+                "annotation, not lysines assayed and found unmodified, so this "
+                "is a weaker construction than the matched screen behind 9.2."
+            ),
+        )
+        out["protein_level_split_honoured"] = computed(
+            True, None,
+            note=("A protein contributes wholly to train or wholly to test: "
+                  f"{report.get('n_proteins_held_out')} of "
+                  f"{report.get('n_proteins')} proteins were held out."))
     out["window_fitted"] = {"computed": True, "value": bool(window.get("fitted")),
-                            "reason": "", "fit_status": window.get("fit_status")}
-    out["protein_level_split_honoured"] = not_computed(
-        "No fit has run, so there is no split to assert.")
+                            "reason": "", "fit_status": window.get("fit_status"),
+                            "note": ("The fit ran but its held-out AUC misses the "
+                                     "floor, so nothing was written back: spec 5.4 "
+                                     "forbids a starting value surviving into a "
+                                     "shipped config unless the fit lands on it.")
+                            if report and not report.get("clears_floor") else None}
     out["honest_limits"] = [
         "Observed ubiquitylation sites come from native E3 biology, not from "
         "induced ternary complexes, so the window would be a proxy even once fitted.",

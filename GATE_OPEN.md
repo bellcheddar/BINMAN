@@ -1,27 +1,27 @@
-# Gate G6 open
+# Gate G7 open
 
-Opened at 2026-10-04T00:17:37+00:00.
+Opened at 2026-10-04T01:21:30+00:00.
 
 ## What is needed
 
-A decision on whether to ship the Degron Scan at all, now that spec 9.2 is measured and fails.
+2 validation dataset(s) could not be obtained automatically: degronopedia, protcid_interfaces.
 
-Sensitivity 0.656 against a floor of 0.70, specificity 0.353 against a floor of 0.60, ROC AUC 0.441 -- below chance -- on 32 depleted and 5,476 matched non-depleted zinc fingers from Sievers et al. 2018. The filter calls 3,544 of the 5,476 negatives. No cut on degron_geometry_score clears both floors (best Youden's J = 0.022), and spec 9.6's single threshold adjustment was already spent on D-010, so no second adjustment was made.
+Each publishes through a JavaScript front end with no documented bulk-export endpoint, or sits behind registration. Spec 4.1b forbids substituting a hand-written control, so the metrics that depend on these are reported as not computed.
 
-Diagnosis: a C2H2 zinc finger is itself a short antiparallel hairpin with an exposed glycine-bearing turn, so the spec 5.2 geometry describes the domain family rather than degradability. The canonical neosubstrates (IKZF3, ZFP91, E4F1) are recovered, but twelve non-degraded zinc fingers outrank all three.
-
-The default taken, per spec 9.2's own instruction for this case, is to keep the module and relabel it a hypothesis generator rather than a classifier, with the measured numbers on its face. The alternative is to drop the module from the shipped app.
+See data/validation/MANIFEST.md for the homepage and citation of each, and the exact outcome of every route tried.
 
 ## What unblocks it
 
 ```bash
-pixi run python -m pipeline.validate --section 9.2
+# download each file by hand from its homepage, then:
+#   mv <file> data/validation/raw/<dataset_name>
+pixi run python pipeline/acquire_validation.py --refresh
 ```
 
 ## Already done
 
-Sievers et al. 2018 data files S2 and S6 acquired, pooled and wired in as the sievers_zf_screen dataset; spec 9.2 sensitivity, specificity, full contingency table, ROC AUC and a complete threshold sweep computed and written to FINDINGS.md; DECISIONS D-024 records the reasoning and the reversal condition; the module, the README and the app are relabelled as a hypothesis generator.
+11 dataset(s) resolved and parsed: biolip2_annotations, biolip2_artefacts, digly_sites, mgdb_glues, mgtbind_compounds, mgtbind_ternary, molgluedb_glues, protacdb_protacs, sievers_zf_screen, ubibrowser_literature_e3, ubibrowser_predicted_e3. Row counts, licences and retrieval timestamps are recorded in data/validation/MANIFEST.md.
 
 ## What happens next
 
-Nothing is blocked. The build continues with the module shipped and flagged. Marc's call: accept the flagged caveat, or drop the Degron Scan from the app. To make it a classifier instead, add a feature that separates degraded from non-degraded zinc fingers within the C2H2 family -- degron sequence context, CRBN interface complementarity, or Zn-coordination geometry -- and re-run against the same matched set.
+G7 is non-blocking by spec. The build continues with the datasets that resolved. Section 9 metrics that depend on a missing dataset are reported as 'not computed: dataset unavailable' in FINDINGS.md, never estimated.

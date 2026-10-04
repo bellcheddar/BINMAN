@@ -226,13 +226,217 @@ def fit_reach_window(write_back: bool = True) -> dict:
                          "values remain flagged unfitted.")
         return report
 
-    # The fitting path is implemented and waiting on the dataset: positives are
-    # lysines with an observed site, negatives are surface lysines on the same
-    # proteins with none, and the split is by protein so no protein appears in
-    # both halves.
-    raise NotImplementedError(
-        f"diGly source '{source}' resolved but the fit is not wired up yet"
-    )
+    return fit_accessibility(source, write_back=write_back)
+
+
+def lysine_accessibility(structure_path: Path, structure_id: str,
+                         sasa: SasaCalculator) -> dict[int, float]:
+    """Relative NZ accessibility for every lysine, with no site definition.
+
+    `measure_lysines` needs a site because it also measures reach. Fitting
+    against observed ubiquitylation sites does not: the question there is
+    whether an observed site is more exposed than an unobserved one, and
+    exposure is a property of the residue in its own structure.
+    """
+    import gemmi
+
+    structure = gemmi.read_structure(str(structure_path))
+    structure.setup_entities()
+    structure.remove_alternative_conformations()
+    structure.remove_hydrogens()
+    structure.remove_waters()
+    if len(structure) == 0:
+        return {}
+
+    whole = AtomGroup(label=f"{structure_id}:all")
+    nz_indices: dict[int, int] = {}
+    for chain in structure[0]:
+        for residue in chain:
+            for atom in residue:
+                if atom.element.name.upper() in {"H", "D"}:
+                    continue
+                if residue.name == "LYS" and atom.name == "NZ":
+                    nz_indices[residue.seqid.num] = len(whole)
+                whole.add(atom.pos.x, atom.pos.y, atom.pos.z, atom.element.name,
+                          f"{residue.name} {residue.seqid.num}", atom.name)
+    if not nz_indices:
+        return {}
+
+    areas = sasa.per_atom(whole, cache_key=f"whole:{structure_id}")
+    return {num: (areas[i] / LYS_MAX_ASA if i < len(areas) else 0.0)
+            for num, i in nz_indices.items()}
+
+
+def fit_accessibility(source: str, write_back: bool = True) -> dict:
+    """Fit `min_nz_rel_sasa` against observed ubiquitylation sites.
+
+    Positives are lysines UniProt records as carrying a ubiquitin isopeptide
+    crosslink. Negatives are the other lysines of the same proteins. The split
+    is by protein, so no protein contributes to both halves, and the threshold
+    is chosen on the training half alone by Youden's J.
+
+    **This fits one of the window's four numbers.** The three Cb-Cb reach
+    boundaries describe distance from a chosen ligand site, and an AlphaFold
+    monomer carrying an observed ubiquitylation site has no ligand site, so the
+    data is silent on them. They stay flagged unfitted rather than being
+    blessed by a fit that did not touch them, and no reach verdict is emitted.
+
+    **What the negatives are worth.** UniProt lists sites that were seen. A
+    lysine with no annotation was not assayed and found negative. The AUC below
+    is therefore measured against an assumed negative set, not a matched one,
+    which is a weaker claim than spec 9.2 gets from the Sievers screen.
+    PhosphoSitePlus would have the same property: it is also a catalogue of
+    observations.
+    """
+    import csv as _csv
+
+    rows = []
+    path = VALIDATION / f"{source}.tsv"
+    with path.open(encoding="utf-8") as handle:
+        rows = list(_csv.DictReader(handle, delimiter="\t"))
+
+    observed: dict[str, set[int]] = {}
+    for row in rows:
+        accession = (row.get("uniprot") or "").strip()
+        try:
+            residue = int(row.get("res_num") or "")
+        except ValueError:
+            continue
+        if accession:
+            observed.setdefault(accession, set()).add(residue)
+
+    cache = INTERIM / "afdb"
+    sasa = SasaCalculator(load_config())
+
+    scored: list[tuple[str, float, int]] = []   # accession, rel SASA, label
+    measured_proteins = 0
+    missing_models = 0
+    for accession, sites in sorted(observed.items()):
+        model = next(iter(cache.glob(f"*{accession}*")), None)
+        if model is None:
+            missing_models += 1
+            continue
+        accessibility = lysine_accessibility(model, accession, sasa)
+        if not accessibility:
+            continue
+        measured_proteins += 1
+        for residue, value in accessibility.items():
+            scored.append((accession, value, 1 if residue in sites else 0))
+
+    positives = sum(1 for _a, _v, label in scored if label == 1)
+    negatives = len(scored) - positives
+    if positives < 20 or negatives < 20:
+        return {"fitted": False, "dataset": source, "held_out_auc": None,
+                "reason": (f"only {positives} positive and {negatives} negative "
+                           "lysines could be measured, which is too few to fit")}
+
+    # Protein-level split: a protein is wholly in train or wholly in test.
+    accessions = sorted({a for a, _v, _l in scored})
+    held_out = {a for i, a in enumerate(accessions) if i % 3 == 0}
+    train = [(v, l) for a, v, l in scored if a not in held_out]
+    test = [(v, l) for a, v, l in scored if a in held_out]
+
+    cuts = sorted({round(v, 3) for v, _l in train})
+    best_cut, best_j = 0.0, -1.0
+    train_pos = sum(1 for _v, l in train if l == 1)
+    train_neg = len(train) - train_pos
+    for cut in cuts:
+        tp = sum(1 for v, l in train if l == 1 and v >= cut)
+        fp = sum(1 for v, l in train if l == 0 and v >= cut)
+        j = (tp / train_pos) - (fp / train_neg)
+        if j > best_j:
+            best_cut, best_j = cut, j
+
+    auc = _auc([(v, l) for v, l in test])
+    test_pos = sum(1 for _v, l in test if l == 1)
+    report = {
+        "fitted": True,
+        "dataset": source,
+        "min_nz_rel_sasa": best_cut,
+        "train_youden_j": round(best_j, 4),
+        "held_out_auc": round(auc, 4),
+        "n_proteins": measured_proteins,
+        "n_proteins_held_out": len(held_out & set(accessions)),
+        "n_positive": positives,
+        "n_negative": negatives,
+        "n_held_out_positive": test_pos,
+        "missing_models": missing_models,
+        "reach_fitted": False,
+        "reason": "",
+        "caveat": (
+            "Accessibility only. The three Cb-Cb reach boundaries are unfitted "
+            "because an AlphaFold monomer with an observed ubiquitylation site "
+            "carries no ligand site for the distance to be measured from, so no "
+            "reach verdict is emitted. The negatives are lysines with no "
+            "annotation rather than lysines assayed and found unmodified."
+        ),
+    }
+    # Spec 5.4 is explicit that a starting value must not survive into a shipped
+    # config unless the fit independently lands on it. A fit that scores at
+    # chance has landed on nothing, so it is recorded and NOT written back: a
+    # blessed threshold carrying a 0.55 AUC would read as evidence it is not.
+    floor = float(load_config().thresholds["validation"]["degradability_auc_floor"])
+    report["held_out_auc_floor"] = floor
+    report["clears_floor"] = bool(auc >= floor)
+    if auc < floor:
+        report["fitted"] = False
+        report["reason"] = (
+            f"The fit ran and is reported, but its held-out AUC of {auc:.4f} "
+            f"misses the {floor} floor, so no window is written and no verdict "
+            "is emitted. Lysine exposure alone barely separates an observed "
+            "ubiquitylation site from an unobserved lysine, which is a result "
+            "about the feature rather than a failure to fit it."
+        )
+        log_event("2.3", f"Accessibility fit on {measured_proteins:,} proteins "
+                         f"scored held-out AUC {auc:.4f} against a {floor} floor. "
+                         "Nothing written back; no verdict emitted.")
+        return report
+
+    if write_back:
+        write_accessibility(best_cut, f"{source}, retrieved {utcnow()[:10]}", auc)
+    log_event("2.3", f"Accessibility fitted on {measured_proteins:,} proteins: "
+                     f"min_nz_rel_sasa {best_cut}, held-out AUC {auc:.4f} over "
+                     f"{test_pos:,} observed sites. Reach stays unfitted.")
+    return report
+
+
+def _auc(scores: list[tuple[float, int]]) -> float:
+    """Rank-based AUC with ties shared, spelled out so it is auditable."""
+    pos = [s for s, l in scores if l == 1]
+    neg = [s for s, l in scores if l == 0]
+    if not pos or not neg:
+        return float("nan")
+    ordered = sorted(scores, key=lambda pair: pair[0])
+    ranks: dict[int, float] = {}
+    i = 0
+    while i < len(ordered):
+        j = i
+        while j + 1 < len(ordered) and ordered[j + 1][0] == ordered[i][0]:
+            j += 1
+        shared = (i + j) / 2.0 + 1.0
+        for k in range(i, j + 1):
+            ranks[k] = shared
+        i = j + 1
+    rank_sum = sum(ranks[k] for k, (_s, l) in enumerate(ordered) if l == 1)
+    return (rank_sum - len(pos) * (len(pos) + 1) / 2.0) / (len(pos) * len(neg))
+
+
+def write_accessibility(cut: float, dataset_version: str, auc: float) -> None:
+    """Write back only what was fitted, leaving the reach boundaries flagged."""
+    import re
+
+    path = CONFIG_DIR / "thresholds.toml"
+    text = path.read_text()
+    for key, value in {
+        "fit_status": '"accessibility fitted on a protein-level split; reach unfitted"',
+        "min_nz_rel_sasa": f"{cut}",
+        "dataset_version": f'"{dataset_version}"',
+        "fit_date": f'"{utcnow()[:10]}"',
+        "held_out_auc": f"{auc:.4f}",
+    }.items():
+        text = re.sub(rf"^({re.escape(key)}\s*=\s*)\S.*$",
+                      lambda m, v=value: m.group(1) + v, text, count=1, flags=re.M)
+    path.write_text(text)
 
 
 def write_window(boundaries: dict, dataset_version: str, auc: float) -> None:
@@ -279,6 +483,10 @@ def run(limit: int | None = None) -> dict:
     sasa = SasaCalculator(config)
 
     fit_report = fit_reach_window()
+    # validate.py reads this rather than re-running the fit, so the number in
+    # FINDINGS.md is the one this run actually produced.
+    (INTERIM / "degradability_fit.json").write_text(
+        json.dumps(fit_report, indent=2) + "\n")
 
     db_path = Path(config.u("env").get("BINMAN_DB", "")) if False else (
         Path(__file__).resolve().parents[1] / "data" / "atlas" / "binman.sqlite"

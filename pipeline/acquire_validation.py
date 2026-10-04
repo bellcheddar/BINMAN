@@ -498,6 +498,59 @@ def parse_sievers_zf_screen(raw: bytes, route: Route) -> list[dict]:
     return rows
 
 
+def parse_uniprot_ubiquitylation(raw: bytes, route: Route) -> list[dict]:
+    """Observed ubiquitylation sites from UniProt CROSSLNK annotations.
+
+    UniProt records an experimentally observed ubiquitylation as a Cross-link
+    feature reading "Glycyl lysine isopeptide (Lys-Gly) (interchain with G-Cter
+    in ubiquitin)" at an exact residue, with an evidence code and the PubMed ID
+    behind it. That is the same observation a diGly proteomics survey reports,
+    curated and with provenance attached.
+
+    SUMO1, SUMO2, NEDD8 and ISG15 crosslinks share the feature type and are
+    excluded here: they are a different modification and would be false
+    positives for a degradation question.
+
+    Evidence codes are carried through rather than flattened. ECO:0000269 is a
+    direct experimental assertion; ECO:0007744 is a combinatorial assertion from
+    a large-scale study, which is what most diGly proteomics contributes. The
+    distinction belongs to whoever fits against this, not to the parser.
+
+    **What this cannot supply.** UniProt lists sites that were seen. A lysine
+    with no annotation was not assayed and found negative, it simply has no
+    annotation, so the absence is not evidence of absence. Any negative set
+    built from the complement is an assumption, and spec 9.4's AUC has to say
+    so. PhosphoSitePlus has the same property: it is also a catalogue of
+    observations, so this is not a weakness of taking the UniProt route.
+
+    Licence: CC-BY-4.0, which is why this route exists at all.
+    """
+    import re
+
+    text = _text(raw, route)
+    rows = []
+    for line in text.splitlines()[1:]:
+        accession, _, rest = line.partition("\t")
+        accession = accession.strip()
+        if not accession:
+            continue
+        for match in re.finditer(
+                r'CROSSLNK (\d+); /note="([^"]+)"(?:; /evidence="([^"]*)")?', rest):
+            position, note, evidence = match.group(1), match.group(2), match.group(3) or ""
+            if "in ubiquitin" not in note:
+                continue
+            pubmed = ";".join(sorted(set(re.findall(r"PubMed:(\d+)", evidence))))
+            rows.append({
+                "uniprot": accession,
+                "res_num": position,
+                "modification": "ubiquitin",
+                "evidence_code": ";".join(sorted(set(re.findall(r"(ECO:\d+)", evidence)))),
+                "direct_experimental": "1" if "ECO:0000269" in evidence else "0",
+                "pubmed_ids": pubmed,
+            })
+    return rows
+
+
 def parse_generic_table(raw: bytes, route: Route) -> list[dict]:
     """A TSV or CSV with a header, read as-is. Used where the schema is unknown."""
     text = _text(raw, route)
@@ -737,6 +790,32 @@ def registry() -> list[Dataset]:
             columns=("uniprot", "gene", "zf_start", "zf_stop", "aa_sequence",
                      "degraded", "screens", "drugs_tested", "drugs_significant",
                      "min_fdr", "max_fold_depletion"),
+        ),
+        Dataset(
+            name="digly_sites",
+            purpose=("Degradability reach window fit (spec 5.4 step 3, 9.4): "
+                     "observed ubiquitylation sites to fit against rather than "
+                     "assumed boundaries"),
+            licence="CC-BY-4.0",
+            redistributable=True,
+            citation="10.1093/nar/gky092",
+            homepage="https://www.uniprot.org/",
+            version_note="UniProtKB reviewed human, pinned by retrieval date",
+            manual_route=(
+                "None needed: the UniProt REST stream endpoint is open and "
+                "requires no account, which is the reason this route was taken "
+                "after PhosphoSitePlus (registration), PLMD (offline) and dbPTM "
+                "(403) all failed."
+            ),
+            routes=[Route(
+                "https://rest.uniprot.org/uniprotkb/stream?query=reviewed:true"
+                "+AND+organism_id:9606+AND+ft_crosslnk:*"
+                "&fields=accession,ft_crosslnk&format=tsv",
+                note="reviewed human entries carrying any cross-link feature"),
+            ],
+            parser=parse_uniprot_ubiquitylation, min_rows=500,
+            columns=("uniprot", "res_num", "modification", "evidence_code",
+                     "direct_experimental", "pubmed_ids"),
         ),
         Dataset(
             name="degronopedia",

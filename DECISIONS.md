@@ -840,3 +840,50 @@ of this project rather than a published rule, which spec 4.1b forbids.
 classifications, run the sweep again with packing specificity measured at each
 floor. That turns the question from "how much recall do we buy" into "what does
 it cost", which is the form in which it can actually be decided.
+
+## D-028: UniProt crosslinks unlock spec 9.4, and the fit fails honestly
+
+**Decision.** Observed ubiquitylation sites are taken from UniProt `CROSSLNK`
+annotations as the `digly_sites` dataset. The accessibility component of the
+reach window is fitted against them on a protein-level split and scores a
+held-out AUC of **0.5458** against a 0.65 floor. **Nothing is written back**,
+`fitted = false` stands, no verdict is emitted, and Gate G6 carries it.
+
+**Context.** PhosphoSitePlus requires registration, PLMD is offline and dbPTM
+returns 403, so 9.4 had been not computed since the build started. UniProt
+annotates an observed ubiquitylation as a Cross-link feature at an exact
+residue with an evidence code and a PubMed ID, which is the same observation a
+diGly survey reports. It is CC-BY-4.0, needs no account, and was already a
+verified project reference. 976 sites on 404 proteins, 718 with direct
+experimental evidence; 5,945 SUMO, NEDD8 and ISG15 crosslinks excluded. 403 of
+the 404 AlphaFold models were already cached from the degron scan.
+
+**What is fitted.** `min_nz_rel_sasa` only. The Cb-Cb reach boundaries measure
+distance from a ligand site, and an AlphaFold monomer with an observed
+ubiquitylation site has no ligand site, so the data cannot speak to them. They
+stay unfitted rather than being blessed by a fit that never touched them.
+
+**Why nothing is written back.** Spec 5.4 states that the starting values must
+not survive into a shipped config unless the fit independently lands on them. A
+fit scoring 0.55 has landed on nothing. `fit_accessibility` now gates the
+write-back on the spec 9.4 floor rather than on the fit having merely run, so
+the failure cannot quietly bless a threshold.
+
+**Why this is still worth having.** A blank became a measured failure, which is
+the same trade D-024 made for 9.2 and the one this project is built to prefer.
+Metrics not computed fell from 4 to 2. The number also says something: lysine
+exposure barely separates an observed ubiquitylation site from an unobserved
+lysine, so site selection is driven by E3 recruitment and sequence context
+rather than accessibility, which is precisely what the module does not model.
+
+**The negatives are weaker than 9.2's.** UniProt lists sites that were seen, so
+an unannotated lysine was not assayed and found unmodified. That bias depresses
+rather than inflates the measured AUC, since unlabelled positives sit in the
+negative pile, and 0.55 is too low for the bias to explain. PhosphoSitePlus has
+the same property, so this is a limit of the question, not of the route.
+
+**Reversal.** A matched set would settle it: a proteome-wide diGly experiment
+reporting both detected and confidently undetected lysines. Failing that, the
+module becomes predictive only by modelling E3 recruitment, at which point the
+reach boundaries can be fitted against ternary-complex geometry rather than
+against native ubiquitylation.

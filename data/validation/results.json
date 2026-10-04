@@ -1,9 +1,21 @@
 {
-  "generated_at": "2026-10-04T01:10:15+00:00",
+  "generated_at": "2026-10-04T01:25:45+00:00",
   "atlas": "/Users/dellboy/Documents/Vibe_Coding/BINMAN/data/atlas/binman.sqlite",
   "atlas_bytes": 149442560,
   "note": "A metric whose dataset is unavailable is reported as computed: false with the reason. Nothing here is estimated, and no hand-written control was substituted for a missing published one (spec 4.1b).",
   "floors_missed": [
+    {
+      "section": "9.1",
+      "metric": "artefact_precision",
+      "value": 0.9391,
+      "floor": 0.95
+    },
+    {
+      "section": "9.1",
+      "metric": "recall",
+      "value": 0.7719,
+      "floor": 0.85
+    },
     {
       "section": "9.2",
       "metric": "sensitivity",
@@ -17,16 +29,10 @@
       "floor": 0.6
     },
     {
-      "section": "9.1",
-      "metric": "artefact_precision",
-      "value": 0.9391,
-      "floor": 0.95
-    },
-    {
-      "section": "9.1",
-      "metric": "recall",
-      "value": 0.7719,
-      "floor": 0.85
+      "section": "9.4",
+      "metric": "held_out_auc",
+      "value": 0.5458,
+      "floor": 0.65
     }
   ],
   "metrics_not_computed": [
@@ -39,16 +45,6 @@
       "section": "9.3",
       "metric": "substrate_spearman",
       "reason": "The atlas `substrate_count` column is populated from the UbiBrowser literature set itself, so a Spearman correlation against UbiBrowser would be a tautology (rho = 1 by construction) rather than a test. A genuine version needs a second, independent substrate source."
-    },
-    {
-      "section": "9.4",
-      "metric": "held_out_auc",
-      "reason": "Observed diGly ubiquitylation sites are unavailable: PhosphoSitePlus requires registration and the ProteomeXchange diGly datasets did not resolve (Gate G7). The reach window is therefore unfitted, no verdict is emitted, and the AUC is not computed."
-    },
-    {
-      "section": "9.4",
-      "metric": "protein_level_split_honoured",
-      "reason": "No fit has run, so there is no split to assert."
     }
   ],
   "9.1": {
@@ -892,22 +888,27 @@
   "9.4": {
     "title": "Degradability",
     "held_out_auc": {
-      "computed": false,
-      "reason": "Observed diGly ubiquitylation sites are unavailable: PhosphoSitePlus requires registration and the ProteomeXchange diGly datasets did not resolve (Gate G7). The reach window is therefore unfitted, no verdict is emitted, and the AUC is not computed.",
+      "computed": true,
+      "value": 0.5458,
       "floor": 0.65,
-      "value": null
+      "reason": "",
+      "passes": false,
+      "source": "UniProt CROSSLNK ubiquitin isopeptide annotations for the reviewed human proteome (950 observed sites on 403 proteins, 11755 unannotated lysines as negatives), measured on a protein-level split with 338 observed sites held out.",
+      "note": "**Accessibility only.** This is the AUC of lysine NZ relative accessibility as a predictor of whether a lysine carries an observed ubiquitylation site. The three Cb-Cb reach boundaries are unfitted and no reach verdict is emitted: an AlphaFold monomer carrying an observed site has no ligand site for the distance to be measured from. The negatives are lysines with no annotation, not lysines assayed and found unmodified, so this is a weaker construction than the matched screen behind 9.2."
+    },
+    "protein_level_split_honoured": {
+      "computed": true,
+      "value": true,
+      "floor": null,
+      "reason": "",
+      "note": "A protein contributes wholly to train or wholly to test: 135 of 403 proteins were held out."
     },
     "window_fitted": {
       "computed": true,
       "value": false,
       "reason": "",
-      "fit_status": "not yet fitted"
-    },
-    "protein_level_split_honoured": {
-      "computed": false,
-      "reason": "No fit has run, so there is no split to assert.",
-      "floor": null,
-      "value": null
+      "fit_status": "not yet fitted",
+      "note": "The fit ran but its held-out AUC misses the floor, so nothing was written back: spec 5.4 forbids a starting value surviving into a shipped config unless the fit lands on it."
     },
     "honest_limits": [
       "Observed ubiquitylation sites come from native E3 biology, not from induced ternary complexes, so the window would be a proxy even once fitted.",

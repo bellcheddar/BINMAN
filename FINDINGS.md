@@ -379,9 +379,67 @@ substrate source.
 
 ## Section 9.4 Degradability validation
 
-Not computed yet: the stage has not run. The reach window in
-`config/thresholds.toml` is still flagged `fitted = false` and its spec 1.0
-starting values carry no empirical standing.
+| Metric | Measured | Floor | Verdict |
+|---|---|---|---|
+| Held-out AUC, accessibility only | **0.5458** | 0.65 | **misses** |
+| Protein-level split honoured | yes, 135 of 403 proteins held out | required | satisfied |
+| Reach window fitted | **no**, and deliberately not written back | | |
+
+**Lysine exposure barely predicts whether a lysine is ubiquitylated.** Training
+Youden's J is 0.09 and the held-out AUC is 0.55, which is a result about the
+feature rather than a failure to fit it.
+
+### Where the data came from
+
+PhosphoSitePlus requires registration, PLMD is offline and dbPTM returns 403,
+so spec 9.4 sat at not computed. The open route was in the project already:
+UniProt records an observed ubiquitylation as a `CROSSLNK` feature reading
+"Glycyl lysine isopeptide (Lys-Gly) (interchain with G-Cter in ubiquitin)" at
+an exact residue, with an evidence code and a PubMed ID. That is the same
+observation a diGly survey reports, curated, with provenance, under CC-BY-4.0.
+
+**976 ubiquitylation sites on 404 reviewed human proteins**, 718 of them direct
+experimental assertions (ECO:0000269) rather than large-scale combinatorial
+ones. SUMO1, SUMO2, NEDD8 and ISG15 crosslinks share the feature type and are
+excluded: 5,945 of them, which would all have been false positives. 403 of the
+404 AlphaFold models were already cached from the degron scan, so no new
+downloads were needed.
+
+### What was fitted, and what was not
+
+Only `min_nz_rel_sasa`. The three Cb-Cb reach boundaries describe distance from
+a chosen ligand site, and an AlphaFold monomer carrying an observed
+ubiquitylation site has no ligand site to measure from, so the data is silent
+on them. They stay flagged unfitted rather than being blessed by a fit that
+never touched them, and **no reach verdict is emitted**.
+
+950 positive and 11,755 negative lysines, split so that a protein contributes
+wholly to train or wholly to test. The threshold was chosen on the training
+half alone by Youden's J, landing at 0.241, and evaluated on 338 held-out
+observed sites.
+
+**The fitted value was not written back.** Spec 5.4 says a starting value must
+not survive into a shipped config unless the protein-level-split fit
+independently lands on it. A fit scoring 0.55 has landed on nothing, and a
+blessed threshold carrying that AUC would read as evidence it is not.
+`fitted = false` stands, and `pipeline/degradability.py` now gates the
+write-back on the floor rather than on the fit merely having run.
+
+### What the negatives are worth
+
+Less than 9.2's. UniProt lists sites that were *seen*; a lysine with no
+annotation was not assayed and found unmodified. The negative set is therefore
+an assumption, where the Sievers screen gave 9.2 a genuinely matched one.
+PhosphoSitePlus would have had the same property, so this is a limit of the
+question rather than of the route taken to it.
+
+That caveat cuts both ways and is worth stating plainly: a biased negative set
+would tend to *depress* measured performance, since unlabelled positives sit in
+the negative pile. An AUC of 0.55 is low enough that the bias does not explain
+it. Exposure is necessary for ubiquitylation and nothing like sufficient:
+site selection is driven by E3 recruitment and sequence context, which is
+exactly what the Degradability module does not yet model. Gate G6 carries it
+(DECISIONS D-028).
 
 ## Section 9.5 BINMAN-LM
 

@@ -1,8 +1,8 @@
 {
-  "generated_at": "2026-10-04T01:10:23+00:00",
+  "generated_at": "2026-10-04T01:26:29+00:00",
   "generator": "pipeline/build_about.py",
   "note": "Every value on this page is read from a build artefact. Nothing here is typed by hand, and a value that could not be read says 'not recorded' rather than showing a plausible guess.",
-  "schematic_description": "The pipeline runs left to right in four stages. Two kinds of input enter on the left: the primary data sources (RCSB, AlphaFold DB, UniProt, InterPro), and separately the validation datasets that serve as ground truth, of which 10 of 12 resolved. Stage 1, acquisition, catalogued 52,821 entries into priority tiers using httpx and tenacity. Stage 2, geometry, analysed 52,586 entries with gemmi and FreeSASA and found 239,485 bridges, with 235 entries failing. Stage 3, scan and triage, used DSSP and fpocket to produce 21,717 degron candidates, 650 triaged ligases and 1,650 scored lysines. Stage 4 trains BINMAN-LM with mlx-lm, which does text work only and never emits a number. Four modules leave on the right: Glue Atlas, Degron Scan, E3 Triage and Degradability.",
+  "schematic_description": "The pipeline runs left to right in four stages. Two kinds of input enter on the left: the primary data sources (RCSB, AlphaFold DB, UniProt, InterPro), and separately the validation datasets that serve as ground truth, of which 11 of 13 resolved. Stage 1, acquisition, catalogued 52,821 entries into priority tiers using httpx and tenacity. Stage 2, geometry, analysed 52,586 entries with gemmi and FreeSASA and found 239,485 bridges, with 235 entries failing. Stage 3, scan and triage, used DSSP and fpocket to produce 21,717 degron candidates, 650 triaged ligases and 1,650 scored lysines. Stage 4 trains BINMAN-LM with mlx-lm, which does text work only and never emits a number. Four modules leave on the right: Glue Atlas, Degron Scan, E3 Triage and Degradability.",
   "stages": {
     "bridges": {
       "total": 52821,
@@ -124,8 +124,8 @@
       "failure_reasons": {}
     },
     "validation_acquire": {
-      "total": 12,
-      "ok": 10,
+      "total": 13,
+      "ok": 11,
       "failed": 2,
       "failure_reasons": {
         "all_routes_exhausted": 2
@@ -207,6 +207,28 @@
           "url": "https://raw.githubusercontent.com/kad-ecoli/mmCIF2BioLiP/master/ligand_list",
           "note": "artefact ligand list consumed by script/rmligand.cpp",
           "rows": 463,
+          "outcome": "ok"
+        }
+      ]
+    },
+    {
+      "name": "digly_sites",
+      "resolved": true,
+      "rows": 976,
+      "licence": "CC-BY-4.0",
+      "redistributable": true,
+      "version": "UniProtKB reviewed human, pinned by retrieval date",
+      "retrieved": "2026-10-04T01:21:30+00:00",
+      "url": "https://rest.uniprot.org/uniprotkb/stream?query=reviewed:true+AND+organism_id:9606+AND+ft_crosslnk:*&fields=accession,ft_crosslnk&format=tsv",
+      "homepage": "https://www.uniprot.org/",
+      "purpose": "Degradability reach window fit (spec 5.4 step 3, 9.4): observed ubiquitylation sites to fit against rather than assumed boundaries",
+      "citation": "10.1093/nar/gky092",
+      "manual_route": "None needed: the UniProt REST stream endpoint is open and requires no account, which is the reason this route was taken after PhosphoSitePlus (registration), PLMD (offline) and dbPTM (403) all failed.",
+      "attempts": [
+        {
+          "url": "https://rest.uniprot.org/uniprotkb/stream?query=reviewed:true+AND+organism_id:9606+AND+ft_crosslnk:*&fields=accession,ft_crosslnk&format=tsv",
+          "note": "reviewed human entries carrying any cross-link feature",
+          "rows": 976,
           "outcome": "ok"
         }
       ]
@@ -435,8 +457,8 @@
       ]
     }
   ],
-  "datasets_resolved": 10,
-  "datasets_total": 12,
+  "datasets_resolved": 11,
+  "datasets_total": 13,
   "references": [
     {
       "name": "AlphaFold Protein Structure Database: massively expanding the structural coverage of protein-sequence space with high-accuracy models",
@@ -1493,11 +1515,23 @@
     "honest_note": "This record was chosen because every stage that has run worked on it. A reader should look at the misses list and the novel-bridge set in FINDINGS.md for the cases where stages did not."
   },
   "validation": {
-    "generated_at": "2026-10-04T01:10:15+00:00",
+    "generated_at": "2026-10-04T01:25:45+00:00",
     "atlas": "/Users/dellboy/Documents/Vibe_Coding/BINMAN/data/atlas/binman.sqlite",
     "atlas_bytes": 149442560,
     "note": "A metric whose dataset is unavailable is reported as computed: false with the reason. Nothing here is estimated, and no hand-written control was substituted for a missing published one (spec 4.1b).",
     "floors_missed": [
+      {
+        "section": "9.1",
+        "metric": "artefact_precision",
+        "value": 0.9391,
+        "floor": 0.95
+      },
+      {
+        "section": "9.1",
+        "metric": "recall",
+        "value": 0.7719,
+        "floor": 0.85
+      },
       {
         "section": "9.2",
         "metric": "sensitivity",
@@ -1511,16 +1545,10 @@
         "floor": 0.6
       },
       {
-        "section": "9.1",
-        "metric": "artefact_precision",
-        "value": 0.9391,
-        "floor": 0.95
-      },
-      {
-        "section": "9.1",
-        "metric": "recall",
-        "value": 0.7719,
-        "floor": 0.85
+        "section": "9.4",
+        "metric": "held_out_auc",
+        "value": 0.5458,
+        "floor": 0.65
       }
     ],
     "metrics_not_computed": [
@@ -1533,16 +1561,6 @@
         "section": "9.3",
         "metric": "substrate_spearman",
         "reason": "The atlas `substrate_count` column is populated from the UbiBrowser literature set itself, so a Spearman correlation against UbiBrowser would be a tautology (rho = 1 by construction) rather than a test. A genuine version needs a second, independent substrate source."
-      },
-      {
-        "section": "9.4",
-        "metric": "held_out_auc",
-        "reason": "Observed diGly ubiquitylation sites are unavailable: PhosphoSitePlus requires registration and the ProteomeXchange diGly datasets did not resolve (Gate G7). The reach window is therefore unfitted, no verdict is emitted, and the AUC is not computed."
-      },
-      {
-        "section": "9.4",
-        "metric": "protein_level_split_honoured",
-        "reason": "No fit has run, so there is no split to assert."
       }
     ],
     "9.1": {
@@ -2386,22 +2404,27 @@
     "9.4": {
       "title": "Degradability",
       "held_out_auc": {
-        "computed": false,
-        "reason": "Observed diGly ubiquitylation sites are unavailable: PhosphoSitePlus requires registration and the ProteomeXchange diGly datasets did not resolve (Gate G7). The reach window is therefore unfitted, no verdict is emitted, and the AUC is not computed.",
+        "computed": true,
+        "value": 0.5458,
         "floor": 0.65,
-        "value": null
+        "reason": "",
+        "passes": false,
+        "source": "UniProt CROSSLNK ubiquitin isopeptide annotations for the reviewed human proteome (950 observed sites on 403 proteins, 11755 unannotated lysines as negatives), measured on a protein-level split with 338 observed sites held out.",
+        "note": "**Accessibility only.** This is the AUC of lysine NZ relative accessibility as a predictor of whether a lysine carries an observed ubiquitylation site. The three Cb-Cb reach boundaries are unfitted and no reach verdict is emitted: an AlphaFold monomer carrying an observed site has no ligand site for the distance to be measured from. The negatives are lysines with no annotation, not lysines assayed and found unmodified, so this is a weaker construction than the matched screen behind 9.2."
+      },
+      "protein_level_split_honoured": {
+        "computed": true,
+        "value": true,
+        "floor": null,
+        "reason": "",
+        "note": "A protein contributes wholly to train or wholly to test: 135 of 403 proteins were held out."
       },
       "window_fitted": {
         "computed": true,
         "value": false,
         "reason": "",
-        "fit_status": "not yet fitted"
-      },
-      "protein_level_split_honoured": {
-        "computed": false,
-        "reason": "No fit has run, so there is no split to assert.",
-        "floor": null,
-        "value": null
+        "fit_status": "not yet fitted",
+        "note": "The fit ran but its held-out AUC misses the floor, so nothing was written back: spec 5.4 forbids a starting value surviving into a shipped config unless the fit lands on it."
       },
       "honest_limits": [
         "Observed ubiquitylation sites come from native E3 biology, not from induced ternary complexes, so the window would be a proxy even once fitted.",
@@ -5568,8 +5591,8 @@
   },
   "gates": [
     {
-      "gate": "G6",
-      "excerpt": "A decision on whether to ship the Degron Scan at all, now that spec 9.2 is measured and fails.\n\nSensitivity 0.656 against a floor of 0.70, specificity 0.353 against a floor of 0.60, ROC AUC 0.441 -- below chance -- on 32 depleted and 5,476 matched non-depleted zinc fingers from Sievers et al. 2018. The filter calls 3,544 of the 5,476 negatives. No cut on degron_geometry_score clears both floors (best Youden's J = 0.022), and spec 9.6's single threshold adjustment was already spent on D-010, so no second adjustment was made.\n\nDiagnosis: a C2H2 zinc finger is itself a short antiparallel hairpin with an exposed glycine-bearing turn, so the spec 5.2 geometry describes the domain family rather than degradability. The canonical neosubstrates (IKZF3, ZFP91, E4F1) are recovered, but twelve non-degraded zinc fingers outrank all three.\n\nThe default taken, per spec 9.2's own instruction for this ca"
+      "gate": "G7",
+      "excerpt": "2 validation dataset(s) could not be obtained automatically: degronopedia, protcid_interfaces.\n\nEach publishes through a JavaScript front end with no documented bulk-export endpoint, or sits behind registration. Spec 4.1b forbids substituting a hand-written control, so the metrics that depend on these are reported as not computed.\n\nSee data/validation/MANIFEST.md for the homepage and citation of each, and the exact outcome of every route tried.\n\n## What unblocks it\n\n```bash\n# download each file by hand from its homepage, then:\n#   mv <file> data/validation/raw/<dataset_name>\npixi run python pipeline/acquire_validation.py --refresh\n```\n\n## Already done\n\n11 dataset(s) resolved and parsed: biolip2_annotations, biolip2_artefacts, digly_sites, mgdb_glues, mgtbind_compounds, mgtbind_ternary, molgluedb_glues, protacdb_protacs, sievers_zf_screen, ubibrowser_literature_e3, ubibrowser_predicted_e3"
     }
   ],
   "unrecorded": [
