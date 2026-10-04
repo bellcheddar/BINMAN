@@ -607,3 +607,6 @@ One line per meaningful event, timestamped UTC (spec Section 0 rule 5).
 | 2026-10-04T16:07:51+00:00 | 9 | Validation run against binman.sqlite: 4 metric(s) not computed (dataset unavailable), 5 measured floor(s) missed. |
 | 2026-10-04T16:23:03+00:00 | 9 | Validation run against binman.sqlite: 0 metric(s) not computed (dataset unavailable), 2 measured floor(s) missed. |
 | 2026-10-04T16:23:04+00:00 | 9 | Validation run against binman.sqlite: 4 metric(s) not computed (dataset unavailable), 5 measured floor(s) missed. |
+| 2026-10-04T16:26:25+00:00 | 5.2 | imid_degradation_score written for 4,650 degron candidates; 17,067 carry no C2H2 motif and are left NULL. |
+| 2026-10-04T16:27:38+00:00 | 9 | Validation run against binman.sqlite: 0 metric(s) not computed (dataset unavailable), 2 measured floor(s) missed. |
+| 2026-10-04T16:27:39+00:00 | 9 | Validation run against binman.sqlite: 4 metric(s) not computed (dataset unavailable), 5 measured floor(s) missed. |

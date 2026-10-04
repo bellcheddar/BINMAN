@@ -149,16 +149,19 @@ def run(limit: int | None = None) -> dict:
         for identifier, _acc, start, end in candidates:
             window = "".join(residues.get(n, "X")
                              for n in range(start - FLANK, end + FLANK + 1))
-            match = C2H2.search(window)
-            if match is None:
+            # Score EVERY zinc finger in the window and keep the best, not the
+            # first. A protein like ZNF653 carries many tandem fingers and only
+            # one of them is the degron; taking the first scored ZNF653 at 0.106
+            # and ZNF692 at 0.046 when both are known pomalidomide substrates.
+            cores = [align(m.group(0), WIDTH) for m in C2H2.finditer(window)]
+            cores = [c for c in cores if c]
+            if not cores:
                 skipped_no_zf += 1
                 continue
-            core = align(match.group(0), WIDTH)
-            if core is None:
-                skipped_no_zf += 1
-                continue
-            probability = float(model.predict_proba(
-                (encode(core, columns) * weights).reshape(1, -1))[0, 1])
+            probability = max(
+                float(model.predict_proba(
+                    (encode(core, columns) * weights).reshape(1, -1))[0, 1])
+                for core in cores)
             updates.append((round(probability, 4), identifier))
             scored += 1
 

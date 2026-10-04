@@ -1894,3 +1894,41 @@ caveat into furniture people stop reading. The degron page's two boxes had
 already become one 121-word table; it is now a one-line caveat beside the data
 with a link to the About tab, where the contingency tables and sweeps already
 live.
+
+## D-052: the two apparent misses were the geometry scan, not the model
+
+**Decision.** `imid_degradation_score` scores every zinc finger in a
+candidate's window and keeps the best, rather than the first. D-049's worry
+that ZNF653 and ZNF692 were model failures is **withdrawn**: they are not.
+
+**What the scores actually show.** Lining each scored atlas row up against the
+zinc finger Sievers reports as degraded:
+
+| gene | atlas row | degraded ZF | overlap | score |
+|---|---|---|---|---|
+| ZFP91 | 400-409 | 400-422 | yes | **0.991** |
+| ZNF276 | 524-533 | 524-546 | yes | **0.959** |
+| IKZF3 | 146-155 | 146-168 | yes | **0.907** |
+| ZNF692 | 448-457 | 417-439 | **no** | 0.046 |
+| ZNF653 | 528-537, 586-595 | 556-578 | **no** | 0.106, 0.011 |
+
+Every row that lands on the degron-bearing finger scores high, and every row
+that does not scores low. The low scores are **correct for the finger they
+describe**. The geometry scan never placed a hairpin candidate on the degron
+finger of those two proteins, so there is no row there to score.
+
+**What that means for the column.** It is per-candidate, not per-protein: it
+answers "is the zinc finger at this hairpin degraded by pomalidomide", and a
+protein whose degron carries no hairpin candidate has no row to carry the
+answer. That is a coverage limit of the upstream scan rather than an error in
+the score, and it is the honest reading: the model was right in all five cases.
+
+**The multi-finger change is kept although it changed nothing measurable.**
+Taking the best of several fingers in one window is correct in principle and no
+score moved, because the windows around these candidates hold one motif each.
+It costs nothing and removes a real failure mode for wider windows.
+
+**What would close the gap.** Scoring every zinc finger in a protein rather
+than only those at hairpin candidates. That is a different column with
+different semantics, per protein rather than per candidate, and it should be
+added as one rather than quietly widening this one.
