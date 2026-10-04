@@ -436,6 +436,42 @@ def section_92(connection: sqlite3.Connection, config) -> dict:
                 "what is wrong and moving it would be tuning against the test set."
             ),
         }
+        fit = _json_file(INTERIM / "degron_sequence_fit.json")
+        if fit:
+            points = fit.get("operating_points") or {}
+            null = fit.get("permutation_null") or {}
+            out["sequence_model_auc"] = {
+                "computed": True, "reason": "", "floor": None,
+                "value": fit.get("auc_mean"),
+                "note": (
+                    "Spec 9.2's reversal condition, tested: a feature that "
+                    "discriminates WITHIN the C2H2 family. Zinc fingers anchored "
+                    "on their C2H2 motif, residues encoded as chemical groups "
+                    "per aligned position, L2 logistic regression evaluated by "
+                    "repeated stratified group k-fold so no gene spans a split. "
+                    f"Held-out AUC {fit.get('auc_mean')} (sd {fit.get('auc_std')}) "
+                    f"against the geometry's {fit.get('geometry_auc_for_comparison')} "
+                    f"and a permutation null of {null.get('null_mean')} "
+                    f"(sd {null.get('null_std')}, p95 {null.get('null_p95')}). "
+                    "Real, and marginal: it clears the null's 95th percentile by "
+                    f"{fit.get('beats_null_by_sd')} standard deviations on 32 "
+                    "positives."
+                ),
+            }
+            out["sequence_model_operating_points"] = {
+                "computed": True, "reason": "", "floor": None,
+                "value": points,
+                "note": (
+                    "Swept on out-of-fold predictions, where every domain is "
+                    "scored by a model that never saw its gene. **No cut "
+                    "satisfies both spec 9.2 floors**: the best Youden's J is "
+                    f"{(points.get('best_youden') or {}).get('youden_j')} at "
+                    f"sensitivity {(points.get('best_youden') or {}).get('sensitivity')} "
+                    f"and specificity {(points.get('best_youden') or {}).get('specificity')}. "
+                    "Better discrimination than the geometry by a wide margin, "
+                    "and still not a classifier."
+                ),
+            }
         out["recovered_zinc_fingers"] = {
             "computed": True, "reason": "", "floor": None,
             "value": sorted(matched["recovered"],

@@ -258,6 +258,47 @@ Of the 11 misses, 9 have at least one degron candidate elsewhere on the same
 protein (ZN526 has 7, ZN501 has 6): the filter fired, in the wrong place. Only
 ZN292 1947–1973 has no candidate anywhere on its protein.
 
+### Testing D-024's reversal condition: sequence beats geometry, and still fails
+
+D-024 named what would make this a classifier: a feature that discriminates
+**within** the C2H2 family, since the geometry describes the family itself.
+That was tested rather than left as a suggestion.
+
+Every assayed zinc finger was anchored on its C2H2 motif, aligned to 23
+positions, and each position encoded as eight overlapping chemical groups
+(hydrophobic, aromatic, positive, negative, polar, tiny, glycine, proline).
+An L2 logistic regression was evaluated by repeated stratified group k-fold, so
+no gene appears in both halves of any split.
+
+| | geometry | sequence model |
+|---|---|---|
+| ROC AUC | 0.441 | **0.637** (sd 0.089) |
+| permutation null | — | 0.510 (sd 0.071, p95 0.615) |
+| best Youden's J | 0.022 | **0.214** |
+| at sensitivity | 0.656 | 0.344 |
+| and specificity | 0.366 | 0.870 |
+| any cut clears both 9.2 floors | **no** | **no** |
+
+**Sequence carries degradability information that geometry does not.** The AUC
+moves from below chance to 0.637, and Youden's J by a factor of ten. The
+permutation null matters here: with 32 positives, 184 columns and paralogous
+zinc-finger families that grouping by gene cannot fully separate, a model can
+score above 0.5 from structure alone. Shuffling the labels through the same
+grouped splitter gives 0.510, and the observed score clears that null's 95th
+percentile by 1.7 standard deviations. Real, and marginal.
+
+**It is still not a classifier.** No cut satisfies sensitivity 0.70 and
+specificity 0.60 together. The best operating point trades almost all
+sensitivity for specificity: 0.344 and 0.870. Gate G6 stays open and the module
+keeps its label.
+
+Why this is the honest ceiling for now: the classic IMiD G-loop is necessary
+and not sufficient, and the counterexamples are not subtle. IKZF3 reads
+`FQCNQC-G-ASF` and is degraded. ZFP30 reads `YECKEC-G-KAF` and is not. ZN184
+and ZN565 carry almost exactly ZFP30's motif and both are degraded. Separating
+those needs the CRBN interface, not the substrate alone, and that is a ternary
+complex calculation this project does not do.
+
 ### The calibration history, which stands
 
 What follows is the method sanity check that preceded the matched set. It

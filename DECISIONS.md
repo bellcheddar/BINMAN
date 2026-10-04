@@ -1282,3 +1282,48 @@ is verified against the held-out questions (D-037).
 **Reversal.** Round 09 is on disk. If the machine ever has the memory for a
 batch-4 run at 32 layers and rank 32, that is the clean experiment and it is
 one command.
+
+## D-039: sequence beats geometry on the degron, and the module still ships relabelled
+
+**Decision.** The sequence model is reported in `FINDINGS.md` and wired into
+spec 9.2 as a measured comparison. **Gate G6 stays open and the Degron Scan
+keeps its hypothesis-generator label.** The shipped `degron_geometry_score` is
+not replaced.
+
+**What was tested.** D-024 named the reversal condition: a feature that
+discriminates within the C2H2 family. `pipeline/degron_sequence.py` anchors
+each assayed zinc finger on its C2H2 motif, aligns to 23 positions, encodes
+each position as eight overlapping chemical groups, and fits an L2 logistic
+regression evaluated by repeated stratified group k-fold so no gene spans a
+split.
+
+| | geometry | sequence |
+|---|---|---|
+| ROC AUC | 0.441 | **0.637** (sd 0.089) |
+| best Youden's J | 0.022 | **0.214** |
+| clears sens 0.70 and spec 0.60 together | no | **no** |
+
+**Why the permutation null was necessary.** 32 positives, 184 columns, and
+zinc-finger paralogues that grouping by gene cannot separate: ZN184, ZN276 and
+ZN653 are different genes with near-identical domains. A model can score above
+0.5 on family structure alone. Shuffling labels through the same grouped
+splitter gives a null of 0.510 (sd 0.071, p95 0.615), and the observed 0.637
+clears that by 1.7 standard deviations. Without that null the headline would
+have been "sequence lifts AUC to 0.64" with no way to know how much of it was
+the splitter.
+
+**Why the module is not re-based on it.** It fails the same floors by the same
+kind of margin, and swapping a geometry score the UI explains for a logistic
+regression over chemical groups would trade an interpretable failure for an
+opaque one. The score shipped in the atlas stays; the sequence result is
+reported as what the reversal condition actually buys.
+
+**What would clear the floors.** Not the substrate alone. The classic G-loop is
+necessary and not sufficient: IKZF3 `FQCNQC-G-ASF` is degraded, ZFP30
+`YECKEC-G-KAF` is not, and ZN184 carries almost exactly ZFP30's motif and is.
+Separating those needs complementarity to the CRBN interface, which is a
+ternary-complex calculation BINMAN does not do.
+
+**Reversal.** `pipeline/degron_sequence.py` takes the matched set and a feature
+matrix. Adding CRBN-interface features to it is the experiment, and the
+grouped, permutation-tested harness is already there to judge them.
