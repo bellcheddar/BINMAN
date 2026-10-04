@@ -72,17 +72,30 @@ def _prefetch() -> None:
     snapshot_download(ADAPTER_REPO, token=HF_TOKEN)
 
 
+def _device_and_dtype():
+    """Run on the GPU, and stay usable on CPU hardware if it is ever moved.
+
+    Kept because it costs nothing and makes the Space independent of the
+    hardware setting: bfloat16 fits a 3B model in 16 GB where float32 would
+    not. The Space runs on ZeroGPU.
+    """
+    if torch.cuda.is_available():
+        return "cuda", torch.float16
+    return "cpu", torch.bfloat16
+
+
 def _load():
     global _model, _tokenizer
     if _model is not None:
         return _model, _tokenizer
+    device, dtype = _device_and_dtype()
     _tokenizer = AutoTokenizer.from_pretrained(BASE_MODEL)
     try:
         base = AutoModelForCausalLM.from_pretrained(
-            BASE_MODEL, dtype=torch.float16, device_map="cuda")
+            BASE_MODEL, dtype=dtype, device_map=device)
     except TypeError:
         base = AutoModelForCausalLM.from_pretrained(
-            BASE_MODEL, torch_dtype=torch.float16, device_map="cuda")
+            BASE_MODEL, torch_dtype=dtype, device_map=device)
     try:
         _model = PeftModel.from_pretrained(base, ADAPTER_REPO,
                                            token=HF_TOKEN).eval()
@@ -155,7 +168,7 @@ def task_c(question: str) -> str:
 
 
 @spaces.GPU(duration=30)
-def _gpu_smoke() -> str:
+def _gpu_smoke() -> str:  # noqa: D401
     """Does ZeroGPU hand this Space a GPU at all?
 
     If the model-serving endpoints fail while this one does too, the fault is
@@ -188,6 +201,7 @@ licences that do not permit redistribution.
 
 with gr.Blocks(title="BINMAN-LM") as demo:
     gr.Markdown(INTRO)
+
 
     with gr.Tab("Query translation"):
         gr.Markdown(

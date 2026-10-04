@@ -1370,3 +1370,51 @@ API. The `whoami-v2` endpoint returns no quota field for this token.
 **Reversal.** The diagnostic GPU endpoint stays in the Space until it is known
 good, because it distinguishes "no GPU" from "model broken" in one click, which
 is the distinction that cost the most time here.
+
+## D-041: D-040 was wrong. The Space worked; the test harness did not
+
+**Decision.** D-040 is superseded. The Space serves round 07 on ZeroGPU and has
+been verified end to end. No hardware change is needed and none was made.
+
+**What D-040 claimed.** That ZeroGPU was granting this Space no GPU, on the
+evidence that a `@spaces.GPU` function doing nothing but reporting
+`torch.cuda.is_available()` failed with `event: error, data: null`.
+
+**What was actually wrong.** The probe. Every call in that investigation went
+through hand-rolled `curl` against the Gradio SSE endpoint, parsing the event
+stream with `grep`. That parsing was broken, and a broken parser returns the
+same null for a working endpoint as for a failing one. Calling the identical
+endpoint with `gradio_client` returns:
+
+    cuda available=True device_count=1 name=NVIDIA RTX PRO 6000 Blackwell
+
+The GPU was there the whole time, including for every "failure" recorded in
+D-037 and D-040.
+
+**The lesson, which is the point of this entry.** A no-op test is only as good
+as the harness carrying it. The smoke endpoint was built to separate "no GPU"
+from "model broken" and it did its job faithlessly, because it was read through
+the same broken channel as everything else. When a diagnostic and the thing it
+diagnoses share a dependency, the diagnostic cannot clear that dependency. The
+client library existed throughout and was skipped twice because installing it
+hit a missing `pip` in the uv virtualenv, which was a two-minute problem
+treated as a dead end.
+
+**Verified now**, round 07 on the live Space:
+
+| probe | answer | |
+|---|---|---|
+| PEG at a lattice contact | `crystallisation_artefact` | correct, and round 05 got this wrong |
+| pomalidomide bridging CRBN and IKZF1 | `molecular_glue` | correct |
+| FAD in a Rossmann pocket | `native_cofactor` | correct |
+| bivalent degrader with a PEG linker | `molecular_glue` | **wrong**, should be `protac` |
+| affinity in nanomolar | structured abstention with a reason | correct |
+| bridging balance above 0.8 | valid query object | correct |
+
+The PROTAC miss is one anecdote against a measured `protac` F1 of 0.975 and is
+not treated as a metric. It is recorded because round 05 answered it correctly
+and round 07 does not, which is worth watching if more cases appear.
+
+**Reversal.** The diagnostic GPU endpoint stays, and so does the CPU fallback
+in `_device_and_dtype`, because neither costs anything and both are now
+correct rather than load-bearing.
