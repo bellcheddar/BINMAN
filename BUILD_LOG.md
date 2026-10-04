@@ -425,3 +425,18 @@ One line per meaningful event, timestamped UTC (spec Section 0 rule 5).
 | 2026-10-03T23:45:01+00:00 | 3.4 | Task B label sources mapped onto the atlas: molecular_glue 130, protac 32, native_cofactor 842, crystallisation_artefact 345, held out as disagreements 123 |
 | 2026-10-03T23:45:01+00:00 | 3.4 | Task B corpus: 15,664 train / 1,714 valid / 4,087 test over 4 classes, unbalanced, 1,214 abstract inputs, 123 disagreements held out. |
 | 2026-10-03T23:45:42+00:00 | 3.7 | Stage 1 LoRA SFT starting: 21,200 train / 2,386 valid examples, rank 16, 16 layers, lr 1e-05, batch 4, 1200 iterations. |
+| 2026-10-04T00:01:04+00:00 | 3.7 | Stage 1 complete in 15.4 min. Best validation loss 0.006 at iteration 1000. |
+| 2026-10-04T00:01:10+00:00 | 3.7 | Fuse succeeded: models/binman-lm/fused |
+| 2026-10-04T00:03:18+00:00 | 3.8 | taskA: 25/100 evaluated (0.93/s), parse 1.000, set equality 1.000. |
+| 2026-10-04T00:03:44+00:00 | 3.8 | taskA: 50/100 evaluated (0.95/s), parse 1.000, set equality 0.960. |
+| 2026-10-04T00:04:09+00:00 | 3.8 | taskA: 75/100 evaluated (0.97/s), parse 0.960, set equality 0.920. |
+| 2026-10-04T00:04:25+00:00 | 3.7 | SFT corpus assembled: 28,304 train (oversampling {'task_a': 2, 'task_c': 4}), task mix abstain 11%, query 34%, triage 55% |
+| 2026-10-04T00:04:34+00:00 | 3.8 | taskA: 100/100 evaluated (0.97/s), parse 0.970, set equality 0.940. |
+| 2026-10-04T00:11:24+00:00 | 3.7 | SFT corpus assembled: 28,304 train (oversampling {'task_a': 2, 'task_c': 4}), task mix abstain 11%, query 34%, triage 55% |
+| 2026-10-04T00:11:24+00:00 | 3.7 | Stage 1 LoRA SFT starting: 28,304 train / 2,386 valid examples, rank 16, 16 layers, lr 1e-05, batch 4, 14152 iterations. |
+| 2026-10-04T00:14:09+00:00 | 1.0 | Validation datasets: 10/12 resolved (biolip2_annotations, biolip2_artefacts, mgdb_glues, mgtbind_compounds, mgtbind_ternary, molgluedb_glues, protacdb_protacs, sievers_zf_screen, ubibrowser_literature_e3, ubibrowser_predicted_e3). Manifest at data/validation/MANIFEST.md. |
+| 2026-10-04T00:14:09+00:00 | gate | G7 opened: 2 validation dataset(s) could not be obtained automatically: degronopedia, protcid_interfaces. |
+| 2026-10-04T00:15:21+00:00 | 9 | Validation run against binman.sqlite: 0 metric(s) not computed (dataset unavailable), 2 measured floor(s) missed. |
+| 2026-10-04T00:16:08+00:00 | 9 | Validation run against binman.sqlite: 0 metric(s) not computed (dataset unavailable), 2 measured floor(s) missed. |
+| 2026-10-04T00:17:37+00:00 | gate | G6 opened: A decision on whether to ship the Degron Scan at all, now that spec 9.2 is measured and fails. |
+| 2026-10-04T00:18:03+00:00 | 4.1b | About tab generated: 51 references, 10/12 datasets resolved, worked example selected, 2 value(s) not recorded. |

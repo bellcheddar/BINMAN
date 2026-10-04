@@ -132,6 +132,14 @@ lm_corruption_mode_floor     = 0.80
 lm_fabrication_rate_max      = 0.00
 lm_baseline_skip_finetune_at = 0.85   # spec 3.0: do not fine-tune Task A above this
 
+# Spec 9.2 matched zinc-finger screen. The significance cut is the one Sievers
+# et al. use in the paper's own analysis, not a cut chosen here, and the
+# residue overlap is how a degron candidate on the AlphaFold model is tied to
+# an assayed zinc-finger domain: any shared residue counts, because the screen
+# reports a domain window and the scan reports a hairpin inside it.
+sievers_fdr                  = 0.05
+degron_overlap_residues      = 1
+
 [atlas]
 # spec 6.5 budgets.
 max_bundle_gb                = 2.5

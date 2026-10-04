@@ -174,6 +174,173 @@ def section_91(connection: sqlite3.Connection, config) -> dict:
     return out
 
 
+def roc_auc(scores: list[tuple[float, int]]) -> float:
+    """AUC as the rank-based Mann-Whitney statistic, ties shared.
+
+    Spelled out rather than imported so the number in FINDINGS.md is auditable
+    against the contingency table beside it.
+    """
+    positives = [s for s, label in scores if label == 1]
+    negatives = [s for s, label in scores if label == 0]
+    if not positives or not negatives:
+        return float("nan")
+    ordered = sorted(scores, key=lambda pair: pair[0])
+    ranks: dict[int, float] = {}
+    index = 0
+    while index < len(ordered):
+        stop = index
+        while stop + 1 < len(ordered) and ordered[stop + 1][0] == ordered[index][0]:
+            stop += 1
+        shared = (index + stop) / 2.0 + 1.0
+        for position in range(index, stop + 1):
+            ranks[position] = shared
+        index = stop + 1
+    rank_sum = sum(ranks[position] for position, (_, label) in enumerate(ordered)
+                   if label == 1)
+    n_pos, n_neg = len(positives), len(negatives)
+    return (rank_sum - n_pos * (n_pos + 1) / 2.0) / (n_pos * n_neg)
+
+
+def degron_threshold_sweep(scores: list[tuple[float, int]],
+                           sensitivity_floor: float,
+                           specificity_floor: float) -> dict:
+    """Sweep `degron_geometry_score` and report whether ANY cut satisfies both
+    spec 9.2 floors at once.
+
+    This exists so the G6 case rests on evidence rather than on one failed
+    operating point. If no cut on the existing score clears both floors, the
+    threshold is not what is wrong with the module and a second adjustment
+    would be tuning against the test set for nothing.
+    """
+    n_pos = sum(1 for _, label in scores if label == 1)
+    n_neg = len(scores) - n_pos
+    if not n_pos or not n_neg:
+        return {}
+
+    points = []
+    best = None
+    for cut in sorted({score for score, _ in scores} | {0.0}):
+        # "called" means the best overlapping candidate scores at or above the
+        # cut; a zinc finger with no overlapping candidate scores zero.
+        tp = sum(1 for score, label in scores if label == 1 and score >= cut and score > 0)
+        fp = sum(1 for score, label in scores if label == 0 and score >= cut and score > 0)
+        sensitivity = tp / n_pos
+        specificity = (n_neg - fp) / n_neg
+        points.append({"cut": round(cut, 4),
+                       "sensitivity": round(sensitivity, 4),
+                       "specificity": round(specificity, 4)})
+        if sensitivity >= sensitivity_floor and specificity >= specificity_floor:
+            if best is None or sensitivity + specificity > best["sensitivity"] + best["specificity"]:
+                best = points[-1]
+    # Youden's J, as the best the score can do regardless of the floors.
+    youden = max(points, key=lambda row: row["sensitivity"] + row["specificity"] - 1.0)
+    return {
+        "any_cut_passes_both_floors": best is not None,
+        "passing_cut": best,
+        "best_youden_j": {**youden,
+                          "j": round(youden["sensitivity"] + youden["specificity"] - 1.0, 4)},
+        "curve": points[:: max(1, len(points) // 24)],
+    }
+
+
+def sievers_matched_sets(connection: sqlite3.Connection, config) -> dict | None:
+    """Score each assayed zinc finger by the degron scan and build the
+    contingency table spec 9.2 asks for.
+
+    A zinc finger counts as *called* when a degron candidate on its AlphaFold
+    model shares at least `validation.degron_overlap_residues` residues with the
+    assayed window. Its score is the best `degron_geometry_score` among the
+    overlapping candidates, and zero when the protein was scanned and nothing
+    overlapped -- which is what makes a matched negative measurable at all.
+
+    A zinc finger whose protein never reached the scan (no AlphaFold model, or
+    outside the reviewed human proteome the scan covers) is excluded and
+    counted, because a miss there is missing data rather than a false negative.
+    """
+    assayed = _read_tsv("sievers_zf_screen")
+    if not assayed:
+        return None
+
+    overlap_floor = int(config.thresholds["validation"]["degron_overlap_residues"])
+
+    scanned: set[str] = set()
+    for record in Manifest("degrons").read():
+        if record.get("status") == "ok" and record.get("key"):
+            scanned.add(record["key"])
+
+    candidates: dict[str, list[tuple[int, int, float]]] = {}
+    for accession, start, end, score in connection.execute(
+            "SELECT uniprot_acc, start_res, end_res, degron_geometry_score "
+            "FROM degron WHERE status = 'ok'"):
+        candidates.setdefault(accession, []).append(
+            (int(start), int(end), float(score or 0.0)))
+
+    scores: list[tuple[float, int]] = []
+    table = {"tp": 0, "fn": 0, "fp": 0, "tn": 0}
+    excluded = {"not_scanned": 0, "no_accession": 0}
+    recovered: list[dict] = []
+    missed: list[dict] = []
+
+    for row in assayed:
+        accession = (row.get("uniprot") or "").strip()
+        if not accession:
+            excluded["no_accession"] += 1
+            continue
+        if accession not in scanned:
+            excluded["not_scanned"] += 1
+            continue
+        try:
+            start = int(row["zf_start"])
+            stop = int(row["zf_stop"])
+        except (KeyError, TypeError, ValueError):
+            excluded["no_accession"] += 1
+            continue
+
+        best = 0.0
+        called = False
+        for low, high, score in candidates.get(accession, ()):
+            shared = min(stop, high) - max(start, low) + 1
+            if shared >= overlap_floor:
+                called = True
+                best = max(best, score)
+
+        degraded = row.get("degraded") == "1"
+        scores.append((best, 1 if degraded else 0))
+        if degraded and called:
+            table["tp"] += 1
+            recovered.append({"gene": row.get("gene", ""), "uniprot": accession,
+                              "window": f"{start}-{stop}", "score": round(best, 4),
+                              "drugs": row.get("drugs_significant", "")})
+        elif degraded:
+            table["fn"] += 1
+            missed.append({"gene": row.get("gene", ""), "uniprot": accession,
+                           "window": f"{start}-{stop}",
+                           "candidates_on_protein": len(candidates.get(accession, ())),
+                           "drugs": row.get("drugs_significant", "")})
+        elif called:
+            table["fp"] += 1
+        else:
+            table["tn"] += 1
+
+    degraded_total = table["tp"] + table["fn"]
+    matched_total = table["tn"] + table["fp"]
+    if not degraded_total or not matched_total:
+        return None
+
+    return {
+        "table": table,
+        "sensitivity": table["tp"] / degraded_total,
+        "specificity": table["tn"] / matched_total,
+        "degraded_total": degraded_total,
+        "matched_total": matched_total,
+        "excluded": excluded,
+        "auc": roc_auc(scores),
+        "recovered": recovered,
+        "missed": missed,
+        "scores": scores,
+    }
+
+
 # --------------------------------------------------------------------------- #
 # 9.2 Degron Scan
 # --------------------------------------------------------------------------- #
@@ -182,15 +349,97 @@ def section_92(connection: sqlite3.Connection, config) -> dict:
     floors = config.thresholds["validation"]
     out: dict = {"title": "Degron Scan"}
     reason = (
-        "The matched degraded and non-degraded zinc-finger sets from the "
-        "Molecular Cell 2025 and Nature Communications 2025 screens did not "
-        "resolve (Gate G7). Specificity is the metric that matters here and "
-        "there is no matched negative set to measure it against, so the module "
-        "is presented as a hypothesis generator rather than a classifier, which "
-        "is what spec 9.2 instructs for exactly this case."
+        "No matched degraded and non-degraded zinc-finger sets resolved (Gate "
+        "G7). Specificity is the metric that matters here and there is no "
+        "matched negative set to measure it against, so the module is presented "
+        "as a hypothesis generator rather than a classifier, which is what spec "
+        "9.2 instructs for exactly this case."
     )
-    out["sensitivity"] = not_computed(reason, floors["degron_sensitivity_floor"])
-    out["specificity"] = not_computed(reason, floors["degron_specificity_floor"])
+    matched = sievers_matched_sets(connection, config)
+    if matched is None:
+        out["sensitivity"] = not_computed(reason, floors["degron_sensitivity_floor"])
+        out["specificity"] = not_computed(reason, floors["degron_specificity_floor"])
+        out["contingency_table"] = not_computed(reason)
+        out["roc_auc"] = not_computed(reason)
+    else:
+        source = (
+            "Sievers et al. 2018 (10.1126/science.aat0572), supplementary data "
+            "files S2 and S6 pooled: "
+            f"{matched['degraded_total']} zinc fingers depleted under IMiD "
+            f"treatment at FDR < {config.thresholds['validation']['sievers_fdr']} "
+            f"against {matched['matched_total']} assayed in the same screens and "
+            "not depleted. Spec 9.2 names the Molecular Cell 2025 and Nature "
+            "Communications 2025 screens; neither resolved, and this is the same "
+            "experimental design -- one flow-cytometry screen supplying both arms "
+            "-- from a source that did."
+        )
+        out["sensitivity"] = computed(
+            round(matched["sensitivity"], 4),
+            floors["degron_sensitivity_floor"],
+            source=source,
+            n=matched["degraded_total"],
+        )
+        out["specificity"] = computed(
+            round(matched["specificity"], 4),
+            floors["degron_specificity_floor"],
+            source=source,
+            n=matched["matched_total"],
+        )
+        out["contingency_table"] = {
+            "computed": True, "reason": "", "value": matched["table"],
+            "note": (
+                "Rows are the screen, columns the geometric filter. A zinc finger "
+                "is 'called' when a degron candidate on its AlphaFold model shares "
+                "at least "
+                f"{config.thresholds['validation']['degron_overlap_residues']} "
+                "residue(s) with the assayed window. "
+                f"{matched['excluded']['not_scanned']:,} assayed zinc fingers were "
+                "excluded because their protein never reached the scan (no "
+                "AlphaFold model, or outside the reviewed human proteome) and "
+                f"{matched['excluded']['no_accession']:,} for want of a usable "
+                "accession or window; a miss there is missing data, not a false "
+                "negative, so neither is scored."
+            ),
+        }
+        out["roc_auc"] = {
+            "computed": True, "reason": "", "floor": None,
+            "value": None if matched["auc"] != matched["auc"] else round(matched["auc"], 4),
+            "note": (
+                "Over degron_geometry_score, taking the best overlapping candidate "
+                "per zinc finger and zero where the protein was scanned and nothing "
+                "overlapped. The score is therefore heavily tied at zero, which "
+                "caps the AUC achievable by ranking alone -- read it with the "
+                "contingency table, not instead of it."
+            ),
+        }
+        sweep = degron_threshold_sweep(
+            matched["scores"],
+            float(floors["degron_sensitivity_floor"]),
+            float(floors["degron_specificity_floor"]),
+        )
+        out["threshold_sweep"] = {
+            "computed": True, "reason": "", "floor": None, "value": sweep,
+            "note": (
+                "Spec 9.6 allows one documented threshold adjustment before G6, "
+                "and D-010 already spent it -- on five documented degrons, with no "
+                "matched negative set in existence at the time. This sweep asks "
+                "whether a second adjustment could even help: if no cut on "
+                "degron_geometry_score clears both floors together, the cut is not "
+                "what is wrong and moving it would be tuning against the test set."
+            ),
+        }
+        out["recovered_zinc_fingers"] = {
+            "computed": True, "reason": "", "floor": None,
+            "value": sorted(matched["recovered"],
+                            key=lambda row: -row["score"]),
+        }
+        out["missed_zinc_fingers"] = {
+            "computed": True, "reason": "", "floor": None,
+            "value": matched["missed"],
+            "note": ("candidates_on_protein is how many degron candidates the scan "
+                     "found anywhere on that protein: a non-zero count with no "
+                     "overlap means the filter fired, but elsewhere."),
+        }
 
     window = config.thresholds["degron"]
     out["calibration"] = {

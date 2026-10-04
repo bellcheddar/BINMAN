@@ -697,3 +697,59 @@ honest outcome is to say the resource does not publish what the metric needs.
 
 **Reversal.** If ProtCID publishes a bulk interface table, add it to the registry
 with a direct route; the parser slot already exists.
+
+## D-024: the degron geometry filter has no specificity, and Gate G6 is opened
+
+**Decision.** Spec 9.2 is now **measured** against a matched published screen,
+and it **fails both floors**: sensitivity 0.656 (floor 0.70) and specificity
+0.353 (floor 0.60), ROC AUC 0.441. Gate G6 is opened. The degron module is
+relabelled in `FINDINGS.md`, the README and the app as a **hypothesis
+generator, not a classifier**, which is what spec 9.2 instructs for exactly
+this case. No second threshold adjustment is made.
+
+**Context.** The screens spec 9.2 names (Molecular Cell 2025, Nature
+Communications 2025) never resolved. Sievers et al. 2018
+(10.1126/science.aat0572) is the same experimental design — one
+flow-cytometry screen supplying both arms — and its supplementary data files
+are open. Data files S2 and S6 are pooled rather than intersected, per the
+instruction to treat each screen as unique data: 5,663 zinc-finger domains,
+32 depleted under at least one of thalidomide, lenalidomide, pomalidomide,
+CC-122 or CC-220 at FDR < 0.05, and 5,631 assayed in the same screens and not
+depleted. 155 were excluded because their protein never reached the AlphaFold
+scan; 5,476 matched negatives and 32 positives were scored.
+
+Contingency table (rows the screen, columns the filter): TP 21, FN 11,
+FP 3,544, TN 1,932.
+
+**Why no second adjustment.** Spec 9.6 allows one documented threshold
+adjustment before G6 and D-010 already spent it — calibrated on five
+documented degrons, with no matched negative set in existence at the time,
+which is precisely how a filter with no specificity gets built. A sweep of
+every attainable cut on `degron_geometry_score` was run to test whether a
+second adjustment could help at all: **no cut clears both floors together**,
+and the best Youden's J over the whole curve is **0.022**. At cut 0.717 the
+filter reaches specificity 0.594 at sensitivity 0.281; to reach specificity
+0.60 it gives up all but a quarter of the positives. Moving the cut would be
+tuning against the test set for a gain of two points of J.
+
+**The finding is the AUC.** 0.441 is *below* chance: the score ranks degraded
+zinc fingers marginally worse than non-degraded ones. The canonical IMiD
+neosubstrates are recovered — IKZF3 146-168 at 0.697, ZFP91 400-422 at 0.662,
+E4F1 220-242 at 0.678 — but twelve non-degraded zinc fingers score above all
+three. Recovering the textbook cases while ranking at chance is the signature
+of a filter that fires on the fold rather than on the degron: a C2H2 zinc
+finger *is* a short antiparallel hairpin with an exposed turn, so the geometry
+spec 5.2 describes is a description of the domain family, not of
+degradability.
+
+**Alternatives considered.** (a) Spend a second adjustment — rejected on the
+sweep above. (b) Add the beta-hairpin glycine as a hard requirement rather
+than a scored term — already required; the 3,544 false positives all carry
+it. (c) Withhold the metric as not computed — rejected: a measured failure
+against a published matched set is a result, and spec 9.2 asks for it plainly.
+
+**Reversal.** The module becomes a classifier again only with a feature that
+separates degraded from non-degraded zinc fingers *within* the C2H2 family —
+the degron sequence context, CRBN-interface complementarity, or the
+Zn-coordination geometry — validated on this same matched set. The set is now
+wired in as `sievers_zf_screen`, so that test is one command away.

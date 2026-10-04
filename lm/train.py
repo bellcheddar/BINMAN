@@ -127,7 +127,19 @@ LORA_RANK = 16
 LORA_LAYERS = 16
 LEARNING_RATE = 1e-5
 MIN_ITERS = 600
-MAX_ITERS = 1200
+# Raised from the spec's 1200. With Task B in the mix the corpus is ~28,000
+# examples, and 1200 iterations at batch 4 shows the model 4,800 samples, which
+# is under a quarter of one epoch. Capping there would have left three quarters
+# of the curated labels unseen. See DECISIONS.md D-024.
+MAX_ITERS = 20000
+
+# Task-level mix. Marc's "treat them all as unique data" applies to the CLASSES
+# inside Task B, and it is honoured: every Task B example is kept. The task axis
+# is a different question. Left alone, Task B's size made the mix 74% triage,
+# 22% query and 4% abstain, and abstain is the task that keeps the model honest
+# (spec 3.5 says to over-weight it, not starve it). Task A and Task C are
+# therefore oversampled by repetition, which discards nothing.
+TASK_OVERSAMPLE = {"task_a": 2, "task_c": 4}
 DPO_BETA = 0.1
 # Preference tuning needs a much gentler step than the SFT stage: the first run
 # reused the SFT learning rate for 600 updates and collapsed the policy.
@@ -165,9 +177,14 @@ def prepare_sft_data() -> dict:
     ):
         rows: list[dict] = []
         for name in sources:
+            stem = name.rsplit("_", 1)[0]
+            # Oversample only the training split: repeating validation or test
+            # rows would flatter the metrics.
+            repeat = TASK_OVERSAMPLE.get(stem, 1) if split == "train" else 1
             for row in _read_jsonl(CORPUS / name):
                 # mlx-lm wants only `messages`; the extra keys confuse its loader.
-                rows.append({"messages": row["messages"]})
+                for _ in range(repeat):
+                    rows.append({"messages": row["messages"]})
         # Interleave rather than concatenate, so a batch mixes tasks and the
         # model never sees a long run of one task tag.
         rows.sort(key=lambda r: hash(r["messages"][1]["content"]) % 1_000_003)
@@ -176,6 +193,17 @@ def prepare_sft_data() -> dict:
             for row in rows:
                 handle.write(json.dumps(row, separators=(",", ":")) + "\n")
         counts[split] = len(rows)
+
+    # Report the task mix so a skew is visible in the log rather than inferred.
+    mix: dict[str, int] = {}
+    for row in _read_jsonl(TRAIN_DATA / "train.jsonl"):
+        tag = row["messages"][0]["content"].split("</task>")[0].replace("<task>", "")
+        mix[tag] = mix.get(tag, 0) + 1
+    counts["task_mix"] = mix
+    log_event("3.7", f"SFT corpus assembled: {counts['train']:,} train "
+                     f"(oversampling {TASK_OVERSAMPLE}), task mix "
+                     + ", ".join(f"{k} {v / max(1, counts['train']):.0%}"
+                                 for k, v in sorted(mix.items())))
     return counts
 
 

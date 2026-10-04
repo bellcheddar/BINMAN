@@ -3,10 +3,17 @@
 
 {% block module_panels %}
 <div class="notice">
-  <strong>This is a geometric filter, not a classifier.</strong>
-  The column is named <code>degron_geometry_score</code> because it is a rank
-  over hairpin geometry, not a calibrated probability of degradation. Read it
-  beside the specificity figure on the About tab.
+  <strong>This is a geometric filter, not a classifier, and it has now been
+  measured.</strong>
+  Against the matched zinc-finger screen of Sievers et al. 2018 &mdash; 32
+  domains depleted by an IMiD against 5,476 assayed in the same screens and not
+  depleted &mdash; it reaches sensitivity <strong>0.66</strong> and specificity
+  <strong>0.35</strong>, with an ROC AUC of <strong>0.44</strong>. That is below
+  chance. The column is named <code>degron_geometry_score</code> because it is a
+  rank over hairpin geometry, not a probability of degradation; a C2H2 zinc
+  finger <em>is</em> a short hairpin with an exposed glycine, so this score
+  largely detects the fold. Use it to generate hypotheses, not to triage. Full
+  contingency table and threshold sweep on the About tab.
 </div>
 {% endblock %}
 

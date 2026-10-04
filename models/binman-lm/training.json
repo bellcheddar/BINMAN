@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-03T21:40:16+00:00",
+  "generated_at": "2026-10-03T23:45:40+00:00",
   "identity": {
     "base_model": "mlx-community/Qwen2.5-3B-Instruct-4bit",
     "quantisation": "4-bit",
@@ -31,78 +31,78 @@
       "description": "structured abstention naming exactly what is missing"
     }
   ],
-  "round": 4,
+  "round": 5,
   "stage_1": {
     "iterations_requested": 1200,
     "batch_size": 4,
     "rank": 16,
     "layers": 16,
     "learning_rate": 1e-05,
-    "wall_clock_seconds": 810.0,
-    "train_examples": 5536,
-    "valid_examples": 672,
+    "wall_clock_seconds": 922.4,
+    "train_examples": 21200,
+    "valid_examples": 2386,
     "exit_code": 0,
     "validation_losses": [
       {
         "iter": 1,
-        "loss": 2.282
+        "loss": 2.709
       },
       {
         "iter": 100,
-        "loss": 0.055
+        "loss": 0.096
       },
       {
         "iter": 200,
-        "loss": 0.013
+        "loss": 0.159
       },
       {
         "iter": 300,
-        "loss": 0.117
+        "loss": 0.018
       },
       {
         "iter": 400,
-        "loss": 0.065
+        "loss": 0.02
       },
       {
         "iter": 500,
-        "loss": 0.008
+        "loss": 0.014
       },
       {
         "iter": 600,
-        "loss": 0.012
+        "loss": 0.026
       },
       {
         "iter": 700,
-        "loss": 0.024
+        "loss": 0.016
       },
       {
         "iter": 800,
-        "loss": 0.048
+        "loss": 0.087
       },
       {
         "iter": 900,
-        "loss": 0.043
+        "loss": 0.01
       },
       {
         "iter": 1000,
-        "loss": 0.059
-      },
-      {
-        "iter": 1100,
         "loss": 0.006
       },
       {
+        "iter": 1100,
+        "loss": 0.023
+      },
+      {
         "iter": 1200,
-        "loss": 0.003
+        "loss": 0.008
       }
     ],
-    "final_train_loss": 0.0,
-    "best_validation_loss": 0.003,
-    "early_stopping_point": 1200,
+    "final_train_loss": 0.006,
+    "best_validation_loss": 0.006,
+    "early_stopping_point": 1000,
     "log": "data/interim/lm_stage1.log",
     "wandb_project": "binman-lm",
-    "wandb_run_name": "binman-qwen-2.5-3b-4bit-round04",
-    "wandb_group": "binman-qwen-2.5-3b-4bit-round04",
+    "wandb_run_name": "binman-qwen-2.5-3b-4bit-round05",
+    "wandb_group": "binman-qwen-2.5-3b-4bit-round05",
     "reported_to_wandb": true
   },
   "stage_2": {

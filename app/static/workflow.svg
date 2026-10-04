@@ -5,7 +5,7 @@
 <marker id="wf-tip" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7Z" fill="var(--line)"/></marker>
 <text class="wf-head" x="12" y="88">Inputs</text>
 <rect class="wf-box" x="12" y="112" width="108" height="58" rx="2"/><text class="wf-t" x="22" y="134">Sources</text><text class="wf-s" x="22" y="150">RCSB, AFDB,</text><text class="wf-s" x="22" y="162">UniProt</text>
-<rect class="wf-ds" x="12" y="188" width="108" height="58" rx="2"/><text class="wf-t" x="22" y="210">Ground truth</text><text class="wf-s" x="22" y="226">8 of 11</text><text class="wf-s" x="22" y="238">resolved</text>
+<rect class="wf-ds" x="12" y="188" width="108" height="58" rx="2"/><text class="wf-t" x="22" y="210">Ground truth</text><text class="wf-s" x="22" y="226">10 of 12</text><text class="wf-s" x="22" y="238">resolved</text>
 <g class="wf-node" data-stage="1" tabindex="0"><rect class="wf-box" x="136" y="112" width="186" height="150" rx="2"/><text class="wf-t" x="148" y="136">1 · Acquisition</text><text class="wf-s" x="148" y="152">httpx, tenacity</text>
 <text class="wf-n" x="148" y="176">52,821 entries</text>
 <text class="wf-n" x="148" y="192">tier 1  902</text>

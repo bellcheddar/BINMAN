@@ -343,6 +343,161 @@ def parse_protacdb_xlsx(raw: bytes, route: Route) -> list[dict]:
     return rows
 
 
+def parse_sievers_zf_screen(raw: bytes, route: Route) -> list[dict]:
+    """Sievers et al. 2018 zinc-finger degradation screens, as the matched
+    positive and negative sets spec 9.2 requires.
+
+    Two screens, pooled, because they assayed overlapping but not identical
+    libraries and the user's instruction was to treat each as unique data
+    rather than intersect down to the smallest:
+
+    * data file S2, sheet `pval_FDR` -- 5,609 zinc fingers, thalidomide,
+      lenalidomide and pomalidomide, t-test FDR.
+    * data file S6, sheet `POM_CC122_CC220_Results_bootstr` -- 3,206 zinc
+      fingers, pomalidomide, CC-122 and CC-220, bootstrap FDR with fold
+      change. Keyed by `GENE_start_stop`, so the UniProt accession is joined
+      back through S2's `zflibrary` sheet.
+
+    A domain is a positive when any drug in either screen depletes it
+    (FDR below `validation.sievers_fdr`, fold depletion above 1) and a
+    negative when it was assayed and no drug did. Both come out of the same
+    flow-cytometry experiment, which is the whole point of spec 9.2:
+    specificity against a matched negative set, not recall in isolation.
+
+    Licence: the supplement is open (Science author-choice); the derivative
+    stays in gitignored `data/validation/` and only metrics reach the repo.
+    """
+    import io as _io
+
+    import openpyxl
+
+    def sheet_rows(workbook, name):
+        sheet = workbook[name]
+        stream = sheet.iter_rows(values_only=True)
+        header = [str(h or "").strip() for h in next(stream)]
+        index = {label: position for position, label in enumerate(header)}
+        for record in stream:
+            if record:
+                yield record, index
+
+    def number(record, index, label):
+        position = index.get(label)
+        if position is None or position >= len(record):
+            return None
+        value = record[position]
+        try:
+            return float(value)
+        except (TypeError, ValueError):
+            return None
+
+    def text(record, index, label):
+        position = index.get(label)
+        if position is None or position >= len(record):
+            return ""
+        value = record[position]
+        return "" if value is None else str(value).strip()
+
+    cut = float(load_config().thresholds["validation"]["sievers_fdr"])
+
+    s2 = openpyxl.load_workbook(_io.BytesIO(raw), read_only=True, data_only=True)
+
+    # The library sheet is the only place the UniProt accession, the residue
+    # range and the gene abbreviation sit together, so it is the join table.
+    accession: dict[str, str] = {}
+    sequence: dict[str, str] = {}
+    for record, index in sheet_rows(s2, "zflibrary"):
+        gene = text(record, index, "Gene")
+        start = number(record, index, "AA Start")
+        stop = number(record, index, "AA Stop")
+        if not gene or start is None or stop is None:
+            continue
+        key = f"{gene}_{int(start)}_{int(stop)}"
+        accession[key] = text(record, index, "Uniprot Code")
+        sequence[key] = text(record, index, "AA Sequence")
+
+    domains: dict[str, dict] = {}
+
+    def touch(key, gene, start, stop, screen):
+        entry = domains.setdefault(key, {
+            "uniprot": accession.get(key, ""),
+            "gene": gene,
+            "zf_start": int(start),
+            "zf_stop": int(stop),
+            "aa_sequence": sequence.get(key, ""),
+            "screens": set(),
+            "drugs_tested": set(),
+            "drugs_significant": set(),
+            "min_fdr": None,
+            "max_fold_depletion": None,
+        })
+        entry["screens"].add(screen)
+        return entry
+
+    def score(entry, drug, fdr, fold):
+        entry["drugs_tested"].add(drug)
+        if fdr is None:
+            return
+        if entry["min_fdr"] is None or fdr < entry["min_fdr"]:
+            entry["min_fdr"] = fdr
+        if fold is not None and (entry["max_fold_depletion"] is None
+                                 or fold > entry["max_fold_depletion"]):
+            entry["max_fold_depletion"] = fold
+        # S2 reports no fold change, so depletion direction cannot be checked
+        # there; S6 reports it and the direction is required.
+        if fdr < cut and (fold is None or fold > 1.0):
+            entry["drugs_significant"].add(drug)
+
+    for record, index in sheet_rows(s2, "pval_FDR"):
+        gene = text(record, index, "Gene")
+        start = number(record, index, "AA.Start")
+        stop = number(record, index, "AA.Stop")
+        if not gene or start is None or stop is None:
+            continue
+        key = f"{gene}_{int(start)}_{int(stop)}"
+        entry = touch(key, gene, start, stop, "S2_ttest")
+        if not entry["uniprot"]:
+            entry["uniprot"] = text(record, index, "Uniprot.Code")
+        for drug in ("THAL", "LEN", "POM"):
+            score(entry, drug, number(record, index, f"{drug}.FDR"), None)
+
+    s6_path = RAW / "aat0572_sievers_data-file-s6.xlsx"
+    if s6_path.exists():
+        s6 = openpyxl.load_workbook(s6_path, read_only=True, data_only=True)
+        for record, index in sheet_rows(s6, "POM_CC122_CC220_Results_bootstr"):
+            key = text(record, index, "ZnF_gene_AApos")
+            parts = key.rsplit("_", 2)
+            if len(parts) != 3 or not parts[1].isdigit() or not parts[2].isdigit():
+                continue
+            gene, start, stop = parts[0], int(parts[1]), int(parts[2])
+            entry = touch(key, gene, start, stop, "S6_bootstrap")
+            for drug in ("POM", "CC122", "CC220"):
+                score(entry, drug,
+                      number(record, index, f"{drug}.FDR"),
+                      number(record, index, f"FoldChange_{drug}"))
+
+    rows = []
+    for entry in domains.values():
+        if not entry["uniprot"]:
+            # Without an accession the domain cannot be placed on an AlphaFold
+            # model, so it can be neither a positive nor a matched negative.
+            continue
+        rows.append({
+            "uniprot": entry["uniprot"],
+            "gene": entry["gene"],
+            "zf_start": entry["zf_start"],
+            "zf_stop": entry["zf_stop"],
+            "aa_sequence": entry["aa_sequence"],
+            "degraded": 1 if entry["drugs_significant"] else 0,
+            "screens": ";".join(sorted(entry["screens"])),
+            "drugs_tested": ";".join(sorted(entry["drugs_tested"])),
+            "drugs_significant": ";".join(sorted(entry["drugs_significant"])),
+            "min_fdr": "" if entry["min_fdr"] is None else f"{entry['min_fdr']:.6g}",
+            "max_fold_depletion": ("" if entry["max_fold_depletion"] is None
+                                   else f"{entry['max_fold_depletion']:.4g}"),
+        })
+    return rows
+
+
 def parse_generic_table(raw: bytes, route: Route) -> list[dict]:
     """A TSV or CSV with a header, read as-is. Used where the schema is unknown."""
     text = _text(raw, route)
@@ -553,6 +708,35 @@ def registry() -> list[Dataset]:
             parser=parse_protacdb_xlsx, min_rows=1000,
             columns=("compound_id", "name", "smiles", "target", "target_uniprot",
                      "e3_ligase", "pdb_id", "pdb_ids"),
+        ),
+        Dataset(
+            name="sievers_zf_screen",
+            purpose=("Degron Scan matched positive and negative sets (spec 9.2): "
+                     "zinc fingers degraded under IMiD treatment against zinc "
+                     "fingers assayed in the same screen and not degraded"),
+            licence="open supplement, Science author-choice",
+            redistributable=False,
+            citation="10.1126/science.aat0572",
+            homepage="https://www.science.org/doi/10.1126/science.aat0572",
+            version_note="supplementary data files S2 and S6, as published 2018-11-02",
+            manual_route=(
+                "The supplementary data files are not behind the paywall but are "
+                "served from a session-scoped path, so fetch them by hand. Open "
+                "https://www.science.org/doi/10.1126/science.aat0572, follow "
+                "'Supplementary Materials', and save data file S2 and data file S6 "
+                "to data/validation/raw/ as aat0572_sievers_data-file-s2.xlsx and "
+                "aat0572_sievers_data-file-s6.xlsx. S2 carries the thalidomide, "
+                "lenalidomide and pomalidomide t-test FDRs plus the library table "
+                "that supplies the UniProt accessions; S6 carries the pomalidomide, "
+                "CC-122 and CC-220 bootstrap FDRs with fold change. Both are read "
+                "by one parser, so S2 is the registered route."
+            ),
+            routes=[Route("file://data/validation/raw/aat0572_sievers_data-file-s2.xlsx",
+                          note="placed by hand from the open supplement", binary=True)],
+            parser=parse_sievers_zf_screen, min_rows=3000,
+            columns=("uniprot", "gene", "zf_start", "zf_stop", "aa_sequence",
+                     "degraded", "screens", "drugs_tested", "drugs_significant",
+                     "min_fdr", "max_fold_depletion"),
         ),
         Dataset(
             name="degronopedia",

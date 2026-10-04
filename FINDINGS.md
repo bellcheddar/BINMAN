@@ -119,17 +119,95 @@ Packing specificity is also not computed: ProtCID did not resolve.
 
 ## Section 9.2 Degron Scan validation
 
-**The spec 9.2 metric cannot be computed.** It requires the matched degraded and
-non-degraded zinc-finger sets from the Molecular Cell 2025 and Nature
-Communications 2025 screens, and neither resolved (Gate G7). Sensitivity and
-specificity are therefore **not computed**, not estimated. Without the matched
-negative set there is no way to know whether a hairpin-plus-glycine filter is
-selecting anything, so the Degron Scan ships as a **hypothesis generator, not a
-classifier**, exactly as spec 9.2 instructs for this case.
+| Metric | Measured | Floor | Verdict |
+|---|---|---|---|
+| Sensitivity on the degraded set | **0.656** (21/32) | 0.70 | **misses** |
+| Specificity on the matched non-degraded set | **0.353** (1,932/5,476) | 0.60 | **misses** |
+| ROC AUC over `degron_geometry_score` | **0.441** | — | below chance |
 
-What follows is a method sanity check against degrons documented in the
-structural literature. It is **not** a substitute for 9.2: the set is small, it
-was used to calibrate the thresholds, and it contains no negatives.
+**The geometric degron filter has no specificity, and the honest reading is that
+it is detecting the C2H2 fold rather than degradability.** Gate G6 is open
+(DECISIONS D-024). The Degron Scan ships as a **hypothesis generator, not a
+classifier**, which is what spec 9.2 instructs for exactly this case.
+
+### The matched set
+
+The screens spec 9.2 names (Molecular Cell 2025, Nature Communications 2025)
+never resolved. Sievers et al. 2018 ([10.1126/science.aat0572](https://doi.org/10.1126/science.aat0572))
+is the same experimental design — one flow-cytometry screen supplying both arms,
+which is the entire point of the test — and its supplementary data are open.
+Data files S2 and S6 are **pooled rather than intersected**, so each screen
+contributes its own domains:
+
+| Screen | Drugs | Domains | Statistic |
+|---|---|---|---|
+| S2 | thalidomide, lenalidomide, pomalidomide | 5,609 | t-test FDR |
+| S6 | pomalidomide, CC-122, CC-220 | 3,206 | bootstrap FDR + fold change |
+| pooled | all five | **5,663** | depleted in any, FDR < 0.05 |
+
+**32 depleted, 5,631 assayed and not depleted.** 155 were excluded because their
+protein never reached the AlphaFold scan, leaving 32 positives and 5,476 matched
+negatives scored. A zinc finger counts as *called* when a degron candidate on
+its AlphaFold model shares at least one residue with the assayed window.
+
+| | filter calls it | filter does not |
+|---|---|---|
+| **depleted in the screen** | 21 | 11 |
+| **assayed, not depleted** | **3,544** | 1,932 |
+
+### The filter fires on 65% of the matched negatives
+
+That is the result. It is not a threshold problem, and the sweep says so: every
+attainable cut on `degron_geometry_score` was tested and **none clears both
+floors together.** The best Youden's J over the whole curve is **0.022**.
+
+| Cut | Sensitivity | Specificity |
+|---|---|---|
+| 0.000 (any candidate) | 0.656 | 0.353 |
+| 0.703 | 0.375 | 0.513 |
+| 0.717 | 0.281 | 0.594 |
+| 0.721 | 0.250 | **0.621** |
+| 0.735 | 0.125 | 0.702 |
+| 0.776 | 0.000 | 0.892 |
+
+To reach the 0.60 specificity floor the filter gives up all but a quarter of the
+positives. Spec 9.6 allows one documented threshold adjustment before G6 and
+D-010 already spent it — calibrated on the five documented degrons below, with
+no matched negative set in existence at the time, which is precisely how a
+filter with no specificity gets built. A second adjustment is not made: on this
+curve it would be tuning against the test set for two points of J.
+
+### Why: a C2H2 zinc finger *is* a short hairpin with an exposed turn
+
+The AUC of 0.441 is the diagnostic. It is *below* chance — the score ranks
+degraded zinc fingers marginally worse than non-degraded ones — while the
+canonical IMiD neosubstrates are nonetheless recovered:
+
+| Gene | Window | Score | Degraded by |
+|---|---|---|---|
+| IKZF3 | 146–168 | 0.697 | LEN, POM |
+| E4F1 | 220–242 | 0.678 | CC-122, LEN, POM |
+| ZFP91 | 400–422 | 0.662 | CC-122, POM, THAL |
+| ZN517 | 452–474 | 0.736 | CC-122, CC-220, LEN, POM |
+| ZN787 | 178–200 | 0.732 | CC-220, LEN, POM, THAL |
+
+Twelve *non-degraded* zinc fingers score above IKZF3, E4F1 and ZFP91. Recovering
+the textbook cases while ranking at chance is the signature of a filter keyed to
+the domain family: the geometry spec 5.2 describes — a two-residue antiparallel
+hairpin with an exposed glycine-bearing turn — is a description of C2H2 itself.
+All 3,544 false positives carry the hairpin glycine, so requiring it harder
+changes nothing.
+
+Of the 11 misses, 9 have at least one degron candidate elsewhere on the same
+protein (ZN526 has 7, ZN501 has 6) — the filter fired, in the wrong place. Only
+ZN292 1947–1973 has no candidate anywhere on its protein.
+
+### The calibration history, which stands
+
+What follows is the method sanity check that preceded the matched set. It
+established that the filter can find the geometry it was built to find, and it
+is **not** a substitute for the numbers above: the set is five proteins, it was
+used to calibrate the thresholds, and it contains no negatives.
 
 ### The spec 5.2 thresholds, applied literally, recover no zinc-finger degron
 
@@ -181,14 +259,22 @@ because on a six-residue turn those are two residues apart.
   Its recruitment to DCAF15 involves an RRM surface rather than a hairpin
   degron, so a hairpin filter is the wrong instrument for it.
 
-### What this does and does not establish
+### What the calibration established, and what the screen then showed
 
-It establishes that the filter can find the geometry it is meant to find, and
-that the spec's literal thresholds could not. It establishes nothing about
-specificity. Relaxing the strand floor from 3 to 2 admits far more hairpins
-proteome-wide, and the cost is unmeasured because the matched negative set is
-unavailable. `calibration_validated = false` in `config/thresholds.toml` records
-that, and the module's UI says so on its face.
+The calibration established that the filter can find the geometry it is meant to
+find, and that the spec's literal thresholds could not. It established nothing
+about specificity — and the concern recorded at the time, that relaxing the
+strand floor from 3 to 2 "admits far more hairpins proteome-wide, and the cost is
+unmeasured", is now measured: the cost is 3,544 false positives on 5,476 matched
+negatives. `calibration_validated = false` in `config/thresholds.toml` was the
+right flag, and it stays set.
+
+**What would make this a classifier.** Not a different cut on this score, but a
+feature that separates degraded from non-degraded zinc fingers *within* the C2H2
+family: degron sequence context, complementarity to the CRBN interface, or
+Zn-coordination geometry. The matched set is now wired in as
+`sievers_zf_screen`, so that test is one command away —
+`pixi run python -m pipeline.validate --section 9.2`.
 
 ## Section 9.3 E3 Triage validation
 
