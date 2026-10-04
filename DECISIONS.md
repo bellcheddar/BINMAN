@@ -2453,3 +2453,46 @@ optimum for the data available. Neither route gets past 14 positives, and the
 honest way to raise this metric is a larger matched screen, not a better fit to
 the one that exists. `pipeline/degron_ablation.py` keeps both results
 reproducible so neither is re-proposed from first principles later.
+
+## D-062: why the flagship metric misses, and a blind spot in a blind-spot inventory
+
+**Finding, not yet a decision.** Glue Atlas recall is 0.7719 against a 0.85 floor:
+73 of 320 curated entries are not recovered. The misses were diagnosed rather
+than estimated, and they fall into three buckets with three different causes.
+
+| bucket | n | cause |
+|---|---:|---|
+| never ingested | 20 | the catalogue requires 2 distinct polymer *entities* |
+| ingested, no bridge | 46 | the spec 5.1 dSASA test rejected the ligand |
+| bridged, classed as something else | 7 | cofactor, cryoprotectant, detergent, peptide-like |
+
+**The 20 are a scope hole, and an embarrassing one.** Spec 1.1 catalogues entries
+with `polymer_entity_count >= 2`, and spec 5.1 requires a bridge to join
+**distinct entities**. A homodimer is one entity with two chains, so every
+homo-oligomeric glue is excluded twice over, by construction, before any
+threshold is applied. Checked against RCSB, all ten sampled misses have
+`polymer_entity_count = 1` with 2 to 20 chains:
+
+* **1A7X**, FKBP12 with FK1012: the original chemical dimeriser.
+* **3TCT**, transthyretin with tafamidis: a marketed drug whose entire mechanism
+  is stabilising a homotetramer.
+* **8FLK**, a STING oligomer with a cyclic dinucleotide.
+* **3KO0**, calmodulin with trifluoperazine, at 20 chains.
+
+A project called a Blind-spot INventory of Molecular Adhesives currently cannot
+represent the class of adhesive that glues a protein to a copy of itself. That
+is not a tuning question and it is not mine to fix silently: it changes what the
+atlas *is*, and spec 1.1 and 5.1 both say "distinct". **Gate: Marc's call.**
+
+**The 46 are a sensitivity question**, and they are not obscure: 3SML is 14-3-3
+sigma, 5GWO and 5ZCG are the abscisic-acid receptor and PP2C, 7JUR is KSR2 with
+MEK1. All passed the catalogue and all were rejected by the dSASA test.
+
+**And the project cannot currently answer why.** The `bridge` table holds 239,485
+rows and every one of them is `status = 'ok'`: **rejections are not recorded at
+all.** There is no artefact saying which ligand was considered and failed, or on
+which criterion, so "why did 14-3-3 sigma miss" cannot be answered from the
+build's own outputs, only by re-running the geometry by hand. Every other stage
+in this project records its failures. This one records only its successes, which
+is the one shape that cannot be audited, and it is why the 46 are a list of PDB
+codes rather than a list of reasons.
