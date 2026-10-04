@@ -887,3 +887,43 @@ reporting both detected and confidently undetected lysines. Failing that, the
 module becomes predictive only by modelling E3 recruitment, at which point the
 reach boundaries can be fitted against ternary-complex geometry rather than
 against native ubiquitylation.
+
+## D-029: the model is served from a private adapter repository, not published
+
+**Decision.** BINMAN-LM is served on a HuggingFace ZeroGPU Space that reads a
+**private** adapter repository with a token. The weights are not published.
+
+**Context.** Marc asked for ZeroGPU serving. Gate G4 authorised a public code
+repository at build start; it did not authorise publishing the model, and the
+licence basis for using PROTAC-DB was his own words: "we are not distributing
+the model, just using it, so i make the decision this is ok as we will
+reference the source and we are not for profit" (D-021). PROTAC-DB's terms
+permit internal use including derivatives and prohibit redistribution. The
+adapter is trained on Task B data derived from it, so a public weights
+repository would be redistribution and would contradict the basis the data was
+accepted on.
+
+**Reason.** A private adapter repository that only the Space can read serves
+inference without publishing weights, which is the thing the licence turns on.
+The sources are cited in the Space README, the repository README and
+`data/validation/MANIFEST.md`.
+
+**What is served.** The three text jobs only: query translation, evidence
+triage and abstention. The atlas is not served. It is 142 MB and several
+source datasets carry licences that do not permit redistribution, so the Space
+shows what the model produces and the repository shows what the pipeline
+computes.
+
+**The conversion risk is not resolved by this decision.** The adapter is
+trained with mlx-lm against a 4-bit quantised base and must be applied to a
+16-bit base on CUDA. `lm/export_hf.py --verify` runs the real held-out test
+questions through the converted adapter and prints the metrics
+`lm/evaluate.py` reports, so the two can be compared. If the converted adapter
+scores materially lower, the options are to train a LoRA against the 16-bit
+base for serving or to serve from Apple hardware. Shipping a degraded adapter
+beside the MLX numbers is not one of them.
+
+**Reversal.** If the PROTAC-DB class were rebuilt from a source that permits
+redistribution, or dropped, the adapter could be published. Task B would then
+be three classes rather than four, and the glue-against-PROTAC confusion that
+the confusion matrix exists to expose would no longer be measurable.

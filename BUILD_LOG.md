@@ -465,3 +465,6 @@ One line per meaningful event, timestamped UTC (spec Section 0 rule 5).
 | 2026-10-04T01:26:29+00:00 | 4.1b | About tab generated: 52 references, 11/13 datasets resolved, worked example selected, 2 value(s) not recorded. |
 | 2026-10-04T01:26:31+00:00 | 9 | Validation run against binman.sqlite: 0 metric(s) not computed (dataset unavailable), 2 measured floor(s) missed. |
 | 2026-10-04T01:26:32+00:00 | 9 | Validation run against binman.sqlite: 2 metric(s) not computed (dataset unavailable), 5 measured floor(s) missed. |
+| 2026-10-04T01:27:55+00:00 | 3.9 | MLX adapter converted to PEFT: 224 tensors, rank 8, alpha 160, 16 layers. |
+| 2026-10-04T01:29:42+00:00 | 9 | Validation run against binman.sqlite: 0 metric(s) not computed (dataset unavailable), 2 measured floor(s) missed. |
+| 2026-10-04T01:29:43+00:00 | 9 | Validation run against binman.sqlite: 2 metric(s) not computed (dataset unavailable), 5 measured floor(s) missed. |
