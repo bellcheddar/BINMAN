@@ -24,11 +24,10 @@ degradability built from the PDB.
 
 Try it: [**Dellboy/binman-lm**](https://huggingface.co/spaces/Dellboy/binman-lm)
 
-> **Provisional adapter.** The weights currently published here are from
-> training round 05, uploaded to validate the serving path end to end. An
-> overnight ablation over LoRA depth, rank and base-model size is running, and
-> this repository will be updated with whichever round measures best. The
-> metrics in `FINDINGS.md` are the authority on performance, not this note.
+> **Current weights: training round 07** — 32 LoRA layers at rank 8, 14,152
+> iterations. Best Task B macro-F1 measured so far (0.9336) and a perfect Task A
+> set equality (1.000). A further round combining 32 layers with rank 32 is
+> still training; this repository is updated when a round measures better.
 
 ## What it does, and what it must never do
 
@@ -52,9 +51,20 @@ feature. That is why abstention is a measured task rather than a disclaimer.
 |---|---|
 | Base | `Qwen/Qwen2.5-3B-Instruct` |
 | Trained against | `mlx-community/Qwen2.5-3B-Instruct-4bit` (4-bit) |
-| Method | LoRA, rank 8, scale 20 (PEFT `lora_alpha` 160), 16 layers |
+| Method | LoRA, rank 8, scale 20 (PEFT `lora_alpha` 160), **32 layers** (4-35) |
+| Iterations | 14,152 at batch 4, two epochs over 28,304 examples |
 | Targets | `q_proj`, `k_proj`, `v_proj`, `o_proj`, `gate_proj`, `up_proj`, `down_proj` |
 | Framework | `mlx-lm` on Apple silicon, converted to PEFT |
+
+Measured on a class-balanced 240-sample triage set (60 per class, fixed seed):
+
+| Metric | Value |
+|---|---|
+| Task B macro-F1 | **0.9336** |
+| `molecular_glue` F1 / recall | 0.958 / 0.950 |
+| `protac` F1 | 0.975 |
+| Task A set equality | **1.000** |
+| Task C abstention / fabrication | 1.00 / **0.00** |
 
 Metrics are published in
 [`FINDINGS.md`](https://github.com/bellcheddar/BINMAN/blob/main/FINDINGS.md)

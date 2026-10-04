@@ -1,10 +1,10 @@
 {
-  "generated_at": "2026-10-04T10:07:54+00:00",
+  "generated_at": "2026-10-04T10:09:37+00:00",
   "identity": {
     "base_model": "mlx-community/Qwen2.5-3B-Instruct-4bit",
     "quantisation": "4-bit",
     "adapter_rank": 32,
-    "adapter_layers": 16,
+    "adapter_layers": 32,
     "fine_tune_type": "lora",
     "fused": false,
     "build_date": "2026-10-04"
@@ -30,30 +30,110 @@
       "description": "structured abstention naming exactly what is missing"
     }
   ],
-  "round": 9,
+  "round": 10,
   "stage_1": {
     "iterations_requested": 14152,
     "batch_size": 4,
     "rank": 32,
-    "layers": 16,
+    "layers": 32,
     "learning_rate": 1e-05,
-    "wall_clock_seconds": 56.1,
+    "wall_clock_seconds": 1947.0,
     "train_examples": 28304,
     "valid_examples": 2386,
     "exit_code": -15,
     "validation_losses": [
       {
         "iter": 1,
-        "loss": 2.586
+        "loss": 2.499
+      },
+      {
+        "iter": 100,
+        "loss": 0.101
+      },
+      {
+        "iter": 200,
+        "loss": 0.016
+      },
+      {
+        "iter": 300,
+        "loss": 0.015
+      },
+      {
+        "iter": 400,
+        "loss": 0.018
+      },
+      {
+        "iter": 500,
+        "loss": 0.015
+      },
+      {
+        "iter": 600,
+        "loss": 0.013
+      },
+      {
+        "iter": 700,
+        "loss": 0.004
+      },
+      {
+        "iter": 800,
+        "loss": 0.014
+      },
+      {
+        "iter": 900,
+        "loss": 0.135
+      },
+      {
+        "iter": 1000,
+        "loss": 0.006
+      },
+      {
+        "iter": 1100,
+        "loss": 0.139
+      },
+      {
+        "iter": 1200,
+        "loss": 0.01
+      },
+      {
+        "iter": 1300,
+        "loss": 0.011
+      },
+      {
+        "iter": 1400,
+        "loss": 0.006
+      },
+      {
+        "iter": 1500,
+        "loss": 0.003
+      },
+      {
+        "iter": 1600,
+        "loss": 0.006
+      },
+      {
+        "iter": 1700,
+        "loss": 0.006
+      },
+      {
+        "iter": 1800,
+        "loss": 0.005
+      },
+      {
+        "iter": 1900,
+        "loss": 0.113
+      },
+      {
+        "iter": 2000,
+        "loss": 0.01
       }
     ],
-    "final_train_loss": 0.144,
-    "best_validation_loss": 2.586,
-    "early_stopping_point": 1,
+    "final_train_loss": 0.0,
+    "best_validation_loss": 0.003,
+    "early_stopping_point": 1500,
     "log": "data/interim/lm_stage1.log",
     "wandb_project": "binman-lm",
-    "wandb_run_name": "binman-qwen-2.5-3b-4bit-round09",
-    "wandb_group": "binman-qwen-2.5-3b-4bit-round09",
+    "wandb_run_name": "binman-qwen-2.5-3b-4bit-round10",
+    "wandb_group": "binman-qwen-2.5-3b-4bit-round10",
     "reported_to_wandb": true
   },
   "stage_2": {

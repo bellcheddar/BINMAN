@@ -48,38 +48,53 @@ ABSTAIN_SYSTEM = (
     '{"abstain": true, "reason": "<why>"} and nothing else.'
 )
 
+# ZeroGPU rules, learned the hard way, both failure modes recorded in D-037:
+#
+#   * The main process must NOT initialise CUDA. Building the model at import
+#     time raised "RuntimeError: No CUDA GPUs are available" from inside
+#     spaces' torch patching, because PEFT touches CUDA while attaching.
+#   * The GPU is granted per request with a time limit, so downloading six
+#     gigabytes of base model inside that window fails with an error carrying
+#     no traceback.
+#
+# So: download at import (pure HTTP, no torch), build the model on first GPU
+# call, and keep it for later calls.
 _model = None
 _tokenizer = None
 
 
+def _prefetch() -> None:
+    """Pull weights to local disk at startup, outside the GPU budget."""
+    from huggingface_hub import snapshot_download
+
+    snapshot_download(BASE_MODEL,
+                      allow_patterns=["*.json", "*.safetensors", "*.txt"])
+    snapshot_download(ADAPTER_REPO, token=HF_TOKEN)
+
+
 def _load():
-    """Load once, on first GPU call. ZeroGPU hands the GPU over per request."""
     global _model, _tokenizer
     if _model is not None:
         return _model, _tokenizer
     _tokenizer = AutoTokenizer.from_pretrained(BASE_MODEL)
-    # transformers 5 renamed torch_dtype to dtype; accept either so the Space
-    # does not break on a routine SDK bump.
     try:
-        model = AutoModelForCausalLM.from_pretrained(
+        base = AutoModelForCausalLM.from_pretrained(
             BASE_MODEL, dtype=torch.float16, device_map="cuda")
     except TypeError:
-        model = AutoModelForCausalLM.from_pretrained(
+        base = AutoModelForCausalLM.from_pretrained(
             BASE_MODEL, torch_dtype=torch.float16, device_map="cuda")
     try:
-        _model = PeftModel.from_pretrained(model, ADAPTER_REPO, token=HF_TOKEN).eval()
+        _model = PeftModel.from_pretrained(base, ADAPTER_REPO,
+                                           token=HF_TOKEN).eval()
     except Exception as error:  # noqa: BLE001
         _model = None
         raise gr.Error(
-            f"The adapter at {ADAPTER_REPO} could not be loaded, so there is "
-            "nothing to serve yet. If this Space was just created the weights "
-            "may still be uploading. Underlying error: "
-            f"{type(error).__name__}: {error}"
-        ) from error
+            f"The adapter at {ADAPTER_REPO} could not be loaded. "
+            f"{type(error).__name__}: {error}") from error
     return _model, _tokenizer
 
 
-@spaces.GPU(duration=60)
+@spaces.GPU(duration=120)
 def _answer(question: str, system: str, max_new_tokens: int) -> str:
     model, tokenizer = _load()
     text = tokenizer.apply_chat_template(
@@ -197,4 +212,5 @@ with gr.Blocks(title="BINMAN-LM") as demo:
 
 # Spaces runs this file as __main__, so launch() is called either way. It is
 # unguarded because the Space is the only place this app runs.
+_prefetch()
 demo.launch()

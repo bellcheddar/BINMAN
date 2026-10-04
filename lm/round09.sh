@@ -30,7 +30,7 @@ say "START $LABEL :: 32 layers, rank 32, $ITERS iters"
 STARTED=$(date +%s)
 
 if pixi run -q python lm/train.py --skip-stage-two --iters $ITERS \
-     --layers 32 --rank 32 > "$LOG_DIR/$LABEL.train.log" 2>&1; then
+     --layers 32 --rank 32 --batch-size 2 > "$LOG_DIR/$LABEL.train.log" 2>&1; then
   say "TRAINED $LABEL in $(( ($(date +%s) - STARTED) / 60 )) min"
 else
   say "FAILED $LABEL -- see $LOG_DIR/$LABEL.train.log"

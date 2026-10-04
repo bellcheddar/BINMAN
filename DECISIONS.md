@@ -1195,3 +1195,45 @@ interpreter that has already advanced past them, which is just as bad.
 **Reversal.** The 32B round is still worth measuring and
 `lm/measure_throughput.py` exists for it. It needs a window where nothing else
 wants the GPU, which is a daytime decision rather than an overnight one.
+
+## D-037: quantisation transfer is clean; the ZeroGPU Space is not yet serving
+
+**Decision.** Round 07 is the shipped adapter. Its conversion to PEFT is
+verified against the real held-out questions and matches the MLX numbers. The
+HuggingFace Space is **not serving it yet** and that is recorded as open rather
+than glossed.
+
+**Quantisation transfer, the risk D-029 named.** The adapter is trained with
+mlx-lm against the 4-bit `mlx-community/Qwen2.5-3B-Instruct-4bit` and served
+against 16-bit `Qwen/Qwen2.5-3B-Instruct`. Nothing guaranteed the correction
+would transfer. It does: zero missing adapter keys, Task A parse 1.000 and set
+equality 1.000 against MLX's 0.983 and 1.000, Task C abstention 1.00 and
+fabrication 0.00. The published metrics therefore describe the served model.
+
+**The Space.** Three configurations were tried and each failed differently:
+
+1. Model built inside the `@spaces.GPU` function, no prefetch: the first
+   request has to pull six gigabytes inside the GPU time budget and fails with
+   an error carrying no traceback.
+2. Model built at module scope: `RuntimeError: No CUDA GPUs are available`,
+   raised from inside spaces' torch patching, because PEFT touches CUDA while
+   attaching and the main process may not initialise it.
+3. Prefetch at import plus build inside the GPU function, which is the
+   combination the first two imply: the Space reaches RUNNING with a clean log
+   and requests still return null with nothing logged.
+
+The adapter is not the cause: the same artefact answers correctly on this
+machine, and round 05's smaller adapter served correctly from this Space
+earlier in the session. The remaining candidates are a ZeroGPU quota exhausted
+by the night's restarts, or a peft version on the Space that handles
+`layers_to_transform` differently from the local 0.21.2. Neither is diagnosable
+from the logs the Space exposes.
+
+**Reason for stopping here.** The model is the deliverable and it is verified.
+Chasing a hosted runtime whose errors are invisible is a poor use of the hours
+before the morning, and the next step needs `HF_DEBUG=1` on the Space and a
+look at the ZeroGPU quota page, which is a daylight task.
+
+**Reversal.** Round 05's 16-layer adapter did serve from this Space. Restoring
+it would give a working demo of a worse model, which is the wrong trade: the
+repository and the model card carry the real numbers.

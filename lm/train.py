@@ -279,6 +279,13 @@ def stage_one(iters: int, batch_size: int, model: str = BASE_MODEL,
         "--mask-prompt",
         "--steps-per-report", "10",
     ]
+    # 32 layers at rank 32 and batch 4 exhausted swap and ground to roughly
+    # three iterations a minute, against 83 for 16 layers at rank 32. Gradient
+    # checkpointing trades compute for activation memory and is switched on for
+    # the heavier configurations rather than always, since it costs speed where
+    # memory was never the constraint.
+    if LORA_LAYERS * LORA_RANK >= 512:
+        command.append("--grad-checkpoint")
     environment = dict(os.environ)
     group = f"{RUN_STEM}-round{round_number:02d}" if round_number else RUN_STEM
     if wandb_available():
