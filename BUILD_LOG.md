@@ -686,3 +686,16 @@ One line per meaningful event, timestamped UTC (spec Section 0 rule 5).
 | 2026-10-04T23:15:11+00:00 | 9.4 | Assayed ubiquitylome: requesting 100 accessions in batches of 50. |
 | 2026-10-04T23:15:13+00:00 | 9.4 | Assayed ubiquitylome: 253 lysines over 70 proteins, 18 ubiquitylated, 235 matched negatives. |
 | 2026-10-04T23:15:29+00:00 | 9.4 | Assayed ubiquitylome: requesting 20,279 accessions in batches of 50. |
+| 2026-10-04T23:15:50+00:00 | 9.4 | 1,050/20,279 accessions, 8,261 assayed lysines, 49.5/s. |
+| 2026-10-04T23:16:19+00:00 | 9.4 | 2,050/20,279 accessions, 28,965 assayed lysines, 40.8/s. |
+| 2026-10-04T23:16:51+00:00 | 9.4 | 3,050/20,279 accessions, 54,844 assayed lysines, 37.0/s. |
+| 2026-10-04T23:17:22+00:00 | 9.4 | 4,050/20,279 accessions, 70,904 assayed lysines, 35.9/s. |
+| 2026-10-04T23:18:02+00:00 | 9.4 | 5,050/20,279 accessions, 94,124 assayed lysines, 32.9/s. |
+| 2026-10-04T23:18:53+00:00 | 9.4 | 6,050/20,279 accessions, 117,710 assayed lysines, 29.6/s. |
+| 2026-10-04T23:19:30+00:00 | 9.4 | 7,050/20,279 accessions, 135,362 assayed lysines, 29.2/s. |
+| 2026-10-04T23:19:35+00:00 | 1.3 | 52,224/52,821 entries, 225,407 bridges, 851 failed, 10.9 entries/s, ~0.0 h remaining. |
+| 2026-10-04T23:20:16+00:00 | 9.4 | 8,050/20,279 accessions, 164,887 assayed lysines, 28.0/s. |
+| 2026-10-04T23:20:35+00:00 | 1.3 | Bridge run finished: 52,821 entries in 81.1 min, 225,416 bridges, 1,043 failed, 10.9 entries/s. |
+| 2026-10-04T23:21:03+00:00 | 9.4 | 9,050/20,279 accessions, 188,604 assayed lysines, 27.1/s. |
+| 2026-10-04T23:21:36+00:00 | 9.4 | 10,050/20,279 accessions, 210,579 assayed lysines, 27.4/s. |
+| 2026-10-04T23:21:40+00:00 | 1.3 | Bridge run starting: 1,043 entries pending of 52,822 catalogued (tiers 1 to 3), 16 IO workers, 14 geometry workers. |

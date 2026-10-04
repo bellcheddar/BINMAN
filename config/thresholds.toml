@@ -53,7 +53,26 @@ glue_balance_strong          = 0.50   # used by the worked-example selector (6.6
 # For scale, a CRBN-DDB1 neosubstrate ternary is about 5 chains and 3 ligands
 # (15 pairs), so the cap is roughly a thousand times larger than the structures
 # this project exists to find.
-max_chain_ligand_pairs       = 20000
+# RAISED 2026-10-04 from 20,000 to 900,000. This is a work cap, not a science
+# threshold: it decides which assemblies are attempted, never which bridges
+# qualify, so it is not a spec 9.6 adjustment.
+#
+# The first clean re-run of the stage exposed what 20,000 actually costs.
+# 1,043 entries were refused where the shipped run refused 235, and 808 of the
+# difference had completed before and held 43,961 bridges: 18.4% of the atlas.
+# The cap was introduced partway through the original multi-session run, so
+# entries processed before it existed went through and later ones did not. The
+# shipped atlas's coverage therefore depended on *when* an entry happened to be
+# processed, which is why the old manifest both completed 7SFV at 864,000 pairs
+# and refused others at 20,406.
+#
+# 900,000 is set just above the largest assembly the original run completed, so
+# this run recovers every lost bridge and also takes in 216 entries the original
+# refused by accident of timing. It costs about 846 minutes of single-threaded
+# geometry, an hour across the configured workers. Above 900,000 adds entries
+# and no bridges: those are the million-pair assemblies the original refused on
+# purpose.
+max_chain_ligand_pairs       = 900000
 
 [degron]
 # spec 5.2: beta-hairpin with an exposed glycine at the tip.

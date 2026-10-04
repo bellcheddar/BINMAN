@@ -2640,3 +2640,40 @@ it is a string match on a chemical name deciding that a degrader is laboratory
 plastic. The two metrics it moves, recall and artefact precision, are the two
 that were already failing, and both are moved by the same rule in the same
 direction.
+
+## D-066: the shipped atlas was missing 18% of its bridges by accident of timing
+
+**Finding, found by re-running the stage cleanly for the first time.** The
+contact-floor re-run (D-064) refused 1,043 entries as `too_complex` where the
+shipped run refused 235. Comparing like for like over the same entries: **808
+went from ok to failed and none went the other way.**
+
+The config and the code were identical in both runs, so the cause was neither.
+`max_chain_ligand_pairs = 20000` was introduced partway through the original
+multi-session run. Entries processed before it existed went through; entries
+processed after did not. **The shipped atlas's coverage depends on when each
+entry happened to be processed**, which is why the original manifest both
+completed 7SFV at 864,000 chain-ligand pairs and refused others at 20,406.
+
+**What it costs.** Those 808 entries hold **43,961 bridges, 18.4% of the
+atlas's 239,485.** The largest are not marginal: 8GYM alone holds 1,828 bridges
+over 326 chains and 510 ligands, and completed in 403 seconds.
+
+**Why this had to be fixed before measuring anything.** Had the re-run shipped
+as it stood, the atlas would have lost 18% of its bridges and the loss would
+have been attributed to the contact threshold, which is the change under
+measurement. Two effects, one number, and the confound would have pointed the
+wrong way: a relaxation that admits 11.9% more bridges would have appeared to
+remove 7% of them.
+
+**The cap is now 900,000**, set just above the largest assembly the original run
+completed. It recovers every lost bridge and additionally admits 216 entries the
+original refused by the same accident of timing. Above 900,000 adds entries and
+no bridges: those are the million-pair assemblies the original refused on
+purpose, and they stay refused. It costs about 846 minutes of single-threaded
+geometry, an hour across the configured workers.
+
+**It is a work cap, not a science threshold.** It decides which assemblies are
+attempted, never which bridges qualify, so it is not a spec 9.6 adjustment and
+needs no authorisation. The contact floor (D-064) is the only science change in
+this rebuild, which keeps the measurement attributable to one cause.
