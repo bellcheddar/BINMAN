@@ -2272,3 +2272,41 @@ table at 34% of its column. It is matched by its position after the viewer now.
 The detail panel shares the viewer's column, so it is capped and scrollable:
 without that, pinning a row on load squeezed the viewer down to its min-height,
 which is the opposite of what the height change was for.
+
+## D-058: a boolean that was false for every row, and a stray database in production
+
+**Decision.** `degron.is_known_neosubstrate` is populated from the two screens
+the repository already carries, rather than dropped. D-055 flagged it as dead
+and left the choice open; this is the choice.
+
+**Why it was not harmless.** The column was 0 for all 21,717 rows and had never
+been written. A boolean that is false everywhere is not a neutral default: the
+degron page rendered a tile reading **"0 known neosubstrates"** about a proteome
+that contains IKZF1, IKZF3, ZFP91, ZNF276 and SALL4. The page was making a
+confident and wrong claim, in a number, which is exactly what spec 1.0 forbids.
+
+**The definition, which is deliberately narrower than the word.** A protein is
+marked when either screen in this repository reports it degraded: Sievers 2018
+under thalidomide, lenalidomide or pomalidomide, joined on `Uniprot.Code`, or
+the Slabicki 2025 validation panel under any of its 29 glutarimide analogs,
+joined on gene symbol. That gives 15 accessions and 35 genes, marking **206
+degron candidates across 38 proteins**.
+
+It means "a screen in this repository reports it degraded", which can be checked
+against files on disk, and not "the literature reports it", which cannot. The
+column's note in the UI says so rather than leaving the stronger reading
+available, and the tile filters the table to those 206 rows.
+
+**A test that would have caught it.** An all-zero boolean passes every schema
+check ever written, because the column exists and its values are valid. The new
+test asserts that something is marked and that the canonical substrates are
+among the marked, which is the only form that fails when the column goes dead
+again.
+
+**Also removed: a stray database that had been deployed.** `data/atlas/` held
+`binman 2.sqlite`, an abandoned partial build from 3 October carrying 300
+entries, 427 bridges and no degrons, ligases or lysines at all. It is gitignored
+so it never reached the repository, and `provision.sh` rsyncs `data/atlas/`
+wholesale, so it had been sitting in `/opt/binman` on the live host since the
+first deploy. Nothing opens it: `app/db.py` resolves `binman.sqlite` by name.
+Removed from both, and the site was checked afterwards.

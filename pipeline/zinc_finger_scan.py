@@ -51,6 +51,8 @@ from pipeline.common import (  # noqa: E402
     ATLAS, INTERIM, MANIFESTS, VALIDATION, Fetcher, load_config, log_event,
     write_jsonl,
 )
+from pipeline.degron_panel import PANEL  # noqa: E402
+from pipeline.degron_slabicki import benjamini_hochberg  # noqa: E402
 
 DB = ATLAS / "binman.sqlite"
 CACHE = INTERIM / "afdb"
@@ -170,6 +172,103 @@ def screen_labels() -> dict[str, list[tuple[int, int, int]]]:
     return out
 
 
+def known_neosubstrates() -> tuple[set[str], set[str]]:
+    """Proteins reported degraded by a glutarimide, by accession and by gene.
+
+    `degron.is_known_neosubstrate` shipped as 0 for all 21,717 rows and had
+    never been populated: a column that is always false reads as "none of these
+    are known", which is a claim, and a wrong one. It needs a definition that
+    can be checked, so this is the one it gets: **a protein reported degraded by
+    any compound in either screen the project already carries.**
+
+    Sievers 2018 contributes thalidomide, lenalidomide and pomalidomide, joined
+    on `Uniprot.Code`. Slabicki 2025's validation panel contributes its 29
+    glutarimide analogs, joined on gene symbol, which that sheet writes properly
+    (BCL6, IKZF1, SALL4) unlike the Sievers `Gene` column (D-055).
+
+    This is an operationalisation, not the literature. It means "a screen in
+    this repository reports it degraded", which is auditable from files on disk,
+    rather than "someone has published it", which is not.
+    """
+    import openpyxl
+
+    config = load_config()
+    fdr = float(config.t("validation.sievers_fdr"))
+    panel_fdr = float(config.t("validation.panel_fdr"))
+
+    accessions: set[str] = set()
+    book = openpyxl.load_workbook(
+        VALIDATION / "raw" / "aat0572_sievers_data-file-s2.xlsx",
+        read_only=True, data_only=True)
+    stream = book["pval_FDR"].iter_rows(values_only=True)
+    index = {str(name): i for i, name in enumerate(next(stream))}
+    for row in stream:
+        if not row or not row[index["Uniprot.Code"]]:
+            continue
+        for column in ("THAL.FDR", "LEN.FDR", "POM.FDR"):
+            value = row[index[column]]
+            if isinstance(value, (int, float)) and value < fdr:
+                accessions.add(str(row[index["Uniprot.Code"]]).strip())
+                break
+
+    genes: set[str] = set()
+    book = openpyxl.load_workbook(PANEL, read_only=True, data_only=True)
+    stream = book["Screen.Validation_Ratio_pval"].iter_rows(values_only=True)
+    index = {str(name): i for i, name in enumerate(next(stream))}
+    best: dict[tuple[str, str], tuple[float, float]] = {}
+    for row in stream:
+        if not row or row[index["Gene"]] is None:
+            continue
+        if str(row[index["Gate"]]) != "A" or str(row[index["Category"]]) != "WT":
+            continue
+        try:
+            p = float(row[index["p_value"]])
+            lfc = float(row[index["LFC"]])
+        except (TypeError, ValueError):
+            continue
+        key = (str(row[index["Drug"]]), str(row[index["Construct.ZnF"]]))
+        if key not in best or p < best[key][0]:
+            best[key] = (p, lfc)
+    by_drug: dict[str, list] = collections.defaultdict(list)
+    for (drug, construct), value in best.items():
+        by_drug[drug].append((construct, value))
+    for drug, rows in by_drug.items():
+        names = [c for c, _v in rows]
+        q = benjamini_hochberg([v[0] for _c, v in rows])
+        for i, name in enumerate(names):
+            if q[i] < panel_fdr and rows[i][1][1] < 0:
+                genes.add(name.rsplit("_", 1)[0])
+    return accessions, genes
+
+
+def mark_known_neosubstrates(connection) -> dict:
+    """Write `degron.is_known_neosubstrate` from the screens, not from nothing."""
+    accessions, genes = known_neosubstrates()
+    connection.execute("UPDATE degron SET is_known_neosubstrate = 0")
+    marked = connection.execute(
+        "UPDATE degron SET is_known_neosubstrate = 1 "
+        "WHERE uniprot_acc IN (%s) OR gene IN (%s)"
+        % (",".join("?" * len(accessions)) or "NULL",
+           ",".join("?" * len(genes)) or "NULL"),
+        [*sorted(accessions), *sorted(genes)]).rowcount
+    connection.commit()
+    proteins = connection.execute(
+        "SELECT COUNT(DISTINCT uniprot_acc) FROM degron "
+        "WHERE is_known_neosubstrate = 1").fetchone()[0]
+    return {
+        "source": ("proteins reported degraded by any compound in Sievers 2018 "
+                   "(THAL, LEN, POM) or the Slabicki 2025 validation panel (29 "
+                   "glutarimide analogs)"),
+        "n_accessions_from_sievers": len(accessions),
+        "n_genes_from_slabicki_panel": len(genes),
+        "degron_rows_marked": int(marked),
+        "proteins_marked": int(proteins),
+        "caveat": ("this is 'a screen in this repository reports it degraded', "
+                   "which is auditable, and not 'the literature reports it', "
+                   "which is not"),
+    }
+
+
 def run(limit: int | None = None) -> dict:
     from pipeline.degron_predict import encode, train_model
     from pipeline.degron_scan import human_proteome
@@ -220,6 +319,8 @@ def run(limit: int | None = None) -> dict:
                        if not (stop < row["zf_start"] or start > row["zf_end"])]
         row["screen_degraded"] = max(overlapping) if overlapping else None
 
+    neosubstrates = mark_known_neosubstrates(connection)
+
     connection.executescript(SCHEMA)
     connection.execute("DELETE FROM zinc_finger")   # idempotent re-run
     connection.executemany(
@@ -248,6 +349,7 @@ def run(limit: int | None = None) -> dict:
         "coverage_gap_pct": round(100.0 * uncovered / len(fingers), 1) if fingers else 0.0,
         "n_fingers_assayed_by_the_screen": len(assayed),
         "n_fingers_screen_degraded": sum(1 for r in assayed if r["screen_degraded"]),
+        "known_neosubstrates": neosubstrates,
         "training_positives": n_positive,
         "semantics": ("one row per C2H2 motif per protein, with no geometry "
                       "filter in front of it; the per-protein answer is MAX() "

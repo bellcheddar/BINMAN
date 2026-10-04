@@ -232,3 +232,30 @@ def test_the_two_degron_fingers_the_scan_missed_are_now_scored(atlas):
             (gene, end, start)).fetchone()[0]
         assert best is not None, f"{gene} degron finger is not in the table"
         assert best > 0.9, f"{gene} degron finger scores only {best}"
+
+
+def test_known_neosubstrates_are_actually_marked(atlas):
+    """A boolean column that is false for every row is a claim, not a default.
+
+    `degron.is_known_neosubstrate` shipped as 0 for all 21,717 rows and had
+    never been populated, so the UI tile read "0 known neosubstrates" about a
+    proteome containing IKZF1, IKZF3, ZFP91 and SALL4 (D-058). It is written
+    from the two screens the repository carries. If it goes back to all-zero,
+    that is the same defect returning.
+    """
+    marked = atlas.execute(
+        "SELECT COUNT(*) FROM degron WHERE is_known_neosubstrate = 1").fetchone()[0]
+    assert marked > 0, "no degron row is marked as a known neosubstrate"
+
+    # The canonical substrates must be among them, by gene.
+    genes = {
+        row[0] for row in atlas.execute(
+            "SELECT DISTINCT gene FROM degron WHERE is_known_neosubstrate = 1")
+    }
+    for gene in ("IKZF1", "IKZF3", "ZFP91"):
+        assert gene in genes, f"{gene} is not marked as a known neosubstrate"
+
+    # And the flag is a strict boolean, never NULL.
+    assert atlas.execute(
+        "SELECT COUNT(*) FROM degron WHERE is_known_neosubstrate NOT IN (0, 1)"
+    ).fetchone()[0] == 0

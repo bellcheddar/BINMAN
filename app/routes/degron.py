@@ -38,7 +38,11 @@ def _stats() -> list[dict]:
         {"label": "high confidence", "value": db.scalar(
             "SELECT COUNT(*) FROM degron WHERE status = 'ok' AND mean_plddt >= 70"),
          "tone": "good", "note": "tip pLDDT ≥ 70"},
+        # Populated from the two screens the repository carries rather than
+        # from a hand-typed list (D-058). It read 0 for every row until then,
+        # which is a claim that none of these are known, and a wrong one.
         {"label": "known neosubstrates", "value": db.scalar(
             "SELECT COUNT(*) FROM degron WHERE status = 'ok' AND is_known_neosubstrate = 1"),
-         "tone": "good"},
+         "tone": "good", "note": "reported degraded in Sievers or Slabicki",
+         "filter": {"field": "is_known_neosubstrate", "op": "eq", "value": 1}},
     ]
