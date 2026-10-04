@@ -773,3 +773,25 @@ glue label is their intersection.
 
 **Reversal.** None needed. If MGTbind issues a corrected DOI, update the
 Candidate and re-run `pipeline.references`.
+
+## D-026: a partial validation run must not truncate results.json
+
+**Decision.** `pipeline.validate` now starts from the sections already on disk
+and overwrites only what the current run recomputes. A regression test pins
+both directions: a partial run keeps the sections it did not run, and a full
+run replaces stale ones rather than merging into them.
+
+**Context.** `run()` built a fresh results dict and wrote it over
+`data/validation/results.json`. `--section 9.2`, used three times while
+building the Sievers metric, therefore deleted 9.1, 9.3, 9.4 and 9.5 from the
+file each time, and `build_about` rebuilt the About tab from the truncated
+result. The atlas and the metrics themselves were never wrong: the loss was in
+the reporting file, and it was silent.
+
+**Reason.** A validation report that quietly drops the sections it did not
+recompute is worse than one that fails loudly, because the About tab and
+FINDINGS both read from it. The `--section` flag exists precisely so a single
+metric can be iterated on, which is the case where the damage is likeliest.
+
+**Reversal.** None wanted. If a section ever needs clearing deliberately,
+delete `results.json` and run the full validation.

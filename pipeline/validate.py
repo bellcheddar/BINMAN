@@ -727,10 +727,23 @@ def run(db_path: Path | None = None, sections: list[str] | None = None) -> dict:
     if not path.exists():
         raise SystemExit(f"{path} does not exist: build the atlas first")
 
+    # A partial run must not destroy the sections it did not run. Start from
+    # whatever is already on disk and overwrite only what this run recomputes:
+    # `--section 9.2` silently replaced the whole file before this, and the
+    # About tab was rebuilt from the truncated result.
+    carried: dict = {}
+    if RESULTS.exists():
+        try:
+            carried = json.loads(RESULTS.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            carried = {}
+
     connection = sqlite3.connect(f"file:{path}?mode=ro", uri=True)
     connection.row_factory = sqlite3.Row
     try:
         results = {
+            **{key: value for key, value in carried.items()
+               if key.startswith("9.")},
             "generated_at": utcnow(),
             "atlas": str(path),
             "atlas_bytes": path.stat().st_size,
@@ -775,8 +788,12 @@ def run(db_path: Path | None = None, sections: list[str] | None = None) -> dict:
         if isinstance(value, dict) and value.get("computed") is False
     ]
 
+    ordered = {key: results[key] for key in results if not key.startswith("9.")}
+    for key in sorted(k for k in results if k.startswith("9.")):
+        ordered[key] = results[key]
+
     RESULTS.parent.mkdir(parents=True, exist_ok=True)
-    RESULTS.write_text(json.dumps(results, indent=2, default=str) + "\n")
+    RESULTS.write_text(json.dumps(ordered, indent=2, default=str) + "\n")
     Manifest(STAGE).record(
         "run", status="ok", floors_missed=len(missed),
         not_computed=len(results["metrics_not_computed"]), atlas=str(path),
