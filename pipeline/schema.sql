@@ -54,6 +54,25 @@ CREATE TABLE IF NOT EXISTS degron (
   is_known_neosubstrate INTEGER, structure_file TEXT, status TEXT DEFAULT 'ok'
 );
 
+-- Every C2H2 zinc finger in the proteome, with no geometry filter in front of
+-- it. Separate from `degron` because the semantics differ: `degron` is per
+-- hairpin candidate and this is per finger, so a protein whose scan placed no
+-- candidate on its degron still gets an answer here (D-052, D-055).
+-- `screen_degraded` is a label from the Sievers screen, NULL where that screen
+-- never assayed a window overlapping the finger, never 0 by default.
+CREATE TABLE IF NOT EXISTS zinc_finger (
+  id INTEGER PRIMARY KEY,
+  uniprot_acc TEXT, gene TEXT,
+  zf_start INTEGER, zf_end INTEGER, core TEXT,
+  mean_plddt REAL,
+  imid_degradation_score REAL,
+  has_degron_candidate INTEGER,
+  screen_degraded INTEGER,
+  status TEXT DEFAULT 'ok'
+);
+CREATE INDEX IF NOT EXISTS zinc_finger_acc ON zinc_finger (uniprot_acc);
+CREATE INDEX IF NOT EXISTS zinc_finger_score ON zinc_finger (imid_degradation_score);
+
 CREATE TABLE IF NOT EXISTS ligase (
   uniprot_acc TEXT PRIMARY KEY, gene TEXT, name TEXT, family TEXT, subfamily TEXT,
   pdb_entries INTEGER, best_structure TEXT, pocket_score REAL, pocket_volume_a3 REAL,

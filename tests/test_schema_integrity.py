@@ -163,3 +163,72 @@ def test_no_third_party_dataset_rows_are_bundled_in_the_atlas(atlas):
     forbidden = {"biolip", "biolip2_annotations", "protacdb", "ubibrowser",
                  "mgdb", "molgluedb", "degronopedia", "phosphositeplus"}
     assert not (tables & forbidden), f"third-party rows bundled: {tables & forbidden}"
+
+
+def test_zinc_finger_table_is_consistent_with_the_degron_table(atlas):
+    """The per-finger table must not contradict the per-candidate one.
+
+    `zinc_finger` exists because `degron.imid_degradation_score` is per hairpin
+    candidate and could not reach a protein's degron finger when the geometry
+    scan placed no candidate there (D-052, D-055). The two must still agree on
+    the facts they share.
+    """
+    present = {
+        row[0] for row in atlas.execute(
+            "SELECT name FROM sqlite_master WHERE type = 'table'")
+    }
+    if "zinc_finger" not in present:
+        pytest.skip("zinc_finger has not been built")
+
+    total = atlas.execute("SELECT COUNT(*) FROM zinc_finger").fetchone()[0]
+    assert total > 0
+
+    # Every score is a probability.
+    assert atlas.execute(
+        "SELECT COUNT(*) FROM zinc_finger WHERE imid_degradation_score IS NOT NULL "
+        "AND (imid_degradation_score < 0 OR imid_degradation_score > 1)"
+    ).fetchone()[0] == 0
+
+    # Every finger has a sane window and a fixed-width anchored core.
+    assert atlas.execute(
+        "SELECT COUNT(*) FROM zinc_finger WHERE zf_end <= zf_start").fetchone()[0] == 0
+    assert atlas.execute(
+        "SELECT COUNT(DISTINCT LENGTH(core)) FROM zinc_finger").fetchone()[0] == 1
+
+    # `screen_degraded` is a three-state label: 1, 0, or NULL for never
+    # assayed. A 0 standing in for "unknown" would read as a matched negative.
+    assert atlas.execute(
+        "SELECT COUNT(*) FROM zinc_finger WHERE screen_degraded NOT IN (0, 1)"
+    ).fetchone()[0] == 0
+
+    # has_degron_candidate must agree with the degron table it was derived from.
+    disagreements = atlas.execute(
+        "SELECT COUNT(*) FROM zinc_finger z WHERE z.has_degron_candidate = 1 "
+        "AND NOT EXISTS (SELECT 1 FROM degron d WHERE d.uniprot_acc = z.uniprot_acc "
+        "AND d.status = 'ok' AND d.start_res <= z.zf_end AND d.end_res >= z.zf_start)"
+    ).fetchone()[0]
+    assert disagreements == 0
+
+
+def test_the_two_degron_fingers_the_scan_missed_are_now_scored(atlas):
+    """D-052's two coverage misses must stay closed.
+
+    ZNF653 and ZNF692 are pomalidomide substrates whose per-candidate rows
+    scored 0.106 and 0.046 because the hairpin scan never landed on their
+    degron finger. If this regresses, the per-finger table has stopped doing
+    the one job it was added for.
+    """
+    present = {
+        row[0] for row in atlas.execute(
+            "SELECT name FROM sqlite_master WHERE type = 'table'")
+    }
+    if "zinc_finger" not in present:
+        pytest.skip("zinc_finger has not been built")
+
+    for gene, start, end in (("ZNF653", 556, 578), ("ZNF692", 417, 439)):
+        best = atlas.execute(
+            "SELECT MAX(imid_degradation_score) FROM zinc_finger "
+            "WHERE gene = ? AND zf_start <= ? AND zf_end >= ?",
+            (gene, end, start)).fetchone()[0]
+        assert best is not None, f"{gene} degron finger is not in the table"
+        assert best > 0.9, f"{gene} degron finger scores only {best}"

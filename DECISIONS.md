@@ -2081,3 +2081,70 @@ unmodified, which is a different experiment from the one that exists.
 cleared the floor and been wrong to use. It is recorded here so that nobody
 reaches for it later: `pipeline/degradability_features.py` reports both columns
 side by side for exactly that reason.
+
+## D-055: the per-protein zinc-finger table, and what it is worth
+
+**Decision.** A `zinc_finger` table ships in the atlas: one row per C2H2 motif
+per protein, scored for glutarimide degradation with no geometry filter in front
+of it. This is the column D-052 named, added as its own thing with per-protein
+semantics rather than by widening `degron.imid_degradation_score`. The UI is
+deliberately not changed yet, because the last standing instruction on the app
+is to make it simpler, and a new page cuts against that.
+
+**It closes the gap it was built for.** 7,452 C2H2 motifs over 1,123 proteins,
+of which **2,792 (37.5%) overlap no hairpin candidate** and were therefore
+unreachable by the per-candidate column at any score. Two of them are the ones
+D-052 identified:
+
+| finger | per-candidate column | this table | screen |
+|---|---:|---:|---|
+| ZNF653 556-578 | 0.106 and 0.011, wrong fingers | **0.982** | degraded |
+| ZNF692 417-439 | 0.046, wrong finger | **0.957** | degraded |
+
+13 of the screen's 14 pomalidomide-degraded fingers are now in the table, and 2
+of those 13 are reachable only because the geometry prefilter is gone.
+
+**What it is worth, which is less than the hit list suggests.** Five of the
+seven canonical substrates audited are genes in the scorer's training set, so
+their scores of 0.907 to 0.991 are partly memory. Only two are genuinely held
+out and it gets one: IKZF1 scores 0.907, and SALL4 scores 0.264 on its
+documented degron and 0.485 on its best finger, which is a real miss recorded as
+one. The generalisation evidence for this scorer is the 29-compound
+gene-disjoint transfer test in D-053, not this table.
+
+**Precision, stated as enrichment because that is the honest unit.** Over the
+5,513 fingers the screen assayed, 13 are degraded, a base rate of 0.24%. In
+sample, because these labels trained the scorer:
+
+| cut | degraded fingers caught | screen-negative fingers above it | precision | enrichment |
+|---|---:|---:|---:|---:|
+| 0.9 | 7 of 13 | 9 | 0.438 | **186x** |
+| 0.7 | 12 of 13 | 80 | 0.130 | 55x |
+| 0.5 | 13 of 13 | 255 | 0.049 | 21x |
+
+So it is a triage ranking, not a call. At its top band it concentrates the
+degrome roughly two-hundredfold and is still wrong more often than not in
+absolute terms, which is the expected behaviour of the operating point D-048
+chose: the spec asks for sensitivity 0.70 at specificity 0.60, and a
+0.24%-prevalence problem punishes that specificity hard. The table is useful for
+ordering experiments and not for believing any single row.
+
+**The five genuine hypotheses.** Among the high-scoring fingers that no hairpin
+candidate reached, five were never assayed by the screen at all: CTCFL 259-279
+(0.939), ZNF407 1688-1708 (0.934), ZFP64 525-546 (0.920), HIVEP3 1756-1776 and
+HIVEP1 88-108 (0.905). Five more score above 0.9 and the screen calls them not
+degraded (HIC1, ZNF821, IKZF5, HIVEP2, PRDM15), which is the false-positive rate
+above being concrete rather than abstract.
+
+**A join bug worth recording.** The first run labelled 3 of 1,178 fingers and
+should have labelled 5,513. The Sievers `Gene` column mixes gene symbols with
+Swiss-Prot entry names: ADNP2 and CTCF appear as themselves, ZNF276 appears as
+ZN276 and BCL11A as BC11A. Joining on it dropped every ZNF gene, which is most
+of the library. The sheet also carries `Uniprot.Code`, so the join is on
+accession now. The symptom was a suspiciously empty label column rather than a
+wrong answer, which is the good kind of failure again.
+
+**Still dead, and flagged not fixed.** `degron.is_known_neosubstrate` is 0 for
+all 21,717 rows and has never been populated. The new table carries
+`screen_degraded` instead, which is sourced, per finger and auditable. The old
+column should either be populated from a documented list or dropped.

@@ -626,3 +626,13 @@ One line per meaningful event, timestamped UTC (spec Section 0 rule 5).
 | 2026-10-04T17:31:36+00:00 | 9 | Validation run against binman.sqlite: 4 metric(s) not computed (dataset unavailable), 5 measured floor(s) missed. |
 | 2026-10-04T17:32:13+00:00 | 9 | Validation run against binman.sqlite: 0 metric(s) not computed (dataset unavailable), 2 measured floor(s) missed. |
 | 2026-10-04T17:32:14+00:00 | 9 | Validation run against binman.sqlite: 4 metric(s) not computed (dataset unavailable), 5 measured floor(s) missed. |
+| 2026-10-04T17:39:42+00:00 | 2.1b | Zinc-finger scan over 200 cached models. |
+| 2026-10-04T17:39:43+00:00 | 2.1b | Zinc-finger table: 10 C2H2 motifs over 1 proteins, of which 2 (20.0%) carry no hairpin candidate and were unreachable by the per-candidate column. |
+| 2026-10-04T17:43:51+00:00 | 2.1b | Zinc-finger scan over 20,279 cached models. |
+| 2026-10-04T17:44:15+00:00 | 2.1b | Zinc-finger table: 7,452 C2H2 motifs over 1,123 proteins, of which 2,792 (37.5%) carry no hairpin candidate and were unreachable by the per-candidate column. |
+| 2026-10-04T17:48:58+00:00 | 2.1b | Zinc-finger scan over 20,279 cached models. |
+| 2026-10-04T17:49:20+00:00 | 2.1b | Zinc-finger table: 7,452 C2H2 motifs over 1,123 proteins, of which 2,792 (37.5%) carry no hairpin candidate and were unreachable by the per-candidate column. |
+| 2026-10-04T17:51:17+00:00 | 9 | Validation run against binman.sqlite: 0 metric(s) not computed (dataset unavailable), 2 measured floor(s) missed. |
+| 2026-10-04T17:51:18+00:00 | 9 | Validation run against binman.sqlite: 4 metric(s) not computed (dataset unavailable), 5 measured floor(s) missed. |
+| 2026-10-04T17:51:50+00:00 | 9 | Validation run against binman.sqlite: 0 metric(s) not computed (dataset unavailable), 2 measured floor(s) missed. |
+| 2026-10-04T17:51:51+00:00 | 9 | Validation run against binman.sqlite: 4 metric(s) not computed (dataset unavailable), 5 measured floor(s) missed. |

@@ -566,6 +566,49 @@ Zn-coordination geometry. The matched set is now wired in as
 `sievers_zf_screen`, so that test is one command away:
 `pixi run python -m pipeline.validate --section 9.2`.
 
+### Every zinc finger in the proteome, not only those with a hairpin
+
+`degron.imid_degradation_score` is per hairpin candidate, so a protein whose
+geometry scan never placed a candidate on its degron finger has no row to carry
+the answer. That cost two real substrates: ZNF653 and ZNF692 are both
+pomalidomide-degraded, and both scored low because the rows that existed
+described the wrong finger. A `zinc_finger` table now scores every C2H2 motif in
+every cached model with no geometry filter in front of it, as a separate column
+with per-protein semantics.
+
+**7,452 fingers over 1,123 proteins, and 2,792 of them (37.5%) overlap no
+hairpin candidate**, so they were unreachable at any score before. Both misses
+are closed: ZNF653 556-578 scores 0.982 where the per-candidate column gave
+0.106 and 0.011, and ZNF692 417-439 scores 0.957 where it gave 0.046. 13 of the
+screen's 14 pomalidomide-degraded fingers are in the table, 2 of them reachable
+only because the prefilter is gone.
+
+**What the hit list is worth is less than it looks.** Five of the seven canonical
+substrates audited are genes in the scorer's training set, so their 0.907 to
+0.991 are partly memory. Two are genuinely held out and it gets one: IKZF1
+scores 0.907, SALL4 scores 0.264 on its documented degron and 0.485 on its best
+finger, which is a miss. The gene-disjoint evidence for this scorer is the
+29-compound transfer test above, not this table.
+
+**Precision belongs in enrichment, because the prevalence is 0.24%.** Of the
+5,513 fingers the screen assayed, 13 are degraded. In sample, since those labels
+trained the scorer:
+
+| cut | caught | screen-negative above it | precision | enrichment |
+|---|---:|---:|---:|---:|
+| 0.9 | 7 of 13 | 9 | 0.438 | **186x** |
+| 0.7 | 12 of 13 | 80 | 0.130 | 55x |
+| 0.5 | 13 of 13 | 255 | 0.049 | 21x |
+
+So it ranks, it does not call. At its top band it concentrates the degrome
+roughly two-hundredfold while still being wrong more often than right in
+absolute terms, which is what a 0.24%-prevalence problem does to the
+specificity 0.60 the spec asks for. Five high-scoring fingers that no candidate
+reached were never assayed at all and are the actual new hypotheses: CTCFL
+259-279, ZNF407 1688-1708, ZFP64 525-546, HIVEP3 1756-1776 and HIVEP1 88-108.
+Five more above 0.9 are called not degraded by the screen (HIC1, ZNF821, IKZF5,
+HIVEP2, PRDM15), which is that false-positive rate made concrete.
+
 ## Section 9.3 E3 Triage validation
 
 | Metric | Measured | Floor | Verdict |
