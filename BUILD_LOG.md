@@ -751,3 +751,11 @@ One line per meaningful event, timestamped UTC (spec Section 0 rule 5).
 | 2026-10-05T02:02:20+00:00 | 3.8 | round07-on-rebuilt-atlas: parse rate 1.0, set equality 1.0 on 120 synthetic queries. |
 | 2026-10-05T02:02:47+00:00 | 3.8 | round13-32b-1epoch synthetic: 25/120 evaluated (0.16/s), parse 1.000, set equality 1.000. |
 | 2026-10-05T02:02:55+00:00 | 3.8 | round14-32b-1epoch: loading mlx-community/Qwen2.5-32B-Instruct-4bit with adapters at models/binman-lm/runs/binman-qwen-2.5-32b-4bit-round14 |
+| 2026-10-05T02:05:40+00:00 | 3.8 | round13-32b-1epoch synthetic: 50/120 evaluated (0.15/s), parse 1.000, set equality 1.000. |
+| 2026-10-05T02:06:03+00:00 | 3.8 | round14-32b-1epoch synthetic: 25/120 evaluated (0.14/s), parse 1.000, set equality 1.000. |
+| 2026-10-05T02:08:33+00:00 | 3.8 | round13-32b-1epoch synthetic: 75/120 evaluated (0.15/s), parse 1.000, set equality 1.000. |
+| 2026-10-05T02:09:01+00:00 | 3.8 | round14-32b-1epoch synthetic: 50/120 evaluated (0.14/s), parse 1.000, set equality 1.000. |
+| 2026-10-05T02:11:28+00:00 | 3.8 | round13-32b-1epoch synthetic: 100/120 evaluated (0.15/s), parse 1.000, set equality 1.000. |
+| 2026-10-05T02:11:55+00:00 | 3.8 | round14-32b-1epoch synthetic: 75/120 evaluated (0.14/s), parse 1.000, set equality 1.000. |
+| 2026-10-05T02:14:10+00:00 | 9 | Validation run against binman.sqlite: 0 metric(s) not computed (dataset unavailable), 2 measured floor(s) missed. |
+| 2026-10-05T02:14:11+00:00 | 9 | Validation run against binman.sqlite: 4 metric(s) not computed (dataset unavailable), 5 measured floor(s) missed. |

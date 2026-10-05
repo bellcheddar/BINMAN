@@ -20,18 +20,27 @@
       <strong>No reach verdict is shown.</strong>
       The window is {{ window.get('fit_status', 'not yet fitted') }}. Its
       starting values in <code>config/thresholds.toml</code> carry no empirical
-      standing, so the verdict column stays out until a fit clears the floor.
+      standing, so the verdict column stays out.
+      A per-lysine model does reach 0.678 on the same assayed data, so the
+      floor is not unreachable. It is not shown either: a model is not a window,
+      and emitting its score would answer a different question from the four
+      thresholds spec 5.4 defines.
     </div>
   {% endif %}
 </div>
 
 <div class="limits">
   <strong>Honest limits of this metric.</strong>
-  Observed ubiquitylation sites come from native E3 biology, not from induced
-  ternary complexes, so the window is a proxy. Absence of a reported site is weak
-  evidence that a lysine is unusable, because detection is incomplete and
-  condition-dependent, and that biases the negative set. Read the AUC as a
-  measure of enrichment, not as a probability of degradability.
+  A lysine counts as unmodified here only if it was seen in an identified
+  peptide and carried no ubiquitylation, so absence of evidence is no longer
+  being read as evidence of absence: 419,405 lysines were assayed, 110,108 of
+  them ubiquitylated. That mattered. On the lysines common to both sets, the old
+  labelling and the assayed one disagree 41% of the time, nearly always on a
+  lysine called unmodified because nobody had looked.
+  What remains a proxy is the biology rather than the statistics. The reach
+  geometry was measured in induced ternary complexes, but the ubiquitylation
+  labels still come from native E3 activity, so a lysine a cell ubiquitylates is
+  standing in for one a degrader would. Narrowed, not removed.
 </div>
 {% endblock %}
 

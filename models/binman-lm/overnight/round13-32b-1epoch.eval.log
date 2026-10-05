@@ -1,3 +1,6 @@
 [3.8] round13-32b-1epoch: loading mlx-community/Qwen2.5-32B-Instruct-4bit with adapters at models/binman-lm/adapters
 Fetching 12 files:   0%|          | 0/12 [00:00<?, ?it/s]Fetching 12 files: 100%|██████████| 12/12 [00:00<00:00, 3537.76it/s]
 [3.8] round13-32b-1epoch synthetic: 25/120 evaluated (0.16/s), parse 1.000, set equality 1.000.
+[3.8] round13-32b-1epoch synthetic: 50/120 evaluated (0.15/s), parse 1.000, set equality 1.000.
+[3.8] round13-32b-1epoch synthetic: 75/120 evaluated (0.15/s), parse 1.000, set equality 1.000.
+[3.8] round13-32b-1epoch synthetic: 100/120 evaluated (0.15/s), parse 1.000, set equality 1.000.
