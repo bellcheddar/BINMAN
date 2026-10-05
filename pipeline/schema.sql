@@ -36,6 +36,9 @@ CREATE TABLE IF NOT EXISTS bridge (
   bridging_balance REAL, buried_fraction REAL,
   contacts_a INTEGER, contacts_b INTEGER,
   heavy_atoms INTEGER, ccd_class TEXT,
+  -- evidence_class is BINMAN-LM's Task B label, as spec 467 defines it. It is
+  -- the only model-derived column in the atlas, so its FieldSpec description
+  -- says so where a query builder will see it (D-078).
   symmetry_mediated INTEGER, evidence_class TEXT,
   alpha REAL, alpha_source TEXT,
   interface_residues_a TEXT, interface_residues_b TEXT,

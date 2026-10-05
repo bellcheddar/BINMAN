@@ -3048,3 +3048,40 @@ references to the deleted `models/binman-lm/adapters` path remain, in
 `training.json` and in `results.json` 9.5's `adapter` field. Both are records of
 runs rather than load paths, and the model card already reads
 `models/binman-lm/served/adapter_config.json` instead (D-074).
+
+## D-078
+
+**The triage head fills `evidence_class`, and nothing else in the atlas is a prediction.**
+
+Task B scored 0.9336 macro F1 and was used for nothing: `evidence_class`, which
+spec line 467 defines as its label, was NULL on all 285,996 bridge rows.
+`pipeline/triage_predict.py` now fills it for the 6,510 entry-ligand pairs whose
+ligand is a glue candidate, using round 07 and the prompt shape
+`lm/build_task_b.py` trains on.
+
+A separate `predicted_evidence_class` column was written first and reverted. The
+spec had already decided where this goes, and putting a second column beside an
+empty one meant for the same thing would have been a private design imposed over
+a published one. What the column needed was not a different name but a
+description that says what produced it, and its FieldSpec now carries one:
+"BINMAN-LM triage prediction, not a curated label", with the macro F1 and the
+note that every other column is measured. That text reaches the column tooltip
+and the query builder.
+
+Inference is its own stage and `build_atlas._post_build` only loads the file it
+wrote, so a routine rebuild does not drag a model load into what is otherwise
+file IO. One prediction covers every bridge row sharing an entry and a ligand:
+the question is about the structure and the ligand, not about which chain pair
+the geometry picked.
+
+**Agreement on unseen components is 14 of 15.** The first figure computed was
+14.4%, counted per entry-ligand pair, and CYC appears in 119 of the 139
+overlapping pairs. A generalisation check has to be counted in the unit the
+split was made on, which for Task B is the chemical component.
+
+The single disagreement is CYC, phycocyanobilin. BioLiP curates it as a
+crystallisation artefact, the model calls it a native cofactor, and it is a
+light-harvesting chromophore. BINMAN's own structural classifier calls it a
+glue candidate. Three classifiers disagree and the curated label is the weakest
+of the three, so it is recorded rather than corrected: BioLiP is the published
+source and overriding it here would be substituting a judgement for a citation.

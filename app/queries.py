@@ -123,8 +123,13 @@ def _bridge_fields() -> dict[str, FieldSpec]:
         FieldSpec("ccd_id", "text", "Ligand CCD", description="chemical component identifier"),
         FieldSpec("ccd_class", "enum", "Ligand class", enum=CCD_CLASSES,
                   description="spec 4.3 classification"),
+        # The only model-derived column in the atlas. The description is what a
+        # reader gets in the column tooltip and the query builder, so it says
+        # what produced the value rather than naming the task that made it.
         FieldSpec("evidence_class", "enum", "Evidence class", enum=EVIDENCE_CLASSES,
-                  description="LM Task B label"),
+                  description="BINMAN-LM triage prediction, not a curated label. "
+                              "Macro F1 0.9336 on held-out chemical components "
+                              "(spec 9.5). Every other column is measured."),
         FieldSpec("dsasa_a", "number", "ΔSASA chain A", unit="Å²"),
         FieldSpec("dsasa_b", "number", "ΔSASA chain B", unit="Å²"),
         FieldSpec("dsasa_total", "number", "ΔSASA total", unit="Å²"),

@@ -860,6 +860,46 @@ is reachable from a monomer, which was open until now, and that the thing
 blocking a degradability verdict is the shape of what spec 5.4 asks for rather
 than the absence of signal in the data.
 
+### The triage head, applied to the atlas
+
+Task B was trained and scored and then used for nothing. `evidence_class`, which
+spec line 467 defines as its label, was NULL on all 285,996 bridge rows. It is
+now filled for the 6,510 entry-ligand pairs whose ligand is classed as a glue
+candidate: 27,590 bridge rows, 6,498 pairs classified and 12 unparseable, which
+are left NULL rather than guessed.
+
+| predicted class | pairs | |
+|---|---:|---:|
+| molecular_glue | 3,257 | 50.0% |
+| native_cofactor | 2,575 | 39.6% |
+| crystallisation_artefact | 578 | 8.9% |
+| protac | 88 | 1.4% |
+| unparseable, left NULL | 12 | 0.2% |
+
+**Agreement on components the model had never seen: 14 of 15.** Task B is split
+by chemical component, so the overlap between these predictions and
+`task_b_test` is the out-of-sample check, and 93% sits where spec 9.5's 0.9336
+macro F1 says it should.
+
+The first measurement of this said **14.4%**, and the error is worth keeping.
+Agreement was counted per entry-ligand pair rather than per component, and one
+component, CYC, appears in 119 of the 139 overlapping pairs. Counting per pair
+when the split was made per component lets a single common ligand outvote
+fourteen others. The unit of a generalisation check has to be the unit the
+split was made on.
+
+**The one disagreement is probably the label, not the model.** CYC is
+phycocyanobilin, the light-harvesting chromophore of phycobiliproteins. BioLiP
+lists it as a crystallisation artefact, which is what makes it the curated
+label here; the model calls it a native cofactor, which is what it is. BINMAN's
+own structural classifier independently disagrees with BioLiP too, calling it a
+glue candidate, which is why it is in this set at all. Three classifiers, three
+answers, and the published one is the least defensible.
+
+**This is the only model-derived column in the atlas.** Its FieldSpec
+description says so, in the text that reaches the column tooltip and the query
+builder, because the number beside it is 0.9336 and not 1.
+
 ## Section 9.5 BINMAN-LM
 
 Measured against the **complete** atlas, with the corpus regenerated from it

@@ -485,12 +485,17 @@ def _post_build() -> dict:
     # first pass and this one was not, which is the argument for the list
     # living here rather than in somebody's memory.
     from pipeline.degron_predict import run as predict
+    from pipeline.triage_predict import load_into_atlas as load_triage
     from pipeline.zinc_finger_scan import run as scan
 
     scored = predict()
     report = scan()
+    # Loads what pipeline/triage_predict.py produced, and does nothing when it
+    # has not run. The inference is its own stage; this is the file IO.
+    triage = load_triage()
     return {
         "imid_degradation_scored": scored.get("scored", 0),
+        "triage_predicted_rows": triage.get("bridge_rows", 0),
         "zinc_finger": report.get("n_fingers", 0),
         "known_neosubstrate_rows": (
             report.get("known_neosubstrates", {}).get("degron_rows_marked", 0)),

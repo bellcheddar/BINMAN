@@ -980,3 +980,39 @@ One line per meaningful event, timestamped UTC (spec Section 0 rule 5).
 | 2026-10-05T11:18:40+00:00 | 4.1b | About tab generated: 53 references, 11/13 datasets resolved, worked example selected, 0 value(s) not recorded, 0 source(s) publish no licence. |
 | 2026-10-05T14:13:57+00:00 | 9 | Validation run against binman.sqlite: 0 metric(s) not computed (dataset unavailable), 2 measured floor(s) missed. |
 | 2026-10-05T14:13:58+00:00 | 9 | Validation run against binman.sqlite: 4 metric(s) not computed (dataset unavailable), 5 measured floor(s) missed. |
+| 2026-10-05T14:15:26+00:00 | 3.5 | Triage prediction: 6 entry-ligand pairs, 5 distinct ligands. |
+| 2026-10-05T14:15:30+00:00 | 3.5 | Triage prediction complete: 6 pairs classified, 0 unparseable. |
+| 2026-10-05T14:15:48+00:00 | 3.5 | Triage prediction: 6,510 entry-ligand pairs, 3,059 distinct ligands. |
+| 2026-10-05T14:16:52+00:00 | 3.5 | 250/6,510 classified. |
+| 2026-10-05T14:17:30+00:00 | 9 | Validation run against binman.sqlite: 0 metric(s) not computed (dataset unavailable), 2 measured floor(s) missed. |
+| 2026-10-05T14:17:31+00:00 | 9 | Validation run against binman.sqlite: 4 metric(s) not computed (dataset unavailable), 5 measured floor(s) missed. |
+| 2026-10-05T14:17:53+00:00 | 3.5 | 500/6,510 classified. |
+| 2026-10-05T14:18:56+00:00 | 3.5 | 750/6,510 classified. |
+| 2026-10-05T14:19:57+00:00 | 3.5 | 1,000/6,510 classified. |
+| 2026-10-05T14:20:59+00:00 | 3.5 | 1,250/6,510 classified. |
+| 2026-10-05T14:22:01+00:00 | 3.5 | 1,500/6,510 classified. |
+| 2026-10-05T14:23:02+00:00 | 3.5 | 1,750/6,510 classified. |
+| 2026-10-05T14:24:04+00:00 | 3.5 | 2,000/6,510 classified. |
+| 2026-10-05T14:25:08+00:00 | 3.5 | 2,250/6,510 classified. |
+| 2026-10-05T14:26:09+00:00 | 3.5 | 2,500/6,510 classified. |
+| 2026-10-05T14:27:12+00:00 | 3.5 | 2,750/6,510 classified. |
+| 2026-10-05T14:28:16+00:00 | 3.5 | 3,000/6,510 classified. |
+| 2026-10-05T14:29:19+00:00 | 3.5 | 3,250/6,510 classified. |
+| 2026-10-05T14:30:21+00:00 | 3.5 | 3,500/6,510 classified. |
+| 2026-10-05T14:31:24+00:00 | 3.5 | 3,750/6,510 classified. |
+| 2026-10-05T14:32:26+00:00 | 3.5 | 4,000/6,510 classified. |
+| 2026-10-05T14:33:29+00:00 | 3.5 | 4,250/6,510 classified. |
+| 2026-10-05T14:34:32+00:00 | 3.5 | 4,500/6,510 classified. |
+| 2026-10-05T14:35:35+00:00 | 3.5 | 4,750/6,510 classified. |
+| 2026-10-05T14:36:37+00:00 | 3.5 | 5,000/6,510 classified. |
+| 2026-10-05T14:37:41+00:00 | 3.5 | 5,250/6,510 classified. |
+| 2026-10-05T14:38:44+00:00 | 3.5 | 5,500/6,510 classified. |
+| 2026-10-05T14:39:49+00:00 | 3.5 | 5,750/6,510 classified. |
+| 2026-10-05T14:40:52+00:00 | 3.5 | 6,000/6,510 classified. |
+| 2026-10-05T14:41:55+00:00 | 3.5 | 6,250/6,510 classified. |
+| 2026-10-05T14:42:57+00:00 | 3.5 | 6,500/6,510 classified. |
+| 2026-10-05T14:42:59+00:00 | 3.5 | Triage prediction complete: 6,510 pairs classified, 12 unparseable. |
+| 2026-10-05T14:44:08+00:00 | 3.5 | Triage predictions loaded: 6,498 pairs onto 27,590 bridge rows. |
+| 2026-10-05T14:44:24+00:00 | 9 | Validation run against binman.sqlite: 0 metric(s) not computed (dataset unavailable), 2 measured floor(s) missed. |
+| 2026-10-05T14:44:25+00:00 | 9 | Validation run against binman.sqlite: 4 metric(s) not computed (dataset unavailable), 5 measured floor(s) missed. |
+| 2026-10-05T14:44:48+00:00 | 4.1b | About tab generated: 53 references, 11/13 datasets resolved, worked example selected, 0 value(s) not recorded, 0 source(s) publish no licence. |

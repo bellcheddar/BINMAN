@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-05T11:18:40+00:00",
+  "generated_at": "2026-10-05T14:44:48+00:00",
   "generator": "pipeline/build_about.py",
   "schematic_description": "The pipeline runs left to right in four stages. Two kinds of input enter on the left: the primary data sources (RCSB, AlphaFold DB, UniProt, InterPro), and separately the validation datasets that serve as ground truth. Stage 1, acquisition, catalogued 130,391 entries into priority tiers using httpx and tenacity. Stage 2, geometry, analysed 55,449 entries with gemmi and FreeSASA and found 285,996 bridges, with 19 entries failing. Stage 3, scan and triage, used DSSP and fpocket to produce 21,717 degron candidates, 650 triaged ligases and 1,650 scored lysines. Stage 4 trains BINMAN-LM with mlx-lm, which does text work only and never emits a number. Four modules leave on the right: Glue Atlas, Degron Scan, E3 Triage and Degradability.",
   "stages": {
@@ -123,6 +123,12 @@
       "failed": 0,
       "failure_reasons": {}
     },
+    "triage_predict": {
+      "total": 6510,
+      "ok": 6510,
+      "failed": 0,
+      "failure_reasons": {}
+    },
     "trimmed_structures": {
       "total": 3839,
       "ok": 3839,
@@ -158,7 +164,7 @@
   },
   "atlas": {
     "available": true,
-    "size_mb": 191.4,
+    "size_mb": 195.1,
     "entry": 130391,
     "entry_failed": 1043,
     "bridge": 285996,

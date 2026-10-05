@@ -3,10 +3,12 @@
 This is the first model-derived data in the atlas, so the boundaries are worth
 stating plainly.
 
-**It does not touch `evidence_class`.** That column is reserved for a label
-read from a curated source, and it is still empty. Predictions go to
-`predicted_evidence_class`, which is a separate column with a name that says
-what it is, so no query can mistake one for the other.
+**It fills `evidence_class`,** which spec line 467 defines as the Task B
+label. A separate prediction column was drafted first and thrown away: the spec
+had already decided where this goes, and adding a second column beside an empty
+one designed for the same thing would have been a private design imposed over a
+public one. What the column needs instead is a description that says it is a
+model prediction, which its FieldSpec now carries.
 
 **It is a label, not a number.** The project rule is that the language model
 never computes, estimates or reports a numeric value, and this emits one of
@@ -166,6 +168,50 @@ def run(db_path: Path = DEFAULT_DB, limit: int | None = None) -> dict:
         log_event("3.5", f"Triage prediction complete: {written:,} pairs classified, "
                          f"{counts['unparseable']:,} unparseable.")
         return report
+    finally:
+        connection.close()
+
+
+def load_into_atlas(db_path: Path = DEFAULT_DB) -> dict:
+    """Write the predictions file into `predicted_evidence_class`.
+
+    Separate from run() on purpose. Inference over 6,510 pairs is its own stage,
+    the way the bridge geometry run is, and build_atlas loads what a stage
+    produced rather than producing it: a model loaded on every atlas build would
+    put minutes of GPU on a step that is otherwise file IO.
+
+    One prediction covers every bridge row sharing its entry and ligand. A
+    ligand bridging three chain pairs in one entry was asked once and all three
+    rows get the answer, because the question was about the structure and the
+    ligand, not about which pair of chains the geometry happened to pick.
+    """
+    if not OUTPUT.exists():
+        return {"loaded": 0, "reason": "no predictions file; run this stage first"}
+    connection = sqlite3.connect(db_path)
+    try:
+        updates = []
+        with OUTPUT.open(encoding="utf-8") as handle:
+            for line in handle:
+                line = line.strip()
+                if not line:
+                    continue
+                try:
+                    row = json.loads(line)
+                except json.JSONDecodeError:
+                    continue
+                if row.get("predicted_evidence_class"):
+                    updates.append((row["predicted_evidence_class"],
+                                    row["pdb_id"], row["ccd_id"]))
+        connection.executemany(
+            "UPDATE bridge SET evidence_class = ? "
+            "WHERE pdb_id = ? AND ccd_id = ?", updates)
+        connection.commit()
+        rows = connection.execute(
+            "SELECT COUNT(*) FROM bridge WHERE evidence_class IS NOT NULL"
+        ).fetchone()[0]
+        log_event("3.5", f"Triage predictions loaded: {len(updates):,} pairs onto "
+                         f"{rows:,} bridge rows.")
+        return {"pairs": len(updates), "bridge_rows": rows}
     finally:
         connection.close()
 
