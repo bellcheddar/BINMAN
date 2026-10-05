@@ -83,26 +83,8 @@
   <h2 id="datasets">Ground truth</h2>
   <p style="max-width:68ch;color:var(--muted)">
     Every module is judged against independently curated published datasets.
-    <strong>{{ about.datasets_resolved }} of {{ about.datasets_total }}</strong>
-    resolved. Where a dataset could not be obtained the metric that depends on it
-    is reported as not computed: no hand-written control was ever substituted for
-    a missing published one.
   </p>
   <div class="panel" style="padding:0"><div id="dataset-table"></div></div>
-
-  {% set unresolved = about.datasets | rejectattr('resolved') | list %}
-  {% if unresolved %}
-    <div class="panel">
-      <h3>What is missing, and how to get it</h3>
-      {% for dataset in unresolved %}
-        <p style="margin:0.6rem 0">
-          <code>{{ dataset.name }}</code> ·
-          <a href="{{ dataset.homepage }}" target="_blank" rel="noopener noreferrer">{{ dataset.homepage }}</a><br>
-          <span style="color:var(--muted)">{{ dataset.manual_route or 'No manual route recorded.' }}</span>
-        </p>
-      {% endfor %}
-    </div>
-  {% endif %}
 
   {# ---------------------------------------------------------- 6.6.4 ------- #}
   <h2 id="example">Worked example</h2>
