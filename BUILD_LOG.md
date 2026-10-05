@@ -883,3 +883,8 @@ One line per meaningful event, timestamped UTC (spec Section 0 rule 5).
 | 2026-10-05T04:24:40+00:00 | 5.2 | imid_degradation_score written for 4,650 degron candidates; 17,067 carry no C2H2 motif and are left NULL. |
 | 2026-10-05T04:26:53+00:00 | 9 | Validation run against binman.sqlite: 0 metric(s) not computed (dataset unavailable), 2 measured floor(s) missed. |
 | 2026-10-05T04:26:54+00:00 | 9 | Validation run against binman.sqlite: 4 metric(s) not computed (dataset unavailable), 4 measured floor(s) missed. |
+| 2026-10-05T04:28:28+00:00 | 2.1b | Zinc-finger scan over 20,279 cached models. |
+| 2026-10-05T04:28:54+00:00 | 2.1b | Zinc-finger table: 7,452 C2H2 motifs over 1,123 proteins, of which 2,792 (37.5%) carry no hairpin candidate and were unreachable by the per-candidate column. |
+| 2026-10-05T04:29:11+00:00 | 9 | Validation run against binman.sqlite: 0 metric(s) not computed (dataset unavailable), 2 measured floor(s) missed. |
+| 2026-10-05T04:29:12+00:00 | 9 | Validation run against binman.sqlite: 4 metric(s) not computed (dataset unavailable), 4 measured floor(s) missed. |
+| 2026-10-05T04:29:24+00:00 | 4.1b | About tab generated: 53 references, 11/13 datasets resolved, worked example selected, 0 value(s) not recorded, 0 source(s) publish no licence. |

@@ -609,6 +609,55 @@ reached were never assayed at all and are the actual new hypotheses: CTCFL
 Five more above 0.9 are called not degraded by the screen (HIC1, ZNF821, IKZF5,
 HIVEP2, PRDM15), which is that false-positive rate made concrete.
 
+### The geometry score is anti-predictive on the assayed set
+
+`degron_geometry_score` scores 0.4407 by ROC AUC over all assayed C2H2 fingers,
+which is below chance. That number hides two separate failures, and separating
+them is what this section is for.
+
+The score is zero when no candidate overlaps an assayed window, and the lowest
+real score is 0.4676, so the not-called fingers sit in a block beneath every
+called one. That block is close to label-neutral (11 of 32 degraded, 1,932 of
+5,476 not), so it is not what drags the figure down. Splitting the two
+questions apart:
+
+| Question | Measure | AUC |
+|---|---|---|
+| Does the scan call degraded fingers more often? | called vs not, 3,565 calls over 5,508 fingers | 0.5045 |
+| Given a call, does the score rank it? | called subset, 21 degraded, 3,544 not | **0.3498** |
+
+Calling is noise. Ranking is inverted, and not marginally: a 20,000-shuffle
+permutation test on the called subset puts the null 95% band at [0.3767,
+0.6244] and the observed 0.3498 outside it, two-sided p = 0.0167 (seed
+20261005).
+
+The two components that reach the atlas are inverted in the same direction and
+neither is significant on its own: `mean_plddt` 0.3875 (p = 0.0775) and
+`tip_rel_sasa` 0.3850 (p = 0.0670). Only the composite clears significance.
+
+**The score has not been inverted, and should not be on this evidence.** Twenty
+one positives is not a basis for flipping a shipped score, a composite can be
+significant while no component is for ordinary reasons of power, and a measure
+that is backwards on one screen is a result to reproduce rather than a
+correction to apply. What it does establish is that the geometry composite as
+weighted carries no usable signal for this benchmark, and that the sequence
+model's 0.6368 is not merely better than geometry but better than something
+measurably worse than guessing.
+
+### A quarter of the score was never persisted
+
+`degron_geometry_score` is `0.35·(pLDDT/100) + 0.40·tip_rel_sasa +
+0.25·regularity`. The first two are columns in the atlas. The third was
+computed in the scan, used in the sum and then dropped: it is in neither
+`data/interim/degrons.jsonl` nor the `degron` table, so a quarter of the
+shipped score could not be audited, ablated or direction-checked without
+re-running the whole scan over 20,431 proteins.
+
+`regularity` is now emitted by the scan, carried in the schema and loaded by
+the atlas. The values arrive with the next degron scan; until that runs the
+column is present and empty, which is the honest state rather than a
+backfilled guess.
+
 ## Section 9.3 E3 Triage validation
 
 | Metric | Measured | Floor | Verdict |

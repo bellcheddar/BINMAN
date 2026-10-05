@@ -50,6 +50,11 @@ CREATE TABLE IF NOT EXISTS degron (
   id INTEGER PRIMARY KEY, uniprot_acc TEXT, afdb_id TEXT, gene TEXT,
   start_res INTEGER, end_res INTEGER, tip_res INTEGER, tip_aa TEXT,
   turn_length INTEGER, mean_plddt REAL, tip_rel_sasa REAL,
+  -- The third component of degron_geometry_score. It was computed, weighted at
+  -- 0.25 and then dropped before anything persisted it, so a quarter of the
+  -- shipped score could not be audited, ablated or direction-checked without
+  -- re-running the whole scan. See FINDINGS.md.
+  regularity REAL,
   degron_geometry_score REAL, motif_family TEXT,
   is_known_neosubstrate INTEGER, structure_file TEXT, status TEXT DEFAULT 'ok'
 );

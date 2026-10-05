@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-10-05T04:13:00+00:00",
+  "generated_at": "2026-10-05T04:29:24+00:00",
   "generator": "pipeline/build_about.py",
-  "schematic_description": "The pipeline runs left to right in four stages. Two kinds of input enter on the left: the primary data sources (RCSB, AlphaFold DB, UniProt, InterPro), and separately the validation datasets that serve as ground truth. Stage 1, acquisition, catalogued 130,391 entries into priority tiers using httpx and tenacity. Stage 2, geometry, analysed 55,449 entries with gemmi and FreeSASA and found 283,131 bridges, with 19 entries failing. Stage 3, scan and triage, used DSSP and fpocket to produce 21,717 degron candidates, 650 triaged ligases and 1,650 scored lysines. Stage 4 trains BINMAN-LM with mlx-lm, which does text work only and never emits a number. Four modules leave on the right: Glue Atlas, Degron Scan, E3 Triage and Degradability.",
+  "schematic_description": "The pipeline runs left to right in four stages. Two kinds of input enter on the left: the primary data sources (RCSB, AlphaFold DB, UniProt, InterPro), and separately the validation datasets that serve as ground truth. Stage 1, acquisition, catalogued 130,391 entries into priority tiers using httpx and tenacity. Stage 2, geometry, analysed 55,449 entries with gemmi and FreeSASA and found 285,996 bridges, with 19 entries failing. Stage 3, scan and triage, used DSSP and fpocket to produce 21,717 degron candidates, 650 triaged ligases and 1,650 scored lysines. Stage 4 trains BINMAN-LM with mlx-lm, which does text work only and never emits a number. Four modules leave on the right: Glue Atlas, Degron Scan, E3 Triage and Degradability.",
   "stages": {
     "bridges": {
       "total": 55468,
@@ -158,14 +158,14 @@
   },
   "atlas": {
     "available": true,
-    "size_mb": 157.0,
-    "entry": 52821,
+    "size_mb": 191.3,
+    "entry": 130391,
     "entry_failed": 1043,
-    "bridge": 283131,
+    "bridge": 285996,
     "bridge_failed": 0,
-    "ligand": 9981,
-    "ligand_failed": 0,
-    "polymer_entity": 329765,
+    "ligand": 30149,
+    "ligand_failed": 19714,
+    "polymer_entity": 407335,
     "polymer_entity_failed": 0,
     "degron": 21717,
     "degron_failed": 0,
@@ -176,19 +176,19 @@
     "edge": 30057,
     "edge_failed": 0,
     "ccd_class_counts": {
-      "glue_candidate": 7385,
-      "cofactor": 860,
-      "lipid": 385,
-      "unknown": 382,
-      "peptide_like": 278,
-      "detergent": 212,
-      "buffer": 194,
-      "sugar": 101,
-      "cryoprotectant": 99,
-      "metal": 64,
-      "covalent_modifier": 21
+      "unknown": 20127,
+      "glue_candidate": 7676,
+      "cofactor": 938,
+      "lipid": 394,
+      "peptide_like": 282,
+      "detergent": 216,
+      "buffer": 206,
+      "sugar": 113,
+      "cryoprotectant": 104,
+      "metal": 70,
+      "covalent_modifier": 23
     },
-    "novel_bridges": 15451
+    "novel_bridges": 15804
   },
   "datasets": [
     {
@@ -1540,11 +1540,11 @@
         "label": "its target has a mapped lysine with a favourable verdict"
       }
     ],
-    "candidate_pool": 3814,
+    "candidate_pool": 3800,
     "excluded_from_pool": {
-      "curated": 36,
+      "curated": 51,
       "degrader_ligase": 60,
-      "titled": 90
+      "titled": 89
     },
     "honest_note": "This record was chosen because every stage that has run worked on it. A reader should look at the misses list and the novel-bridge set in FINDINGS.md for the cases where stages did not."
   },

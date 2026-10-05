@@ -2888,3 +2888,41 @@ were measured against the same database on the same day with the same harness.
 128 MB adapter. The checkpoints can go; the adapter and its config stay, because
 the next person to wonder whether scale helps should be able to see that it was
 tried rather than assumed.
+
+## D-072
+
+**The degron geometry score is not inverted, despite measuring 0.3498.**
+
+On the called subset of the Sievers assayed C2H2 fingers,
+`degron_geometry_score` ranks degraded fingers below non-degraded ones with AUC
+0.3498, significantly below chance (20,000-shuffle permutation test, null 95%
+band [0.3767, 0.6244], two-sided p = 0.0167, seed 20261005). Inverting it would
+read 0.6502, which would beat the sequence model's 0.6368 and clear a floor the
+module currently misses.
+
+It has not been inverted. Twenty one positives is not a basis for flipping a
+shipped score; the composite is significant while neither measurable component
+is (`mean_plddt` p = 0.0775, `tip_rel_sasa` p = 0.0670), which is what low
+power looks like; and a score that runs backwards on one screen is a result to
+reproduce on a second, not a sign to change. Inverting it here would turn a
+measurement into a number chosen because it passes.
+
+What the measurement is good for is deciding where the effort goes: the
+geometry composite as weighted carries no usable signal on this benchmark, so
+tuning its three weights is not the route to a better AUC. The sequence model
+already measures 0.6368 against a geometry score that is worse than guessing.
+
+## D-073
+
+**`regularity` is persisted, and the column ships empty until the scan reruns.**
+
+It is 0.25 of `degron_geometry_score` and was computed, used and discarded, so
+a quarter of the shipped score was unauditable from any artefact. It is now
+emitted by `pipeline/degron_scan.py`, declared in `pipeline/schema.sql` and
+loaded by `pipeline/build_atlas.py`.
+
+The values need a degron rescan over 20,431 proteins. Until that runs the
+column exists and is NULL for every row. That is deliberate: a backfill would
+have to recompute the DSSP bridge-partner pairing the value comes from, which
+is the rescan, and anything cheaper would be a guess in a column whose whole
+purpose is to make the score checkable.

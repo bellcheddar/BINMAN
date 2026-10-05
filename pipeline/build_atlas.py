@@ -414,7 +414,7 @@ def build(fresh: bool = True) -> dict:
         counts["degron"] = load_table_from_jsonl(
             connection, "degron", INTERIM / "degrons.jsonl",
             ("uniprot_acc", "afdb_id", "gene", "start_res", "end_res", "tip_res",
-             "tip_aa", "turn_length", "mean_plddt", "tip_rel_sasa",
+             "tip_aa", "turn_length", "mean_plddt", "tip_rel_sasa", "regularity",
              "degron_geometry_score", "motif_family", "is_known_neosubstrate",
              "structure_file", "status"),
         )

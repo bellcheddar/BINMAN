@@ -378,6 +378,10 @@ def _scan_worker(job: dict) -> dict:
                     "turn_length": h.turn_length,
                     "mean_plddt": h.mean_plddt,
                     "tip_rel_sasa": h.tip_rel_sasa,
+                    # Emitted so all three components of the score below are on
+                    # the row that carries it. Without this one the score could
+                    # not be taken apart after the fact.
+                    "regularity": h.regularity,
                     "degron_geometry_score": h.score,
                     "motif_family": MOTIF_FAMILY,
                     "is_known_neosubstrate": 0,
