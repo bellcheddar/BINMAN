@@ -166,6 +166,31 @@ code, kbd, samp, .mono { font-family: var(--data); font-size: 0.86em; }
 }
 .brand__sub { color: var(--muted); font-size: 0.68rem; letter-spacing: 0.02em; }
 
+/* The six letters that spell BINMAN, lit in sequence left to right.
+
+   A long rest between sweeps on purpose. The header is sticky, so this is on
+   screen the whole time someone is working; something that pulsed continuously
+   would be an animated advert sitting over the data. One pass every seven
+   seconds reads as the name assembling itself and then getting out of the way.
+
+   The sweep is colour and weight only, with no layout property animated, so it
+   cannot reflow the header mid-pass. The reduced-motion rule at the bottom of
+   this file collapses the duration, which leaves the letters in their resting
+   accent colour and nothing moving. */
+.brand__key {
+  color: var(--accent); font-weight: 700;
+  animation: brand-key 7s ease-in-out infinite;
+}
+.brand__key:nth-of-type(2) { animation-delay: 0.16s; }
+.brand__key:nth-of-type(3) { animation-delay: 0.32s; }
+.brand__key:nth-of-type(4) { animation-delay: 0.48s; }
+.brand__key:nth-of-type(5) { animation-delay: 0.64s; }
+
+@keyframes brand-key {
+  0%, 9%, 100% { color: var(--accent); text-shadow: none; }
+  3% { color: var(--ink); text-shadow: 0 0 9px var(--accent); }
+}
+
 /* A one-line caveat under a page blurb. A full notice box at the top of every
    page turns the caveat into furniture people stop reading; this keeps the
    warning adjacent to the data and sends the detail to the About tab. */

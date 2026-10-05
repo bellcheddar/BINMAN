@@ -46,7 +46,19 @@
     </svg>
     <span>
       <span class="brand__name">BINMAN</span><br>
-      <span class="brand__sub">Blind-spot INventory of Molecular Adhesives and Neosubstrates</span>
+      {# The letters that spell BINMAN, wrapped so they can be lit in sequence.
+
+         No aria-label and no aria-hidden. The obvious markup was to label the
+         whole sentence and hide the split version from assistive tech, but
+         aria-label on a plain span is not reliably exposed, and if it were
+         ignored the tagline would vanish from screen readers altogether.
+         Inline spans do not break the text node, so the sentence reads as
+         written. #}
+      <span class="brand__sub"><span class="brand__key">B</span>lind-spot <span
+        class="brand__key">IN</span>ventory of <span
+        class="brand__key">M</span>olecular <span
+        class="brand__key">A</span>dhesives and <span
+        class="brand__key">N</span>eosubstrates</span>
     </span>
   </a>
 
