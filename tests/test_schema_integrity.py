@@ -259,3 +259,34 @@ def test_known_neosubstrates_are_actually_marked(atlas):
     assert atlas.execute(
         "SELECT COUNT(*) FROM degron WHERE is_known_neosubstrate NOT IN (0, 1)"
     ).fetchone()[0] == 0
+
+
+def test_every_post_build_column_survives_a_rebuild(atlas):
+    """The columns and tables added after the atlas is built must be present.
+
+    `build_atlas` recreates the schema, so anything a later stage ALTERs in or
+    creates is dropped by a rebuild. Three such things exist and all three went
+    missing at once: `zinc_finger`, `degron.is_known_neosubstrate`, and
+    `degron.imid_degradation_score`. The first two had tests and were caught
+    immediately. The third did not, and surfaced as the Degron Scan page
+    rendering "query failed: no such column" over an empty table, because that
+    column is in the query's default projection.
+
+    They are re-derived by `build_atlas._post_build` now. This asserts the
+    outcome rather than the wiring, so it still fails if the wiring is removed.
+    """
+    columns = {row[1] for row in atlas.execute("PRAGMA table_info(degron)")}
+    for column in ("imid_degradation_score", "is_known_neosubstrate"):
+        assert column in columns, f"degron.{column} did not survive the build"
+
+    tables = {
+        row[0] for row in atlas.execute(
+            "SELECT name FROM sqlite_master WHERE type = 'table'")
+    }
+    assert "zinc_finger" in tables, "zinc_finger did not survive the build"
+
+    # Present but empty is the same defect wearing a different hat.
+    scored = atlas.execute(
+        "SELECT COUNT(*) FROM degron WHERE imid_degradation_score IS NOT NULL"
+    ).fetchone()[0]
+    assert scored > 0, "imid_degradation_score exists but is empty for every row"

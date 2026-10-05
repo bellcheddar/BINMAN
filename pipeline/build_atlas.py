@@ -477,10 +477,20 @@ def _post_build() -> dict:
         log_event("4.3", "Per-finger scan skipped: no AlphaFold cache, so "
                          "zinc_finger and is_known_neosubstrate are absent.")
         return {"zinc_finger": 0, "zinc_finger_skipped": "no AlphaFold cache"}
+    # `degron_predict` first: it ALTERs the degron table to add
+    # `imid_degradation_score`, which a fresh build drops along with the rest.
+    # Missing it left the Degron Scan page showing "query failed: no such
+    # column" with an empty table, because the column is in the query's default
+    # projection. Two of these three post-build steps were wired in on the
+    # first pass and this one was not, which is the argument for the list
+    # living here rather than in somebody's memory.
+    from pipeline.degron_predict import run as predict
     from pipeline.zinc_finger_scan import run as scan
 
+    scored = predict()
     report = scan()
     return {
+        "imid_degradation_scored": scored.get("scored", 0),
         "zinc_finger": report.get("n_fingers", 0),
         "known_neosubstrate_rows": (
             report.get("known_neosubstrates", {}).get("degron_rows_marked", 0)),

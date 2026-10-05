@@ -11,7 +11,9 @@
 (function (global) {
   'use strict';
 
-  var REPRESENTATIONS = ['cartoon', 'molecular-surface', 'ball-and-stick'];
+  /* Surface first, because that is what every viewer now opens on. Cycling
+   * starts from the shown state rather than jumping to cartoon on first press. */
+  var REPRESENTATIONS = ['molecular-surface', 'cartoon', 'ball-and-stick'];
 
   /* The standard AlphaFold four-band pLDDT scale (spec 6.4). */
   var PLDDT_BANDS = [
@@ -58,14 +60,18 @@
      * already be framed when the viewer appears rather than drifting into
      * place on every pin. The Reset button animates, where a transition helps
      * the user keep their bearings. */
+    /* The polymer surface is translucent so the ligand still reads through it.
+     * An opaque surface fills the space a cartoon leaves open, and at a camera
+     * framed on the ligand it simply swallows it. */
+    polymer: { alpha: 0.45 },
     focus: {
-      extraRadius: 2.5,
+      extraRadius: 22,
       /* A named CCD is the ligand the row is about, so it can fill the frame.
        * An inferred one is whatever non-polymer the file happened to carry,
        * and on an E3 structure that can be a single ion: framing it as tightly
        * shows a glowing dot in a void, so it is pulled back far enough to show
        * the pocket it sits in. */
-      minRadius: 7, minRadiusInferred: 28,
+      minRadius: 18, minRadiusInferred: 34,
       /* Below 1 tightens the whole-structure framing, which is the branch a
        * lens node lands in: no ligand and no named residues, so there is
        * nothing to zoom to and the default reset leaves a monomer small. */
@@ -260,6 +266,8 @@
       }
       return null;
     }).then(function () {
+      return self._surfacePolymer();
+    }).then(function () {
       return self.applyLigandPresentation(spec);
     }).catch(function (error) {
       console.warn('presentation step skipped', error);
@@ -297,6 +305,64 @@
       });
     });
     return out;
+  };
+
+  /* The polymer components: everything the preset built that is not the ligand,
+   * not water and not a lone ion. These are what become the surface. */
+  Viewer.prototype._polymerComponents = function () {
+    var out = [];
+    this._structureRefs().forEach(function (ref) {
+      (ref.components || []).forEach(function (component) {
+        var key = String(component.key || '').toLowerCase();
+        var label = '';
+        try {
+          label = String(component.cell.obj.label || '').toLowerCase();
+        } catch (e) { /* key alone is enough to decide */ }
+        var text = key + ' ' + label;
+        if (text.indexOf('polymer') >= 0) { out.push(component); }
+      });
+    });
+    return out;
+  };
+
+  /* Render the protein as a surface rather than ribbons.
+   *
+   * The ligand keeps its sticks and its shell: a surface over the ligand too
+   * would bury the thing the viewer exists to show. Only the polymer changes.
+   *
+   * `resolution` is left on Mol*'s adaptive default rather than pinned. A
+   * fixed fine resolution is affordable on a 200-residue monomer and is not on
+   * a 300-chain assembly, and this atlas holds both.
+   */
+  Viewer.prototype._surfacePolymer = function () {
+    var plugin = this._plugin();
+    var components = this._polymerComponents();
+    if (!plugin || !plugin.build || !components.length) {
+      return Promise.resolve(false);
+    }
+    var update = plugin.build();
+    var touched = 0;
+    components.forEach(function (component) {
+      (component.representations || []).forEach(function (rep) {
+        if (!rep.cell) { return; }
+        touched += 1;
+        update.to(rep.cell).update(function (old) {
+          /* params reset so the new type takes its own defaults rather than
+           * inheriting the cartoon's, then the alpha applied on top. */
+          old.type = {
+            name: 'molecular-surface',
+            params: { alpha: LIGAND.polymer.alpha }
+          };
+        });
+      });
+    });
+    if (!touched) { return Promise.resolve(false); }
+    return Promise.resolve(update.commit()).then(function () {
+      return true;
+    }).catch(function (error) {
+      console.warn('polymer surface not applied', error);
+      return false;
+    });
   };
 
   /* The ligand to frame, as a Mol* loci.
