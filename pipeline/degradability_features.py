@@ -89,6 +89,44 @@ def observed_sites() -> dict[str, set[int]]:
     return out
 
 
+def assayed_lysines() -> dict[str, dict[int, int]]:
+    """Accession to {residue: ubiquitylated}, over lysines actually assayed.
+
+    The other reader, observed_sites(), gives the lysines UniProt annotates as
+    crosslinked, and everything else on the protein becomes a negative by
+    default. D-067 measured what that costs: unannotated lysines skew buried,
+    because buried lysines are also harder to detect by mass spectrometry, so
+    the negative set is enriched for exactly what an exposure feature measures
+    and every exposure figure built on it is biased upward.
+
+    This reads the ubiquitylome manifest instead, where a row exists only for a
+    lysine seen in an identified peptide. A lysine absent from it was never
+    assayed and is dropped rather than called a negative.
+    """
+    path = MANIFESTS / "ubiquitylome.jsonl"
+    out: dict[str, dict[int, int]] = {}
+    if not path.exists():
+        return out
+    with path.open(encoding="utf-8") as handle:
+        for line in handle:
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                row = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            accession = (row.get("uniprot") or "").strip()
+            try:
+                residue = int(row.get("res_num"))
+            except (TypeError, ValueError):
+                continue
+            if accession:
+                out.setdefault(accession, {})[residue] = int(
+                    row.get("ubiquitylated") or 0)
+    return out
+
+
 def _features_for(job: dict) -> list[dict]:
     """Every lysine of one AlphaFold model, with its features and label."""
     import freesasa
@@ -98,6 +136,9 @@ def _features_for(job: dict) -> list[dict]:
     from pipeline.degron_scan import parse_dssp, run_dssp
 
     accession, sites, path = job["accession"], set(job["sites"]), Path(job["path"])
+    assayed = job.get("assayed")
+    if assayed is not None:
+        assayed = {int(k): int(v) for k, v in assayed.items()}
     try:
         structure = gemmi.read_structure(str(path))
         structure.setup_entities()
@@ -175,10 +216,16 @@ def _features_for(job: dict) -> list[dict]:
             state = secondary.get(number, "-")
             fraction = (lambda members: float(
                 sum(c in members for c in context) / len(context)) if context else 0.0)
+            # In assayed mode the job carries the measured lysines and
+            # nothing else is a negative, so an unassayed lysine is skipped
+            # rather than labelled 0.
+            if assayed is not None and number not in assayed:
+                continue
             rows.append({
                 "accession": accession,
                 "residue": number,
-                "label": 1 if number in sites else 0,
+                "label": (assayed[number] if assayed is not None
+                          else (1 if number in sites else 0)),
                 "rel_sasa": float(exposure),
                 "plddt": float(plddt.get(number, 0.0)),
                 "plddt_window": float(np.mean(window)) if window else 0.0,
@@ -204,14 +251,34 @@ def _features_for(job: dict) -> list[dict]:
         return [{"accession": accession, "error": str(exc)[:200]}]
 
 
-def extract(limit: int | None = None) -> list[dict]:
-    """Features for every measurable lysine, cached so the fit is re-runnable."""
+def extract(limit: int | None = None, assayed: bool = False) -> list[dict]:
+    """Features for every measurable lysine, cached so the fit is re-runnable.
+
+    `assayed` switches the negative set from "every other lysine on the
+    protein" to "lysines seen in an identified peptide and not ubiquitylated",
+    which is the construction D-067 requires and the one the shipped numbers
+    were never measured against.
+    """
     jobs = []
-    for accession, sites in sorted(observed_sites().items()):
-        model = next(iter(CACHE.glob(f"*{accession}*")), None)
-        if model is not None:
-            jobs.append({"accession": accession, "sites": sorted(sites),
-                         "path": str(model)})
+    if assayed:
+        measured = assayed_lysines()
+        if not measured:
+            raise SystemExit(
+                "data/manifests/ubiquitylome.jsonl is missing or empty. Run "
+                "pipeline/acquire_ubiquitylome.py before asking for assayed "
+                "negatives.")
+        for accession, residues in sorted(measured.items()):
+            model = next(iter(CACHE.glob(f"*{accession}*")), None)
+            if model is not None:
+                jobs.append({"accession": accession, "sites": [],
+                             "assayed": {str(k): v for k, v in residues.items()},
+                             "path": str(model)})
+    else:
+        for accession, sites in sorted(observed_sites().items()):
+            model = next(iter(CACHE.glob(f"*{accession}*")), None)
+            if model is not None:
+                jobs.append({"accession": accession, "sites": sorted(sites),
+                             "path": str(model)})
     if limit:
         jobs = jobs[:limit]
     workers = int(load_config().u("compute.cpu_workers"))
@@ -273,7 +340,7 @@ def _within_protein_auc(predictions, labels, groups):
     return float(np.mean(scores)), len(scores)
 
 
-def run(limit: int | None = None) -> dict:
+def run(limit: int | None = None, assayed: bool = False) -> dict:
     import numpy as np
     from sklearn.metrics import roc_auc_score
 
@@ -281,7 +348,7 @@ def run(limit: int | None = None) -> dict:
     floor = float(config.t("validation.degradability_auc_floor"))
     seed = int(config.t("validation.panel_seed"))
 
-    rows = extract(limit=limit)
+    rows = extract(limit=limit, assayed=assayed)
     labels = np.asarray([r["label"] for r in rows])
     groups = np.asarray([r["accession"] for r in rows])
     columns = {name: np.asarray([r[name] for r in rows], dtype=float)
@@ -295,9 +362,15 @@ def run(limit: int | None = None) -> dict:
         "n_positive": int(labels.sum()),
         "n_proteins": int(len(set(groups))),
         "auc_floor": floor,
-        "negatives_caveat": ("the negatives are the other lysines of the same "
-                             "proteins, which were not assayed and found "
-                             "unmodified, so every figure here is generous"),
+        "negatives": "assayed" if assayed else "assumed",
+        "negatives_caveat": (
+            "a negative is a lysine seen in an identified peptide that never "
+            "carries ubiquitylation, so the figures here are not flattered by "
+            "the detection bias D-067 measured"
+            if assayed else
+            "the negatives are the other lysines of the same proteins, which "
+            "were not assayed and found unmodified, so every figure here is "
+            "generous"),
         "single_features": {},
         "feature_sets": {},
     }
@@ -360,10 +433,15 @@ def run(limit: int | None = None) -> dict:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--assayed", action="store_true",
+        help="use lysines assayed and found unmodified as the negatives, from "
+             "data/manifests/ubiquitylome.jsonl, instead of every other lysine "
+             "on the protein (D-067)")
     parser.add_argument("--limit", type=int, default=None,
                         help="measure only the first N proteins, for a smoke test")
     args = parser.parse_args()
-    report = run(limit=args.limit)
+    report = run(limit=args.limit, assayed=args.assayed)
     print(json.dumps({k: v for k, v in report.items()
                       if k not in ("single_features", "feature_sets")}, indent=2))
     print("\nsingle features, within-protein AUC (* is protein-constant):")
