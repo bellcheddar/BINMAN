@@ -254,16 +254,6 @@
       {% endif %}
     </div>
 
-    <div class="panel">
-      <h3>Try it yourself</h3>
-      <p>
-        <a class="btn btn--accent" id="try-it"
-           href="{{ url_for('ledger.index') }}#glue={{ ex.pdb_id }}:{{ ex.ccd_id }}:{{ ex.bridge_id }}">
-          Load this record into the live selection
-        </a>
-      </p>
-      <p class="panel__note">{{ ex.honest_note }}</p>
-    </div>
   {% endif %}
 
   {# ---------------------------------------------------------- 6.6.2 ------- #}
