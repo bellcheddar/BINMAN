@@ -11,6 +11,10 @@ data/interim/
 # stage manifests are regenerable and large (catalogue.jsonl is ~132 MB)
 data/manifests/*.jsonl
 data/atlas/*.sqlite
+# SQLite's write-ahead log and shared-memory files. They exist only while a
+# connection is open, and a commit made during a build swept two of them in.
+data/atlas/*.sqlite-shm
+data/atlas/*.sqlite-wal
 data/atlas/*.duckdb
 data/afdb/
 app/static/structures/*.cif.gz
