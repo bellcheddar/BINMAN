@@ -2775,3 +2775,32 @@ rather than an error:
 The numbering check that caught the first was written because author numbering
 and UniProt numbering disagree often and silently. It earned its place
 immediately.
+
+## D-069: the atlas rebuild does not move the language-model metrics
+
+**Checked before it could mislead.** Round 07 is the model to beat (Task B macro
+F1 0.9336) and its scores were measured against the pre-rebuild atlas. Today's
+rebuild took the atlas from 239,485 bridges to 283,131, and Task A's primary
+metric executes queries against that atlas, so the obvious worry is that round
+14 would be compared against a baseline measured on different data.
+
+**It does not matter, and that is a measurement rather than an assumption.**
+Set equality runs both the predicted query and the gold query against whichever
+atlas is present and compares the row sets, so a change to the atlas moves both
+sides together. Re-evaluating round 07 on the rebuilt atlas returns every figure
+unchanged to four decimal places:
+
+| | parse | set equality | exact | Task B | Task C |
+|---|---:|---:|---:|---:|---:|
+| round 07, original atlas | 1.0 | 1.0 | 0.975 | 0.9336 | 1.0 |
+| round 07, rebuilt atlas | 1.0 | 1.0 | 0.975 | 0.9336 | 1.0 |
+
+So round 14 can be compared against the published round 07 number directly, and
+the re-evaluated baseline is kept alongside it in `lm_eval.json` as the evidence
+rather than the claim.
+
+**Round 14 completed**: 14,152 iterations, one full epoch, 32 layers, rank 8,
+scale 20, batch 2, learning rate 1e-5, on Qwen2.5-32B-Instruct-4bit. This is
+genuinely the 32B: D-044 recorded two earlier rounds that reported 32B and
+trained the 3B through a default-argument trap, and the adapter config names the
+32B model and a 128 MB adapter over 141 checkpoints.

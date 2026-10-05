@@ -740,3 +740,14 @@ One line per meaningful event, timestamped UTC (spec Section 0 rule 5).
 | 2026-10-05T01:07:41+00:00 | 5.2 | imid_degradation_score written for 4,650 degron candidates; 17,067 carry no C2H2 motif and are left NULL. |
 | 2026-10-05T01:08:15+00:00 | 9 | Validation run against binman.sqlite: 0 metric(s) not computed (dataset unavailable), 2 measured floor(s) missed. |
 | 2026-10-05T01:08:16+00:00 | 9 | Validation run against binman.sqlite: 4 metric(s) not computed (dataset unavailable), 5 measured floor(s) missed. |
+| 2026-10-05T01:36:16+00:00 | 3.8 | round07-on-rebuilt-atlas: loading mlx-community/Qwen2.5-3B-Instruct-4bit with adapters at models/binman-lm/runs/binman-qwen-2.5-3b-4bit-round07 |
+| 2026-10-05T01:41:05+00:00 | 3.8 | round07-on-rebuilt-atlas synthetic: 25/120 evaluated (0.09/s), parse 1.000, set equality 1.000. |
+| 2026-10-05T01:45:32+00:00 | 3.8 | round07-on-rebuilt-atlas synthetic: 50/120 evaluated (0.09/s), parse 1.000, set equality 1.000. |
+| 2026-10-05T01:49:59+00:00 | 3.8 | round07-on-rebuilt-atlas synthetic: 75/120 evaluated (0.09/s), parse 1.000, set equality 1.000. |
+| 2026-10-05T01:54:28+00:00 | 3.8 | round07-on-rebuilt-atlas synthetic: 100/120 evaluated (0.09/s), parse 1.000, set equality 1.000. |
+| 2026-10-05T01:59:35+00:00 | 3.7 | Stage 1 complete in 697.6 min. Best validation loss 0.0 at iteration 2400. |
+| 2026-10-05T01:59:53+00:00 | 3.7 | Fuse succeeded: models/binman-lm/fused |
+| 2026-10-05T01:59:55+00:00 | 3.8 | round13-32b-1epoch: loading mlx-community/Qwen2.5-32B-Instruct-4bit with adapters at models/binman-lm/adapters |
+| 2026-10-05T02:02:20+00:00 | 3.8 | round07-on-rebuilt-atlas: parse rate 1.0, set equality 1.0 on 120 synthetic queries. |
+| 2026-10-05T02:02:47+00:00 | 3.8 | round13-32b-1epoch synthetic: 25/120 evaluated (0.16/s), parse 1.000, set equality 1.000. |
+| 2026-10-05T02:02:55+00:00 | 3.8 | round14-32b-1epoch: loading mlx-community/Qwen2.5-32B-Instruct-4bit with adapters at models/binman-lm/runs/binman-qwen-2.5-32b-4bit-round14 |
