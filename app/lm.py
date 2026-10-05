@@ -53,6 +53,62 @@ def enabled() -> bool:
     return bool(endpoint())
 
 
+def _ask(system: str, user: str, timeout: float, max_tokens: int = 512) -> LmResult:
+    """One call to the model. Never raises: an unreachable LM is a normal state."""
+    url = endpoint()
+    if not url:
+        return LmResult(ok=False, error="BINMAN_LM_URL is not set")
+    try:
+        import httpx
+    except ImportError as exc:
+        return LmResult(ok=False, error=f"the LM client is not installed: {exc}")
+    body = {"messages": [{"role": "system", "content": system},
+                         {"role": "user", "content": user}],
+            "max_tokens": max_tokens, "temperature": 0.0}
+    try:
+        with httpx.Client(timeout=timeout) as client:
+            response = client.post(url.rstrip("/") + "/v1/chat/completions", json=body)
+            response.raise_for_status()
+            data = response.json()
+        return LmResult(ok=True, text=(data["choices"][0]["message"]["content"] or "").strip())
+    except Exception as exc:  # noqa: BLE001
+        return LmResult(ok=False, error=f"{type(exc).__name__}: {exc}"[:200])
+
+
+def explain_refusal(question: str, timeout: float = 20.0) -> LmResult:
+    """Why a question cannot be answered from the atlas, in the model's words.
+
+    The abstain head was trained, scored at a 0.0 fabrication rate over 40
+    unanswerable questions, and then called by nothing. A question the schema
+    cannot answer went to the query head, came back as a query object naming a
+    field that does not exist, and reached the user as "the model proposed an
+    invalid query: field 'binding_affinity' is not a field of bridge". That is
+    the parser's complaint about the model, not an answer to the person.
+
+    This asks the head that was trained for the job. It returns
+    {"answerable": false, "missing": [...], "explanation": "..."} and the
+    explanation is what the user sees.
+    """
+    result = _ask(SYSTEM_PROMPTS["abstain"], question, timeout, max_tokens=220)
+    if not result.ok:
+        return result
+    candidate = result.text
+    if "```" in candidate:
+        for part in candidate.split("```"):
+            stripped = part.strip()
+            if stripped.startswith("json"):
+                stripped = stripped[4:].strip()
+            if stripped.startswith("{"):
+                candidate = stripped
+                break
+    try:
+        payload = json.loads(candidate)
+    except json.JSONDecodeError:
+        return LmResult(ok=False, text=result.text,
+                        error="the model did not explain in JSON")
+    return LmResult(ok=True, payload=payload, text=result.text)
+
+
 def propose_query(question: str, schema: dict, timeout: float = 20.0) -> LmResult:
     """Ask the model for a query object. Never raises: the UI degrades instead."""
     url = endpoint()

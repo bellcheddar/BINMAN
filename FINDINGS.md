@@ -899,6 +899,39 @@ is reachable from a monomer, which was open until now, and that the thing
 blocking a degradability verdict is the shape of what spec 5.4 asks for rather
 than the absence of signal in the data.
 
+### The abstain head, wired to the box
+
+Task C scored a 0.0 fabrication rate over 40 unanswerable questions and was
+called by nothing. A question the atlas cannot answer went to the query head,
+came back as a query object naming a field that does not exist, and reached the
+user as "the model proposed an invalid query: field 'binding_affinity' is not a
+field of bridge". That is the parser's complaint about the model, not an answer
+to the person who asked.
+
+`/api/nl` now asks the abstain head when the parser rejects a proposal.
+Measured over 20 held-out unanswerable questions:
+
+| outcome | before | after |
+|---|---:|---:|
+| explained to the user | 0 | **16** |
+| raw parser error | 16 | 0 |
+| schema-valid but wrong query | 4 | 4 |
+
+What the user reads instead: *"A degradability readout needs all three corners
+pinned. Missing: ligase."* and *"Cooperativity is not computable from a
+structure. BINMAN stores no measured cooperativity values."*
+
+**The 4 that remain are the honest limit, and they are the dangerous ones.**
+Those questions produce a query the schema accepts. Asked for a binding
+affinity in nanomolar the model filtered on ΔSASA and molecular weight; asked
+which compounds passed phase II it filtered on tier and evidence class. Both
+are wrong and neither is catchable by a parser, because every field named
+exists. The abstain head is never consulted on them, since nothing failed.
+
+Closing that gap means asking the abstain head first on every question, which
+doubles the model calls per query on a time-boxed ZeroGPU allocation. The
+measurement is here; the trade is not taken.
+
 ### The triage head, applied to the atlas
 
 Task B was trained and scored and then used for nothing. `evidence_class`, which

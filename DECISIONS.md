@@ -3105,3 +3105,26 @@ domain should be expected to be.
 
 No combined score ships. Adding 189 features to gain 0.02 of a standard
 deviation would be complexity bought with nothing.
+
+## D-080
+
+**The abstain head answers when the parser rejects, and not before.**
+
+Task C was trained, scored at a 0.0 fabrication rate and called by nothing.
+`/api/nl` now calls it when `parse()` raises, so an unanswerable question
+returns the model's explanation instead of the parser's complaint. Over 20
+held-out unanswerable questions, 16 that produced a raw parser error now
+produce an explanation naming what is missing.
+
+**It is not asked first, and 4 of 20 therefore pass unchallenged.** Those
+produce a query the schema accepts: binding affinity in nanomolar became a
+filter on ΔSASA and molecular weight, phase II trials became tier and evidence
+class. Nothing fails, so nothing triggers the abstain path, and a confident
+wrong answer reaches the table.
+
+Asking the abstain head first would catch them and would double the model calls
+per question against a ZeroGPU allocation that is time-boxed per request. The
+20% residual is recorded rather than paid for, because the alternative slows
+every correct question to protect against one in five of the wrong ones, and
+the wrong ones are visible: the query stack shows which fields were filtered,
+so a user who asked about affinity can see the answer is about buried area.

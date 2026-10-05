@@ -287,9 +287,16 @@
         Util.post('/api/nl', { question: question }).then(function (result) {
           busy(false);
           if (!result.ok) {
+            /* An abstention is an answer, not a failure. The model was trained
+               to say what is missing when the atlas cannot answer, so its
+               explanation is shown as the response rather than behind the
+               wording used for a transport error. */
+            var data = result.data || {};
             if (note) {
-              note.textContent = (result.data && result.data.error) ||
-                'The model could not answer. Build the query below instead.';
+              note.textContent = data.abstained
+                ? data.error
+                : (data.error ||
+                   'The model could not answer. Build the query below instead.');
             }
             return;
           }

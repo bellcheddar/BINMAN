@@ -87,6 +87,20 @@ def natural_language():
     try:
         query = parse(result.payload)
     except QueryError as exc:
+        # The query head answered a question the schema cannot answer, and the
+        # parser caught it. Ask the head that was trained for this case what is
+        # actually missing, so the user reads an explanation instead of the
+        # parser's complaint about the model.
+        refusal = lm.explain_refusal(question)
+        if refusal.ok and isinstance(refusal.payload, dict):
+            payload = refusal.payload
+            if payload.get("answerable") is False and payload.get("explanation"):
+                return jsonify({
+                    "error": payload["explanation"],
+                    "missing": payload.get("missing") or [],
+                    "abstained": True,
+                    "fallback": "manual_builder",
+                }), 422
         return jsonify({"error": f"the model proposed an invalid query: {exc}",
                         "proposed": result.payload, "fallback": "manual_builder"}), 422
     return jsonify({"query": query.as_dict(), "describe": query.describe()})
