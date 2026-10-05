@@ -57,15 +57,26 @@
 
   <div class="panel">
     <h3>Stage counts, read from the manifests</h3>
+    {# Only the stages that processed a body of records.
+
+       Twenty-three stages write a manifest, but fifteen of them record a
+       single run of a step that either happened or did not (build_atlas,
+       references, lm_train), and three have not run at all. Listed, they
+       filled two thirds of the table with ones and zeros and buried the eight
+       counts anyone reads it for. Nothing is hidden: every stage is still in
+       data/manifests/ and in the artefact behind this page.
+
+       The succeeded column went with them. It was always the total minus the
+       failures, so it said nothing the other two columns did not, and the
+       failure reasons now sit with the number they explain. #}
     <table class="grid-table">
-      <thead><tr><th>Stage</th><th class="num">Total</th><th class="num">Succeeded</th>
-        <th class="num">Failed</th><th>Failure reasons</th></tr></thead>
+      <thead><tr><th>Stage</th><th class="num">Records</th>
+        <th class="num">Failed</th><th>Why</th></tr></thead>
       <tbody>
-        {% for name, stage in about.stages.items() %}
+        {% for name, stage in about.stages.items() if stage.total > 1 %}
           <tr>
             <td><code>{{ name }}</code></td>
             <td class="num">{{ stage.total | thousands }}</td>
-            <td class="num">{{ stage.ok | thousands }}</td>
             <td class="num" {% if stage.failed %}style="color:var(--bad)"{% endif %}>
               {{ stage.failed | thousands }}</td>
             <td>
@@ -77,6 +88,10 @@
         {% endfor %}
       </tbody>
     </table>
+    <p style="margin:0.6rem 0 0;color:var(--muted);font-size:0.8rem">
+      Stages that record a single run rather than a body of records are left
+      out. All of them are in <code>data/manifests/</code>.
+    </p>
   </div>
 
   {# ---------------------------------------------------------- datasets ---- #}
