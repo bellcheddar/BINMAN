@@ -3085,3 +3085,23 @@ light-harvesting chromophore. BINMAN's own structural classifier calls it a
 glue candidate. Three classifiers disagree and the curated label is the weakest
 of the three, so it is recorded rather than corrected: BioLiP is the published
 source and overriding it here would be substituting a judgement for a citation.
+
+## D-079
+
+**Geometry and sequence are not combined: the combination measures no gain.**
+
+D-075 left the route open because an inverted feature still carries
+information where a model can weight it freely. Measured on the same 5,663
+fingers, the same 32 positives, the same gene-grouped repeated protocol and the
+same seeds as the sequence model: sequence alone 0.6334, geometry alone 0.5564,
+both together 0.6348. The gain from adding geometry is 0.0014, which is 0.02 of
+one split-to-split standard deviation.
+
+Two things worth keeping from it. Geometry rises from 0.4407 to 0.5564 once the
+weights are free, so the fixed positive weights in `config/thresholds.toml` cost
+about 0.12 of AUC by forcing the sign; and geometry is redundant with sequence
+rather than complementary to it, which is what two descriptions of the same
+domain should be expected to be.
+
+No combined score ships. Adding 189 features to gain 0.02 of a standard
+deviation would be complexity bought with nothing.

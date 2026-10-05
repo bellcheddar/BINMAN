@@ -693,6 +693,45 @@ regularity is computed it has been selected to its ceiling: the filter and the
 score are measuring the same thing twice, and the second time carries no
 information.
 
+### Combining geometry with sequence adds nothing
+
+D-075 left one route open. Geometry is inverted, and an inverted feature is not
+an empty one: a model free to give it a negative weight can use what a
+fixed positive-weighted sum throws away. So the question was whether a model
+that knows geometry is backwards beats one that never sees it.
+
+`pipeline/degron_combined.py` runs the protocol `degron_sequence.py` already
+uses, on the same 5,663 fingers with the same 32 positives and the same seeds:
+StratifiedGroupKFold over four folds grouped by gene, 25 repeats.
+
+| model | AUC mean | sd | min | max |
+|---|---:|---:|---:|---:|
+| sequence only, 184 features | 0.6334 | 0.0772 | 0.4174 | 0.8097 |
+| geometry only, 5 features | 0.5564 | 0.0751 | 0.3931 | 0.7302 |
+| **both, 189 features** | **0.6348** | 0.0794 | 0.3619 | 0.8236 |
+| permutation null, 200 rounds | 0.5080 | 0.0677 | p95 | 0.6075 |
+
+**Freeing the weights recovers most of what the shipped score throws away.**
+Geometry goes from 0.4407 as a fixed positive sum to 0.5564 when a model can
+choose the signs, which is the inversion being used rather than suffered. It is
+still inside the null band, so geometry alone remains indistinguishable from
+chance, but the gap between 0.4407 and 0.5564 is the cost of the hand-chosen
+weights rather than a property of the features.
+
+**Combining adds 0.0014, which is 0.02 of one standard deviation.** Geometry
+carries nothing the sequence does not already have. That is not surprising
+after the fact: both describe the same C2H2 domain, one through its residues
+and one through the shape those residues produce, and the shape is the more
+lossy description of the two.
+
+So the combination route is closed, and closed on a measurement. What remains
+is the sequence model at 0.6334 against the shipped geometry score at 0.4407,
+on a module that currently ships something worse than chance.
+
+**It is a weak result and should be read as one.** 32 positives, a spread of
+0.077 across splits, and a null whose 95th percentile is 0.6075: the sequence
+model clears chance, and not by much.
+
 ## Section 9.3 E3 Triage validation
 
 | Metric | Measured | Floor | Verdict |

@@ -1016,3 +1016,14 @@ One line per meaningful event, timestamped UTC (spec Section 0 rule 5).
 | 2026-10-05T14:44:24+00:00 | 9 | Validation run against binman.sqlite: 0 metric(s) not computed (dataset unavailable), 2 measured floor(s) missed. |
 | 2026-10-05T14:44:25+00:00 | 9 | Validation run against binman.sqlite: 4 metric(s) not computed (dataset unavailable), 5 measured floor(s) missed. |
 | 2026-10-05T14:44:48+00:00 | 4.1b | About tab generated: 53 references, 11/13 datasets resolved, worked example selected, 0 value(s) not recorded, 0 source(s) publish no licence. |
+| 2026-10-05T19:29:21+00:00 | 5.2 | Combined degron model: 5,663 fingers, 32 degraded, 3,565 called by the geometry filter, 184 sequence features and 5 geometry features. |
+| 2026-10-05T19:29:26+00:00 | 5.2 | sequence_only: AUC 0.6340 +/- 0.0795 over 20 splits. |
+| 2026-10-05T19:29:26+00:00 | 5.2 | geometry_only: AUC 0.5569 +/- 0.0872 over 20 splits. |
+| 2026-10-05T19:29:27+00:00 | 5.2 | combined: AUC 0.6331 +/- 0.0834 over 20 splits. |
+| 2026-10-05T19:29:42+00:00 | 5.2 | Combined degron model: 5,663 fingers, 32 degraded, 3,565 called by the geometry filter, 184 sequence features and 5 geometry features. |
+| 2026-10-05T19:29:46+00:00 | 5.2 | sequence_only: AUC 0.6334 +/- 0.0772 over 100 splits. |
+| 2026-10-05T19:29:48+00:00 | 5.2 | geometry_only: AUC 0.5564 +/- 0.0751 over 100 splits. |
+| 2026-10-05T19:29:51+00:00 | 5.2 | combined: AUC 0.6348 +/- 0.0794 over 100 splits. |
+| 2026-10-05T19:31:10+00:00 | 9 | Validation run against binman.sqlite: 4 metric(s) not computed (dataset unavailable), 5 measured floor(s) missed. |
+| 2026-10-05T19:32:04+00:00 | 9 | Validation run against binman.sqlite: 0 metric(s) not computed (dataset unavailable), 2 measured floor(s) missed. |
+| 2026-10-05T19:32:05+00:00 | 9 | Validation run against binman.sqlite: 4 metric(s) not computed (dataset unavailable), 5 measured floor(s) missed. |

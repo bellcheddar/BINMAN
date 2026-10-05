@@ -844,6 +844,26 @@ def section_95(config) -> dict:
         out["error"] = "lm_eval.json could not be parsed"
         return out
 
+    def _annotate_adapter(record: dict) -> dict:
+        """Say so when the recorded adapter path no longer exists.
+
+        The path was written at evaluation time and is not stable:
+        models/binman-lm/adapters held round 07 when round 07 was evaluated, a
+        later 32B run overwrote it, and D-077 deleted it. The stage name is the
+        identifier that survives, so it is reported as the answer and the path
+        as the historical note rather than as a location anyone should look in.
+        """
+        path = record.get("adapter") or ""
+        if path and not (Path(__file__).resolve().parents[1] / path).exists():
+            record = dict(record)
+            record["adapter_note"] = (
+                f"`{path}` was the path at evaluation time and no longer "
+                "exists (D-077). The stage name identifies the run; "
+                "models/binman-lm/runs/binman-qwen-2.5-3b-4bit-round07 is what "
+                "serves, and models/binman-lm/served/adapter_config.json "
+                "describes it.")
+        return record
+
     # The file is keyed by stage. Prefer the stage named in the model card, then
     # the newest round, so the floors describe the adapter that actually ships
     # rather than whichever evaluation happened to run last.
@@ -866,7 +886,7 @@ def section_95(config) -> dict:
     report_blob = blob[stage]
     out["stage_reported"] = stage
     out["available_stages"] = sorted(stages)
-    out.update(report_blob)
+    out.update(_annotate_adapter(report_blob))
 
     # Spec 9.5 floors. These were never checked: section_95 dumped the raw file
     # and the LM was the only module whose floors no gate ever saw.

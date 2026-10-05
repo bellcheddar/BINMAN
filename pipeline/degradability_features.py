@@ -283,9 +283,25 @@ def extract(limit: int | None = None, assayed: bool = False) -> list[dict]:
         jobs = jobs[:limit]
     workers = int(load_config().u("compute.cpu_workers"))
     rows: list[dict] = []
+    # Progress, because this is a three-hour job over 18,003 models that
+    # previously printed nothing at all until it finished. Telling a stalled run
+    # from a working one meant reading process tables and file timestamps from
+    # outside, twice. Every stage that takes minutes logs; this one now does.
+    import time
+    started = time.monotonic()
+    last = started
     with ProcessPoolExecutor(max_workers=workers) as pool:
-        for produced in pool.map(_features_for, jobs, chunksize=4):
+        for done, produced in enumerate(
+                pool.map(_features_for, jobs, chunksize=4), start=1):
             rows.extend(produced)
+            now = time.monotonic()
+            if now - last > 300:
+                rate = done / max(1e-9, now - started)
+                remaining = (len(jobs) - done) / max(1e-9, rate)
+                log_event("2.3", f"{done:,}/{len(jobs):,} models measured, "
+                                 f"{len(rows):,} lysines, {rate:.1f}/s, "
+                                 f"~{remaining / 3600:.1f} h remaining.")
+                last = now
     failures = [r for r in rows if "error" in r]
     rows = [r for r in rows if "error" not in r]
     write_jsonl(MANIFEST, rows)

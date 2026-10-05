@@ -405,6 +405,13 @@ def run(model_path: str = BASE_MODEL, adapter_path: str | None = None,
             "generated_at": utcnow(),
             "model": model_path,
             "adapter": adapter_path or "",
+            # The run directory the path resolved to, which is stable where the
+            # path is not. models/binman-lm/adapters was a moving target: it
+            # held round 07 when round 07 was evaluated, a later 32B run
+            # overwrote it, and D-074 is the model card that misdescribed the
+            # shipped model as a result. A record should name the run.
+            "adapter_run": (Path(adapter_path).resolve().name
+                            if adapter_path else ""),
             "atlas": str(DB_PATH),
             "prompt_style": (
                 "trained system turn, no schema in context"

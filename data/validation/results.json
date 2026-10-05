@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-10-05T11:17:45+00:00",
+  "generated_at": "2026-10-05T19:31:09+00:00",
   "atlas": "/Users/dellboy/Documents/Vibe_Coding/BINMAN/data/atlas/binman.sqlite",
-  "atlas_bytes": 200654848,
+  "atlas_bytes": 204562432,
   "note": "A metric whose dataset is unavailable is reported as computed: false with the reason. Nothing here is estimated, and no hand-written control was substituted for a missing published one (spec 4.1b).",
   "floors_missed": [
     {
@@ -1216,6 +1216,7 @@
       "abstention_rate": 1.0,
       "fabrications": []
     },
+    "adapter_note": "`models/binman-lm/adapters` was the path at evaluation time and no longer exists (D-077). The stage name identifies the run; models/binman-lm/runs/binman-qwen-2.5-3b-4bit-round07 is what serves, and models/binman-lm/served/adapter_config.json describes it.",
     "parse_rate": {
       "computed": true,
       "value": 1.0,
