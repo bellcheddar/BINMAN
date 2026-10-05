@@ -380,6 +380,14 @@ code, kbd, samp, .mono { font-family: var(--data); font-size: 0.86em; }
   border-radius: var(--radius); padding: 0.8rem; margin-bottom: 0.9rem;
 }
 .panel > h2:first-child, .panel > h3:first-child { margin-top: 0; }
+/* A section heading inside its own panel. Every heading on the About page
+   lives in a panel now, so an h2 here is a panel title that happens to open
+   a section: sized between the page h1 and the h3 panel titles under it, and
+   given a rule so a panel holding both reads as heading then subheading. */
+.panel > h2 { font-size: 1rem; color: var(--ink);
+  border-bottom: 1px solid var(--line); padding-bottom: 0.4rem; }
+.panel > h2 + h3 { margin-top: 0.7rem; }
+.panel--flush > h2 { margin: 0; padding: 0.8rem 0.8rem 0.5rem; }
 .panel > :last-child { margin-bottom: 0; }
 
 /* A panel whose body is a full-bleed table or canvas. The padding moves from

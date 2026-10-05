@@ -879,3 +879,7 @@ One line per meaningful event, timestamped UTC (spec Section 0 rule 5).
 | 2026-10-05T04:19:26+00:00 | 9 | Validation run against binman.sqlite: 4 metric(s) not computed (dataset unavailable), 5 measured floor(s) missed. |
 | 2026-10-05T04:20:50+00:00 | 9 | Validation run against binman.sqlite: 0 metric(s) not computed (dataset unavailable), 2 measured floor(s) missed. |
 | 2026-10-05T04:20:51+00:00 | 9 | Validation run against binman.sqlite: 4 metric(s) not computed (dataset unavailable), 5 measured floor(s) missed. |
+| 2026-10-05T04:22:14+00:00 | 4.3 | Atlas built: 130,391 entries, 285,996 bridges (15,804 novel), 30,149 ligands, 21,717 degrons, 650 ligases, 1,650 lysines, 190.2 MB. |
+| 2026-10-05T04:24:40+00:00 | 5.2 | imid_degradation_score written for 4,650 degron candidates; 17,067 carry no C2H2 motif and are left NULL. |
+| 2026-10-05T04:26:53+00:00 | 9 | Validation run against binman.sqlite: 0 metric(s) not computed (dataset unavailable), 2 measured floor(s) missed. |
+| 2026-10-05T04:26:54+00:00 | 9 | Validation run against binman.sqlite: 4 metric(s) not computed (dataset unavailable), 4 measured floor(s) missed. |

@@ -41,9 +41,8 @@
 
 
   {# ---------------------------------------------------------- 6.6.1 ------- #}
-  <h2 id="workflow">Workflow</h2>
   <div class="panel">
-    <h3>Pipeline schematic</h3>
+    <h2 id="workflow">Workflow</h2>
     {# Inlined, not <img>: an SVG loaded as an image cannot read the page's CSS
        custom properties, so the Depot tokens would resolve to nothing and every
        fill would render black. #}
@@ -94,20 +93,22 @@
   </div>
 
   {# ---------------------------------------------------------- datasets ---- #}
-  <h2 id="datasets">Ground truth</h2>
   <div class="panel panel--flush">
-    <h3>Validation datasets</h3>
+    <h2 id="datasets">Ground truth</h2>
     <p>Every module is judged against independently curated published datasets.</p>
     <div id="dataset-table"></div>
   </div>
 
   {# ---------------------------------------------------------- 6.6.4 ------- #}
-  <h2 id="example">Worked example</h2>
   {% set ex = about.worked_example %}
   {% if not ex.available %}
-    <div class="notice">{{ ex.note }}</div>
+    <div class="panel">
+      <h2 id="example">Worked example</h2>
+      <div class="notice">{{ ex.note }}</div>
+    </div>
   {% else %}
     <div class="panel">
+      <h2 id="example">Worked example</h2>
       <h3>Which criteria this example meets</h3>
       <table class="grid-table">
         <tbody>
@@ -266,13 +267,15 @@
   {% endif %}
 
   {# ---------------------------------------------------------- 6.6.2 ------- #}
-  <h2 id="model">BINMAN-LM model card</h2>
   {% set card = about.model_card %}
   {% if not card.trained %}
-    <div class="notice">{{ card.status_note }}</div>
+    <div class="panel">
+      <h2 id="model">BINMAN-LM model card</h2>
+      <div class="notice">{{ card.status_note }}</div>
+    </div>
   {% else %}
     <div class="panel">
-      <h3>Identity</h3>
+      <h2 id="model">BINMAN-LM model card</h2>
       <table class="grid-table"><tbody>
         {% for key, item in card.identity.items() %}
           <tr><td>{{ key | replace('_', ' ') }}</td><td>{{ value(item) }}</td></tr>
@@ -282,9 +285,8 @@
   {% endif %}
 
   {# ---------------------------------------------------------- 6.6.3 ------- #}
-  <h2 id="references">References</h2>
   <div class="panel panel--flush">
-    <h3>Every source the build touched</h3>
+    <h2 id="references">References</h2>
     <div id="reference-table"></div>
     <div class="panel__foot">
       <button class="btn" type="button" id="bibtex-export">Export BibTeX</button>
