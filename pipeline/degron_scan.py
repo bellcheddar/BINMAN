@@ -533,6 +533,17 @@ def run(limit: int | None = None, retry_failed: bool = False) -> dict:
                         handle.write(json.dumps(hairpin, separators=(",", ":")) + "\n")
                         rows.append(hairpin)
                     totals["degrons"] += len(hairpins)
+                    # Flushed before the manifest records the protein as done.
+                    #
+                    # The stream was only flushed inside the five-minute logging
+                    # branch, while the manifest was written per protein, so the
+                    # manifest ran ahead of the data it describes by up to five
+                    # minutes of rows. Killing the scan in that window lost those
+                    # candidates permanently: the resume skips a protein the
+                    # manifest calls done, so nothing would ever look for them
+                    # again. One flush per protein against a buffered append is
+                    # not a cost worth that.
+                    handle.flush()
                     manifest.record(accession, status="ok",
                                     degrons=len(hairpins),
                                     residues=result.get("residues"),

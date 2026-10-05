@@ -909,3 +909,9 @@ One line per meaningful event, timestamped UTC (spec Section 0 rule 5).
 | 2026-10-05T04:51:38+00:00 | 2.1 | 2,015/20,431 scanned, 2,222 candidates, 194 failed, 1.7/s, ~3.1 h remaining. |
 | 2026-10-05T04:52:14+00:00 | 9 | Validation run against binman.sqlite: 0 metric(s) not computed (dataset unavailable), 2 measured floor(s) missed. |
 | 2026-10-05T04:52:15+00:00 | 9 | Validation run against binman.sqlite: 4 metric(s) not computed (dataset unavailable), 4 measured floor(s) missed. |
+| 2026-10-05T04:56:42+00:00 | 2.1 | 2,523/20,431 scanned, 2,805 candidates, 211 failed, 1.7/s, ~3.0 h remaining. |
+| 2026-10-05T05:01:42+00:00 | 2.1 | 3,018/20,431 scanned, 3,452 candidates, 224 failed, 1.7/s, ~2.9 h remaining. |
+| 2026-10-05T05:06:43+00:00 | 2.1 | 3,524/20,431 scanned, 4,054 candidates, 233 failed, 1.7/s, ~2.8 h remaining. |
+| 2026-10-05T05:11:43+00:00 | 2.1 | 4,024/20,431 scanned, 4,523 candidates, 243 failed, 1.7/s, ~2.7 h remaining. |
+| 2026-10-05T05:12:08+00:00 | 9 | Validation run against binman.sqlite: 0 metric(s) not computed (dataset unavailable), 2 measured floor(s) missed. |
+| 2026-10-05T05:12:08+00:00 | 9 | Validation run against binman.sqlite: 4 metric(s) not computed (dataset unavailable), 4 measured floor(s) missed. |
