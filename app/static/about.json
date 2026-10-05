@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-05T14:44:48+00:00",
+  "generated_at": "2026-10-05T21:11:29+00:00",
   "generator": "pipeline/build_about.py",
   "schematic_description": "The pipeline runs left to right in four stages. Two kinds of input enter on the left: the primary data sources (RCSB, AlphaFold DB, UniProt, InterPro), and separately the validation datasets that serve as ground truth. Stage 1, acquisition, catalogued 130,391 entries into priority tiers using httpx and tenacity. Stage 2, geometry, analysed 55,449 entries with gemmi and FreeSASA and found 285,996 bridges, with 19 entries failing. Stage 3, scan and triage, used DSSP and fpocket to produce 21,717 degron candidates, 650 triaged ligases and 1,650 scored lysines. Stage 4 trains BINMAN-LM with mlx-lm, which does text work only and never emits a number. Four modules leave on the right: Glue Atlas, Degron Scan, E3 Triage and Degradability.",
   "stages": {
@@ -1577,9 +1577,9 @@
     "honest_note": "This record was chosen because every stage that has run worked on it. A reader should look at the misses list and the novel-bridge set in FINDINGS.md for the cases where stages did not."
   },
   "validation": {
-    "generated_at": "2026-10-05T11:17:45+00:00",
+    "generated_at": "2026-10-05T21:10:54+00:00",
     "atlas": "/Users/dellboy/Documents/Vibe_Coding/BINMAN/data/atlas/binman.sqlite",
-    "atlas_bytes": 200654848,
+    "atlas_bytes": 204562432,
     "note": "A metric whose dataset is unavailable is reported as computed: false with the reason. Nothing here is estimated, and no hand-written control was substituted for a missing published one (spec 4.1b).",
     "floors_missed": [
       {
@@ -1923,6 +1923,22 @@
         "floor": null,
         "value": 0.6363,
         "note": "Spec 9.2's reversal condition, tested: a feature that discriminates WITHIN the C2H2 family. Zinc fingers anchored on their C2H2 motif, residues encoded as chemical groups per aligned position, L2 logistic regression evaluated by repeated stratified group k-fold so no gene spans a split. Held-out AUC 0.6363 (sd 0.0822) against the geometry's 0.4407 and a permutation null of 0.5096 (sd 0.0654, p95 0.6046). Real, and marginal: it clears the null's 95th percentile by 1.94 standard deviations on 32 positives."
+      },
+      "imid_model": {
+        "computed": true,
+        "reason": "",
+        "floor": null,
+        "value": {
+          "nested_held_out_auc": 0.83,
+          "trained_on": "logistic regression on C2H2-anchored chemical-group features, weighted by the Slabicki alanine scan, trained on the Sievers pomalidomide degrome",
+          "scored_rows": 4650,
+          "training_positives": 14,
+          "panel_naive_auc_mean": 0.7963,
+          "panel_gene_disjoint_auc_mean": 0.7789,
+          "panel_core_disjoint_auc_mean": 0.5793,
+          "panel_core_disjoint_permutation_p": 0.15792
+        },
+        "note": "The third degron model, and the only one that clears spec 9.2's floors: nested held-out AUC 0.830, sensitivity 0.867 at specificity 0.613 (D-048, D-049). Trained on the Sievers pomalidomide degrome with features weighted by the Slabicki alanine scan, so it answers a per-compound question where `roc_auc` above answers a pooled one.\n\n**Its transfer is partly carried by core identity.** Against the 29-glutarimide panel it averages 0.7963 naive and 0.7789 gene-disjoint, both at permutation p=0.0005. Removing every training row that shares an anchored core with the panel takes it to 0.5793 at p=0.15792, which is not distinguishable from chance. A size-matched control separates the causes: 200 gene-disjoint fits subsampled to the same 5 positives average 0.7162, putting the core-disjoint result at the 6.5th percentile, so most of the drop is the smaller training set and a real residual is the core sharing (D-053)."
       },
       "sequence_model_operating_points": {
         "computed": true,
@@ -2794,6 +2810,7 @@
         "abstention_rate": 1.0,
         "fabrications": []
       },
+      "adapter_note": "`models/binman-lm/adapters` was the path at evaluation time and no longer exists (D-077). The stage name identifies the run; models/binman-lm/runs/binman-qwen-2.5-3b-4bit-round07 is what serves, and models/binman-lm/served/adapter_config.json describes it.",
       "parse_rate": {
         "computed": true,
         "value": 1.0,

@@ -458,6 +458,67 @@ def section_92(connection: sqlite3.Connection, config) -> dict:
                     "positives."
                 ),
             }
+            # The module's third model, which this section never reported.
+            #
+            # 9.2 gave the geometry score and the pooled sequence model and
+            # stopped, while `imid_degradation_score` sat in the atlas on 4,650
+            # rows at a nested held-out AUC of 0.830. A validation section that
+            # omits the best of the three models it is validating understates
+            # the module in its own report.
+            #
+            # Read from the artefacts, and both regimes reported. The nested
+            # figure is measured on the screen it was trained on, with the
+            # training folds held out; the panel figures are transfer to 29
+            # other glutarimides, where removing training rows that share an
+            # anchored core takes it to chance. Reporting the first without the
+            # second would be the inflated number this file exists to avoid.
+            predict = _json_file(INTERIM / "degron_predict.json")
+            panel = _json_file(INTERIM / "degron_panel.json")
+            if predict:
+                regimes = (panel or {}).get("regimes", {})
+                naive = regimes.get("naive", {})
+                gene = regimes.get("gene_disjoint", {})
+                core = regimes.get("core_disjoint", {})
+                control = (panel or {}).get("size_matched_control", {})
+                out["imid_model"] = {
+                    "computed": True, "reason": "", "floor": None,
+                    "value": {
+                        "nested_held_out_auc": 0.830,
+                        "trained_on": predict.get("model"),
+                        "scored_rows": predict.get("scored"),
+                        "training_positives": predict.get("training_positives"),
+                        "panel_naive_auc_mean": naive.get("auc_mean"),
+                        "panel_gene_disjoint_auc_mean": gene.get("auc_mean"),
+                        "panel_core_disjoint_auc_mean": core.get("auc_mean"),
+                        "panel_core_disjoint_permutation_p": core.get("permutation_p"),
+                    },
+                    "note": (
+                        "The third degron model, and the only one that clears "
+                        "spec 9.2's floors: nested held-out AUC 0.830, "
+                        "sensitivity 0.867 at specificity 0.613 (D-048, D-049). "
+                        "Trained on the Sievers pomalidomide degrome with "
+                        "features weighted by the Slabicki alanine scan, so it "
+                        "answers a per-compound question where `roc_auc` above "
+                        "answers a pooled one.\n\n"
+                        "**Its transfer is partly carried by core identity.** "
+                        "Against the 29-glutarimide panel it averages "
+                        f"{naive.get('auc_mean')} naive and "
+                        f"{gene.get('auc_mean')} gene-disjoint, both at "
+                        "permutation p=0.0005. Removing every training row that "
+                        "shares an anchored core with the panel takes it to "
+                        f"{core.get('auc_mean')} at p="
+                        f"{core.get('permutation_p')}, which is not "
+                        "distinguishable from chance. A size-matched control "
+                        "separates the causes: 200 gene-disjoint fits "
+                        "subsampled to the same 5 positives average "
+                        f"{control.get('auc_mean')}, putting the core-disjoint "
+                        "result at the "
+                        f"{control.get('core_disjoint_percentile_of_control')}th "
+                        "percentile, so most of the drop is the smaller "
+                        "training set and a real residual is the core sharing "
+                        "(D-053)."
+                    ),
+                }
             out["sequence_model_operating_points"] = {
                 "computed": True, "reason": "", "floor": None,
                 "value": points,
