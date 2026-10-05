@@ -119,7 +119,14 @@ def candidates() -> list[Candidate]:
                   url="https://degronopedia.com/"),
         Candidate("ubibrowser2", "database",
                   "E3 Triage substrate counts and the spec 9.3 enrichment test",
-                  "not determined: the project site states no terms, and the NAR paper's CC BY-NC-4.0 covers the article rather than the database",
+                  # Not "not determined": that was a reported gap, and the gap
+                  # has been resolved as far as it can be. The source publishes
+                  # no terms at all (site and documentation both checked, and
+                  # the NAR paper's CC BY-NC-4.0 covers the article, not the
+                  # database), so what is recorded is what BINMAN does with it:
+                  # derived per-ligase counts ship, the interaction records do
+                  # not, and the source is cited. See D-070.
+                  "no terms published by the source; BINMAN ships derived per-ligase counts, not the interaction records, and cites the source (D-070)",
                   query="UbiBrowser 2.0 comprehensive resource proteome-wide known and predicted ubiquitin ligase substrate interactions",
                   expect=("ubibrowser",),
                   url="http://ubibrowser.bio-it.cn/ubibrowser_v3/"),

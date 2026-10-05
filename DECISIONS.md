@@ -2804,3 +2804,41 @@ scale 20, batch 2, learning rate 1e-5, on Qwen2.5-32B-Instruct-4bit. This is
 genuinely the 32B: D-044 recorded two earlier rounds that reported 32B and
 trained the 3B through a default-argument trap, and the adapter config names the
 32B model and a 128 MB adapter over 141 checkpoints.
+
+## D-070: the UbiBrowser licence, resolved as far as it can be
+
+**Decision.** `ubibrowser2`'s licence is recorded as **"no terms published by the
+source; BINMAN ships derived per-ligase counts, not the interaction records, and
+cites the source"**, replacing "not determined". The About page's notice about it
+is removed.
+
+**The lookup was exhausted first, because the right fix for an unknown licence
+is to find the licence.** Checked today:
+
+* `ubibrowser.bio-it.cn/ubibrowser_v3/` returns HTTP 200 and carries no licence,
+  terms, copyright or usage text.
+* Its documentation page has a Download section and, again, no terms.
+* `/home/help`, `/home/about` and `/home/contact` are all 404.
+* Crossref gives 10.1093/nar/gkab962 one licence, CC BY-NC-4.0, with
+  `content-version: vor`. That is the article, not the database behind it.
+
+So the source publishes nothing, and no amount of further looking changes that.
+"Not determined" was accurate about the source and useless to a reader, because
+it describes an absence without saying what the project did about it.
+
+**What is recorded instead is checkable.** The atlas carries
+`ligase.substrate_count` and `substrate_count_predicted`, two integers per
+ligase. It does not carry the interaction records those counts were derived
+from, and `deploy/provision.sh` excludes `data/validation/` entirely, so the
+live host holds `data/atlas` alone. Verified on the droplet: `/opt/binman/data`
+contains only `atlas`. The source is cited in the references table with its DOI.
+
+That is the same position Marc took on PROTAC-DB: use it, derive from it, cite
+it, do not redistribute it, not for profit. It is stated here as what BINMAN
+does rather than as a permission the source gave, because the source gave none.
+
+**The notice is removed and the fact is not.** Each reference's licence stays in
+the About page's references table, and `reference_summary.licence_not_determined`
+stays in the artefact and now reads 0. A future source with no terms will show
+in the table and in that count, so removing the banner costs visibility rather
+than the record.

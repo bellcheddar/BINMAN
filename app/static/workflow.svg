@@ -14,9 +14,9 @@
 </g>
 <path class="wf-arrow" d="M324,148.0 L352,148.0" marker-end="url(#wf-tip)"/>
 <g class="wf-node" data-stage="2" tabindex="0"><rect class="wf-box" x="358" y="74" width="196" height="148" rx="2"/><text class="wf-t" x="370" y="98">2 · Geometry</text><text class="wf-s" x="370" y="114">gemmi, FreeSASA</text>
-<text class="wf-n" x="370" y="138">52,586 entries analysed</text>
-<text class="wf-n" x="370" y="154">239,485 bridges found</text>
-<text class="wf-bad" x="370" y="208">235 failed</text>
+<text class="wf-n" x="370" y="138">52,802 entries analysed</text>
+<text class="wf-n" x="370" y="154">283,131 bridges found</text>
+<text class="wf-bad" x="370" y="208">19 failed</text>
 </g>
 <path class="wf-arrow" d="M554,148.0 L582,148.0" marker-end="url(#wf-tip)"/>
 <g class="wf-node" data-stage="3" tabindex="0"><rect class="wf-box" x="588" y="74" width="196" height="148" rx="2"/><text class="wf-t" x="600" y="98">3 · Scan and triage</text><text class="wf-s" x="600" y="114">DSSP, fpocket</text>
