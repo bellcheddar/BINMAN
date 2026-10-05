@@ -892,3 +892,9 @@ One line per meaningful event, timestamped UTC (spec Section 0 rule 5).
 | 2026-10-05T04:31:33+00:00 | 2.1 | Degron scan: 20,431 accessions pending, 16 IO workers, 14 DSSP workers. |
 | 2026-10-05T04:32:40+00:00 | 9 | Validation run against binman.sqlite: 4 metric(s) not computed (dataset unavailable), 0 measured floor(s) missed. |
 | 2026-10-05T04:32:40+00:00 | 9 | Validation run against binman.sqlite: 8 metric(s) not computed (dataset unavailable), 2 measured floor(s) missed. |
+| 2026-10-05T04:36:25+00:00 | 9 | Validation run against binman.sqlite: 4 metric(s) not computed (dataset unavailable), 0 measured floor(s) missed. |
+| 2026-10-05T04:36:25+00:00 | 9 | Validation run against binman.sqlite: 8 metric(s) not computed (dataset unavailable), 2 measured floor(s) missed. |
+| 2026-10-05T04:36:36+00:00 | 2.1 | 504/20,431 scanned, 548 candidates, 165 failed, 1.7/s, ~3.3 h remaining. |
+| 2026-10-05T04:38:11+00:00 | 4.1b | About tab generated: 53 references, 11/13 datasets resolved, worked example selected, 0 value(s) not recorded, 0 source(s) publish no licence. |
+| 2026-10-05T04:38:23+00:00 | 9 | Validation run against binman.sqlite: 4 metric(s) not computed (dataset unavailable), 0 measured floor(s) missed. |
+| 2026-10-05T04:38:24+00:00 | 9 | Validation run against binman.sqlite: 8 metric(s) not computed (dataset unavailable), 2 measured floor(s) missed. |

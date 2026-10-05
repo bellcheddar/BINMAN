@@ -527,6 +527,32 @@ def _decode(value):
     return value or []
 
 
+def _adapter_repo() -> str:
+    """The adapter's HuggingFace id, read from the Space that loads it.
+
+    deploy/hf-space/README.md declares it in its `models:` front matter and
+    deploy/hf-space/app.py takes it as the default for BINMAN_ADAPTER_REPO, so
+    the Space is the thing that actually knows. Reading it here means the link
+    on the About page cannot drift from the repository the demo pulls.
+    """
+    readme = ROOT / "deploy" / "hf-space" / "README.md"
+    try:
+        lines = readme.read_text(encoding="utf-8").splitlines()
+    except OSError:
+        return ""
+    inside = False
+    for line in lines:
+        if line.strip() == "models:":
+            inside = True
+            continue
+        if inside:
+            stripped = line.strip()
+            if stripped.startswith("- "):
+                return stripped[2:].strip()
+            break
+    return ""
+
+
 def _curated_glue_entries() -> set[str]:
     import csv
 
@@ -818,6 +844,16 @@ def build() -> dict:
         "hardware": config.hardware,
         "gates": _gate_state(),
         "unrecorded": sorted(set(unrecorded)),
+        # Where the model and the code actually live. The adapter id is read
+        # from the Space's own front matter rather than written twice.
+        "links": {
+            "github": "https://github.com/bellcheddar/BINMAN",
+            "adapter": (f"https://huggingface.co/{_adapter_repo()}"
+                        if _adapter_repo() else ""),
+            "adapter_id": _adapter_repo(),
+            "space": "https://huggingface.co/spaces/Dellboy/binman-lm",
+            "space_live": "https://dellboy-binman-lm.hf.space",
+        },
         "citation": {
             "project": "Deller, M. C. BINMAN: Blind-spot INventory of Molecular "
                        "Adhesives and Neosubstrates.",

@@ -379,15 +379,20 @@ code, kbd, samp, .mono { font-family: var(--data); font-size: 0.86em; }
   background: var(--surface); border: 1px solid var(--line);
   border-radius: var(--radius); padding: 0.8rem; margin-bottom: 0.9rem;
 }
-.panel > h2:first-child, .panel > h3:first-child { margin-top: 0; }
-/* A section heading inside its own panel. Every heading on the About page
-   lives in a panel now, so an h2 here is a panel title that happens to open
-   a section: sized between the page h1 and the h3 panel titles under it, and
-   given a rule so a panel holding both reads as heading then subheading. */
-.panel > h2 { font-size: 1rem; color: var(--ink);
-  border-bottom: 1px solid var(--line); padding-bottom: 0.4rem; }
-.panel > h2 + h3 { margin-top: 0.7rem; }
-.panel--flush > h2 { margin: 0; padding: 0.8rem 0.8rem 0.5rem; }
+/* One panel title, whatever its level.
+
+   A panel's title was h2 in some sections and h3 in others, and the two were
+   styled differently: the h2 carried a rule under it and the h3 did not, so
+   identical cards looked like different kinds of thing depending on which tag
+   happened to open them. The step panels had a third style again, small and
+   accent-coloured. All of them are this now, and the heading level goes back
+   to being about document structure rather than appearance. */
+.panel > h2, .panel > h3 {
+  font-size: 0.95rem; color: var(--ink);
+  text-transform: uppercase; letter-spacing: 0.04em;
+  margin: 0 0 0.7rem;
+  border-bottom: 1px solid var(--line); padding-bottom: 0.4rem;
+}
 .panel > :last-child { margin-bottom: 0; }
 
 /* A panel whose body is a full-bleed table or canvas. The padding moves from
@@ -395,17 +400,18 @@ code, kbd, samp, .mono { font-family: var(--data); font-size: 0.86em; }
    This was `style="padding:0"` repeated inline in four places, which meant the
    title and the blurb had nowhere to live and ended up outside the panel. */
 .panel--flush { padding: 0; }
-.panel--flush > h3 { margin: 0; padding: 0.8rem 0.8rem 0.5rem; }
+.panel--flush > h2, .panel--flush > h3 {
+  margin: 0; padding: 0.8rem 0.8rem 0.5rem;
+}
 .panel--flush > p { margin: 0; padding: 0 0.8rem 0.8rem; }
 .panel--flush > .panel__foot { padding: 0.7rem 0.8rem; border-top: 1px solid var(--line); }
 
 /* A numbered step in the About walkthrough. A panel like any other, keeping the
    accent edge that marked it out when it was a bare left-border block. */
+/* The accent edge is what marks a step out. Its title is the same as every
+   other panel title, so the walkthrough reads as four cards in a sequence
+   rather than as four cards in a different typeface. */
 .panel--step { border-left: 3px solid var(--accent); }
-.panel--step > h3 {
-  font-family: var(--display); font-size: 0.7rem; color: var(--accent);
-  text-transform: uppercase; letter-spacing: 0.08em; margin: 0 0 0.5rem;
-}
 .panel__lead { font-size: 1.05rem; font-weight: 600; margin: 0 0 0.2rem; }
 .panel__note { color: var(--muted); font-size: 0.86rem; max-width: 68ch; }
 .panel__table { max-width: 34rem; }

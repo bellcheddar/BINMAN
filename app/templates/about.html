@@ -109,7 +109,10 @@
   {% else %}
     <div class="panel">
       <h2 id="example">Worked example</h2>
-      <h3>Which criteria this example meets</h3>
+      {# Not a second h3. Panel titles are all one style now, so an h3 directly
+         under the h2 would stack two identical-looking rules on top of each
+         other. This is the table's caption, which is what it always was. #}
+      <p class="panel__note">Which criteria this example meets.</p>
       <table class="grid-table">
         <tbody>
           {% for criterion in ex.criteria %}
@@ -217,17 +220,21 @@
           {{ lig.family }} ligase, ranked {{ lig.triage_rank | thousands }} of
           {{ lig.total_ligases | thousands }} by the E3 Triage stage.
         </p>
+        {# Left aligned. The values were .num and sat hard against the right
+           edge of a 34rem table, a column's width away from the labels they
+           belong to. Nothing here is being compared down the column, which is
+           the only thing right alignment buys. #}
         <table class="grid-table panel__table"><tbody>
           <tr><td>Pocket druggability score</td>
-              <td class="num">{{ lig.pocket_score | sigfig }}</td></tr>
+              <td>{{ lig.pocket_score | sigfig }}</td></tr>
           <tr><td>Pocket volume</td>
-              <td class="num">{{ lig.pocket_volume_a3 | sigfig(4) }} Å³</td></tr>
+              <td>{{ lig.pocket_volume_a3 | sigfig(4) }} Å³</td></tr>
           <tr><td>Triage score</td>
-              <td class="num">{{ lig.triage_score | sigfig }}</td></tr>
+              <td>{{ lig.triage_score | sigfig }}</td></tr>
           <tr><td>Triage rank</td>
-              <td class="num">{{ lig.triage_rank | thousands }}</td></tr>
+              <td>{{ lig.triage_rank | thousands }}</td></tr>
           <tr><td>Curated substrates</td>
-              <td class="num">{{ lig.substrate_count | thousands }}</td></tr>
+              <td>{{ lig.substrate_count | thousands }}</td></tr>
           <tr><td>Exploitation status</td>
               <td>{{ lig.exploitation_status }}</td></tr>
         </tbody></table>
@@ -270,6 +277,17 @@
         {% for key, item in card.identity.items() %}
           <tr><td>{{ key | replace('_', ' ') }}</td><td>{{ value(item) }}</td></tr>
         {% endfor %}
+        {% if about.links.adapter %}
+          <tr><td>adapter</td><td>
+            <a href="{{ about.links.adapter }}" target="_blank" rel="noopener noreferrer">{{ about.links.adapter_id }}</a>
+          </td></tr>
+        {% endif %}
+        <tr><td>demo space</td><td>
+          <a href="{{ about.links.space }}" target="_blank" rel="noopener noreferrer">{{ about.links.space }}</a>
+        </td></tr>
+        <tr><td>source</td><td>
+          <a href="{{ about.links.github }}" target="_blank" rel="noopener noreferrer">{{ about.links.github }}</a>
+        </td></tr>
       </tbody></table>
     </div>
   {% endif %}

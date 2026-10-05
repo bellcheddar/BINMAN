@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-05T04:29:24+00:00",
+  "generated_at": "2026-10-05T04:38:11+00:00",
   "generator": "pipeline/build_about.py",
   "schematic_description": "The pipeline runs left to right in four stages. Two kinds of input enter on the left: the primary data sources (RCSB, AlphaFold DB, UniProt, InterPro), and separately the validation datasets that serve as ground truth. Stage 1, acquisition, catalogued 130,391 entries into priority tiers using httpx and tenacity. Stage 2, geometry, analysed 55,449 entries with gemmi and FreeSASA and found 285,996 bridges, with 19 entries failing. Stage 3, scan and triage, used DSSP and fpocket to produce 21,717 degron candidates, 650 triaged ligases and 1,650 scored lysines. Stage 4 trains BINMAN-LM with mlx-lm, which does text work only and never emits a number. Four modules leave on the right: Glue Atlas, Degron Scan, E3 Triage and Degradability.",
   "stages": {
@@ -53,12 +53,12 @@
       "failure_reasons": {}
     },
     "degrons": {
-      "total": 20431,
-      "ok": 19861,
-      "failed": 570,
+      "total": 816,
+      "ok": 648,
+      "failed": 168,
       "failure_reasons": {
-        "RuntimeError": 418,
-        "afdb_model_unavailable": 152
+        "afdb_model_unavailable": 152,
+        "RuntimeError": 16
       }
     },
     "edges": {
@@ -3050,6 +3050,13 @@
     }
   ],
   "unrecorded": [],
+  "links": {
+    "github": "https://github.com/bellcheddar/BINMAN",
+    "adapter": "https://huggingface.co/Dellboy/binman-lm-adapter",
+    "adapter_id": "Dellboy/binman-lm-adapter",
+    "space": "https://huggingface.co/spaces/Dellboy/binman-lm",
+    "space_live": "https://dellboy-binman-lm.hf.space"
+  },
   "citation": {
     "project": "Deller, M. C. BINMAN: Blind-spot INventory of Molecular Adhesives and Neosubstrates.",
     "repository": "https://github.com/bellcheddar/BINMAN",
