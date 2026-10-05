@@ -454,7 +454,37 @@ def build(fresh: bool = True) -> dict:
                      f"({novel_note}), {counts['ligand']:,} ligands, "
                      f"{counts['degron']:,} degrons, {counts['ligase']:,} ligases, "
                      f"{counts['lysine']:,} lysines, {size_mb:.1f} MB.")
+    counts.update(_post_build())
     return counts
+
+
+def _post_build() -> dict:
+    """Re-derive what a fresh build drops, because a fresh build drops it.
+
+    `zinc_finger` and `degron.is_known_neosubstrate` are produced by
+    `pipeline.zinc_finger_scan`, which runs after the atlas exists because it
+    reads the degron table. A rebuild recreates the schema and both vanish: the
+    table silently, and the flag back to 0 for every row, which is a UI tile
+    confidently reading "0 known neosubstrates" again (D-058).
+
+    Nothing failed when that happened here. Three tests caught it, which is the
+    only reason it is wired in rather than left as a step somebody has to
+    remember. Running it costs about four minutes and needs the AlphaFold cache;
+    when the cache is absent the reason is recorded rather than passed over.
+    """
+    cache = INTERIM / "afdb"
+    if not cache.exists() or not any(cache.iterdir()):
+        log_event("4.3", "Per-finger scan skipped: no AlphaFold cache, so "
+                         "zinc_finger and is_known_neosubstrate are absent.")
+        return {"zinc_finger": 0, "zinc_finger_skipped": "no AlphaFold cache"}
+    from pipeline.zinc_finger_scan import run as scan
+
+    report = scan()
+    return {
+        "zinc_finger": report.get("n_fingers", 0),
+        "known_neosubstrate_rows": (
+            report.get("known_neosubstrates", {}).get("degron_rows_marked", 0)),
+    }
 
 
 def main() -> int:
