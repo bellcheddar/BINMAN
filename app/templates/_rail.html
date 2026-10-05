@@ -23,6 +23,17 @@
                placeholder="e.g. balanced glue candidates under 2.5 Å">
       </div>
       <button class="btn" type="button" id="nl-run">Build query</button>
+      {% set examples = nl_examples.get(record_type) %}
+      {% if examples %}
+        <div class="examples" id="nl-examples">
+          <span class="examples__label">Try one</span>
+          {% for example in examples %}
+            <button class="chip" type="button" data-nl-example="{{ example }}">
+              {{ example }}
+            </button>
+          {% endfor %}
+        </div>
+      {% endif %}
       <p class="stack__empty" id="nl-note">
         BINMAN-LM proposes a query object. Every number you see is computed in
         Python, never by the model.

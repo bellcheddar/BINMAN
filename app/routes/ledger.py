@@ -18,9 +18,9 @@ def index():
         active="atlas",
         page_title="Glue Atlas",
         page_blurb=(
-            "Every non-polymer entity that buries meaningful surface against two or "
-            "more distinct polymer chains at once. Crystallisation furniture is "
-            "classified, not deleted, so the counts reconcile."
+            "Non-polymer entities burying surface against two or more polymer "
+            "chains at once, with crystallisation furniture classified rather "
+            "than deleted."
         ),
         stats=stats,
         compare=request.args.get("compare") == "1",

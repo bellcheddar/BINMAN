@@ -6,6 +6,7 @@ from flask import Blueprint, render_template
 
 from app import db
 from app.routes import module_context
+from app.thresholds import table
 
 bp = Blueprint("degron", __name__, url_prefix="/degron")
 
@@ -17,10 +18,8 @@ def index():
         active="degron",
         page_title="Degron Scan",
         page_blurb=(
-            "The β-hairpin-with-exposed-glycine geometry that underlies CRBN "
-            "neosubstrate recognition, found by geometry rather than by sequence "
-            "motif. This is a geometric filter and its score is a rank, not a "
-            "calibrated probability."
+            "CRBN neosubstrate β-hairpin geometry found by shape rather than "
+            "sequence motif: the score is a rank, not a calibrated probability."
         ),
         stats=_stats(),
         **module_context("degron"),
@@ -30,14 +29,20 @@ def index():
 def _stats() -> list[dict]:
     if not db.available() or db.scalar("SELECT COUNT(*) FROM degron") == 0:
         return []
+    # The cut was written into the SQL as a literal 70, which is a threshold in
+    # Python by any reading of it. It comes from the file, and the same value
+    # drives the card's note and its filter so all three cannot drift apart.
+    plddt = float(table("degron").get("min_mean_plddt", 70.0))
     return [
         {"label": "candidates", "value": db.scalar(
             "SELECT COUNT(*) FROM degron WHERE status = 'ok'")},
         {"label": "proteins", "value": db.scalar(
             "SELECT COUNT(DISTINCT uniprot_acc) FROM degron WHERE status = 'ok'")},
         {"label": "high confidence", "value": db.scalar(
-            "SELECT COUNT(*) FROM degron WHERE status = 'ok' AND mean_plddt >= 70"),
-         "tone": "good", "note": "tip pLDDT ≥ 70"},
+            "SELECT COUNT(*) FROM degron WHERE status = 'ok' AND mean_plddt >= ?",
+            (plddt,)),
+         "tone": "good", "note": f"tip pLDDT ≥ {plddt:g}",
+         "filter": {"field": "mean_plddt", "op": "gte", "value": plddt}},
         # Populated from the two screens the repository carries rather than
         # from a hand-typed list (D-058). It read 0 for every row until then,
         # which is a claim that none of these are known, and a wrong one.

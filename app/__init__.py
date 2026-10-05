@@ -11,7 +11,7 @@ import json
 import os
 from pathlib import Path
 
-from flask import Flask, render_template
+from flask import Flask, render_template, url_for
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -25,6 +25,42 @@ MODULES = (
     {"slug": "degradability", "endpoint": "degradability.index", "label": "Degradability",
      "count_key": "lysine", "corner": "centre"},
 )
+
+# Worked questions for the natural-language box, one set per record type.
+#
+# They are here rather than in the template because each one has to be
+# answerable by the fields that record type actually has: an example that the
+# parser rejects teaches the user that the box does not work. Every field named
+# below appears in app.queries.RECORD_TYPES for that type.
+#
+# Every one of them has been run against the live model and the atlas: it has
+# to parse, it has to come back for the record type whose page it sits on, and
+# it has to return rows. Three earlier candidates were dropped on that test.
+# "known neosubstrates with confident structure" made the model invent a field
+# and the parser rejected it; "the most exposed lysines" produced a relative
+# SASA floor of 0.5, which nothing in this atlas clears.
+NL_EXAMPLES = {
+    "bridge": (
+        "novel bridges",
+        "symmetry mediated bridges",
+        "bridges burying more than 400 Å²",
+    ),
+    "degron": (
+        "known neosubstrates",
+        "degrons with a mean pLDDT above 80",
+        "degrons with an exposed tip",
+    ),
+    "ligase": (
+        "orphan ligases",
+        "ligases with more than 10 PDB entries",
+        "ligases with a pocket score above 0.5",
+    ),
+    "lysine": (
+        "lysines within 12 Å of the site centroid",
+        "lysines with a Cβ-Cβ distance under 20 Å",
+        "lysines with relative SASA above 0.1",
+    ),
+}
 
 
 def create_app(config: dict | None = None) -> Flask:
@@ -81,6 +117,14 @@ def create_app(config: dict | None = None) -> Flask:
         counts = db.table_counts()
         return {
             "modules": MODULES,
+            # record type -> module URL, so a model proposal for another record
+            # type can be handed to the page that owns it rather than silently
+            # dropping every filter that page does not share.
+            "module_urls": {
+                module["count_key"]: url_for(module["endpoint"])
+                for module in MODULES
+            },
+            "nl_examples": NL_EXAMPLES,
             "counts": counts,
             "atlas_available": db.available(),
             "lm_enabled": lm.enabled(),

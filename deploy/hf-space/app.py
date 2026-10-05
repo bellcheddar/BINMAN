@@ -255,7 +255,99 @@ with gr.Blocks(title="BINMAN-LM") as demo:
             "What is the melting temperature of the complex?",
         ], unanswerable)
 
+# --------------------------------------------------------------------------- #
+# OpenAI-compatible route
+#
+# BINMAN's web app speaks one protocol for the language model: POST
+# <BINMAN_LM_URL>/v1/chat/completions with the usual messages array. The Space
+# speaks Gradio, which is a different thing entirely, so the natural-language
+# box has been hidden on the live site with "the language model is not enabled
+# for this deployment" even though the model has been up and serving this whole
+# time.
+#
+# The adapter belongs here rather than in the web app. The app's client is a
+# standard one and should stay that way; the Space is the component with the
+# unusual interface, so the Space carries the translation. It also means a
+# future move to any OpenAI-compatible host needs no change on the app side at
+# all, just a different URL.
+# --------------------------------------------------------------------------- #
+
+import threading
+import time
+import uuid
+
+from fastapi.responses import JSONResponse
+from fastapi.routing import APIRoute
+
+
+async def _chat_completions(body: dict) -> JSONResponse:
+    """Translate one OpenAI chat request into one call to the trained model.
+
+    Deliberately minimal: no streaming, no tools, no n>1. BINMAN asks a single
+    question and reads a single string back, and anything else here would be
+    surface area nothing calls.
+    """
+    messages = body.get("messages") or []
+    system = next((m.get("content", "") for m in messages
+                   if m.get("role") == "system"), TRAINED_SYSTEM)
+    user = next((m.get("content", "") for m in reversed(messages)
+                 if m.get("role") == "user"), "")
+    if not str(user).strip():
+        return JSONResponse(status_code=400,
+                            content={"error": {"message": "no user message"}})
+
+    # Clamped: the GPU allocation is time-boxed, and an unbounded max_tokens
+    # from a caller would spend it on a runaway generation.
+    try:
+        budget = int(body.get("max_tokens") or 320)
+    except (TypeError, ValueError):
+        budget = 320
+    budget = max(16, min(budget, 512))
+
+    try:
+        text = _answer(str(user), str(system), budget)
+    except Exception as error:  # noqa: BLE001
+        return JSONResponse(status_code=503, content={
+            "error": {"message": f"{type(error).__name__}: {error}"[:300]}})
+
+    return JSONResponse(content={
+        "id": "chatcmpl-" + uuid.uuid4().hex[:24],
+        "object": "chat.completion",
+        "created": int(time.time()),
+        "model": "binman-lm",
+        "choices": [{
+            "index": 0,
+            "message": {"role": "assistant", "content": text},
+            "finish_reason": "stop",
+        }],
+        "usage": {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0},
+    })
+
+
+def _install_openai_routes(app) -> None:
+    """Add the machine routes to Gradio's own FastAPI app.
+
+    Not `gr.mount_gradio_app` into a FastAPI app of our own, which was tried
+    and failed: Spaces waits for Gradio's `launch()` to report the app ready,
+    and a bare `uvicorn.run` never does, so the container started cleanly and
+    was killed one second later. `launch(prevent_thread_lock=True)` performs
+    that handshake and hands back the running app, which is what gets the
+    routes.
+
+    The route goes at the front of the router. Only the POST is served: a
+    companion GET /v1/models was tried and returned the Gradio page, because
+    Gradio serves the single-page app for GET on any path and does so ahead of
+    anything added here. BINMAN never calls it, so it is gone rather than
+    shipped broken.
+    """
+    app.router.routes.insert(0, APIRoute(
+        "/v1/chat/completions", _chat_completions, methods=["POST"]))
+
+
 # Spaces runs this file as __main__, so launch() is called either way. It is
 # unguarded because the Space is the only place this app runs.
 _prefetch()
-demo.launch()
+demo.launch(prevent_thread_lock=True)
+_install_openai_routes(demo.app)
+# launch() no longer blocks, so the process has to be held open itself.
+threading.Event().wait()

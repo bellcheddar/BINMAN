@@ -228,7 +228,10 @@
         }
         saveStack();
         renderStack();
-        run();
+        /* Forced, for the same reason an answered question forces it: the card
+           claims to filter the table and the viewer, and a viewer left on a row
+           the new filter excludes has filtered only the table. */
+        run().then(function () { pinFirstRow(true); });
         [].slice.call(document.querySelectorAll('[data-stat-filter]')).forEach(function (other) {
           var s2; try { s2 = [].concat(JSON.parse(other.getAttribute('data-stat-filter'))); } catch (e) { return; }
           var on2 = s2.every(function (w) { return state.filters.some(function (f) {
@@ -251,12 +254,24 @@
     var nlButton = document.getElementById('nl-run');
     var nlInput = document.getElementById('nl-input');
     if (nlButton && nlInput) {
+      var examples = document.getElementById('nl-examples');
+      var chips = examples
+        ? [].slice.call(examples.querySelectorAll('[data-nl-example]'))
+        : [];
+
+      var busy = function (on) {
+        nlButton.disabled = on;
+        chips.forEach(function (chip) { chip.disabled = on; });
+      };
+
       var ask = function () {
         var question = nlInput.value.trim();
         if (!question) { return; }
         var note = document.getElementById('nl-note');
         if (note) { note.textContent = 'Asking BINMAN-LM…'; }
+        busy(true);
         Util.post('/api/nl', { question: question }).then(function (result) {
+          busy(false);
           if (!result.ok) {
             if (note) {
               note.textContent = (result.data && result.data.error) ||
@@ -265,26 +280,87 @@
             return;
           }
           var query = result.data.query || {};
-          state.filters = (query.filters || []).filter(function (f) {
+
+          /* The model answers for whichever record type the question is about,
+           * which is not always the page it was asked on. Dropping the filters
+           * silently left the table unchanged and the box looking broken, so
+           * the query is handed to the module that owns that record type: the
+           * stack is shared storage, and the target page reloads it on init. */
+          var target = query.record_type;
+          var urls = B.moduleUrls || {};
+          if (target && target !== state.recordType && urls[target]) {
+            state.filters = query.filters || [];
+            saveStack();
+            try {
+              sessionStorage.setItem(NL_HANDOFF_KEY, JSON.stringify({
+                recordType: target, sort: query.sort || null, question: question
+              }));
+            } catch (e) { /* the sort is a nicety; the filters are the answer */ }
+            if (note) {
+              note.textContent = 'That question is about ' + target +
+                ' records. Opening that module…';
+            }
+            global.location.href = urls[target];
+            return;
+          }
+
+          var proposed = query.filters || [];
+          state.filters = proposed.filter(function (f) {
             return !!fields()[f.field];
           });
+          var dropped = proposed.length - state.filters.length;
           if (query.sort) {
             state.sortField = query.sort.field;
             state.sortDirection = query.sort.direction;
           }
           saveStack();
           renderStack();
-          run();
+          /* Forced, because the answer is the rows this query returns: the
+           * table, the detail panel and the viewer all move to the top one. */
+          run().then(function () { pinFirstRow(true); });
           if (note) {
             note.textContent = 'Proposed by BINMAN-LM, validated by the parser. ' +
-              'Every number shown is computed in Python.';
+              'Every number shown is computed in Python.' +
+              (dropped ? ' ' + dropped + ' proposed filter(s) named no field of ' +
+                 'this module and were discarded.' : '');
           }
         });
       };
+
+      chips.forEach(function (chip) {
+        chip.addEventListener('click', function () {
+          nlInput.value = chip.getAttribute('data-nl-example') || '';
+          ask();
+        });
+      });
       nlButton.addEventListener('click', ask);
       nlInput.addEventListener('keydown', function (event) {
         if (event.key === 'Enter') { event.preventDefault(); ask(); }
       });
+    }
+  }
+
+  /* The sort and the question from a cross-module handoff. The filters travel
+   * in the shared stack; this carries what the stack has no room for. */
+  var NL_HANDOFF_KEY = 'binman.nl-handoff';
+
+  function applyHandoff() {
+    var stored = null;
+    try {
+      stored = JSON.parse(sessionStorage.getItem(NL_HANDOFF_KEY) || 'null');
+      sessionStorage.removeItem(NL_HANDOFF_KEY);
+    } catch (e) { return; }
+    if (!stored || stored.recordType !== state.recordType) { return; }
+    if (stored.sort && fields()[stored.sort.field]) {
+      state.sortField = stored.sort.field;
+      state.sortDirection = stored.sort.direction;
+    }
+    var input = document.getElementById('nl-input');
+    if (input && stored.question) { input.value = stored.question; }
+    var note = document.getElementById('nl-note');
+    if (note && stored.question) {
+      note.textContent = 'Answering “' + stored.question + '”, asked on ' +
+        'another module. Proposed by BINMAN-LM, validated by the parser.';
     }
   }
 
@@ -297,19 +373,70 @@
     structure_file: 'Structure', title: 'Title', id: 'ID'
   };
 
+  /* Short header text, one per field.
+   *
+   * The full labels are written for the query builder, where a line of prose
+   * is right. In a header they were four and five words wide, which pushed
+   * eleven columns past the panel and left the table scrolling sideways next
+   * to a viewer that does not move. The full label, the unit and the field
+   * description all survive in the header tooltip, so nothing is lost; it is
+   * one hover away instead of always on screen.
+   *
+   * Field names are unique across record types, so one flat map serves all
+   * four modules. A field with no entry here falls back to its full label.
+   */
+  var SHORT_LABELS = {
+    // bridge
+    pdb_id: 'PDB', ccd_id: 'CCD', ccd_class: 'Class',
+    chain_a: 'Ch A', chain_b: 'Ch B',
+    dsasa_a: 'ΔSASA A', dsasa_b: 'ΔSASA B', dsasa_total: 'ΔSASA',
+    bridging_balance: 'Balance', buried_fraction: 'Buried', resolution: 'Res',
+    evidence_class: 'Evidence', heavy_atoms: 'Atoms', contacts_a: 'Cts A',
+    contacts_b: 'Cts B', symmetry_mediated: 'Symmetry', novel_bridge: 'Novel',
+    release_date: 'Released', ligand_name: 'Ligand', structure_file: 'File',
+    // degron
+    uniprot_acc: 'UniProt', gene: 'Gene', afdb_id: 'AFDB',
+    tip_res: 'Tip #', tip_aa: 'Tip aa', turn_length: 'Turn',
+    mean_plddt: 'pLDDT', tip_rel_sasa: 'Tip SASA',
+    degron_geometry_score: 'Geometry', imid_degradation_score: 'IMiD',
+    motif_family: 'Motif', is_known_neosubstrate: 'Known',
+    // ligase
+    family: 'Family', subfamily: 'Subfamily', pdb_entries: 'PDBs',
+    pocket_score: 'Pocket', pocket_volume_a3: 'Volume',
+    substrate_count: 'Substrates', substrate_count_predicted: 'Predicted',
+    exploitation_status: 'Status', triage_score: 'Score', triage_rank: 'Rank',
+    expression_breadth: 'Breadth', tumour_enriched: 'Tumour',
+    has_ligand: 'Ligand',
+    // lysine
+    structure_id: 'Structure', site_id: 'Site', res_num: 'Residue',
+    nz_rel_sasa: 'NZ SASA', cb_cb_distance: 'Cβ–Cβ',
+    nz_centroid_distance: 'NZ–centroid', verdict: 'Verdict',
+    observed_diGly: 'diGly'
+  };
+
   function columnDefinitions() {
     var all = fields();
     var columns = (B.defaultColumns || []).map(function (name) {
       var spec = all[name] || { label: DISPLAY_LABELS[name] || name, kind: 'text' };
+      var short = SHORT_LABELS[name] || spec.label;
+      var full = spec.label + (spec.unit ? ' (' + spec.unit + ')' : '');
       var definition = {
-        title: spec.label + (spec.unit ? ' (' + spec.unit + ')' : ''),
+        title: short,
         field: name,
-        headerTooltip: spec.description || spec.label,
+        /* The header carries the unit as a separate muted token rather than in
+         * the title text: it keeps the word short while leaving the number's
+         * unit on screen, which is where it is actually needed. */
+        titleFormatter: function () {
+          return '<span class="col-name">' + Util.escape(short) + '</span>' +
+            (spec.unit ? '<span class="col-unit">' + Util.escape(spec.unit) +
+               '</span>' : '');
+        },
+        headerTooltip: full + (spec.description ? ' · ' + spec.description : ''),
         resizable: true
       };
       if (spec.kind === 'number') {
         definition.hozAlign = 'right';
-        definition.formatter = function (cell) { return Util.num(cell.getValue()); };
+        definition.formatter = function (cell) { return Util.num2(cell.getValue()); };
       } else if (spec.kind === 'bool') {
         definition.hozAlign = 'center';
         definition.formatter = function (cell) {
@@ -356,7 +483,23 @@
        * the viewer sizes itself from the row, and Mol* initialised onto a
        * zero-height canvas and rendered nothing. A number breaks the cycle. */
       height: Math.max(520, global.innerHeight - 330) + 'px',
-      layout: 'fitDataStretch',
+      /* fitColumns, not fitDataStretch: the table shares its row with the
+       * viewer, so it has a width rather than taking one. fitDataStretch sized
+       * every column to its widest cell and let the total overflow, which put
+       * a horizontal scrollbar under eleven columns and hid the last four
+       * until you dragged. This divides the width it has instead, and the
+       * short headers are what make the result readable rather than cramped.
+       *
+       * minWidth keeps a column from collapsing to nothing on the widest
+       * record type; below it Tabulator scrolls, which is the honest outcome
+       * when the columns genuinely cannot fit. */
+      layout: 'fitColumns',
+      columnDefaults: {
+        minWidth: 62,
+        /* Any value too wide for its column is one hover away rather than
+         * truncated with no way to read it. */
+        tooltip: true
+      },
       placeholder: B.atlasAvailable
         ? 'No rows match this query stack.'
         : 'The atlas has not been built yet.',
@@ -430,7 +573,7 @@
       th.textContent = (spec && spec.label) || DISPLAY_LABELS[key] || key;
       var td = document.createElement('td');
       td.className = 'num';
-      td.textContent = spec && spec.kind === 'number' ? Util.num(value) : String(value);
+      td.textContent = spec && spec.kind === 'number' ? Util.num2(value) : String(value);
       tr.appendChild(th); tr.appendChild(td);
       body.appendChild(tr);
     });
@@ -488,17 +631,24 @@
 
   var autoPinned = false;
 
-  /* Pin the first row on first load, so the viewer opens with something in it.
+  /* Pin the first row, so the viewer holds something rather than an empty state.
    *
-   * Once only, and never over an existing pin: a viewer restored from a URL
-   * fragment keeps what the link asked for, and a user who clears the stack is
-   * not dragged back to row one on the next query.
+   * On first load this runs once and never over an existing pin: a viewer
+   * restored from a URL fragment keeps what the link asked for, and a user who
+   * clears the stack is not dragged back to row one on the next query.
+   *
+   * `force` overrides both, and is what an answered question uses. A model
+   * proposal that changes the whole result set and leaves the viewer on a row
+   * that is no longer in it has answered the question only halfway.
    */
-  function autoPinFirstRow() {
-    if (autoPinned || !state.lastRows.length) { return; }
+  function pinFirstRow(force) {
+    if (!state.lastRows.length) { return; }
+    if (!force) {
+      if (autoPinned) { return; }
+      var slot = SELECTION_SLOT[state.recordType];
+      if (slot && Selection.get()[slot]) { autoPinned = true; return; }
+    }
     autoPinned = true;
-    var slot = SELECTION_SLOT[state.recordType];
-    if (slot && Selection.get()[slot]) { return; }
     var first = state.lastRows[0];
     state.pinnedRow = first;
     Selection.fromRecord(state.recordType, first);
@@ -527,7 +677,7 @@
       }
       state.lastRows = result.data.rows || [];
       if (state.table) { state.table.replaceData(state.lastRows); }
-      autoPinFirstRow();
+      pinFirstRow(false);
       /* Re-apply the selection now that the rows are here.
        *
        * Selection.subscribe fires immediately, so a viewer restored from a URL
@@ -587,9 +737,9 @@
           return String(r.id) === String(rowId);
         })[0];
         var overlay = row
-          ? 'ΔSASA ' + Util.num(row.dsasa_a) + ' / ' + Util.num(row.dsasa_b) + ' Å²' +
-            ' · balance ' + Util.num(row.bridging_balance) +
-            ' · buried ' + Util.num(row.buried_fraction)
+          ? 'ΔSASA ' + Util.num2(row.dsasa_a) + ' / ' + Util.num2(row.dsasa_b) + ' Å²' +
+            ' · balance ' + Util.num2(row.bridging_balance) +
+            ' · buried ' + Util.num2(row.buried_fraction)
           : null;
         return {
           role: 'glue',
@@ -632,16 +782,33 @@
           return r.uniprot_acc === selection.e3;
         })[0];
         var best = ligase && ligase.best_structure;
+        /* best_structure is a deposited entry for 292 of the 650 ligases and an
+         * AlphaFold model name (AF-<acc>-F1) for the rest. Only the four-letter
+         * form can go to RCSB, so the predicted ones were dropped and more than
+         * half the rail pinned to an empty viewer. They load from AFDB instead,
+         * coloured by pLDDT and labelled as predicted so the surface is not
+         * mistaken for experiment. */
+        var predicted = !!best && best.length !== 4;
+        var pocket = ligase && ligase.pocket_score !== null &&
+          ligase.pocket_score !== undefined
+          ? 'pocket score ' + Util.num2(ligase.pocket_score) +
+            ' · volume ' + Util.num2(ligase.pocket_volume_a3) + ' Å³'
+          : null;
+        var url = ligase && ligase.structure_file
+          ? '/api/structures/' + ligase.structure_file
+          : (predicted ? B.afdbCifUrl(selection.e3) : null);
         return {
           role: 'e3',
-          url: ligase && ligase.structure_file ? '/api/structures/' + ligase.structure_file : null,
-          pdbId: (!ligase || !ligase.structure_file) && best && best.length === 4 ? best : null,
+          url: url,
+          format: 'mmcif',
+          pdbId: (!ligase || !ligase.structure_file) && !predicted && best &&
+            best.length === 4 ? best : null,
           identifier: (ligase && ligase.gene) || selection.e3,
           identifierHref: 'https://www.uniprot.org/uniprotkb/' + selection.e3,
-          overlay: ligase && ligase.pocket_score !== null && ligase.pocket_score !== undefined
-            ? 'pocket score ' + Util.num(ligase.pocket_score) +
-              ' · volume ' + Util.num(ligase.pocket_volume_a3) + ' Å³'
-            : null
+          plddt: predicted,
+          overlay: predicted
+            ? (pocket ? pocket + ' · predicted model' : 'predicted model')
+            : pocket
         };
       }
       if (recordType === 'lysine') {
@@ -704,6 +871,7 @@
   function init() {
     if (!state.recordType) { return; }
     loadStack();
+    applyHandoff();
     initBuilder();
     renderStack();
     initTable();

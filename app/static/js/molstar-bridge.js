@@ -293,7 +293,10 @@
     var role = spec.role || this.options.role;
 
     return Promise.resolve().then(function () {
-      if (role === 'degron' && spec.plddt !== false) {
+      /* The degron viewer is always an AlphaFold model, so it opts out
+       * explicitly; every other role opts in, which the E3 viewer does on the
+       * rows whose only structure is a predicted one. */
+      if (spec.plddt === true || (role === 'degron' && spec.plddt !== false)) {
         return self._colourByPlddt();
       }
       return null;
@@ -353,6 +356,7 @@
    * a component that does not exist.
    */
   Viewer.prototype._hideWater = function () {
+    var self = this;
     var plugin = this._plugin();
     if (!plugin || !plugin.state || !plugin.state.data) { return 0; }
     var hidden = 0;
@@ -364,15 +368,58 @@
           label = String(component.cell.obj.label || '').toLowerCase();
         } catch (e) { /* key alone is enough */ }
         if ((key + ' ' + label).indexOf('water') < 0) { return; }
-        try {
-          plugin.state.data.updateCellState(
-            component.cell.transform.ref, { isHidden: true });
-          hidden += 1;
-        } catch (e) {
-          console.warn('could not hide water', e);
-        }
+        if (self._hideSubtree(component)) { hidden += 1; }
       });
     });
+    return hidden;
+  };
+
+  /* Hide a component and everything built from it.
+   *
+   * `isHidden` is per cell and does not inherit. Setting it on the component
+   * alone left the ball-and-stick representation underneath it visible, which
+   * is why the waters stayed on screen: Mol*'s own eye toggle walks the
+   * subtree pre-order and sets the flag on every descendant, and this does the
+   * same. Trimmed local structures carry no waters, so the only viewer where
+   * the difference showed was the E3 one, which always loads a full deposited
+   * entry from RCSB.
+   *
+   * The hierarchy's own representation list is hidden first and the state tree
+   * walked second. Either alone would do; both cost nothing and the tree shape
+   * is the one part of this that is not a documented API.
+   */
+  Viewer.prototype._hideSubtree = function (component) {
+    var plugin = this._plugin();
+    var data = plugin && plugin.state && plugin.state.data;
+    if (!data || !data.updateCellState) { return 0; }
+    var hidden = 0;
+    var seen = {};
+
+    function conceal(ref) {
+      if (!ref || seen[ref]) { return; }
+      seen[ref] = true;
+      try {
+        data.updateCellState(ref, { isHidden: true });
+        hidden += 1;
+      } catch (e) {
+        /* A cell that has already been torn down is nothing to hide. */
+        return;
+      }
+      var children = null;
+      try {
+        children = data.tree && data.tree.children && data.tree.children.get(ref);
+      } catch (e) { children = null; }
+      if (children && children.forEach) {
+        children.forEach(function (child) { conceal(child); });
+      }
+    }
+
+    (component.representations || []).forEach(function (rep) {
+      if (rep.cell && rep.cell.transform) { conceal(rep.cell.transform.ref); }
+    });
+    if (component.cell && component.cell.transform) {
+      conceal(component.cell.transform.ref);
+    }
     return hidden;
   };
 

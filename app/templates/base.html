@@ -33,11 +33,16 @@
 
 <header class="app-header">
   <a class="brand" href="{{ url_for('ledger.index') }}">
-    <svg class="brand__mark" viewBox="0 0 32 32" aria-hidden="true">
-      <rect x="4" y="11" width="24" height="17" rx="1.5" fill="var(--accent)"/>
-      <rect x="2" y="7" width="28" height="4" rx="1" fill="var(--ink)"/>
-      <rect x="13" y="4" width="6" height="3" rx="1" fill="var(--ink)"/>
-      <path d="M11 15v9M16 15v9M21 15v9" stroke="var(--surface)" stroke-width="1.8" stroke-linecap="round"/>
+    {# The body was 24 wide by 17 tall, which is a crate rather than a bin. It
+       is twice as tall now and tapers slightly towards the base, which is the
+       shape that reads as a bin at 26 px without any added detail. #}
+    <svg class="brand__mark" viewBox="0 0 32 50" aria-hidden="true">
+      <path d="M4.6 12h22.8l-1.7 33.3a1.7 1.7 0 0 1-1.7 1.6H8a1.7 1.7 0 0 1-1.7-1.6z"
+            fill="var(--accent)"/>
+      <rect x="2" y="7" width="28" height="5" rx="1.2" fill="var(--ink)"/>
+      <rect x="13" y="3.5" width="6" height="3.5" rx="1.2" fill="var(--ink)"/>
+      <path d="M11.3 18v21M16 18v21M20.7 18v21" stroke="var(--surface)"
+            stroke-width="1.9" stroke-linecap="round"/>
     </svg>
     <span>
       <span class="brand__name">BINMAN</span><br>

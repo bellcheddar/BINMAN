@@ -17,9 +17,8 @@ def index():
         active="lens",
         page_title="Lens Graph",
         page_blurb=(
-            "One network, four lenses. The modules recolour the same graph and "
-            "change the side panel rather than showing a different graph. Pruned "
-            "to the pinned ligase's neighbourhood by default."
+            "One network, four lenses: the modules recolour the same graph, "
+            "pruned to the pinned ligase's neighbourhood by default."
         ),
         focus=request.args.get("focus", ""),
         depth=request.args.get("depth", "2"),

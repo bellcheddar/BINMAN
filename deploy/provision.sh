@@ -63,7 +63,10 @@ set -euo pipefail
 cd $APP_DIR
 test -d .venv || python3 -m venv .venv
 ./.venv/bin/pip install --quiet --upgrade pip
-./.venv/bin/pip install --quiet flask gunicorn
+# httpx is the LM client's transport (app/lm.py). Without it the natural-
+# language box 500s on the first question instead of degrading, because
+# the import sits outside the fallback.
+./.venv/bin/pip install --quiet flask gunicorn httpx
 chown -R binman:binman $APP_DIR
 REMOTE
 

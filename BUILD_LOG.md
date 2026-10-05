@@ -776,3 +776,76 @@ One line per meaningful event, timestamped UTC (spec Section 0 rule 5).
 | 2026-10-05T02:37:27+00:00 | 9 | Validation run against binman.sqlite: 4 metric(s) not computed (dataset unavailable), 5 measured floor(s) missed. |
 | 2026-10-05T02:43:14+00:00 | 9 | Validation run against binman.sqlite: 0 metric(s) not computed (dataset unavailable), 2 measured floor(s) missed. |
 | 2026-10-05T02:43:15+00:00 | 9 | Validation run against binman.sqlite: 4 metric(s) not computed (dataset unavailable), 5 measured floor(s) missed. |
+| 2026-10-05T03:15:58+00:00 | 1.1 | Tier 1 seed: 6,143 entries referenced by the resolved validation datasets plus the spec 12.3 reference list. |
+| 2026-10-05T03:15:58+00:00 | 1.1 | RCSB Search API: 130,391 entries with >= 2 polymer entities and >= 1 non-polymer entity. |
+| 2026-10-05T03:16:03+00:00 | 1.1 | Retrieved 130,391 candidate identifiers. |
+| 2026-10-05T03:16:25+00:00 | 1.1 | Metadata fetched for 2,000 of 130,391 entries. |
+| 2026-10-05T03:16:47+00:00 | 1.1 | Metadata fetched for 4,000 of 130,391 entries. |
+| 2026-10-05T03:17:08+00:00 | 1.1 | Metadata fetched for 6,000 of 130,391 entries. |
+| 2026-10-05T03:17:25+00:00 | 1.1 | Metadata fetched for 8,000 of 130,391 entries. |
+| 2026-10-05T03:17:44+00:00 | 1.1 | Metadata fetched for 10,000 of 130,391 entries. |
+| 2026-10-05T03:18:03+00:00 | 1.1 | Metadata fetched for 12,000 of 130,391 entries. |
+| 2026-10-05T03:18:23+00:00 | 1.1 | Metadata fetched for 14,000 of 130,391 entries. |
+| 2026-10-05T03:18:39+00:00 | 1.1 | Metadata fetched for 16,000 of 130,391 entries. |
+| 2026-10-05T03:18:52+00:00 | 1.1 | Metadata fetched for 18,000 of 130,391 entries. |
+| 2026-10-05T03:19:05+00:00 | 1.1 | Metadata fetched for 20,000 of 130,391 entries. |
+| 2026-10-05T03:19:19+00:00 | 1.1 | Metadata fetched for 22,000 of 130,391 entries. |
+| 2026-10-05T03:19:32+00:00 | 1.1 | Metadata fetched for 24,000 of 130,391 entries. |
+| 2026-10-05T03:19:45+00:00 | 1.1 | Metadata fetched for 26,000 of 130,391 entries. |
+| 2026-10-05T03:19:58+00:00 | 1.1 | Metadata fetched for 28,000 of 130,391 entries. |
+| 2026-10-05T03:20:12+00:00 | 1.1 | Metadata fetched for 30,000 of 130,391 entries. |
+| 2026-10-05T03:20:24+00:00 | 1.1 | Metadata fetched for 32,000 of 130,391 entries. |
+| 2026-10-05T03:20:37+00:00 | 1.1 | Metadata fetched for 34,000 of 130,391 entries. |
+| 2026-10-05T03:20:50+00:00 | 1.1 | Metadata fetched for 36,000 of 130,391 entries. |
+| 2026-10-05T03:21:03+00:00 | 1.1 | Metadata fetched for 38,000 of 130,391 entries. |
+| 2026-10-05T03:21:16+00:00 | 1.1 | Metadata fetched for 40,000 of 130,391 entries. |
+| 2026-10-05T03:21:29+00:00 | 1.1 | Metadata fetched for 42,000 of 130,391 entries. |
+| 2026-10-05T03:21:43+00:00 | 1.1 | Metadata fetched for 44,000 of 130,391 entries. |
+| 2026-10-05T03:21:56+00:00 | 1.1 | Metadata fetched for 46,000 of 130,391 entries. |
+| 2026-10-05T03:22:10+00:00 | 1.1 | Metadata fetched for 48,000 of 130,391 entries. |
+| 2026-10-05T03:22:27+00:00 | 1.1 | Metadata fetched for 50,000 of 130,391 entries. |
+| 2026-10-05T03:22:48+00:00 | 1.1 | Metadata fetched for 52,000 of 130,391 entries. |
+| 2026-10-05T03:23:10+00:00 | 1.1 | Metadata fetched for 54,000 of 130,391 entries. |
+| 2026-10-05T03:23:34+00:00 | 1.1 | Metadata fetched for 56,000 of 130,391 entries. |
+| 2026-10-05T03:23:57+00:00 | 1.1 | Metadata fetched for 58,000 of 130,391 entries. |
+| 2026-10-05T03:24:20+00:00 | 1.1 | Metadata fetched for 60,000 of 130,391 entries. |
+| 2026-10-05T03:24:41+00:00 | 1.1 | Metadata fetched for 62,000 of 130,391 entries. |
+| 2026-10-05T03:25:03+00:00 | 1.1 | Metadata fetched for 64,000 of 130,391 entries. |
+| 2026-10-05T03:25:25+00:00 | 1.1 | Metadata fetched for 66,000 of 130,391 entries. |
+| 2026-10-05T03:25:46+00:00 | 1.1 | Metadata fetched for 68,000 of 130,391 entries. |
+| 2026-10-05T03:26:06+00:00 | 1.1 | Metadata fetched for 70,000 of 130,391 entries. |
+| 2026-10-05T03:26:28+00:00 | 1.1 | Metadata fetched for 72,000 of 130,391 entries. |
+| 2026-10-05T03:26:48+00:00 | 1.1 | Metadata fetched for 74,000 of 130,391 entries. |
+| 2026-10-05T03:27:09+00:00 | 1.1 | Metadata fetched for 76,000 of 130,391 entries. |
+| 2026-10-05T03:27:31+00:00 | 1.1 | Metadata fetched for 78,000 of 130,391 entries. |
+| 2026-10-05T03:27:57+00:00 | 1.1 | Metadata fetched for 80,000 of 130,391 entries. |
+| 2026-10-05T03:28:21+00:00 | 1.1 | Metadata fetched for 82,000 of 130,391 entries. |
+| 2026-10-05T03:28:43+00:00 | 1.1 | Metadata fetched for 84,000 of 130,391 entries. |
+| 2026-10-05T03:29:11+00:00 | 1.1 | Metadata fetched for 86,000 of 130,391 entries. |
+| 2026-10-05T03:29:29+00:00 | 1.1 | Metadata fetched for 88,000 of 130,391 entries. |
+| 2026-10-05T03:29:43+00:00 | 1.1 | Metadata fetched for 90,000 of 130,391 entries. |
+| 2026-10-05T03:29:59+00:00 | 1.1 | Metadata fetched for 92,000 of 130,391 entries. |
+| 2026-10-05T03:30:18+00:00 | 1.1 | Metadata fetched for 94,000 of 130,391 entries. |
+| 2026-10-05T03:30:36+00:00 | 1.1 | Metadata fetched for 96,000 of 130,391 entries. |
+| 2026-10-05T03:30:53+00:00 | 1.1 | Metadata fetched for 98,000 of 130,391 entries. |
+| 2026-10-05T03:31:12+00:00 | 1.1 | Metadata fetched for 100,000 of 130,391 entries. |
+| 2026-10-05T03:31:31+00:00 | 1.1 | Metadata fetched for 102,000 of 130,391 entries. |
+| 2026-10-05T03:31:48+00:00 | 1.1 | Metadata fetched for 104,000 of 130,391 entries. |
+| 2026-10-05T03:32:08+00:00 | 1.1 | Metadata fetched for 106,000 of 130,391 entries. |
+| 2026-10-05T03:32:25+00:00 | 1.1 | Metadata fetched for 108,000 of 130,391 entries. |
+| 2026-10-05T03:32:44+00:00 | 1.1 | Metadata fetched for 110,000 of 130,391 entries. |
+| 2026-10-05T03:33:01+00:00 | 1.1 | Metadata fetched for 112,000 of 130,391 entries. |
+| 2026-10-05T03:33:23+00:00 | 1.1 | Metadata fetched for 114,000 of 130,391 entries. |
+| 2026-10-05T03:33:49+00:00 | 1.1 | Metadata fetched for 116,000 of 130,391 entries. |
+| 2026-10-05T03:34:14+00:00 | 1.1 | Metadata fetched for 118,000 of 130,391 entries. |
+| 2026-10-05T03:34:39+00:00 | 1.1 | Metadata fetched for 120,000 of 130,391 entries. |
+| 2026-10-05T03:35:02+00:00 | 1.1 | Metadata fetched for 122,000 of 130,391 entries. |
+| 2026-10-05T03:35:22+00:00 | 1.1 | Metadata fetched for 124,000 of 130,391 entries. |
+| 2026-10-05T03:35:49+00:00 | 1.1 | Metadata fetched for 126,000 of 130,391 entries. |
+| 2026-10-05T03:36:16+00:00 | 1.1 | Metadata fetched for 128,000 of 130,391 entries. |
+| 2026-10-05T03:36:38+00:00 | 1.1 | Metadata fetched for 130,000 of 130,391 entries. |
+| 2026-10-05T03:36:46+00:00 | 1.1 | Catalogue written: 130,391 entries. Tier counts: {1: 3871, 2: 34222, 3: 17375, 4: 74923}. |
+| 2026-10-05T03:43:02+00:00 | 9 | Validation run against binman.sqlite: 0 metric(s) not computed (dataset unavailable), 2 measured floor(s) missed. |
+| 2026-10-05T03:43:03+00:00 | 9 | Validation run against binman.sqlite: 4 metric(s) not computed (dataset unavailable), 5 measured floor(s) missed. |
+| 2026-10-05T03:47:17+00:00 | 9 | Validation run against binman.sqlite: 0 metric(s) not computed (dataset unavailable), 2 measured floor(s) missed. |
+| 2026-10-05T03:47:18+00:00 | 9 | Validation run against binman.sqlite: 4 metric(s) not computed (dataset unavailable), 5 measured floor(s) missed. |

@@ -59,7 +59,10 @@ def propose_query(question: str, schema: dict, timeout: float = 20.0) -> LmResul
     if not url:
         return LmResult(ok=False, error="BINMAN_LM_URL is not set")
 
-    import httpx
+    try:
+        import httpx
+    except ImportError as exc:  # a host without the transport is a normal state
+        return LmResult(ok=False, error=f"the LM client is not installed: {exc}")
 
     body = {
         "messages": [

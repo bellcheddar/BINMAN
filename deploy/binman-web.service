@@ -20,10 +20,13 @@ EnvironmentFile=-/opt/binman/.env
 Environment="BINMAN_DB=/opt/binman/data/atlas/binman.sqlite"
 Environment="PYTHONUNBUFFERED=1"
 # The natural-language box is optional and the app is fully functional without
-# it. Point this at the HuggingFace Space only if that endpoint is wired to
-# speak the app's LM protocol; it is a Gradio app, not a drop-in, so it stays
-# unset until that adapter exists.
-# Environment="BINMAN_LM_URL="
+# it. The Space now carries an OpenAI-compatible POST /v1/chat/completions in
+# front of the Gradio UI, which is the protocol app/lm.py speaks, so this is
+# set. Unset it and the box hides itself again with nothing else affected.
+#
+# The timeout is 20 s in app/lm.py. ZeroGPU allocates per request, so the first
+# question after an idle period is the slow one.
+Environment="BINMAN_LM_URL=https://dellboy-binman-lm.hf.space"
 # Two workers, not three. The droplet has 3.8 GB total with roughly 1.1 GB
 # available across thirteen other apps, and BINMAN is read-only over SQLite so
 # threads carry concurrency more cheaply than processes here.

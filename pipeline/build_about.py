@@ -681,9 +681,8 @@ def build() -> dict:
         "generated_at": utcnow(),
         "generator": "pipeline/build_about.py",
         "note": (
-            "Every value on this page is read from a build artefact. Nothing here "
-            "is typed by hand, and a value that could not be read says "
-            f"'{NOT_RECORDED}' rather than showing a plausible guess."
+            f"A value that could not be read says '{NOT_RECORDED}' rather than "
+            "a plausible guess."
         ),
         "schematic_description": description,
         "stages": stages,

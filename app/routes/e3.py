@@ -17,9 +17,9 @@ def index():
         active="e3",
         page_title="E3 Triage",
         page_blurb=(
-            "The human E3 ligase repertoire ranked on ligandability, structural "
-            "coverage, expression selectivity and family. Every component of the "
-            "score is a visible column: there is no hidden scoring."
+            "The human E3 repertoire ranked on ligandability, structural "
+            "coverage, expression selectivity and family, every component a "
+            "visible column."
         ),
         stats=_stats(),
         weights=_weights(),
@@ -36,12 +36,19 @@ def _stats() -> list[dict]:
         {"label": "with a pocket score", "value": db.scalar(
             "SELECT COUNT(*) FROM ligase WHERE status = 'ok' AND pocket_score IS NOT NULL"),
          "tone": "good"},
+        # Both of these count an exact value of one field, so the filter
+        # reproduces the figure exactly. "with a pocket score" counts a NOT
+        # NULL, which the query grammar has no operator for, so it stays a
+        # plain figure rather than clicking through to a different number.
         {"label": "orphan", "value": db.scalar(
             "SELECT COUNT(*) FROM ligase WHERE status = 'ok' AND exploitation_status = 'orphan'"),
-         "tone": "warn"},
+         "tone": "warn",
+         "filter": {"field": "exploitation_status", "op": "eq", "value": "orphan"}},
         {"label": "clinically validated", "value": db.scalar(
             "SELECT COUNT(*) FROM ligase WHERE status = 'ok' "
-            "AND exploitation_status = 'clinically validated'"), "tone": "good"},
+            "AND exploitation_status = 'clinically validated'"), "tone": "good",
+         "filter": {"field": "exploitation_status", "op": "eq",
+                    "value": "clinically validated"}},
     ]
 
 

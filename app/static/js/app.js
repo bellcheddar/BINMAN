@@ -33,6 +33,25 @@
       return n.toPrecision(digits || 3).replace(/\.?0+$/, '');
     },
 
+    /* Table cells: a fixed two decimal places.
+     *
+     * `num` uses significant figures, which is right for a single quoted value
+     * and wrong for a column: 0.455, 1230 and 12.3 in the same column put the
+     * decimal point in three different places and the eye cannot compare them.
+     * Two places aligns them.
+     *
+     * Whole numbers keep no decimals. A residue number, a PDB entry count and
+     * a triage rank are counts, not measurements, and 155.00 claims a
+     * precision that the idea of a residue number does not have.
+     */
+    num2: function (value) {
+      if (value === null || value === undefined || value === '') { return '–'; }
+      var n = Number(value);
+      if (!isFinite(n)) { return String(value); }
+      if (Number.isInteger(n)) { return n.toLocaleString('en-GB'); }
+      return n.toFixed(2);
+    },
+
     pill: function (text, tone) {
       var cls = tone ? 'pill pill--' + tone : 'pill';
       return '<span class="' + cls + '">' + Util.escape(text) + '</span>';
