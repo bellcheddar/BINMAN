@@ -298,6 +298,7 @@
       }
       return null;
     }).then(function () {
+      self.root.setAttribute('data-water-hidden', String(self._hideWater()));
       return self._surfacePolymer();
     }).then(function () {
       return self.applyLigandPresentation(spec);
@@ -337,6 +338,42 @@
       });
     });
     return out;
+  };
+
+  /* Hide water.
+   *
+   * The trimmed structures this app serves carry none, and AlphaFold models
+   * carry none, so this looks unnecessary until you notice that most bridge
+   * rows have no local file and load the full deposited entry from RCSB
+   * instead, and the E3 viewer always does. Those bring their waters with
+   * them, and a few hundred red dots over a surface is noise.
+   *
+   * Hidden rather than deleted: the data stays in the state tree, so the
+   * Mol* controls can bring it back, and nothing downstream has to cope with
+   * a component that does not exist.
+   */
+  Viewer.prototype._hideWater = function () {
+    var plugin = this._plugin();
+    if (!plugin || !plugin.state || !plugin.state.data) { return 0; }
+    var hidden = 0;
+    this._structureRefs().forEach(function (ref) {
+      (ref.components || []).forEach(function (component) {
+        var key = String(component.key || '').toLowerCase();
+        var label = '';
+        try {
+          label = String(component.cell.obj.label || '').toLowerCase();
+        } catch (e) { /* key alone is enough */ }
+        if ((key + ' ' + label).indexOf('water') < 0) { return; }
+        try {
+          plugin.state.data.updateCellState(
+            component.cell.transform.ref, { isHidden: true });
+          hidden += 1;
+        } catch (e) {
+          console.warn('could not hide water', e);
+        }
+      });
+    });
+    return hidden;
   };
 
   /* The polymer components: everything the preset built that is not the ligand,

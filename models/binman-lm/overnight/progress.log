@@ -22,3 +22,5 @@
 [10:21:50] START round13-32b-1epoch :: 32B, 32 layers, rank 8, batch 2, 14152 iters (one epoch)
 [21:59:54] TRAINED round13-32b-1epoch in 698 min
 [21:59:54] EVAL round13-32b-1epoch
+[22:28:03] EVALUATED round13-32b-1epoch
+[22:28:03] === round13-32b-1epoch finished ===
