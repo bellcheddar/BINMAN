@@ -3128,3 +3128,24 @@ per question against a ZeroGPU allocation that is time-boxed per request. The
 every correct question to protect against one in five of the wrong ones, and
 the wrong ones are visible: the query stack shows which fields were filtered,
 so a user who asked about affinity can see the answer is about buried area.
+
+## D-081
+
+**Artefact precision stays at 0.9401: the gap cannot be closed honestly.**
+
+377 of 401 artefact CCDs are correctly not called glue, against a 0.95 floor.
+All 24 misses were inspected. Ten appear in zero bridge rows, so they cost the
+classifier's score and not the atlas. The other fourteen span 138 to 885 Da, so
+no size rule separates them from real glues, and the triage head independently
+agrees with BioLiP on ten of them.
+
+`pipeline/ccd_classes.py` does not read the BioLiP artefact list and will not
+start. The classifier is structural and BioLiP is the independent ground truth
+it is scored against; feeding the list into the rules would take precision to
+roughly 1.0 and make the metric measure nothing, which is the tautology already
+refused for the E3 substrate Spearman. Tuning the structural rules until these
+particular 24 fall out is the same fault more slowly: fitting the rule to the
+test set.
+
+The floor is missed and reported as missed. CYC, which carries 5,504 of the
+bridges in this set, is probably BioLiP's error rather than the classifier's.

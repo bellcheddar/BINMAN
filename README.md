@@ -211,6 +211,19 @@ translation against a closed schema, not open-ended reasoning.
 | Ligand triage from an abstract | macro F1 | **0.9336** | 0.85 |
 | Structured abstention | fabrication rate | **0.000** | 0.00 |
 
+**All three heads now do work.** Query drives the "Ask in words" box. Triage
+fills `evidence_class` for 6,510 entry-ligand pairs across 27,590 bridge rows,
+the only model-derived column in the atlas, agreeing with the curated label on
+14 of 15 chemical components it had never seen. Abstention answers questions
+the atlas cannot: of 20 held-out unanswerable questions, 16 that used to return
+a parser error now return an explanation naming what is missing.
+
+Four of those 20 still produce a query the schema accepts and the atlas cannot
+support. Asked for a binding affinity in nanomolar the model filters on buried
+area and molecular weight. Nothing fails, so nothing catches it, and the only
+defence is that the query it built is shown to the user. That is the sharpest
+limit on this box and it is measured rather than hedged.
+
 The baseline decides whether to train at all. Zero-shot with the full schema in
 context the base model reached set equality 0.233, well under the 0.85 at which
 fine-tuning would have been skipped for grammar-constrained decoding. Training

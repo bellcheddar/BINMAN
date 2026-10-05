@@ -693,6 +693,37 @@ regularity is computed it has been selected to its ceiling: the filter and the
 score are measuring the same thing twice, and the second time carries no
 information.
 
+### Why artefact precision stops at 0.9401, and why it should
+
+377 of 401 artefact CCDs are correctly not called glue. The floor is 0.95, so
+four more would clear it. All 24 misses were read.
+
+**Ten of them never bridge anything.** CB3, D01, IBM, IPL, KAI, LXB, LXZ, NGZ,
+TCA and TG1 are classified `glue_candidate` and appear in zero bridge rows, so
+they cost the classifier's precision and cost the atlas nothing. The metric
+measures the classification rule, not the data a user sees, and on this half of
+the gap those are different things.
+
+**The remaining fourteen are mostly what BioLiP says they are**, and the triage
+head agrees independently on ten of them: four small aromatic acids (PHB, SAL,
+DHB, HC4), a sulfonic acid, tridecane, two phytanyl lipids, N-oxalylglycine and
+a glycerol ester. They are 138 to 885 Da, so no size rule separates them from a
+real glue without taking real glues with them.
+
+**The gap must not be closed by consulting the artefact list.**
+`pipeline/ccd_classes.py` never reads BioLiP: the classifier is structural, and
+BioLiP is the independent ground truth it is scored against. Feeding that list
+into the rules would move precision to about 1.0 and make the number mean
+nothing, which is the tautology this project already refused for the E3
+substrate Spearman. Tuning the structural rules until these particular 24 fall
+out is the same fault wearing a slower disguise: it is fitting the rule to the
+test set.
+
+So 0.9401 stands, and the honest reading is that it is a real 0.94 rather than
+a 0.95 that could be bought. One of the 24 is probably BioLiP's error anyway:
+CYC is phycocyanobilin, a light-harvesting chromophore the triage head calls a
+native cofactor, and it carries 5,504 of the bridges in this set.
+
 ### Combining geometry with sequence adds nothing
 
 D-075 left one route open. Geometry is inverted, and an inverted feature is not
