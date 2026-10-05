@@ -1,6 +1,14 @@
-{# The left rail: modules, the natural-language box, the query builder and the
-   query stack. The stack is the app's audit trail and pastes cleanly into a
-   methods section (spec 6.3). #}
+{# The left rail: the module list and the natural-language box.
+
+   The field/operator/value builder and the query stack were removed at Marc's
+   request. Filters still exist and still drive the table and the viewer: the
+   headline cards set them, the model sets them, and they persist across
+   modules in the same localStorage key as before. What is gone is the manual
+   way to type one and the visible list of what is applied. Spec 6.3 calls the
+   stack the app's audit trail, so that is a deliberate departure from it; the
+   query object is still returned by /api/query and still describable, and
+   ledger.js keeps stackAsText() and renderStack() behind element guards so
+   putting the panel back is markup only. #}
 <aside class="rail" aria-label="Modules and filters">
 
   <nav class="rail__modules" aria-label="Analysis modules">
@@ -41,42 +49,10 @@
     {% else %}
       <p class="stack__empty">
         The language model is not enabled for this deployment, so the
-        natural-language box is hidden. Everything else works as normal: build
-        the query below.
+        natural-language box is hidden. The headline figures above the table
+        still filter it.
       </p>
     {% endif %}
-  </div>
-
-  <div>
-    <h3>Add a filter</h3>
-    <div class="builder__row">
-      <div class="field">
-        <label for="f-field">Field</label>
-        <select id="f-field"></select>
-      </div>
-      <div class="field">
-        <label for="f-op">Operator</label>
-        <select id="f-op"></select>
-      </div>
-      <div class="field">
-        <label for="f-value">Value</label>
-        <input id="f-value" type="text" autocomplete="off">
-      </div>
-    </div>
-    <button class="btn btn--accent" type="button" id="f-add">Add to stack</button>
-  </div>
-
-  <div class="stack">
-    <div class="stack__head">
-      <h3>Query stack</h3>
-      <button class="btn" type="button" id="stack-copy"
-              title="Copy the stack as text for a methods section">Copy</button>
-    </div>
-    <ul class="stack__list" id="stack-list" aria-live="polite"></ul>
-    <div class="stack__head" style="border-top:1px solid var(--line);border-bottom:0">
-      <button class="btn" type="button" id="stack-clear">Clear</button>
-      <span class="count mono" id="stack-total"></span>
-    </div>
   </div>
 
 </aside>

@@ -197,7 +197,17 @@
         }
       });
     }
+  }
 
+  /* --------------------------------------------------------- stat cards --- */
+
+  /* Its own function, not the tail of initBuilder.
+   *
+   * The stat cards and the natural-language box used to be wired up inside
+   * initBuilder, after its `if (!fieldSelect) return`. They have nothing to do
+   * with the field/operator/value form, so removing that form from the rail
+   * would have silently taken both of them with it. */
+  function initStatCards() {
     /* Headline figures filter the table. Clicking a card pushes its filter onto
        the stack, clicking it again removes it, so the number above and the rows
        below always describe the same set. Without this the cards state a count
@@ -250,7 +260,11 @@
         run();
       });
     }
+  }
 
+  /* -------------------------------------------------------- ask in words --- */
+
+  function initNaturalLanguage() {
     var nlButton = document.getElementById('nl-run');
     var nlInput = document.getElementById('nl-input');
     if (nlButton && nlInput) {
@@ -318,11 +332,15 @@
           /* Forced, because the answer is the rows this query returns: the
            * table, the detail panel and the viewer all move to the top one. */
           run().then(function () { pinFirstRow(true); });
+          /* No success note. The answer is the rows in the table and the
+             structure in the viewer, and a line of reassurance under every one
+             of them was furniture. The discard warning stays, because that one
+             tells the user something happened to their question. */
           if (note) {
-            note.textContent = 'Proposed by BINMAN-LM, validated by the parser. ' +
-              'Every number shown is computed in Python.' +
-              (dropped ? ' ' + dropped + ' proposed filter(s) named no field of ' +
-                 'this module and were discarded.' : '');
+            note.textContent = dropped
+              ? dropped + ' proposed filter(s) named no field of this module ' +
+                'and were discarded.'
+              : '';
           }
         });
       };
@@ -359,8 +377,11 @@
     if (input && stored.question) { input.value = stored.question; }
     var note = document.getElementById('nl-note');
     if (note && stored.question) {
+      /* This one stays: the user asked the question somewhere else and is
+         now looking at a different module, so it says why the page changed
+         under them. */
       note.textContent = 'Answering “' + stored.question + '”, asked on ' +
-        'another module. Proposed by BINMAN-LM, validated by the parser.';
+        'another module.';
     }
   }
 
@@ -873,6 +894,8 @@
     loadStack();
     applyHandoff();
     initBuilder();
+    initStatCards();
+    initNaturalLanguage();
     renderStack();
     initTable();
     initViewer();
