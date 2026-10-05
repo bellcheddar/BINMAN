@@ -27,10 +27,8 @@
 
   <div class="pane__head">
     <h1>About BINMAN</h1>
-    <span class="meta">generated {{ about.generated_at }} by <code>{{ about.generator }}</code></span>
+    <span class="meta">generated {{ about.generated_at }}</span>
   </div>
-  <p style="max-width:68ch;color:var(--muted);margin-top:0">{{ about.note }}</p>
-
   {% if about.unrecorded %}
     <div class="notice">
       <strong>{{ about.unrecorded | length }} value(s) could not be read from an artefact</strong>

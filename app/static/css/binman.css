@@ -189,7 +189,17 @@ code, kbd, samp, .mono { font-family: var(--data); font-size: 0.86em; }
   background: var(--accent-soft); color: var(--accent); border-color: var(--accent);
 }
 
-.header-tools { margin-left: auto; display: flex; align-items: center; gap: 0.6rem; }
+/* The tabs and the theme toggle, held on one line.
+
+   nowrap on the container is the point: the header itself wraps, and when the
+   toggle was a sibling of the nav it was the item that got pushed to a row of
+   its own at almost every window width. The nav inside still wraps, so a narrow
+   window breaks the tabs over two lines with the toggle beside them rather than
+   below. */
+.header-end {
+  margin-left: auto; display: flex; align-items: center;
+  gap: 0.6rem; flex-wrap: nowrap; min-width: 0;
+}
 
 .theme-toggle {
   background: var(--surface-2); color: var(--ink);

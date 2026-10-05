@@ -565,8 +565,23 @@ def workflow_svg(stages: dict, atlas: dict, datasets: list[dict]) -> tuple[str, 
     box_w, box_h, gap = 196, 148, 34
     left_margin = 128
     top = 74
-    module_w, module_h, module_step = 124, 26, 34
+    module_w = 124
     modules = ("Glue Atlas", "Degron Scan", "E3 Triage", "Degradability")
+
+    # All three columns span exactly the stage boxes, so the figure has one top
+    # edge and one bottom edge instead of three. They were drawn to their own
+    # fixed heights before: the stage row ran to top+148, the two input boxes
+    # stopped at top+134 and the module stack at top+128, which read as a
+    # drawing that had not been lined up rather than as three kinds of thing.
+    #
+    # Derived rather than typed. The second input box is positioned from the
+    # bottom and the module height is what is left after the steps, so integer
+    # division cannot leave either column a pixel short of the others.
+    input_gap = 12
+    input_h = (box_h - input_gap) // 2
+    input_bottom_y = top + box_h - input_h
+    module_step = 40
+    module_h = box_h - (len(modules) - 1) * module_step
 
     # The canvas is COMPUTED from the layout rather than fixed. A hardcoded
     # 1060x460 left a third of the height empty and, once widened by hand, cut
@@ -601,16 +616,17 @@ def workflow_svg(stages: dict, atlas: dict, datasets: list[dict]) -> tuple[str, 
     # Inputs on the left: primary sources, and validation sets as a distinct shape.
     parts.append(f'<text class="wf-head" x="12" y="{top - 24}">Inputs</text>')
     parts.append(
-        f'<rect class="wf-box" x="12" y="{top}" width="108" height="58" rx="2"/>'
-        f'<text class="wf-t" x="22" y="{top + 22}">Sources</text>'
-        f'<text class="wf-s" x="22" y="{top + 38}">RCSB, AFDB,</text>'
-        f'<text class="wf-s" x="22" y="{top + 50}">UniProt</text>'
+        f'<rect class="wf-box" x="12" y="{top}" width="108" height="{input_h}" rx="2"/>'
+        f'<text class="wf-t" x="22" y="{top + 24}">Sources</text>'
+        f'<text class="wf-s" x="22" y="{top + 42}">RCSB, AFDB,</text>'
+        f'<text class="wf-s" x="22" y="{top + 56}">UniProt</text>'
     )
     parts.append(
-        f'<rect class="wf-ds" x="12" y="{top + 76}" width="108" height="58" rx="2"/>'
-        f'<text class="wf-t" x="22" y="{top + 98}">Ground truth</text>'
-        f'<text class="wf-s" x="22" y="{top + 114}">Published</text>'
-        f'<text class="wf-s" x="22" y="{top + 126}">datasets</text>'
+        f'<rect class="wf-ds" x="12" y="{input_bottom_y}" width="108" '
+        f'height="{input_h}" rx="2"/>'
+        f'<text class="wf-t" x="22" y="{input_bottom_y + 24}">Ground truth</text>'
+        f'<text class="wf-s" x="22" y="{input_bottom_y + 42}">Published</text>'
+        f'<text class="wf-s" x="22" y="{input_bottom_y + 56}">datasets</text>'
     )
 
     for index, column in enumerate(columns):
@@ -638,13 +654,15 @@ def workflow_svg(stages: dict, atlas: dict, datasets: list[dict]) -> tuple[str, 
                 f'L{start + gap - 6},{top + box_h / 2}" marker-end="url(#wf-tip)"/>'
             )
 
+    # Both input arrows leave their own box at its mid-height and converge on
+    # the first stage box, so they follow the boxes wherever those are placed.
     parts.append(
-        f'<path class="wf-arrow" d="M120,{top + 29} L{left_margin - 6},{top + 50}" '
-        f'marker-end="url(#wf-tip)"/>'
+        f'<path class="wf-arrow" d="M120,{top + input_h / 2} '
+        f'L{left_margin - 6},{top + box_h / 2 - 10}" marker-end="url(#wf-tip)"/>'
     )
     parts.append(
-        f'<path class="wf-arrow" d="M120,{top + 105} L{left_margin - 6},{top + 90}" '
-        f'marker-end="url(#wf-tip)"/>'
+        f'<path class="wf-arrow" d="M120,{input_bottom_y + input_h / 2} '
+        f'L{left_margin - 6},{top + box_h / 2 + 10}" marker-end="url(#wf-tip)"/>'
     )
 
     # Modules leaving on the right. `out_x` is computed above, with the canvas.
@@ -654,7 +672,7 @@ def workflow_svg(stages: dict, atlas: dict, datasets: list[dict]) -> tuple[str, 
         parts.append(
             f'<rect class="wf-box" x="{out_x}" y="{y}" width="{module_w}" '
             f'height="{module_h}" rx="2"/>'
-            f'<text class="wf-n" x="{out_x + 10}" y="{y + 18}">{label}</text>'
+            f'<text class="wf-n" x="{out_x + 10}" y="{y + module_h / 2 + 4}">{label}</text>'
         )
     # The arrow into the module column starts at the last stage box, not at a
     # notional gap beyond it, which previously ran off the canvas.
@@ -730,10 +748,10 @@ def build() -> dict:
     about = {
         "generated_at": utcnow(),
         "generator": "pipeline/build_about.py",
-        "note": (
-            f"A value that could not be read says '{NOT_RECORDED}' rather than "
-            "a plausible guess."
-        ),
+        # No standing note. The page no longer prints one, and the behaviour it
+        # described is still visible where it matters: the unrecorded banner
+        # fires when a value could not be read, and NOT_RECORDED appears in the
+        # cell itself rather than a guess.
         "schematic_description": description,
         "stages": stages,
         "atlas": atlas,

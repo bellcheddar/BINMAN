@@ -52,23 +52,27 @@
 
   {% include "_triangle.html" %}
 
-  <nav class="app-nav" aria-label="Modules">
-    {% for module in modules %}
-      <a href="{{ url_for(module.endpoint) }}"
-         {% if active == module.slug %}aria-current="page"{% endif %}>{{ module.label }}</a>
-    {% endfor %}
-    {% for item in nav_extra %}
-      <a href="{{ url_for(item.endpoint) }}"
-         {% if active == item.endpoint.split('.')[0] %}aria-current="page"{% endif %}>{{ item.label }}</a>
-    {% endfor %}
-  </nav>
+  {# The tabs and the theme toggle share one flex row that does not wrap, so the
+     toggle stays on the tabs' line. It used to sit in its own .header-tools
+     block after the nav, and the header wraps, so at most window widths it
+     dropped onto a second row by itself.
 
-  <div class="header-tools">
+     The "LM on" pill is gone. The natural-language box in the rail appears when
+     the model is configured and is replaced by a line of text when it is not,
+     which says the same thing where someone is actually looking for it. #}
+  <div class="header-end">
+    <nav class="app-nav" aria-label="Modules">
+      {% for module in modules %}
+        <a href="{{ url_for(module.endpoint) }}"
+           {% if active == module.slug %}aria-current="page"{% endif %}>{{ module.label }}</a>
+      {% endfor %}
+      {% for item in nav_extra %}
+        <a href="{{ url_for(item.endpoint) }}"
+           {% if active == item.endpoint.split('.')[0] %}aria-current="page"{% endif %}>{{ item.label }}</a>
+      {% endfor %}
+    </nav>
     {% if not atlas_available %}
       <span class="pill pill--warn">atlas not built</span>
-    {% endif %}
-    {% if lm_enabled %}
-      <span class="pill pill--glue" title="BINMAN-LM endpoint is configured">LM on</span>
     {% endif %}
     <button class="theme-toggle" type="button" id="theme-toggle"
             aria-label="Switch between light and dark theme">◐</button>
