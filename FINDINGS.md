@@ -750,11 +750,17 @@ Cilantro columns and no Lavender at all. Roughly half the evidence behind every
 published call is absent from the file, so no statistic computed from it can
 reproduce them.
 
-**What would fix it is an acquisition, not a computation.** Supplement 4 is
-`.xls`, whose 65,536-row limit is the whole problem; supplements 5 to 8 are
-`.xlsx` at 1,048,576 rows and are not truncated. The same table in `.xlsx`, or
-the counts deposited in GEO, would carry all 17 compounds and both libraries
-with no reconstruction at all.
+**What would fix it is an acquisition, and the acquisition exists.** The
+search is in D-083. In short: the publisher serves the same truncated `.xls`
+that PMC does, byte-for-byte in size, so there is no better copy of that table
+anywhere; but the complete screen is in SRA, 168 primary-screen runs across
+three BioProjects, mirrored by ENA over plain HTTPS.
+
+The part that makes it usable is that each run's BioSample description carries
+the demultiplexing key: the stagger sequences in order, beside the sample names
+they belong to, each naming a library, a compound, a gate and a replicate. It
+includes **Lavender**, whose absence is the reason this section exists, and
+compounds that appear in no published table at all.
 
 Two smaller traps for whoever picks this up: `ZnF.Sequence` in supplement 4 is
 nucleotide, not protein, so it needs translating before any sequence model sees

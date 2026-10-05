@@ -3175,5 +3175,51 @@ positives would put that disagreement into every number downstream, and the
 labels would carry our name while being read as the paper's.
 
 What unblocks it is an acquisition. Supplement 4 is `.xls` and its 65,536-row
-limit is the entire problem; supplements 5 to 8 are `.xlsx` and are intact. The
-same table as `.xlsx`, or the counts in GEO, needs no reconstruction.
+limit is the entire problem; supplements 5 to 8 are `.xlsx` and are intact.
+
+**Superseded in part by D-083.** This said no further method work would close
+the gap, which is true of the supplement and false of the study. An exhaustive
+search found the complete data in SRA, including the Lavender library whose
+absence is the reason given above.
+
+## D-083
+
+**The Slabicki screen is fully public in SRA, including what the supplement lost.**
+
+D-082 concluded that half the evidence behind every published call was absent
+and no method would recover it. That is true of the supplementary file and not
+of the study. Searched exhaustively:
+
+* **PMC** (PMC12458990) carries supplement 4 only as `.xls`.
+* **The publisher** serves the same file: `mmc3` on the Elsevier CDN is
+  45,288,960 bytes, byte-identical in size to the PMC copy. The truncation is in
+  the published supplement at source, not a PMC artefact. `file` reports a
+  Composite Document File saved from Mac Excel in October 2024, and the ratio
+  sheet sits exactly on the 65,536-row BIFF8 limit.
+* **No `.xlsx` of that table exists**, and there is no GitHub or Zenodo deposit:
+  the paper states it "does not report original code".
+* **SRA has everything.** 168 primary-screen runs across PRJNA1295817,
+  PRJNA1295818 and PRJNA1295819, plus 96 validation runs. ENA mirrors the FASTQ
+  over plain HTTPS at roughly 500 to 800 MB a run, so no sra-tools is needed.
+
+**The demultiplexing key is in the BioSample descriptions**, which is the part
+that makes this usable. Each run multiplexes 8 to 14 samples by a
+variable-length stagger sequence, and the description lists the staggers in
+order beside the sample names. One primary-screen run reads:
+
+    Stagger sequences (in sample order): empty__A__GA__CGA__ACGA__CTAGAA__...
+    Sample order: ZnF.three.Cil_U937_ALV1_C_Rep3__ZnF.three.Cil_U937_ALV2_G_Rep3
+                  __...__ZnF.three.Lav_U937_ALV1_C_Rep3__...
+
+That carries the library, the compound, the gate and the replicate, and it
+includes **Lavender**, whose absence from the read-count sheet is the whole
+reason D-082 gave up. It also names compounds that appear in no published
+table at all: NH2.4.Ph.Glu.Amide, Ph.Glu.Amide, OCH3.4.Ph.Glu.Amide.
+
+**Not yet reanalysed, and the remaining work is named rather than estimated.**
+A first-pass matcher scored 14 construct hits in 200,000 reads, because the
+reads do not begin at the construct: they carry vector, a Kozak, the tail of
+eGFP and a GGGGS linker before the insert, and the library's own sequences are
+nucleotide rather than protein. Locating the insert within the amplicon is
+ordinary work and it is work, so it is recorded as the next step rather than
+claimed as done.
