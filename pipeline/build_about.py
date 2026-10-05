@@ -437,6 +437,44 @@ def worked_example() -> dict:
             return {"available": False,
                     "note": "No bridge satisfied even the relaxed criteria."}
 
+        # The example's own ligase, so step 3 of the walkthrough can state its
+        # triage numbers instead of claiming the stage has not run. Best-ranked
+        # first, because an entry can carry more than one: 7OJX holds RNF38
+        # alongside ubiquitin and an E2.
+        ligase = None
+        if chosen.get("accessions"):
+            marks = ",".join("?" * len(chosen["accessions"]))
+            row = connection.execute(
+                f"SELECT uniprot_acc, gene, family, pocket_score, pocket_volume_a3, "
+                f"triage_rank, triage_score, exploitation_status, substrate_count "
+                f"FROM ligase WHERE status = 'ok' AND uniprot_acc IN ({marks}) "
+                f"ORDER BY triage_rank LIMIT 1", chosen["accessions"]).fetchone()
+            if row is not None:
+                ligase = dict(row)
+                ligase["total_ligases"] = connection.execute(
+                    "SELECT COUNT(*) FROM ligase WHERE status = 'ok'").fetchone()[0]
+
+        # How many bridges this entry records in total, and how many of them
+        # this ligand accounts for. Step 1 used to illustrate the filter with a
+        # sentence about a PEG oligomer in the same entry, which was true of the
+        # example it was written for and a fabrication about any other.
+        entry_bridges = connection.execute(
+            "SELECT COUNT(*) FROM bridge WHERE status = 'ok' AND pdb_id = ?",
+            (chosen["pdb_id"],)).fetchone()[0]
+        ligand_bridges = connection.execute(
+            "SELECT COUNT(*) FROM bridge WHERE status = 'ok' AND pdb_id = ? "
+            "AND ccd_id = ?", (chosen["pdb_id"], chosen["ccd_id"])).fetchone()[0]
+        # Checked, not assumed. The record is picked on resolution and balance,
+        # so it happens to be the widest interface of its ligand here and there
+        # is nothing in the selection that makes that always true.
+        largest = connection.execute(
+            "SELECT MAX(dsasa_total) FROM bridge WHERE status = 'ok' "
+            "AND pdb_id = ? AND ccd_id = ?",
+            (chosen["pdb_id"], chosen["ccd_id"])).fetchone()[0]
+        is_largest = (largest is not None
+                      and chosen.get("dsasa_total") is not None
+                      and abs(largest - chosen["dsasa_total"]) < 1e-9)
+
         labels = dict(CRITERIA)
         return {
             "available": True,
@@ -457,6 +495,10 @@ def worked_example() -> dict:
             "interface_residues_a": _decode(chosen.get("interface_residues_a")),
             "interface_residues_b": _decode(chosen.get("interface_residues_b")),
             "accessions": chosen.get("accessions", []),
+            "ligase": ligase,
+            "entry_bridges": entry_bridges,
+            "ligand_bridges": ligand_bridges,
+            "is_largest_for_ligand": is_largest,
             "criteria": [
                 {"key": key, "label": labels[key],
                  "met": bool(chosen["criteria_met"].get(key)),

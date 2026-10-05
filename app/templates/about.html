@@ -150,12 +150,21 @@
               <tr><td>Ligand heavy atoms</td><td class="num">{{ ex.heavy_atoms }}</td></tr>
             </tbody>
           </table>
+          {# Derived from the chosen record. The sentence here used to describe
+             a PEG oligomer in the same entry, which was true of the example it
+             was written for and a fabrication about every other one. #}
           <p style="font-size:0.86rem;color:var(--muted)">
             This passes the bridging filter because it buries more than the
             minimum area against <em>both</em> chains at once and makes enough
-            heavy-atom contacts to each. A PEG oligomer in the same entry fails
-            on two counts: it is classified as a cryoprotectant from its
-            structure, and it grazes one chain rather than bridging two.
+            heavy-atom contacts to each. Anything burying surface against only
+            one chain, or classified from its structure as crystallisation
+            furniture, is counted and kept but not called a bridge.
+            {{ ex.pdb_id }} records
+            {{ ex.entry_bridges | thousands }} bridge(s) in total,
+            {{ ex.ligand_bridges | thousands }} of them for
+            <code>{{ ex.ccd_id }}</code> across different chain pairs{% if
+            ex.is_largest_for_ligand %}; the one above is the widest of
+            them{% endif %}.
           </p>
         </div>
         <div>
@@ -194,10 +203,37 @@
 
     <div class="about-step" id="example-step-3">
       <div class="about-step__n">Step 3 · its ligase in context</div>
-      <div class="notice">
-        The E3 Triage stage has not run, so there is no pocket score, volume or
-        triage rank for this record yet.
-      </div>
+      {# This step used to print "the E3 Triage stage has not run" with no
+         condition on it at all. The stage had run, and the example is chosen
+         partly because its ligase has a pocket score, so the page was stating
+         the opposite of what it had just used to pick the record. #}
+      {% set lig = ex.ligase %}
+      {% if lig %}
+        <p>
+          <code>{{ lig.gene }}</code> ({{ lig.uniprot_acc }}), a
+          {{ lig.family }} ligase, ranked {{ lig.triage_rank | thousands }} of
+          {{ lig.total_ligases | thousands }} by the E3 Triage stage.
+        </p>
+        <table class="grid-table" style="max-width:34rem"><tbody>
+          <tr><td>Pocket druggability score</td>
+              <td class="num">{{ lig.pocket_score | sigfig }}</td></tr>
+          <tr><td>Pocket volume</td>
+              <td class="num">{{ lig.pocket_volume_a3 | sigfig(4) }} Å³</td></tr>
+          <tr><td>Triage score</td>
+              <td class="num">{{ lig.triage_score | sigfig }}</td></tr>
+          <tr><td>Triage rank</td>
+              <td class="num">{{ lig.triage_rank | thousands }}</td></tr>
+          <tr><td>Curated substrates</td>
+              <td class="num">{{ lig.substrate_count | thousands }}</td></tr>
+          <tr><td>Exploitation status</td>
+              <td>{{ lig.exploitation_status }}</td></tr>
+        </tbody></table>
+      {% else %}
+        <div class="notice">
+          No entity in this structure is in the E3 Triage table, so there is no
+          pocket score, volume or triage rank to show for it.
+        </div>
+      {% endif %}
     </div>
 
     <div class="about-step" id="example-step-4">
