@@ -1,20 +1,14 @@
 {
-  "generated_at": "2026-10-05T00:34:04+00:00",
+  "generated_at": "2026-10-05T08:03:35+00:00",
   "atlas": "/Users/dellboy/Documents/Vibe_Coding/BINMAN/data/atlas/binman.sqlite",
-  "atlas_bytes": 163500032,
+  "atlas_bytes": 200654848,
   "note": "A metric whose dataset is unavailable is reported as computed: false with the reason. Nothing here is estimated, and no hand-written control was substituted for a missing published one (spec 4.1b).",
   "floors_missed": [
     {
       "section": "9.1",
       "metric": "artefact_precision",
-      "value": 0.9391,
+      "value": 0.9401,
       "floor": 0.95
-    },
-    {
-      "section": "9.1",
-      "metric": "recall",
-      "value": 0.825,
-      "floor": 0.85
     },
     {
       "section": "9.2",
@@ -47,6 +41,11 @@
       "reason": "The atlas `substrate_count` column is populated from the UbiBrowser literature set itself, so a Spearman correlation against UbiBrowser would be a tautology (rho = 1 by construction) rather than a test. A genuine version needs a second, independent substrate source."
     },
     {
+      "section": "9.4",
+      "metric": "exposure_vs_assayed_negatives",
+      "reason": "D-067 measures exposure at 0.5020 within protein against 309,297 lysines assayed and found unmodified, superseding the 0.5458 above, and a per-lysine model at 0.6778. Those runs wrote no artefact: the numbers are in DECISIONS.md and thresholds.toml as prose. Re-running pipeline/degradability_features.py against data/interim/acquire_ubiquitylome.json would make them readable here. Until it does, this section reports no figure rather than copying one out of a document."
+    },
+    {
       "section": "9.5",
       "metric": "task_a_external",
       "reason": "Not computable: no externally phrased query survived the harvest. 463 candidate sentences were pulled from open-access reviews and 18 are genuinely interrogative, but none asks a question BINMAN's schema can answer: they ask about linker composition, ubiquitin chain architecture, alternative splicing and metabolite-specific teratogenicity. Review articles pose mechanistic questions, not database queries. Reporting a number measured on project-phrased rows would claim a register-mismatch result the data does not support."
@@ -61,40 +60,34 @@
     "title": "Glue Atlas",
     "artefact_precision": {
       "computed": true,
-      "value": 0.9391,
+      "value": 0.9401,
       "floor": 0.95,
       "reason": "",
       "passes": false,
-      "n": 345,
-      "not_called_glue": 324,
+      "n": 401,
+      "not_called_glue": 377,
       "note": "Measured over the artefact CCDs present in the atlas. The held-out-split figure in FINDINGS.md (0.927) is the one to quote: it was measured on a half of the list that the classification rules were not developed against."
     },
     "recall": {
       "computed": true,
-      "value": 0.825,
+      "value": 0.8781,
       "floor": 0.85,
       "reason": "",
-      "passes": false,
+      "passes": true,
       "n": 320,
-      "recovered": 264
+      "recovered": 281
     },
     "misses": {
       "computed": true,
       "value": [
-        "1A7X",
         "1KKQ",
         "2OVM",
-        "3BBR",
         "3JRQ",
         "3KB3",
         "3KDJ",
-        "3KO0",
         "3OGL",
         "3QN1",
-        "3TCT",
-        "3U15",
         "3UJL",
-        "3VBG",
         "3ZVU",
         "4A69",
         "4DS8",
@@ -105,36 +98,25 @@
         "5D3F",
         "5GWO",
         "5GWP",
-        "5J89",
-        "5J8O",
         "5JO2",
         "5MN0",
         "5MXO",
-        "5NIU",
         "5ZCG",
         "5ZCH",
         "5ZCL",
-        "6C8C",
         "6GHP",
-        "6KL5",
         "6KL6",
-        "6MG5",
         "6NV2",
         "6QDS",
         "6QTL",
-        "6R3K",
-        "6XMX",
         "6YOX",
-        "7DY7",
         "7EG0",
         "7EG4",
         "7JUR",
         "7JUX",
         "7LRD",
-        "7NLD",
         "8BX3",
         "8BYF",
-        "8FLK",
         "8JYC",
         "8JYE"
       ],
@@ -149,30 +131,30 @@
       "value": null
     },
     "counts": {
-      "bridges": 283131,
-      "glue_candidate_bridges": 27132,
-      "entries_with_a_bridge": 18496,
-      "symmetry_mediated": 38204
+      "bridges": 285996,
+      "glue_candidate_bridges": 27605,
+      "entries_with_a_bridge": 19126,
+      "symmetry_mediated": 38748
     },
     "novel_bridges": {
       "computed": true,
-      "value": 15451,
+      "value": 15804,
       "floor": null,
       "reason": "",
       "note": "The headline result."
     },
     "ccd_class_counts": {
-      "glue_candidate": 7385,
-      "cofactor": 860,
-      "lipid": 385,
-      "unknown": 382,
-      "peptide_like": 278,
-      "detergent": 212,
-      "buffer": 194,
-      "sugar": 101,
-      "cryoprotectant": 99,
-      "metal": 64,
-      "covalent_modifier": 21
+      "unknown": 20127,
+      "glue_candidate": 7676,
+      "cofactor": 938,
+      "lipid": 394,
+      "peptide_like": 282,
+      "detergent": 216,
+      "buffer": 206,
+      "sugar": 113,
+      "cryoprotectant": 104,
+      "metal": 70,
+      "covalent_modifier": 23
     }
   },
   "9.2": {
@@ -360,8 +342,8 @@
       "computed": true,
       "reason": "",
       "floor": null,
-      "value": 0.6368,
-      "note": "Spec 9.2's reversal condition, tested: a feature that discriminates WITHIN the C2H2 family. Zinc fingers anchored on their C2H2 motif, residues encoded as chemical groups per aligned position, L2 logistic regression evaluated by repeated stratified group k-fold so no gene spans a split. Held-out AUC 0.6368 (sd 0.0895) against the geometry's 0.4407 and a permutation null of 0.5096 (sd 0.0654, p95 0.6046). Real, and marginal: it clears the null's 95th percentile by 1.94 standard deviations on 32 positives."
+      "value": 0.6363,
+      "note": "Spec 9.2's reversal condition, tested: a feature that discriminates WITHIN the C2H2 family. Zinc fingers anchored on their C2H2 motif, residues encoded as chemical groups per aligned position, L2 logistic regression evaluated by repeated stratified group k-fold so no gene spans a split. Held-out AUC 0.6363 (sd 0.0822) against the geometry's 0.4407 and a permutation null of 0.5096 (sd 0.0654, p95 0.6046). Real, and marginal: it clears the null's 95th percentile by 1.94 standard deviations on 32 positives."
     },
     "sequence_model_operating_points": {
       "computed": true,
@@ -911,7 +893,13 @@
       "reason": "",
       "passes": false,
       "source": "UniProt CROSSLNK ubiquitin isopeptide annotations for the reviewed human proteome (950 observed sites on 403 proteins, 11755 unannotated lysines as negatives), measured on a protein-level split with 338 observed sites held out.",
-      "note": "**Accessibility only.** This is the AUC of lysine NZ relative accessibility as a predictor of whether a lysine carries an observed ubiquitylation site. The three Cb-Cb reach boundaries are unfitted and no reach verdict is emitted: an AlphaFold monomer carrying an observed site has no ligand site for the distance to be measured from. The negatives are lysines with no annotation, not lysines assayed and found unmodified, so this is a weaker construction than the matched screen behind 9.2."
+      "note": "**SUPERSEDED, and reported because it is the last figure any artefact holds.** D-067 remeasured exposure against lysines assayed and found unmodified and got 0.5020, at chance. This 0.5458 was measured against lysines nobody had annotated, which skew buried because buried lysines are also harder to detect by mass spectrometry, so the negative set was enriched for exactly what this feature measures and the number is biased upward. Read it as an upper bound on a dead criterion, not as the module's accuracy.\n\n**Accessibility only.** It is the AUC of lysine NZ relative accessibility as a predictor of whether a lysine carries an observed ubiquitylation site. The three Cb-Cb reach boundaries are unfitted and no reach verdict is emitted: an AlphaFold monomer carrying an observed site has no ligand site for the distance to be measured from."
+    },
+    "exposure_vs_assayed_negatives": {
+      "computed": false,
+      "reason": "D-067 measures exposure at 0.5020 within protein against 309,297 lysines assayed and found unmodified, superseding the 0.5458 above, and a per-lysine model at 0.6778. Those runs wrote no artefact: the numbers are in DECISIONS.md and thresholds.toml as prose. Re-running pipeline/degradability_features.py against data/interim/acquire_ubiquitylome.json would make them readable here. Until it does, this section reports no figure rather than copying one out of a document.",
+      "floor": 0.65,
+      "value": null
     },
     "protein_level_split_honoured": {
       "computed": true,
@@ -924,7 +912,7 @@
       "computed": true,
       "value": false,
       "reason": "",
-      "fit_status": "not yet fitted",
+      "fit_status": "not fitted: exposure scores 0.5020 against assayed negatives and the three reach distances score 0.42 to 0.48 on induced ternary complexes, all below the 0.65 floor (D-067, D-068)",
       "note": "The fit ran but its held-out AUC misses the floor, so nothing was written back: spec 5.4 forbids a starting value surviving into a shipped config unless the fit lands on it."
     },
     "honest_limits": [
@@ -946,8 +934,11 @@
       "final",
       "round06",
       "round07-32layers",
+      "round07-on-rebuilt-atlas",
       "round08-rank32",
       "round09-32layers-rank32",
+      "round13-32b-1epoch",
+      "round14-32b-1epoch",
       "round_with_task_b",
       "stage1",
       "stage2"

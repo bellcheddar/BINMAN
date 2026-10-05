@@ -151,8 +151,8 @@ as such rather than guessed.
 
 ## What it found
 
-**52,821 entries, 283,131 bridges, 15,451 of them novel**, meaning they appear
-in none of the three curated glue databases. 27,132 bridges carry a ligand
+**55,449 entries, 285,996 bridges, 15,804 of them novel**, meaning they appear
+in none of the three curated glue databases. 27,605 bridges carry a ligand
 classed as a glue candidate; the remaining crystallisation furniture is
 classified rather than deleted, so the counts reconcile. 21,717 degron
 candidates over 8,983 proteins, 7,452 C2H2 zinc fingers scored individually,
@@ -179,14 +179,20 @@ ubiquitin is transferred.
 
 ### What the first rule costs
 
-The rule above has a price, and it is paid in public. Of the fifteen spec
-Section 9 metrics: six pass, five miss their floor and four are not computable
-for want of a dataset. The misses are diagnosed rather than hidden, and the
-diagnosis is usually the useful part. Glue recall sits at 0.825 against a 0.85
-floor, and the remaining gap is dominated by homo-oligomeric glues that the
-inclusion criterion excludes by construction, which is a scope limit rather than
-a tuning one. Full accounting in [`FINDINGS.md`](FINDINGS.md), with every
-judgement call and how to reverse it in [`DECISIONS.md`](DECISIONS.md).
+The rule above has a price, and it is paid in public. Of the sixteen spec
+Section 9 metrics: seven pass, four miss their floor and five are not
+computable for want of a dataset. The misses are diagnosed rather than hidden,
+and the diagnosis is usually the useful part.
+
+Glue recall used to be one of them, at 0.825 against a 0.85 floor, and the
+diagnosis was that the gap was dominated by homo-oligomeric glues the inclusion
+criterion excluded by construction: a homodimer is one entity whatever its
+chain count, so FKBP12 with FK1012 and transthyretin with tafamidis were never
+fetched. Widening the catalogue to those entries took recall to **0.8781**, 281
+of 320 curated glues, and the floor is met. That is what the diagnoses are for.
+
+Full accounting in [`FINDINGS.md`](FINDINGS.md), with every judgement call and
+how to reverse it in [`DECISIONS.md`](DECISIONS.md).
 
 ## 🎓 BINMAN-LM
 
