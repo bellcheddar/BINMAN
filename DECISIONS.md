@@ -2885,9 +2885,13 @@ atlas first (D-069) and returned every figure unchanged, so the two rows above
 were measured against the same database on the same day with the same harness.
 
 **What the 32B cost.** About ten hours of training, 18 GB of checkpoints and a
-128 MB adapter. The checkpoints can go; the adapter and its config stay, because
-the next person to wonder whether scale helps should be able to see that it was
-tried rather than assumed.
+128 MB adapter.
+
+**Superseded 2026-10-05 (D-077).** This said the checkpoints could go and the
+adapter should stay, so the scale experiment stayed visible. Marc chose to keep
+only round 07 and the 32B adapter went with the rest. What survives it is this
+decision and the measured rows above, which is the part that carries the
+finding: the numbers are here whether or not the weights are.
 
 ## D-072
 
@@ -3013,3 +3017,34 @@ blocked by an open question: whether any monomer-derivable signal reaches the
 floor at all. It does. What blocks a verdict is the shape spec 5.4 asks for,
 not an absence of signal, and that is a different problem with a different
 solution.
+
+## D-077
+
+**114.7 GB of model storage deleted; round 07 and the corpus kept.**
+
+`models/` held 114.8 GB and now holds 0.1 GB. Deleted: `models/binman-lm/fused`
+(19 GB), every training run except round 07 (59 GB), the
+`models/binman-lm/adapters` directory (18 GB), and round 07's own 140
+intermediate checkpoints (7 GB). Kept: round 07's final adapter and config, its
+wandb record, `adapters-dpo` at 25 MB, and the 22 MB training corpus.
+
+Round 07 is kept because it is what serves and what
+`pipeline/triage_predict.py` loads. It was copied aside before anything was
+deleted and verified intact after. Nothing in the codebase referenced an
+intermediate checkpoint, which is why they could go without a resume path being
+lost.
+
+`fused` was already recorded in FINDINGS as an artefact that parsed 0 of 10
+held-out questions and "was deleted rather than shipped". It had not been. The
+deletion makes the record true.
+
+**This supersedes D-071's retention of the 32B adapter**, and D-071 now says so.
+The scale experiment survives as its measured rows rather than its weights.
+
+**Nothing live depends on local weights.** The Space pulls
+`Dellboy/binman-lm-adapter` from HuggingFace, so the demo and the
+natural-language box were verified answering 200 after the deletion. Two
+references to the deleted `models/binman-lm/adapters` path remain, in
+`training.json` and in `results.json` 9.5's `adapter` field. Both are records of
+runs rather than load paths, and the model card already reads
+`models/binman-lm/served/adapter_config.json` instead (D-074).
