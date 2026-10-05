@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-10-04T13:14:00+00:00",
+  "generated_at": "2026-10-05T00:34:04+00:00",
   "atlas": "/Users/dellboy/Documents/Vibe_Coding/BINMAN/data/atlas/binman.sqlite",
-  "atlas_bytes": 149442560,
+  "atlas_bytes": 163500032,
   "note": "A metric whose dataset is unavailable is reported as computed: false with the reason. Nothing here is estimated, and no hand-written control was substituted for a missing published one (spec 4.1b).",
   "floors_missed": [
     {
@@ -13,7 +13,7 @@
     {
       "section": "9.1",
       "metric": "recall",
-      "value": 0.7719,
+      "value": 0.825,
       "floor": 0.85
     },
     {
@@ -71,12 +71,12 @@
     },
     "recall": {
       "computed": true,
-      "value": 0.7719,
+      "value": 0.825,
       "floor": 0.85,
       "reason": "",
       "passes": false,
       "n": 320,
-      "recovered": 247
+      "recovered": 264
     },
     "misses": {
       "computed": true,
@@ -89,13 +89,8 @@
         "3KB3",
         "3KDJ",
         "3KO0",
-        "3OGK",
         "3OGL",
-        "3P1O",
         "3QN1",
-        "3SML",
-        "3SMM",
-        "3SMO",
         "3TCT",
         "3U15",
         "3UJL",
@@ -121,7 +116,6 @@
         "5ZCL",
         "6C8C",
         "6GHP",
-        "6HN2",
         "6KL5",
         "6KL6",
         "6MG5",
@@ -131,26 +125,15 @@
         "6R3K",
         "6XMX",
         "6YOX",
-        "6YPY",
         "7DY7",
         "7EG0",
         "7EG4",
         "7JUR",
-        "7JUV",
         "7JUX",
         "7LRD",
         "7NLD",
-        "8AXE",
-        "8BUJ",
-        "8BWJ",
-        "8BWX",
         "8BX3",
-        "8BX4",
-        "8BXI",
         "8BYF",
-        "8BYO",
-        "8BYY",
-        "8C0K",
         "8FLK",
         "8JYC",
         "8JYE"
@@ -166,27 +149,27 @@
       "value": null
     },
     "counts": {
-      "bridges": 239485,
-      "glue_candidate_bridges": 24204,
-      "entries_with_a_bridge": 17536,
-      "symmetry_mediated": 28780
+      "bridges": 283131,
+      "glue_candidate_bridges": 27132,
+      "entries_with_a_bridge": 18496,
+      "symmetry_mediated": 38204
     },
     "novel_bridges": {
       "computed": true,
-      "value": 14260,
+      "value": 15451,
       "floor": null,
       "reason": "",
       "note": "The headline result."
     },
     "ccd_class_counts": {
-      "glue_candidate": 7366,
-      "cofactor": 863,
+      "glue_candidate": 7385,
+      "cofactor": 860,
       "lipid": 385,
       "unknown": 382,
       "peptide_like": 278,
-      "detergent": 223,
+      "detergent": 212,
       "buffer": 194,
-      "sugar": 106,
+      "sugar": 101,
       "cryoprotectant": 99,
       "metal": 64,
       "covalent_modifier": 21

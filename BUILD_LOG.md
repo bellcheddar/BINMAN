@@ -721,3 +721,13 @@ One line per meaningful event, timestamped UTC (spec Section 0 rule 5).
 | 2026-10-05T00:04:06+00:00 | 9.4 | Reach on induced ternaries: 136 assayed lysines over 68 complexes, 64 ubiquitylated. |
 | 2026-10-05T00:05:06+00:00 | 9.4 | Reach on induced ternaries: 0 assayed lysines over 68 complexes, 0 ubiquitylated. |
 | 2026-10-05T00:05:44+00:00 | 9.4 | Reach on induced ternaries: 369 assayed lysines over 68 complexes, 181 ubiquitylated. |
+| 2026-10-05T00:07:32+00:00 | 1.3 | 985/1,043 entries, 53,680 bridges, 19 failed, 0.4 entries/s, ~0.0 h remaining. |
+| 2026-10-05T00:12:49+00:00 | 1.3 | 1,041/1,043 entries, 56,829 bridges, 19 failed, 0.3 entries/s, ~0.0 h remaining. |
+| 2026-10-05T00:17:50+00:00 | 1.3 | 1,041/1,043 entries, 56,829 bridges, 19 failed, 0.3 entries/s, ~0.0 h remaining. |
+| 2026-10-05T00:23:16+00:00 | 1.3 | 1,042/1,043 entries, 57,115 bridges, 19 failed, 0.3 entries/s, ~0.0 h remaining. |
+| 2026-10-05T00:28:16+00:00 | 1.3 | 1,042/1,043 entries, 57,115 bridges, 19 failed, 0.3 entries/s, ~0.0 h remaining. |
+| 2026-10-05T00:29:35+00:00 | 1.3 | Bridge run finished: 1,043 entries in 67.9 min, 57,715 bridges, 19 failed, 0.3 entries/s. |
+| 2026-10-05T00:32:50+00:00 | 4.3 | Atlas built: 52,821 entries, 283,131 bridges (15,451 novel), 9,981 ligands, 21,717 degrons, 650 ligases, 1,650 lysines, 155.9 MB. |
+| 2026-10-05T00:34:04+00:00 | 9 | Validation run against binman.sqlite: 4 metric(s) not computed (dataset unavailable), 5 measured floor(s) missed. |
+| 2026-10-05T00:34:48+00:00 | 9 | Validation run against binman.sqlite: 0 metric(s) not computed (dataset unavailable), 2 measured floor(s) missed. |
+| 2026-10-05T00:34:49+00:00 | 9 | Validation run against binman.sqlite: 4 metric(s) not computed (dataset unavailable), 5 measured floor(s) missed. |

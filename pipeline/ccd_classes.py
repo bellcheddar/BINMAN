@@ -201,6 +201,9 @@ SEED_SETS: tuple[tuple[str, set[str]], ...] = (
 # Classes whose members are small by nature. A name match for one of these on a
 # molecule larger than this is rejected: see the guard in `classify`.
 SIZE_GUARDED_CLASSES = frozenset({"buffer", "cryoprotectant"})
+# A detergent is an amphiphile with a simple head. Triton's single phenyl is
+# the most any genuine one here carries; two or more rings means a drug.
+MAX_DETERGENT_AROMATIC_RINGS = 1
 MAX_FURNITURE_HEAVY_ATOMS = 12
 
 FURNITURE_CLASSES = frozenset(
@@ -248,6 +251,21 @@ def _element_from_formula(formula: str) -> str | None:
             not re.fullmatch(r"[0-9+-]+", tokens[1]):
         return None
     return first
+
+
+def _aromatic_rings(smiles: str) -> int:
+    """Aromatic ring count, or 0 when the structure cannot be read.
+
+    Falling back to 0 keeps an unreadable SMILES on the old behaviour rather
+    than silently reclassifying it on missing evidence.
+    """
+    try:
+        from pipeline.chem_rules import features
+
+        found = features(smiles)
+        return int(found.aromatic_rings) if found else 0
+    except Exception:
+        return 0
 
 
 def classify(
@@ -331,6 +349,21 @@ def classify(
             continue
         if ccd_class in SIZE_GUARDED_CLASSES and heavy_atoms is not None \
                 and heavy_atoms > MAX_FURNITURE_HEAVY_ATOMS:
+            continue
+        # The detergent pattern matches alkyl-chain words (octyl, dodecyl,
+        # lauryl, decyl) anywhere in the name, and an IUPAC name says "octyl"
+        # for any eight-carbon linker. That classified RN3 and RN6 as
+        # detergent and marked them furniture: both are CRBN-recruiting BET
+        # degraders, thalidomide joined to JQ1 through a C8 linker, filed as
+        # crystallisation plastic on a substring (D-065).
+        #
+        # Size cannot separate them: the largest correctly classed detergent
+        # here is a 1,165 Da maltoside. Aromatic rings can. Of the 59 CCDs this
+        # rule claimed, 48 have none or one and are genuine amphiphiles, and
+        # all 10 with two or more are drugs, degraders or alkyl-chain natural
+        # products.
+        if ccd_class == "detergent" and smiles \
+                and _aromatic_rings(smiles) >= MAX_DETERGENT_AROMATIC_RINGS + 1:
             continue
         return result(ccd_class, f"name_rule:{ccd_class}")
 
