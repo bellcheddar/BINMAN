@@ -2842,3 +2842,42 @@ the About page's references table, and `reference_summary.licence_not_determined
 stays in the artefact and now reads 0. A future source with no terms will show
 in the table and in that count, so removing the banner costs visibility rather
 than the record.
+
+## D-071: the 32B does not beat the 3B, so the 3B ships
+
+**Decision.** `round07`, a 3B with the last 32 layers trained, stays the shipped
+model. Round 14, a 32B trained for a full epoch on the same corpus, does not
+beat it on any metric and is marginally worse on two.
+
+| | parse | set equality | exact | Task B macro F1 | Task C |
+|---|---:|---:|---:|---:|---:|
+| round 07, 3B, 32 layers | 1.0 | 1.0 | 0.975 | **0.9336** | 1.0 |
+| round 14, 32B, 1 epoch | 1.0 | 1.0 | 0.9583 | 0.9253 | 1.0 |
+
+**In samples, which is what decides whether this means anything.** Task B is
+**222 of 240 against 224 of 240**: two classifications. Task A exact match is
+115 of 120 against 117: two queries. Parse rate, set equality and abstention are
+tied at ceiling, where they have been since round 06. Per class the 32B is
+slightly behind on crystallisation artefact (0.885 against 0.901) and native
+cofactor (0.884 against 0.901) and level on glue and PROTAC.
+
+So the honest statement is not "the 32B is worse". It is that **ten times the
+parameters and ten hours of training produce no measurable difference**, and the
+difference that exists points the wrong way by an amount a handful of samples
+could reverse.
+
+**Why this was worth running anyway.** The ablation that chose round 07's shape
+(D-0xx, the depth sweep) showed depth was the lever and that rank and epochs
+were not. The open question was whether the lever simply ran out at 3B or kept
+going with scale. It ran out. That is a cheaper thing to know than to assume in
+either direction, and it closes the loop's stated gate: the best model is the
+one already shipped.
+
+**The comparison is like for like.** Round 07 was re-evaluated on the rebuilt
+atlas first (D-069) and returned every figure unchanged, so the two rows above
+were measured against the same database on the same day with the same harness.
+
+**What the 32B cost.** About ten hours of training, 18 GB of checkpoints and a
+128 MB adapter. The checkpoints can go; the adapter and its config stay, because
+the next person to wonder whether scale helps should be able to see that it was
+tried rather than assumed.
