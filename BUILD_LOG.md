@@ -771,3 +771,6 @@ One line per meaningful event, timestamped UTC (spec Section 0 rule 5).
 | 2026-10-05T02:28:03+00:00 | 3.8 | round13-32b-1epoch: parse rate 1.0, set equality 1.0 on 120 synthetic queries. |
 | 2026-10-05T02:29:38+00:00 | 9 | Validation run against binman.sqlite: 0 metric(s) not computed (dataset unavailable), 2 measured floor(s) missed. |
 | 2026-10-05T02:29:39+00:00 | 9 | Validation run against binman.sqlite: 4 metric(s) not computed (dataset unavailable), 5 measured floor(s) missed. |
+| 2026-10-05T02:34:36+00:00 | 3.8 | round14-32b-1epoch: parse rate 1.0, set equality 1.0 on 120 synthetic queries. |
+| 2026-10-05T02:37:26+00:00 | 9 | Validation run against binman.sqlite: 0 metric(s) not computed (dataset unavailable), 2 measured floor(s) missed. |
+| 2026-10-05T02:37:27+00:00 | 9 | Validation run against binman.sqlite: 4 metric(s) not computed (dataset unavailable), 5 measured floor(s) missed. |

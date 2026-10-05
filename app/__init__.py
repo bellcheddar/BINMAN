@@ -38,6 +38,29 @@ def create_app(config: dict | None = None) -> Flask:
     if config:
         app.config.update(config)
 
+    # Cache-bust every static URL with the file's modification time.
+    #
+    # The assets ship with `cache-control: no-cache`, which asks a browser to
+    # revalidate, and in practice browsers still served a mixture of old and
+    # new files across a deploy: a stale molstar-bridge.js beside a fresh
+    # ledger.js is a combination neither version was ever tested as, and it
+    # presents as the table and the viewer being empty rather than as an error.
+    #
+    # A changed file gets a changed URL, so the stale copy is not a candidate
+    # to serve and the failure cannot happen. Cheaper than reasoning about
+    # revalidation, and it is the one fix that does not depend on the browser
+    # behaving.
+    @app.url_defaults
+    def _static_cache_key(endpoint: str, values: dict) -> None:
+        if endpoint != "static" or "filename" not in values:
+            return
+        try:
+            stamp = os.stat(os.path.join(app.static_folder,
+                                         values["filename"])).st_mtime
+        except OSError:
+            return          # a missing file is the router's problem, not this
+        values["v"] = int(stamp)
+
     from app import db, lm
     from app.routes import about, degradability, degron, e3, ledger, lens
 
