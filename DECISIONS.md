@@ -2467,10 +2467,17 @@ than estimated, and they fall into three buckets with three different causes.
 | bridged, classed as something else | 7 | cofactor, cryoprotectant, detergent, peptide-like |
 
 **The 20 are a scope hole, and an embarrassing one.** Spec 1.1 catalogues entries
-with `polymer_entity_count >= 2`, and spec 5.1 requires a bridge to join
-**distinct entities**. A homodimer is one entity with two chains, so every
-homo-oligomeric glue is excluded twice over, by construction, before any
-threshold is applied. Checked against RCSB, all ten sampled misses have
+with `polymer_entity_count >= 2`, so a pure homodimer, being one entity however
+many chains it has, is never fetched.
+
+> **Correction, D-071 onward.** This entry first said the exclusion happened
+> **twice over**, in the catalogue and again in spec 5.1's "distinct entities".
+> The second half is wrong. `find_bridges` rejects only a chain paired with
+> itself: its own comment says "two copies of the same chain are distinct
+> instances and do count". The atlas already holds **42,797 same-entity
+> bridges, 15.1% of the total**, so homo-oligomeric glue detection has worked
+> all along inside catalogued entries. The gap is the catalogue query alone,
+> which makes the fix one line rather than a change to what a bridge is. Checked against RCSB, all ten sampled misses have
 `polymer_entity_count = 1` with 2 to 20 chains:
 
 * **1A7X**, FKBP12 with FK1012: the original chemical dimeriser.

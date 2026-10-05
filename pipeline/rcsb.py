@@ -86,11 +86,29 @@ def _terminal(attribute: str, operator: str, value: Any) -> dict:
 
 
 def bridging_candidate_query() -> dict:
-    """Spec 1.1: entries with >= 2 distinct polymer entities and >= 1 non-polymer entity."""
+    """Entries with a ligand and at least two polymer CHAINS it could bridge.
+
+    Spec 1.1 says two distinct polymer *entities*, and that quietly excluded
+    every homo-oligomeric glue: a homodimer is one entity whatever its chain
+    count, so FKBP12 with FK1012, the original chemical dimeriser, and
+    transthyretin with tafamidis, a marketed drug whose mechanism is stabilising
+    a homotetramer, were never fetched. A Blind-spot INventory of Molecular
+    Adhesives could not represent a glue that sticks a protein to a copy of
+    itself. Widened on Marc's authorisation (D-062, D-072).
+
+    The bridging test itself never needed changing. `find_bridges` rejects only
+    a chain paired with itself, and the atlas already holds 42,797 same-entity
+    bridges, so the geometry has always handled this and only the catalogue was
+    narrow.
+
+    `deposited_polymer_entity_instance_count` is the chain count, which is the
+    quantity the bridging question actually turns on.
+    """
     return {
         "type": "group", "logical_operator": "and",
         "nodes": [
-            _terminal("rcsb_entry_info.polymer_entity_count", "greater_or_equal", 2),
+            _terminal("rcsb_entry_info.deposited_polymer_entity_instance_count",
+                      "greater_or_equal", 2),
             _terminal("rcsb_entry_info.nonpolymer_entity_count", "greater_or_equal", 1),
         ],
     }
