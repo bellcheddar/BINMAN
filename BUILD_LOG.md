@@ -932,3 +932,39 @@ One line per meaningful event, timestamped UTC (spec Section 0 rule 5).
 | 2026-10-05T05:36:45+00:00 | 2.1 | 6,540/20,431 scanned, 7,444 candidates, 291 failed, 1.7/s, ~2.3 h remaining. |
 | 2026-10-05T05:37:43+00:00 | 9 | Validation run against binman.sqlite: 0 metric(s) not computed (dataset unavailable), 2 measured floor(s) missed. |
 | 2026-10-05T05:37:43+00:00 | 9 | Validation run against binman.sqlite: 5 metric(s) not computed (dataset unavailable), 4 measured floor(s) missed. |
+| 2026-10-05T05:41:46+00:00 | 2.1 | 7,045/20,431 scanned, 7,976 candidates, 304 failed, 1.7/s, ~2.2 h remaining. |
+| 2026-10-05T05:46:46+00:00 | 2.1 | 7,554/20,431 scanned, 8,424 candidates, 317 failed, 1.7/s, ~2.1 h remaining. |
+| 2026-10-05T05:51:46+00:00 | 2.1 | 8,057/20,431 scanned, 8,963 candidates, 335 failed, 1.7/s, ~2.1 h remaining. |
+| 2026-10-05T05:56:46+00:00 | 2.1 | 8,559/20,431 scanned, 9,436 candidates, 347 failed, 1.7/s, ~2.0 h remaining. |
+| 2026-10-05T06:01:47+00:00 | 2.1 | 9,061/20,431 scanned, 9,932 candidates, 356 failed, 1.7/s, ~1.9 h remaining. |
+| 2026-10-05T06:06:47+00:00 | 2.1 | 9,578/20,431 scanned, 10,450 candidates, 373 failed, 1.7/s, ~1.8 h remaining. |
+| 2026-10-05T06:11:47+00:00 | 2.1 | 10,084/20,431 scanned, 11,050 candidates, 386 failed, 1.7/s, ~1.7 h remaining. |
+| 2026-10-05T06:16:49+00:00 | 2.1 | 10,591/20,431 scanned, 11,470 candidates, 400 failed, 1.7/s, ~1.6 h remaining. |
+| 2026-10-05T06:21:49+00:00 | 2.1 | 11,096/20,431 scanned, 12,090 candidates, 408 failed, 1.7/s, ~1.5 h remaining. |
+| 2026-10-05T06:26:49+00:00 | 2.1 | 11,600/20,431 scanned, 12,539 candidates, 418 failed, 1.7/s, ~1.5 h remaining. |
+| 2026-10-05T06:31:50+00:00 | 2.1 | 12,086/20,431 scanned, 13,016 candidates, 424 failed, 1.7/s, ~1.4 h remaining. |
+| 2026-10-05T06:36:51+00:00 | 2.1 | 12,583/20,431 scanned, 13,526 candidates, 437 failed, 1.7/s, ~1.3 h remaining. |
+| 2026-10-05T06:41:52+00:00 | 2.1 | 13,070/20,431 scanned, 14,039 candidates, 446 failed, 1.7/s, ~1.2 h remaining. |
+| 2026-10-05T06:46:53+00:00 | 2.1 | 13,559/20,431 scanned, 14,613 candidates, 456 failed, 1.7/s, ~1.1 h remaining. |
+| 2026-10-05T06:51:53+00:00 | 2.1 | 14,047/20,431 scanned, 15,200 candidates, 466 failed, 1.7/s, ~1.1 h remaining. |
+| 2026-10-05T06:56:55+00:00 | 2.1 | 14,534/20,431 scanned, 15,737 candidates, 475 failed, 1.7/s, ~1.0 h remaining. |
+| 2026-10-05T07:01:56+00:00 | 2.1 | 15,019/20,431 scanned, 16,397 candidates, 481 failed, 1.7/s, ~0.9 h remaining. |
+| 2026-10-05T07:06:57+00:00 | 2.1 | 15,509/20,431 scanned, 17,088 candidates, 491 failed, 1.7/s, ~0.8 h remaining. |
+| 2026-10-05T07:11:57+00:00 | 2.1 | 15,995/20,431 scanned, 17,773 candidates, 499 failed, 1.7/s, ~0.7 h remaining. |
+| 2026-10-05T07:16:59+00:00 | 2.1 | 16,484/20,431 scanned, 18,373 candidates, 504 failed, 1.7/s, ~0.7 h remaining. |
+| 2026-10-05T07:21:59+00:00 | 2.1 | 16,971/20,431 scanned, 18,962 candidates, 514 failed, 1.7/s, ~0.6 h remaining. |
+| 2026-10-05T07:26:59+00:00 | 2.1 | 17,456/20,431 scanned, 19,664 candidates, 522 failed, 1.7/s, ~0.5 h remaining. |
+| 2026-10-05T07:32:00+00:00 | 2.1 | 17,936/20,431 scanned, 20,367 candidates, 525 failed, 1.7/s, ~0.4 h remaining. |
+| 2026-10-05T07:37:01+00:00 | 2.1 | 18,430/20,431 scanned, 20,761 candidates, 534 failed, 1.7/s, ~0.3 h remaining. |
+| 2026-10-05T07:42:01+00:00 | 2.1 | 18,915/20,431 scanned, 21,179 candidates, 542 failed, 1.7/s, ~0.3 h remaining. |
+| 2026-10-05T07:47:01+00:00 | 2.1 | 19,406/20,431 scanned, 21,430 candidates, 552 failed, 1.7/s, ~0.2 h remaining. |
+| 2026-10-05T07:52:01+00:00 | 2.1 | 19,894/20,431 scanned, 21,654 candidates, 564 failed, 1.7/s, ~0.1 h remaining. |
+| 2026-10-05T07:55:51+00:00 | 2.1 | Degron scan complete: 20,279 proteins scanned, 21,717 candidate degrons written, 570 failed. |
+| 2026-10-05T07:56:23+00:00 | 4.3 | Atlas built: 130,391 entries, 285,996 bridges (15,804 novel), 30,149 ligands, 21,717 degrons, 650 ligases, 1,650 lysines, 190.2 MB. |
+| 2026-10-05T07:58:47+00:00 | 5.2 | imid_degradation_score written for 4,650 degron candidates; 17,067 carry no C2H2 motif and are left NULL. |
+| 2026-10-05T07:59:24+00:00 | 9 | Validation run against binman.sqlite: 0 metric(s) not computed (dataset unavailable), 2 measured floor(s) missed. |
+| 2026-10-05T07:59:25+00:00 | 9 | Validation run against binman.sqlite: 5 metric(s) not computed (dataset unavailable), 4 measured floor(s) missed. |
+| 2026-10-05T08:02:30+00:00 | 2.1b | Zinc-finger scan over 20,279 cached models. |
+| 2026-10-05T08:02:54+00:00 | 2.1b | Zinc-finger table: 7,452 C2H2 motifs over 1,123 proteins, of which 2,792 (37.5%) carry no hairpin candidate and were unreachable by the per-candidate column. |
+| 2026-10-05T08:03:04+00:00 | 9 | Validation run against binman.sqlite: 0 metric(s) not computed (dataset unavailable), 2 measured floor(s) missed. |
+| 2026-10-05T08:03:05+00:00 | 9 | Validation run against binman.sqlite: 5 metric(s) not computed (dataset unavailable), 4 measured floor(s) missed. |

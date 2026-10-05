@@ -654,9 +654,44 @@ shipped score could not be audited, ablated or direction-checked without
 re-running the whole scan over 20,431 proteins.
 
 `regularity` is now emitted by the scan, carried in the schema and loaded by
-the atlas. The values arrive with the next degron scan; until that runs the
-column is present and empty, which is the honest state rather than a
-backfilled guess.
+the atlas. The rescan that filled it reproduced the original run exactly:
+21,717 candidates from 20,279 proteins with 570 failures, the same counts to
+the row, which is what a scan that gained a field and changed no behaviour
+should produce.
+
+### What the third component turned out to be
+
+A constant.
+
+| component | weight | AUC on the called subset | p |
+|---|---:|---:|---:|
+| `mean_plddt` | 0.35 | 0.3875 | 0.0775 |
+| `tip_rel_sasa` | 0.40 | 0.3850 | 0.0670 |
+| `regularity` | 0.25 | **0.5001** | 1.0000 |
+| the composite | | **0.3498** | 0.0167 |
+
+The permutation test on `regularity` returns a null 95% band of [0.5001,
+0.5001], with no width at all. A shuffle cannot move an AUC whose inputs are
+tied, and they are: 83.3% of all 21,717 candidates carry regularity exactly
+1.0, and across the 3,565 assayed fingers the scan calls, the score takes two
+distinct values in total, 0.6667 and 1.0.
+
+So a quarter of `degron_geometry_score` is 0.25 added to every row it ranks.
+The score is
+
+    0.25 + 0.35 x (pLDDT / 100) + 0.40 x tip_rel_sasa
+
+for all practical purposes, and both surviving terms are inverted. That is the
+whole of the composite's 0.3498: a weighted sum of two features that point the
+wrong way, plus an offset that points nowhere.
+
+This could not have been seen before. The value was computed in the scan, used
+in the sum and discarded, so the only way to learn that a quarter of the score
+was inert was to persist it and measure it. The hairpin filter admits a
+candidate only when its strands are already well paired, so by the time
+regularity is computed it has been selected to its ceiling: the filter and the
+score are measuring the same thing twice, and the second time carries no
+information.
 
 ## Section 9.3 E3 Triage validation
 

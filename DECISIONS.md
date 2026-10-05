@@ -2958,3 +2958,32 @@ that describes the served model rather than a local experiment. `fused` is not
 read from it: a PEFT adapter is applied to the base at load time by
 construction, so it is what "serves an adapter" means. training.json is kept
 and published as `last_training_run`, under a name that says what it is.
+
+## D-075
+
+**A quarter of the degron geometry score is a constant, measured not inferred.**
+
+`degron_geometry_score` is `0.35 x (pLDDT/100) + 0.40 x tip_rel_sasa + 0.25 x
+regularity`. With regularity persisted and measurable for the first time, its
+AUC on the called subset of the Sievers assayed fingers is 0.5001, and the
+20,000-shuffle permutation test returns a null 95% band of [0.5001, 0.5001].
+A band of zero width means the inputs are tied, and they are: 83.3% of all
+21,717 candidates sit at exactly 1.0, and the 3,565 called fingers take two
+distinct values between them.
+
+The cause is not a bug in the measurement. The hairpin filter admits a
+candidate only when its strands are already well paired, so regularity has been
+selected to its ceiling before it is scored. The filter and the third term of
+the score measure the same property, and the second measurement carries no
+information once the first has been applied as a gate.
+
+**The weights are not being rebalanced on this.** Removing the dead term and
+renormalising the other two changes no ranking at all, since a constant added
+to every row cannot reorder them: it would make the formula honest without
+making the score better, and the two surviving terms are themselves inverted
+(D-072). A score whose every measurable component is at or below chance does
+not need its weights adjusted. It needs a different feature set, which is what
+the sequence model at 0.6368 already is.
+
+What this does settle is that weight tuning is not the route to a better degron
+AUC, and now on a measurement rather than a suspicion.
