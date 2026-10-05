@@ -1037,6 +1037,38 @@ Closing that gap means asking the abstain head first on every question, which
 doubles the model calls per query on a time-boxed ZeroGPU allocation. The
 measurement is here; the trade is not taken.
 
+### Asking the abstain head first refuses everything
+
+The 4-in-20 confabulation rate above has an obvious fix: consult the abstain
+head on every question instead of only after the parser rejects one. It was
+tried and reverted the same hour.
+
+| questions | before | abstain-first |
+|---|---:|---:|
+| 12 shipped presets, all answerable | 12 answered | **0 answered, 12 refused** |
+| 20 held-out unanswerable | 16 explained | 20 explained |
+
+It refuses everything. "The atlas holds no degron data" about an atlas holding
+21,717 degrons; "the atlas holds no filters for a pocket score" about a column
+that exists. The explanations are fluent and uniformly false.
+
+**The cause is the training distribution.** Task C was built from unanswerable
+questions only, so the head never saw an answerable one. It is a generator of
+refusal explanations, not a classifier of answerability, and asked whether
+anything can be answered it says no with a plausible reason.
+
+**That also means spec 9.5's Task C figures cannot detect this.** Abstention
+rate 1.0 and fabrication rate 0.0 are measured on 40 unanswerable questions, and
+a head that always abstains scores perfectly on both. It is the same degenerate
+policy the DPO rounds produced, caught there by a generation guard and not
+caught here because no answerable question is in the test set.
+
+So the parser failure is doing real work, not merely routing. It is the only
+signal in the system that a question is unanswerable, and the abstain head's job
+is to explain a refusal that something else has already decided on. The 4 in 20
+stay uncaught, which is recorded above as the honest limit rather than traded
+for refusing the other 16 of 16.
+
 ### The triage head, applied to the atlas
 
 Task B was trained and scored and then used for nothing. `evidence_class`, which

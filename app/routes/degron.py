@@ -18,8 +18,9 @@ def index():
         active="degron",
         page_title="Degron Scan",
         page_blurb=(
-            "CRBN neosubstrate β-hairpin geometry found by shape rather than "
-            "sequence motif: the score is a rank, not a calibrated probability."
+            "Ranked by the glutarimide degradation model (nested AUC 0.830), "
+            "which scores the 4,650 candidates carrying a C2H2 motif; the rest "
+            "keep their hairpin geometry rank below them."
         ),
         stats=_stats(),
         **module_context("degron"),

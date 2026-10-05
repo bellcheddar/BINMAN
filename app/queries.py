@@ -237,12 +237,25 @@ RECORD_TYPES: dict[str, RecordType] = {
     ),
     "degron": RecordType(
         name="degron", label="Degron Scan", table="degron",
-        fields=_degron_fields(), default_sort="degron_geometry_score",
+        fields=_degron_fields(),
+        # Gate G6, closed (D-085). The module used to rank by
+        # degron_geometry_score, which measures 0.4407 against the assayed
+        # screen: below chance, with one of its three components a constant and
+        # the other two inverted. imid_degradation_score reaches a nested 0.830
+        # and is the only degron model that clears spec 9.2's floors, so the
+        # page now leads with it.
+        #
+        # It covers 4,650 of 21,717 candidates, the ones carrying a C2H2 motif,
+        # and SQLite sorts NULL last under DESC, so the scored rows rank first
+        # and the rest keep their place below rather than being hidden. The
+        # geometry score stays a column: it answers a different question and
+        # the UI has always explained it.
+        default_sort="imid_degradation_score",
         default_direction="desc",
         default_columns=(
             "uniprot_acc", "gene", "tip_res", "tip_aa", "turn_length",
-            "mean_plddt", "tip_rel_sasa", "degron_geometry_score",
-            "imid_degradation_score",
+            "mean_plddt", "tip_rel_sasa", "imid_degradation_score",
+            "degron_geometry_score",
         ),
         identity_columns=("id",),
     ),

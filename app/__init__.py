@@ -46,7 +46,12 @@ NL_EXAMPLES = {
         "bridges burying more than 400 Å²",
     ),
     "degron": (
-        "known neosubstrates",
+        # Named with its record type. "known neosubstrates" alone routed to
+        # ligase after G6 changed the degron schema summary, and
+        # is_known_neosubstrate is a degron field, so the parser rejected it.
+        # The model's record-type choice is sensitive to incidental schema
+        # text, so a preset should not rely on it inferring one.
+        "degrons that are known neosubstrates",
         "degrons with a mean pLDDT above 80",
         "degrons with an exposed tip",
     ),

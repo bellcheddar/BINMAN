@@ -3262,3 +3262,58 @@ Lavender reads separated within a lane.
 **Nothing is claimed from the partial counts.** They are correct per construct
 and unattributable per library, which makes them unusable as labels, and
 `pipeline/slabicki_count_proof.py` says so in its first line.
+
+## D-085
+
+**Gate G6 closed: the Degron Scan ranks by the model that answers its question.**
+
+The module sorted by `degron_geometry_score`, which measures 0.4407 against the
+assayed screen. Below chance, with one of its three components a constant
+(D-075) and the other two inverted (D-072). `imid_degradation_score` reaches a
+nested 0.830 and is the only degron model clearing spec 9.2's floors (D-048), so
+the page leads with it.
+
+It covers 4,650 of 21,717 candidates, those carrying a C2H2 motif. SQLite sorts
+NULL last under DESC, so the scored rows rank first and the unscored keep their
+place below rather than being hidden, and the geometry score stays a column
+because it answers a different question. The top of the table is now ZFP91,
+E4F1, ZNF276 and ZNF827, which are real CRBN neosubstrates.
+
+Read D-053 beside this: the 0.830 is nested on its own screen and its transfer
+to other glutarimides is partly carried by shared anchored cores, falling to
+0.579 at p=0.16 when those are removed. Section 9.2 reports both regimes.
+
+**One preset broke on it.** "known neosubstrates" began routing to `ligase`,
+where `is_known_neosubstrate` does not exist, because the schema summary in the
+prompt changed. It now reads "degrons that are known neosubstrates". The
+model's record-type choice is sensitive to incidental schema text, which is
+worth knowing before anyone edits a RecordType casually.
+
+## D-086
+
+**The abstain head is not asked first: it refuses everything.**
+
+D-080 recorded 4 of 20 unanswerable questions passing uncaught because the query
+head answers them with a schema-valid query, and named the fix as asking the
+abstain head first. Marc accepted that. It was implemented, measured and
+reverted within the hour.
+
+Asked first, it refused **all 12 shipped presets**, every one of them
+answerable: "the atlas holds no degron data" about 21,717 degrons, "no filters
+for a pocket score" about a column that exists. Fluent and uniformly false.
+
+Task C was built from unanswerable questions only, so the head never saw an
+answerable one. It generates refusal explanations; it does not classify
+answerability. And spec 9.5 cannot see this, because abstention rate 1.0 and
+fabrication rate 0.0 are both measured on unanswerable questions alone, where a
+head that always abstains scores perfectly. Same degenerate policy the DPO
+rounds produced, caught there by a generation guard.
+
+So the parser failure stays the trigger. It is the only signal in the system
+that a question is unanswerable, and the abstain head explains a refusal
+something else decided. The 4 in 20 remain uncaught and remain recorded, which
+is better than refusing 16 of 16 good questions to catch them.
+
+**What would actually fix it** is a Task C test set containing answerable
+questions, so the metric can see a model that refuses everything, and training
+examples where the answer is "yes, here is the query". Neither exists today.
