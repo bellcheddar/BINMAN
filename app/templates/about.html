@@ -233,20 +233,23 @@
       {% endif %}
     </div>
 
-    <div class="panel panel--step" id="example-step-4">
-      <h3>Step 4 · is the target degradable?</h3>
-      {% set window = about.thresholds.degradability.reach_window %}
-      {% if window.fitted %}
+    {# Step 4 appears when there is a verdict to show and not before.
+
+       It used to render a notice explaining that the reach window is unfitted,
+       which is true but was the same disclosure the Degradability module
+       already makes in its own Reach window panel, where someone looking at
+       lysines will actually meet it. A walkthrough step whose entire content
+       is "this step cannot be shown" is not a step. The condition is on the
+       panel rather than inside it, so the step returns of its own accord once
+       the fit clears its floor. #}
+    {% set window = about.thresholds.degradability.reach_window %}
+    {% if window.fitted %}
+      <div class="panel panel--step" id="example-step-4">
+        <h3>Step 4 · is the target degradable?</h3>
         <p>Held-out AUC {{ window.held_out_auc | sigfig }}, fitted
            {{ window.fit_date }} against {{ window.dataset_version }}.</p>
-      {% else %}
-        <div class="notice notice--bad">
-          The reach window is not fitted ({{ window.fit_status }}), so no verdict
-          is shown. The spec 1.0 starting values carry no empirical standing and
-          are deliberately not used to produce a number.
-        </div>
-      {% endif %}
-    </div>
+      </div>
+    {% endif %}
 
   {% endif %}
 
