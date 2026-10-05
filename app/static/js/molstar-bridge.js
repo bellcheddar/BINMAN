@@ -60,10 +60,21 @@
      * already be framed when the viewer appears rather than drifting into
      * place on every pin. The Reset button animates, where a transition helps
      * the user keep their bearings. */
-    /* The polymer surface is translucent so the ligand still reads through it.
-     * An opaque surface fills the space a cartoon leaves open, and at a camera
-     * framed on the ligand it simply swallows it. */
-    polymer: { alpha: 0.45 },
+    /* A blob, not a cast of every side chain.
+     *
+     * `gaussian-surface` rather than `molecular-surface`: it is a density
+     * isosurface, so it is smooth by construction where the molecular surface
+     * traces each atom and reproduces every side-chain crevice. Mol*'s own
+     * parameter description for `smoothness` calls it "the blob surface".
+     *
+     * radiusOffset inflates each atom before the density is computed, which is
+     * what merges side chains into the body of the protein; smoothness is at
+     * its minimum, where lower means smoother; resolution is coarsened from
+     * the default. Translucent so the ligand still reads through it.
+     */
+    polymer: {
+      alpha: 0.45, radiusOffset: 1.6, smoothness: 1.0, resolution: 1.6
+    },
     focus: {
       extraRadius: 22,
       /* A named CCD is the ligand the row is about, so it can fill the frame.
@@ -137,6 +148,14 @@
         if (action === 'interface') { self.toggleInterface(); }
       });
     });
+  };
+
+  /* Visibility rather than display: the WebGL canvas must keep its size while
+   * hidden, and `display: none` would collapse it to zero and make Mol*
+   * initialise onto a canvas with no area. */
+  Viewer.prototype._setCanvasVisible = function (visible) {
+    if (!this.canvas) { return; }
+    this.canvas.style.visibility = visible ? '' : 'hidden';
   };
 
   Viewer.prototype.showEmpty = function (message) {
@@ -218,6 +237,16 @@
     if (signature === this.current) { return Promise.resolve(); }
     this.current = signature;
 
+    /* Hide the canvas until the presentation is on it.
+     *
+     * Mol*'s default preset renders a cartoon the moment the structure
+     * parses, and the surface only replaces it one state commit later. The
+     * viewer therefore flashed a ribbon trace and then swapped it, which reads
+     * as a glitch rather than as loading. Nothing can be shown earlier because
+     * the surface cannot be built before the structure exists, so the honest
+     * option is to show nothing until it is ready.
+     */
+    this._setCanvasVisible(false);
     return this.init().then(function (viewer) {
       self.hideEmpty();
       return self._clear(viewer).then(function () {
@@ -230,9 +259,12 @@
       if (spec.identifier) { self.setIdentifier(spec.identifier, spec.identifierHref); }
       if (spec.overlay) { self.setOverlay(spec.overlay); }
       return self.applyPresentation(spec);
+    }).then(function () {
+      self._setCanvasVisible(true);
     }).catch(function (error) {
       console.error('structure load failed', error);
       self.current = null;
+      self._setCanvasVisible(true);
       self.showEmpty('That structure could not be loaded.');
     });
   };
@@ -350,8 +382,13 @@
           /* params reset so the new type takes its own defaults rather than
            * inheriting the cartoon's, then the alpha applied on top. */
           old.type = {
-            name: 'molecular-surface',
-            params: { alpha: LIGAND.polymer.alpha }
+            name: 'gaussian-surface',
+            params: {
+              alpha: LIGAND.polymer.alpha,
+              radiusOffset: LIGAND.polymer.radiusOffset,
+              smoothness: LIGAND.polymer.smoothness,
+              resolution: LIGAND.polymer.resolution
+            }
           };
         });
       });

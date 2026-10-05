@@ -5,13 +5,6 @@
 {% if weights %}
 <div class="panel">
   <h3>Ranking weights</h3>
-  <p style="color:var(--muted);margin-top:0;font-size:0.85rem">
-    Read live from <code>config/thresholds.toml</code>. Every component is a
-    visible column in the table: there is no hidden scoring. The spec 9.3
-    enrichment test runs with <code>exploitation_status</code> and
-    <code>has_ligand</code> held out of these weights, otherwise it would be
-    circular.
-  </p>
   <table class="grid-table">
     <thead><tr><th>Component</th><th class="num">Weight</th></tr></thead>
     <tbody>
