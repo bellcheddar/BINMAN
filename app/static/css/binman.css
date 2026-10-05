@@ -554,7 +554,6 @@ code, kbd, samp, .mono { font-family: var(--data); font-size: 0.86em; }
   font-family: var(--display); font-size: 0.7rem; color: var(--accent);
   text-transform: uppercase; letter-spacing: 0.08em;
 }
-.limits { border-left: 3px solid var(--bad); background: color-mix(in srgb, var(--bad) 6%, var(--surface)); padding: 0.7rem 0.85rem; border-radius: var(--radius); }
 
 /* -------------------------------------------------------------------------- */
 /* lens graph                                                                 */

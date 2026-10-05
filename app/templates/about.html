@@ -238,56 +238,10 @@
         {% endfor %}
       </tbody></table>
     </div>
-    <div class="panel">
-      <h3>Results</h3>
-      <table class="grid-table"><tbody>
-        {% for key, item in card.results.items() if item is not mapping %}
-          <tr><td>{{ key | replace('_', ' ') }}</td><td class="num">{{ item | sigfig }}</td></tr>
-        {% endfor %}
-      </tbody></table>
-    </div>
   {% endif %}
-
-  <div class="panel">
-    <h3>What it ran on</h3>
-    <table class="grid-table"><tbody>
-      {% for key, item in card.hardware.items() %}
-        <tr><td>{{ key | replace('_', ' ') }}</td><td>{{ value(item) }}</td></tr>
-      {% endfor %}
-    </tbody></table>
-  </div>
-
-  <div class="limits">
-    <strong>Limits, stated here rather than in a footnote.</strong>
-    <ul style="margin:0.4rem 0 0">
-      {% for limit in card.limits %}<li>{{ limit }}</li>{% endfor %}
-    </ul>
-  </div>
-
-  <div class="panel">
-    <h3>Availability</h3>
-    <p style="margin:0">
-      {% if card.availability.endpoint_live %}
-        <span class="pill pill--good">endpoint live</span>
-      {% else %}
-        <span class="pill">endpoint not configured for this deployment</span>
-      {% endif %}
-      {{ card.availability.note }}
-    </p>
-  </div>
 
   {# ---------------------------------------------------------- 6.6.3 ------- #}
   <h2 id="references">References</h2>
-  <p style="max-width:68ch;color:var(--muted)">
-    Every database, dataset, model and piece of software the build touched.
-    {{ about.reference_summary.total }} rows:
-    {{ about.reference_summary.verified }} Crossref verified,
-    {{ about.reference_summary.unverified }} unverified and kept rather than
-    dropped, {{ about.reference_summary.licence_not_determined }} with a licence
-    that could not be determined. References are resolved by Crossref search and
-    checked against the expected title, because an earlier revision's
-    hand-written DOIs included several that resolved to the wrong paper.
-  </p>
   <div class="panel" style="padding:0"><div id="reference-table"></div></div>
   <p>
     <button class="btn" type="button" id="bibtex-export">Export BibTeX</button>
@@ -299,16 +253,6 @@
       <a href="{{ about.citation.repository }}" target="_blank" rel="noopener noreferrer">{{ about.citation.repository }}</a></p>
     <p style="margin:0;color:var(--muted)">{{ about.citation.instruction }}</p>
   </div>
-
-  {% if about.gates %}
-    <h2 id="gates">Open gates</h2>
-    {% for gate in about.gates %}
-      <div class="panel">
-        <h3>Gate {{ gate.gate }}</h3>
-        <pre style="white-space:pre-wrap;font-family:var(--data);font-size:0.78rem;margin:0">{{ gate.excerpt }}</pre>
-      </div>
-    {% endfor %}
-  {% endif %}
 
 {% endif %}
 </div>
