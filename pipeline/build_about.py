@@ -244,7 +244,14 @@ def model_card() -> dict:
             "BINMAN_LM_URL is unset."
             if not (lm or training) else ""
         ),
-        "identity": training.get("identity", {}),
+        # The served model, not the last one trained. training.json is kept
+        # as the record of that run, under a name that says so.
+        "identity": _served_identity() or training.get("identity", {}),
+        "identity_source": ("the adapter the Space loads"
+                            if _served_identity() else
+                            "models/binman-lm/training.json, which records the "
+                            "last training run and may not be what ships"),
+        "last_training_run": training.get("identity", {}),
         "training": training.get("training", {}),
         "tasks": training.get("tasks", []),
         "results": lm,
@@ -546,6 +553,42 @@ def _decode(value):
         except json.JSONDecodeError:
             return []
     return value or []
+
+
+def _served_identity() -> dict:
+    """What the demo actually loads, from the adapter it actually loads.
+
+    models/binman-lm/training.json is overwritten by each training run, so it
+    describes the last thing trained rather than the thing that ships. The last
+    run was the 32B experiment that was evaluated and rejected, so the model
+    card published a base model four times the size of the real one and
+    `fused: true`, which FINDINGS.md records as an artefact that parsed 0 of 10
+    held-out questions and was deleted rather than shipped. The rank and the
+    layer count happened to match, which is why it read as plausible.
+
+    models/binman-lm/served/adapter_config.json is the config fetched from the
+    adapter repository the Space loads. It is the only file in the project that
+    describes the served model rather than a local experiment.
+    """
+    path = ROOT / "models" / "binman-lm" / "served" / "adapter_config.json"
+    try:
+        config = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return {}
+    layers = config.get("layers_to_transform") or []
+    return {
+        "base_model": config.get("base_model_name_or_path", NOT_RECORDED),
+        # No adapter row here: the template renders it as a link of its own, and
+        # carrying it in both put the same value in the table twice.
+        "fine_tune_type": str(config.get("peft_type", "")).lower() or NOT_RECORDED,
+        "adapter_rank": config.get("r", NOT_RECORDED),
+        "adapter_alpha": config.get("lora_alpha", NOT_RECORDED),
+        "adapter_layers": len(layers) if layers else NOT_RECORDED,
+        # A PEFT adapter is applied to the base at load time by construction.
+        # Fusing was tried and the result was deleted, so this is not a value
+        # read from anywhere: it is what "serves an adapter" means.
+        "fused": False,
+    }
 
 
 def _adapter_repo() -> str:

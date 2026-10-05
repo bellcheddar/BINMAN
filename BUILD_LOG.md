@@ -922,3 +922,10 @@ One line per meaningful event, timestamped UTC (spec Section 0 rule 5).
 | 2026-10-05T05:26:45+00:00 | 2.1 | 5,537/20,431 scanned, 6,131 candidates, 273 failed, 1.7/s, ~2.5 h remaining. |
 | 2026-10-05T05:27:57+00:00 | 9 | Validation run against binman.sqlite: 0 metric(s) not computed (dataset unavailable), 2 measured floor(s) missed. |
 | 2026-10-05T05:27:57+00:00 | 9 | Validation run against binman.sqlite: 5 metric(s) not computed (dataset unavailable), 4 measured floor(s) missed. |
+| 2026-10-05T05:31:45+00:00 | 2.1 | 6,035/20,431 scanned, 6,746 candidates, 282 failed, 1.7/s, ~2.4 h remaining. |
+| 2026-10-05T05:33:33+00:00 | 4.1b | About tab generated: 53 references, 11/13 datasets resolved, worked example selected, 0 value(s) not recorded, 0 source(s) publish no licence. |
+| 2026-10-05T05:33:41+00:00 | 9 | Validation run against binman.sqlite: 0 metric(s) not computed (dataset unavailable), 2 measured floor(s) missed. |
+| 2026-10-05T05:33:42+00:00 | 9 | Validation run against binman.sqlite: 5 metric(s) not computed (dataset unavailable), 4 measured floor(s) missed. |
+| 2026-10-05T05:34:13+00:00 | 4.1b | About tab generated: 53 references, 11/13 datasets resolved, worked example selected, 0 value(s) not recorded, 0 source(s) publish no licence. |
+| 2026-10-05T05:34:48+00:00 | 9 | Validation run against binman.sqlite: 0 metric(s) not computed (dataset unavailable), 2 measured floor(s) missed. |
+| 2026-10-05T05:34:48+00:00 | 9 | Validation run against binman.sqlite: 5 metric(s) not computed (dataset unavailable), 4 measured floor(s) missed. |

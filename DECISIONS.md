@@ -2926,3 +2926,35 @@ column exists and is NULL for every row. That is deliberate: a backfill would
 have to recompute the DSSP bridge-partner pairing the value comes from, which
 is the rescan, and anything cheaper would be a guess in a column whose whole
 purpose is to make the score checkable.
+
+## D-074
+
+**The model card describes the served adapter, not the last training run.**
+
+`models/binman-lm/training.json` is overwritten by each training run, and
+`pipeline/build_about.py` read its `identity` block as the model card. The last
+run was the 32B experiment that was evaluated and rejected, so the About page
+published, as the description of the shipped model:
+
+| field | published | actually served |
+|---|---|---|
+| base model | `mlx-community/Qwen2.5-32B-Instruct-4bit` | `Qwen/Qwen2.5-3B-Instruct` |
+| fused | `true` | `false`, a PEFT adapter applied at load |
+| shipped adapter | `models/binman-lm/adapters` | `Dellboy/binman-lm-adapter` |
+
+The rank (8) and the layer count (32) matched by coincidence, which is why it
+read as plausible. `fused: true` also contradicts FINDINGS.md directly, which
+records that fusing produced a model parsing 0 of 10 held-out questions and
+that the artefact was deleted rather than shipped.
+
+Nothing was wrong with what serves. The Space loads `Qwen/Qwen2.5-3B-Instruct`
+and the adapter repository, and answers correctly; only the description of it
+was wrong, and the local `models/binman-lm/adapters` directory has since been
+overwritten by the 32B round14 run, so it is no longer what its name implies.
+
+The card now reads `models/binman-lm/served/adapter_config.json`, fetched from
+the adapter repository the Space loads, which is the only file in the project
+that describes the served model rather than a local experiment. `fused` is not
+read from it: a PEFT adapter is applied to the base at load time by
+construction, so it is what "serves an adapter" means. training.json is kept
+and published as `last_training_run`, under a name that says what it is.
