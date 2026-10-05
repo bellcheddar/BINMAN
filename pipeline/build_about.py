@@ -510,6 +510,11 @@ def worked_example() -> dict:
             "interface_residues_a": _decode(chosen.get("interface_residues_a")),
             "interface_residues_b": _decode(chosen.get("interface_residues_b")),
             "accessions": chosen.get("accessions", []),
+            # The trimmed entry, so the viewer can frame this bridge's own copy
+            # of the ligand. 7OJX holds three ME7 copies across three chain
+            # pairs; focusing the ligand in the full deposited entry frames the
+            # union of all three, which is the whole complex.
+            "structure_file": chosen.get("structure_file") or "",
             "degron": degron,
             "ligase": ligase,
             "entry_bridges": entry_bridges,

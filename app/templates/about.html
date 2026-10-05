@@ -107,37 +107,7 @@
       <div class="notice">{{ ex.note }}</div>
     </div>
   {% else %}
-    <div class="panel">
-      <h2 id="example">Worked example</h2>
-      {# Not a second h3. Panel titles are all one style now, so an h3 directly
-         under the h2 would stack two identical-looking rules on top of each
-         other. This is the table's caption, which is what it always was. #}
-      <p class="panel__note">Which criteria this example meets.</p>
-      <table class="grid-table">
-        <tbody>
-          {% for criterion in ex.criteria %}
-            <tr>
-              <td>
-                {% if criterion.met %}<span class="pill pill--good">met</span>
-                {% elif criterion.relaxed %}<span class="pill pill--warn">relaxed</span>
-                {% else %}<span class="pill pill--bad">not met</span>{% endif %}
-              </td>
-              <td>{{ criterion.label }}</td>
-            </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-      {% if ex.relaxed %}
-        <p class="panel__note">
-          {{ ex.relaxed | length }} criterion(a) were relaxed, in the documented
-          order, because no record satisfied all of them. A worked example that
-          quietly stops being true is worse than none, so the relaxation is shown
-          rather than hidden.
-        </p>
-      {% endif %}
-    </div>
-
-    <div class="panel panel--step" id="example-step-1">
+    <div class="panel panel--step" id="example">
       <h3>Step 1 · found in the atlas</h3>
       <p class="panel__lead">{{ ex.pdb_id }} · {{ ex.ccd_id }}</p>
       <p>{{ ex.title }}</p>

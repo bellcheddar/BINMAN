@@ -205,6 +205,10 @@
     });
   }
 
+  /* Matches ledger.js. Both files frame the same kind of row, so they frame it
+     the same way. */
+  var HAIRPIN_PAD = 6;
+
   function initExampleViewers() {
     var example = about.worked_example || {};
     if (!example.available) { return; }
@@ -212,7 +216,15 @@
     if (first) {
       B.mountViewer(first, {
         role: 'glue',
-        pdbId: example.pdb_id,
+        /* The trimmed entry when there is one, the deposited entry otherwise,
+           which is what the ledger's glue viewer does. It matters for framing:
+           7OJX carries three copies of ME7 across three chain pairs, so
+           focusing the ligand in the full entry frames the union of all three
+           and the camera lands on the whole complex instead of the bridge. */
+        url: example.structure_file
+          ? '/api/structures/' + example.structure_file
+          : null,
+        pdbId: example.structure_file ? null : example.pdb_id,
         ccdId: example.ccd_id,
         identifier: example.pdb_id + ' · ' + example.ccd_id,
         identifierHref: 'https://www.rcsb.org/structure/' + example.pdb_id,
@@ -233,7 +245,10 @@
         role: 'degron',
         url: B.afdbCifUrl(degron.uniprot_acc),
         format: 'mmcif',
-        focusResidues: [{ start: degron.start_res, end: degron.end_res }],
+        /* Tip plus a little context either side, the same window the ledger's
+           degron viewer frames, rather than the hairpin's own extent. */
+        focusResidues: [{ start: degron.tip_res - HAIRPIN_PAD,
+                          end: degron.tip_res + HAIRPIN_PAD }],
         identifier: degron.gene + ' · ' + degron.afdb_id,
         identifierHref: 'https://alphafold.ebi.ac.uk/entry/' + degron.uniprot_acc,
         overlay: 'tip ' + degron.tip_aa + degron.tip_res +

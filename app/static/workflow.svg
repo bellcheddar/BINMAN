@@ -23,7 +23,7 @@
 <text class="wf-n" x="600" y="138">21,717 degrons scanned</text>
 <text class="wf-n" x="600" y="154">650 ligases triaged</text>
 <text class="wf-n" x="600" y="170">1,650 lysines scored</text>
-<text class="wf-bad" x="600" y="208">182 failed</text>
+<text class="wf-bad" x="600" y="208">189 failed</text>
 </g>
 <path class="wf-arrow" d="M784,148.0 L812,148.0" marker-end="url(#wf-tip)"/>
 <g class="wf-node" data-stage="4" tabindex="0"><rect class="wf-box" x="818" y="74" width="196" height="148" rx="2"/><text class="wf-t" x="830" y="98">4 · Model</text><text class="wf-s" x="830" y="114">mlx-lm, LoRA</text>
