@@ -3223,3 +3223,42 @@ eGFP and a GGGGS linker before the insert, and the library's own sequences are
 nucleotide rather than protein. Locating the insert within the amplicon is
 ordinary work and it is work, so it is recorded as the next step rather than
 claimed as done.
+
+## D-084
+
+**The SRA recount is feasible and is not finished: the two libraries are
+sequence-identical.**
+
+D-083 found the data. This is the attempt to use it, and what it ran into.
+
+**What works.** Reads match by k-mer with no anchor needed: 8,069 of the 9,097
+constructs appear in a 38 MB slice of one primary-screen run, forward
+orientation only, and **94.8% of reads in that slice are assigned to a
+construct**. The demultiplexing key in each BioSample description gives the
+stagger sequences in order beside the sample names.
+
+**What stops it.** Cilantro and Lavender carry **identical insert DNA for all
+9,097 constructs**, checked name by name. A run multiplexes both libraries and
+reuses the same staggers across them, so stagger plus insert cannot say which
+library a read came from, and six of the fourteen samples in the run tested are
+ambiguous. This is why every Lavender sample counted zero: not a bug, an
+identifiability problem.
+
+Three things were tried and do not separate them, recorded so they are not
+tried again: the AgeI site before the insert, present in 3% of reads; the
+upstream context of the insert, which gives 15,343 distinct 14-mers and no
+two-way split; and the library amplification primers, which are character for
+character identical between libraries in supplement 3. The synthesis primers do
+differ but appear in 206 of 300,000 reads, far too few to label a sample.
+
+**What would resolve it**, in the order worth trying: the two libraries are
+likely different reporter backbones, so a library-specific vector sequence
+should exist somewhere in the amplicon and simply is not in the first 110 bases;
+reads from the other end of the amplicon, or the paired mate if one was
+deposited, would carry it. Failing that, the lead contact is offered in the
+paper for exactly this, and the question to ask is narrow: how were Cilantro and
+Lavender reads separated within a lane.
+
+**Nothing is claimed from the partial counts.** They are correct per construct
+and unattributable per library, which makes them unusable as labels, and
+`pipeline/slabicki_count_proof.py` says so in its first line.
