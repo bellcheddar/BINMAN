@@ -927,11 +927,27 @@ rather than substituted. See the Gates section.
 | `binman-qwen-2.5-3b-4bit-round01` | LoRA SFT on the partial atlas | superseded |
 | `binman-qwen-2.5-3b-4bit-round02` | DPO, lr 1e-5, 600 steps | rejected: collapsed the model |
 | `binman-qwen-2.5-3b-4bit-round03` | DPO, lr 5e-7, 150 steps | rejected: still degraded |
-| `binman-qwen-2.5-3b-4bit-round04` | LoRA SFT on the complete atlas | **shipped** |
+| `binman-qwen-2.5-3b-4bit-round05` | LoRA SFT, rank 8, 16 layers, 1,200 iterations | superseded |
+| `binman-qwen-2.5-3b-4bit-round06` | rank 8, 16 layers, 14,152 iterations | evaluated |
+| `binman-qwen-2.5-3b-4bit-round07` | rank 8, 32 layers, 14,152 iterations | **shipped** |
+| `binman-qwen-2.5-3b-4bit-round08` | rank 32, 16 layers | evaluated, not shipped |
+| `binman-qwen-2.5-3b-4bit-round09` | rank 32, 16 layers | evaluated, not shipped |
+| `binman-qwen-2.5-3b-4bit-round10` to `round13` | rank 32 and rank 8 at 32 layers | trained, not in the evaluated set |
+| `binman-qwen-2.5-32b-4bit-round14` | the 32B experiment | rejected, see above |
 
-Round 04: rank 16, 16 layers, lr 1e-5, 1,200 iterations, 4,752 train and 574
-valid examples, validation loss to 0.004, around 420 tokens/s, 6 GB peak on the
-M2 Ultra. Tracked in Weights & Biases under `binman-lm`.
+**This table was wrong until 2026-10-05.** It named round 04 as shipped at rank
+16 over 16 layers, and round 04 has no artefact left: `models/binman-lm/runs/`
+begins at round 05. What ships is round 07, confirmed twice over. The adapter
+repository the Space loads reports `r: 8` over 32 transformed layers, and
+`results.json` 9.5 reports its evaluated stage as `round07-32layers`. The
+parameters in the old entry matched neither.
+
+Round 07: rank 8, 32 layers, lr 1e-5, 14,152 iterations, 4,752 train and 574
+valid examples, on the M2 Ultra. Tracked in Weights & Biases under `binman-lm`.
+
+Rounds 10 to 13 exist as runs and are not in `results.json`'s evaluated stage
+list. They are recorded here as trained rather than given an outcome, because
+no measurement of them survives to support one.
 
 Both DPO rounds reached a near-zero loss by collapsing the policy rather than
 learning the preference, and the per-mode win rates could not detect it: they
