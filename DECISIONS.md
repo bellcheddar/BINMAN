@@ -2720,3 +2720,58 @@ on that basis is a change to what the module emits, not a fit of what the spec
 describes, and the three reach boundaries still have no ligand site to be
 measured from except in the 89 ternary complexes. Both halves are the next step;
 neither is done, and the notice stays until they are.
+
+## D-068: reach from the ligand site does not predict ubiquitylation
+
+**Finding.** The three Cb-Cb reach boundaries of spec 5.4 were fitted for the
+first time, on induced ternary geometry, and the variable they rest on is
+uninformative. The window cannot be fitted, and the reason is now mechanical
+rather than logistical.
+
+**What was measured.** 68 of BINMAN's own ternary complexes, where a ligand
+bridges an E3 to a non-E3 partner: CRBN with BRD4 through a PROTAC, DCAF15 with
+RBM39, beta-TrCP1 with beta-catenin. 43 survived the checks, giving **369
+assayed lysines on substrate chains, 181 of them ubiquitylated**, each measured
+from the bridging ligand exactly as spec 5.4 describes.
+
+| variable | AUC |
+|---|---:|
+| Cb-Cb distance to the ligand site | **0.4223** |
+| NZ to ligand centroid | 0.4770 |
+| NZ relative SASA | 0.4595 |
+
+Ubiquitylated lysines are **farther** from the ligand than assayed-unmodified
+ones: median 18.7 A against 14.9 A. Not noise around 0.5, but slightly inverted.
+
+**Why that is the expected answer, in hindsight.** The ligand site is where the
+substrate is *recruited*. It is not where ubiquitin is *transferred*. Transfer
+happens at the E2 active site, positioned by the cullin scaffold and RBX1 tens
+of angstroms away, and the ligand has no say in it. Distance from the ligand was
+never the right geometric variable; distance from the E2 would be, and these
+structures almost never contain the E2. Spec 5.4's premise, that reach from the
+site predicts which lysine is used, does not survive contact with the geometry
+it describes.
+
+**So the degradability window cannot be fitted on any of its four numbers.**
+Exposure is at chance against assayed negatives (0.5020, D-067) and all three
+reach distances are at or below chance here. What does clear the floor is a
+per-lysine *model* at 0.6778, which is a different object from a set of
+thresholds.
+
+**Three bugs found on the way, all mine, none of which would have announced
+itself.** They are recorded because each produced a confident wrong number
+rather than an error:
+
+1. Lysines were measured across every chain, so the ligase's lysines were
+   attributed to the substrate's accession. 59 of 68 entries then failed the
+   numbering check, which is the only reason it was caught.
+2. `cb_cb_distance` returns -1 when no Cb-Cb exists, and that went into the AUC
+   where negation makes it the closest possible value.
+3. The site was passed as the ligand residue, but the Cb-Cb distance is to the
+   nearest *site residue's* CB and a ligand has no CB. Every distance was the
+   sentinel, and the first run reported an AUC over a set that was entirely
+   sentinel values.
+
+The numbering check that caught the first was written because author numbering
+and UniProt numbering disagree often and silently. It earned its place
+immediately.

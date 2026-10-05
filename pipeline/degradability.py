@@ -91,8 +91,16 @@ def measure_lysines(
     structure_id: str,
     site_id: str,
     sasa: SasaCalculator,
+    chains: set[str] | None = None,
 ) -> list[LysineMeasurement]:
-    """Measure every lysine in a structure against one site definition."""
+    """Measure every lysine in a structure against one site definition.
+
+    `chains` restricts the lysines measured to those chains. A ternary complex
+    holds the ligase as well as the substrate, and measuring both together
+    attributes the ligase's lysines to the substrate's accession, so the caller
+    that cares passes the substrate chain. The default of None keeps the
+    whole-structure behaviour the lysine table is built on.
+    """
     import gemmi
 
     structure = gemmi.read_structure(str(structure_path))
@@ -121,6 +129,8 @@ def measure_lysines(
     site_cb: list[tuple[float, float, float]] = []
 
     for chain in model:
+        if chains is not None and chain.name not in chains:
+            continue
         for residue in chain:
             key = (chain.name, residue.seqid.num)
             for atom in residue:

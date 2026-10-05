@@ -711,3 +711,13 @@ One line per meaningful event, timestamped UTC (spec Section 0 rule 5).
 | 2026-10-04T23:26:51+00:00 | 9.4 | 19,050/20,279 accessions, 387,804 assayed lysines, 27.9/s. |
 | 2026-10-04T23:27:26+00:00 | 9.4 | 20,050/20,279 accessions, 414,163 assayed lysines, 27.9/s. |
 | 2026-10-04T23:27:35+00:00 | 9.4 | Assayed ubiquitylome: 419,405 lysines over 18,003 proteins, 110,108 ubiquitylated, 309,297 matched negatives. |
+| 2026-10-04T23:31:48+00:00 | 1.3 | 96/1,043 entries, 14,059 bridges, 0 failed, 0.2 entries/s, ~1.7 h remaining. |
+| 2026-10-04T23:36:51+00:00 | 1.3 | 180/1,043 entries, 29,944 bridges, 0 failed, 0.2 entries/s, ~1.2 h remaining. |
+| 2026-10-04T23:42:21+00:00 | 1.3 | 255/1,043 entries, 36,297 bridges, 1 failed, 0.2 entries/s, ~1.1 h remaining. |
+| 2026-10-04T23:47:22+00:00 | 1.3 | 335/1,043 entries, 40,139 bridges, 1 failed, 0.2 entries/s, ~0.9 h remaining. |
+| 2026-10-04T23:52:22+00:00 | 1.3 | 584/1,043 entries, 44,438 bridges, 5 failed, 0.3 entries/s, ~0.4 h remaining. |
+| 2026-10-04T23:57:23+00:00 | 1.3 | 738/1,043 entries, 46,666 bridges, 6 failed, 0.3 entries/s, ~0.2 h remaining. |
+| 2026-10-05T00:02:31+00:00 | 1.3 | 798/1,043 entries, 47,987 bridges, 11 failed, 0.3 entries/s, ~0.2 h remaining. |
+| 2026-10-05T00:04:06+00:00 | 9.4 | Reach on induced ternaries: 136 assayed lysines over 68 complexes, 64 ubiquitylated. |
+| 2026-10-05T00:05:06+00:00 | 9.4 | Reach on induced ternaries: 0 assayed lysines over 68 complexes, 0 ubiquitylated. |
+| 2026-10-05T00:05:44+00:00 | 9.4 | Reach on induced ternaries: 369 assayed lysines over 68 complexes, 181 ubiquitylated. |
