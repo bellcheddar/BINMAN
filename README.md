@@ -2,7 +2,7 @@
 
 > **Molecular glues have been sitting in the PDB for thirty years, deposited without being labelled as such. This is the inventory.**
 
-![python](https://img.shields.io/badge/python-3.11-3776AB?logo=python&logoColor=white) ![environment](https://img.shields.io/badge/environment-pixi%20%2B%20uv-1e73be) ![structures](https://img.shields.io/badge/structures-52821%20entries-2C6D60) ![validation](https://img.shields.io/badge/validation-published%20datasets%20only-D65B0A) ![licence](https://img.shields.io/badge/licence-code%20reusable-6A6F68) ![author](https://img.shields.io/badge/author-Marc%20C.%20Deller,%20D.Phil.-1C244B)
+![python](https://img.shields.io/badge/python-3.11-3776AB?logo=python&logoColor=white) ![environment](https://img.shields.io/badge/environment-pixi%20%2B%20uv-1e73be) ![bridges](https://img.shields.io/badge/bridges-283131-2C6D60) ![validation](https://img.shields.io/badge/validation-published%20datasets%20only-D65B0A) ![licence](https://img.shields.io/badge/licence-code%20reusable-6A6F68) ![author](https://img.shields.io/badge/author-Marc%20C.%20Deller,%20D.Phil.-1C244B)
 
 <table>
 <tr>
@@ -34,9 +34,9 @@ work and none of the arithmetic.
 | Module | Question | Method |
 |---|---|---|
 | **Glue Atlas** | Which deposited ligands bridge two protein chains? | ΔSASA against each chain, heavy-atom contacts, bridging balance, PLIP interaction typing at both half-interfaces |
-| **Degron Scan** | Which human proteins carry the β-hairpin-with-exposed-glycine geometry that CRBN reads? | DSSP over the AlphaFold human proteome, found by geometry rather than by sequence motif. **Validated and failed:** against a matched published screen it scores AUC 0.44, so it ships as a hypothesis generator, not a classifier (see [FINDINGS](FINDINGS.md#section-92-degron-scan-validation)) |
+| **Degron Scan** | Which human proteins carry a zinc finger a glutarimide will degrade? | Two columns with different jobs. `imid_degradation_score` is a sequence model on C2H2-anchored chemical groups, weighted by a measured alanine scan: nested AUC **0.830**, and gene-disjoint it transfers above chance to **24 of 29** glutarimide analogs. `degron_geometry_score` ranks hairpin shape and is a hypothesis generator, not a classifier |
 | **E3 Triage** | Which E3 ligases are under-exploited and worth a ligand campaign? | InterPro family assignment, fpocket druggability, expression selectivity, substrate counts, ranked by a transparent weighted sum with every component visible |
-| **Degradability** | Does this target have a usable lysine near the binding site? | Lysine NZ accessibility and Cβ–Cβ geometry relative to a chosen site, against a reach window fitted to observed ubiquitylation sites rather than assumed |
+| **Degradability** | Does this target have a usable lysine near the binding site? | Lysine NZ accessibility and Cβ-Cβ geometry from a chosen site, measured against **419,405 lysines assayed by mass spectrometry**, 110,108 ubiquitylated and 309,297 seen and found unmodified. The window is not fitted and no verdict is emitted, because the measurement says it should not be |
 
 ## The two rules the project is built on
 
@@ -149,108 +149,78 @@ DOI string alone, 6 with no citeable paper (software, kept with its canonical UR
 rather than dropped), and every licence that could not be determined recorded
 as such rather than guessed.
 
-## Current state
+## What it found
 
-All four phases are built and QC'd. See [`PROGRESS.md`](PROGRESS.md) for the
-live checklist, [`BUILD_LOG.md`](BUILD_LOG.md) for the event log and
-[`DECISIONS.md`](DECISIONS.md) for every judgement call with its reasoning and
-how to reverse it.
+**52,821 entries, 283,131 bridges, 15,451 of them novel**, meaning they appear
+in none of the three curated glue databases. 27,132 bridges carry a ligand
+classed as a glue candidate; the remaining crystallisation furniture is
+classified rather than deleted, so the counts reconcile. 21,717 degron
+candidates over 8,983 proteins, 7,452 C2H2 zinc fingers scored individually,
+650 E3 ligases ranked, 30,057 edges in the shared network.
 
-**52,821 entries, 239,485 bridges, 14,260 of them novel** (appearing in none of
-the three curated glue databases), 21,717 degron candidates, 650 E3 ligases.
-Section 9: four floors measured and passed, four measured and missed, four not
-computed for want of a dataset. Every miss is diagnosed rather than hidden, and
-two of them are worth more than a pass would have been: the degron geometry
-filter scores AUC 0.44 against a matched published screen and is therefore
-relabelled a hypothesis generator (D-024), and the glue recall deficit is
-traced to a single spec criterion that no permitted adjustment can rescue
-(D-027).
+Three results are worth stating on their own.
 
-An early result worth stating: the bridging filter recovers five of six
-canonical glues with literature-consistent interface residues, and it shows
-that a genuine CRBN neosubstrate glue is **strongly asymmetric** (bridging
-balance 0.33 to 0.36, against 0.88 for rapamycin). An intuitive symmetry
-threshold would have rejected exactly the class the project exists to find.
-That is in `FINDINGS.md` with the numbers.
+**A real CRBN neosubstrate glue is strongly asymmetric.** Bridging balance 0.33
+to 0.36, against 0.88 for rapamycin. An intuitive symmetry threshold would have
+rejected exactly the class the project exists to find.
 
-## 🎓 BINMAN-LM: training strategy
+**The glutarimide degron grammar is shared across the chemical series.** A model
+trained on pomalidomide alone transfers above chance to 24 of the 29 analogs of
+a published screen, gene-disjoint, mean AUC 0.779 at permutation p=0.0005. The
+obvious hypothesis, that promiscuous compounds should be less predictable, was
+tested across all 29 and is not supported.
+
+**Lysine exposure does not predict ubiquitylation.** Against 309,297 lysines
+assayed and found unmodified, rather than lysines nobody had annotated, exposure
+scores 0.502: chance. The two labellings disagree on 41% of lysines. Reach from
+the ligand site, measured in 43 induced ternary complexes, scores 0.42 to 0.48,
+because the ligand site is where a substrate is recruited and not where
+ubiquitin is transferred.
+
+### What the first rule costs
+
+The rule above has a price, and it is paid in public. Of the fifteen spec
+Section 9 metrics: six pass, five miss their floor and four are not computable
+for want of a dataset. The misses are diagnosed rather than hidden, and the
+diagnosis is usually the useful part. Glue recall sits at 0.825 against a 0.85
+floor, and the remaining gap is dominated by homo-oligomeric glues that the
+inclusion criterion excludes by construction, which is a scope limit rather than
+a tuning one. Full accounting in [`FINDINGS.md`](FINDINGS.md), with every
+judgement call and how to reverse it in [`DECISIONS.md`](DECISIONS.md).
+
+## 🎓 BINMAN-LM
 
 The model does three text jobs and no arithmetic. Every number in BINMAN is
-computed deterministically in Python and passed to the interface; the model's
-only numeric output is a filter threshold the user then sees in the query stack.
+computed deterministically in Python; the model's only numeric output is a
+filter threshold the user then sees in the query stack.
 
-**Base model.** `Qwen2.5-3B-Instruct`, 4-bit, through `mlx-lm` on an M2 Ultra.
-3B is deliberate: the tasks are structured translation against a closed schema,
-not open-ended reasoning, and a small model that fits comfortably in unified
-memory can be retrained in minutes rather than hours.
+**What ships.** `Qwen2.5-3B-Instruct` at 4 bit, LoRA over the last 32 layers,
+through `mlx-lm` on an M2 Ultra. 3B is deliberate: the tasks are structured
+translation against a closed schema, not open-ended reasoning.
 
-**The baseline runs first, and it decides whether to train at all.** Zero-shot
-with the full schema in context, the base model reached set equality 0.233 and a
-parse rate of 0.283, well under the 0.85 threshold at which fine-tuning would
-have been skipped in favour of grammar-constrained decoding. So it was trained.
+| Task | Metric | Score | Floor |
+|---|---|---:|---:|
+| Natural language to query object | parse rate | **1.000** | 0.99 |
+| | set equality | **1.000** | 0.90 |
+| Ligand triage from an abstract | macro F1 | **0.9336** | 0.85 |
+| Structured abstention | fabrication rate | **0.000** | 0.00 |
 
-### Rounds
-
-Runs are tracked in Weights & Biases under `binman-lm`, named to the convention
-used across the other projects.
-
-| Round | Stage | Outcome |
-|---|---|---|
-| `binman-qwen-2.5-3b-4bit-round01` | LoRA SFT, rank 16, 16 layers, lr 1e-5, 1200 iterations | **Shipped.** Validation loss 2.494 to 0.001. |
-| `binman-qwen-2.5-3b-4bit-round02` | DPO, beta 0.1, lr 1e-5, 600 steps | Rejected: collapsed the model. |
-| `binman-qwen-2.5-3b-4bit-round03` | DPO, beta 0.1, lr 5e-7, 150 steps | Rejected: still degraded. |
-
-Round 01 is what serves. It turned parse rate 0.283 into **0.992** and set
-equality 0.233 into **0.992**, and it internalised the schema well enough that
+The baseline decides whether to train at all. Zero-shot with the full schema in
+context the base model reached set equality 0.233, well under the 0.85 at which
+fine-tuning would have been skipped for grammar-constrained decoding. Training
+turned that into 1.000, and the model internalised the schema well enough that
 inference needs 83 prompt tokens where the baseline needed 841.
 
-### Why DPO was attempted
+**Depth is the lever.** An ablation over layers, rank and epochs found that
+training more layers is what moves the metrics, that rank and epoch count do
+not, and that combining them loses. Scale was then tested directly: a 32B
+trained for a full epoch matches the 3B on parse, set equality and abstention,
+all at ceiling, and is behind by two classifications out of 240 on triage. Ten
+times the parameters bought nothing measurable, so the 3B ships (D-071).
 
-Supervised fine-tuning only ever shows the model correct answers, so it learns
-the shape of a right answer but never the boundary between a right one and a
-plausible wrong one. Direct Preference Optimisation trains on pairs: the same
-question with a correct query object and a deliberately corrupted one, teaching
-the model to prefer the first. BINMAN's pairs cover seven corruption modes, 200
-each, generated rather than curated:
-
-| Mode | The corruption | What it teaches |
-|---|---|---|
-| `hallucinated_field` | a plausible field that does not exist | stay inside the schema |
-| `operator_inversion` | `gt` becomes `lt` | above against below |
-| `unit_confusion` | ΔSASA quoted in Å rather than Å² | domain units are not interchangeable |
-| `dropped_constraint` | three clauses in, two out | completeness |
-| `invented_entity` | a ligase not in the vocabulary | closed-world discipline |
-| `wrong_question` | valid JSON, different intent | semantic fidelity |
-| `prose_not_json` | a chatty explanation | format discipline |
-
-### Why it did not ship
-
-Both DPO attempts reached a near-zero loss by collapsing the policy rather than
-learning the preference. The first emitted `ccdccdccd…` indefinitely.
-
-The instructive part is that **the metric could not see it**: per-mode preference
-win rates measured 0.95 to 1.00 on the collapsed model, because a degenerate
-policy trivially assigns a higher likelihood to one string than another. The
-adapter would have shipped on those numbers.
-
-So a generation guard now runs held-out test questions through any candidate
-adapter and requires 80% to produce a query object the real parser accepts,
-before it is allowed to ship. Stage 1 scores 10 of 10; the DPO adapters scored 6
-of 10 and 0 of 10 and were refused. Stage 1 already clears every floor it is
-measured against, so the preference stage was an improvement on an
-already-passing model rather than a requirement.
-
-`mlx-lm` 0.32 ships no preference trainer at all, so the DPO loop is this
-project's own code against its LoRA machinery, with reference log-probabilities
-cached once from the frozen stage 1 model.
-
-### Serving
-
-BINMAN-LM serves as base model plus adapter, not as a fused model: fusing against
-the 4-bit base produced a model that parsed 0 of 10 held-out questions and
-invented its own output schema, so the artefact was deleted rather than shipped.
-The endpoint is a feature flag. With `BINMAN_LM_URL` unset the natural-language
-box is hidden and nothing else changes.
+**Serving.** Base model plus adapter rather than a fused model, behind a
+feature flag. With `BINMAN_LM_URL` unset the natural-language box is hidden and
+nothing else changes, which is why the live deployment runs without it.
 
 ## Repository layout
 
