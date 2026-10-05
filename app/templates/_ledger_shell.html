@@ -77,7 +77,12 @@
 
     <div class="split split--workbench">
       <div>
-        <div class="panel" style="padding:0">
+        {# The one panel on the site with no h3 title, deliberately. It is the
+           page's primary surface rather than a card among cards, and it pairs
+           with the viewer beside it, which is a .viewer with its own toolbar
+           and no heading either. A title here would restate the h1 and push the
+           table down past the height initTable computes for it. #}
+        <div class="panel panel--flush">
           <div id="ledger-table"></div>
         </div>
       </div>

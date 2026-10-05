@@ -15,30 +15,33 @@
     </div>
   {% endif %}
 
-  <div class="panel" style="display:flex;gap:0.5rem;flex-wrap:wrap;align-items:flex-end">
-    <div class="field" style="margin:0">
-      <label for="lens-focus">Focus accession</label>
-      <input id="lens-focus" type="text" value="{{ focus }}" placeholder="e.g. Q96SW2">
+  <div class="panel">
+    <h3>Graph controls</h3>
+    <div class="panel__controls">
+      <div class="field">
+        <label for="lens-focus">Focus accession</label>
+        <input id="lens-focus" type="text" value="{{ focus }}" placeholder="e.g. Q96SW2">
+      </div>
+      <div class="field">
+        <label for="lens-depth">Depth</label>
+        <select id="lens-depth">
+          <option value="1" {% if depth == '1' %}selected{% endif %}>1</option>
+          <option value="2" {% if depth == '2' %}selected{% endif %}>2</option>
+          <option value="3" {% if depth == '3' %}selected{% endif %}>3</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="lens-lens">Lens</label>
+        <select id="lens-lens">
+          <option value="family">E3 family</option>
+          <option value="pocket">Pocket score</option>
+          <option value="exploitation">Exploitation status</option>
+          <option value="triage">Triage rank</option>
+        </select>
+      </div>
+      <button class="btn btn--accent" type="button" id="lens-load">Load</button>
+      <button class="btn" type="button" id="lens-expand">Expand</button>
     </div>
-    <div class="field" style="margin:0">
-      <label for="lens-depth">Depth</label>
-      <select id="lens-depth">
-        <option value="1" {% if depth == '1' %}selected{% endif %}>1</option>
-        <option value="2" {% if depth == '2' %}selected{% endif %}>2</option>
-        <option value="3" {% if depth == '3' %}selected{% endif %}>3</option>
-      </select>
-    </div>
-    <div class="field" style="margin:0">
-      <label for="lens-lens">Lens</label>
-      <select id="lens-lens">
-        <option value="family">E3 family</option>
-        <option value="pocket">Pocket score</option>
-        <option value="exploitation">Exploitation status</option>
-        <option value="triage">Triage rank</option>
-      </select>
-    </div>
-    <button class="btn btn--accent" type="button" id="lens-load">Load</button>
-    <button class="btn" type="button" id="lens-expand">Expand</button>
   </div>
 
   <div class="lens">

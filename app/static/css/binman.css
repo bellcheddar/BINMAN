@@ -347,11 +347,42 @@ code, kbd, samp, .mono { font-family: var(--data); font-size: 0.86em; }
 }
 .pane__head .meta { color: var(--muted); font-family: var(--data); font-size: 0.78rem; }
 
+/* One card. Every panel on the site is this box with an h3 title as its first
+   child, and nothing sits loose between panels: content that floated outside
+   one looked like it belonged to whatever panel happened to be above it. */
 .panel {
   background: var(--surface); border: 1px solid var(--line);
   border-radius: var(--radius); padding: 0.8rem; margin-bottom: 0.9rem;
 }
 .panel > h2:first-child, .panel > h3:first-child { margin-top: 0; }
+.panel > :last-child { margin-bottom: 0; }
+
+/* A panel whose body is a full-bleed table or canvas. The padding moves from
+   the box onto the title and any prose, so the table still meets the border.
+   This was `style="padding:0"` repeated inline in four places, which meant the
+   title and the blurb had nowhere to live and ended up outside the panel. */
+.panel--flush { padding: 0; }
+.panel--flush > h3 { margin: 0; padding: 0.8rem 0.8rem 0.5rem; }
+.panel--flush > p { margin: 0; padding: 0 0.8rem 0.8rem; }
+.panel--flush > .panel__foot { padding: 0.7rem 0.8rem; border-top: 1px solid var(--line); }
+
+/* A numbered step in the About walkthrough. A panel like any other, keeping the
+   accent edge that marked it out when it was a bare left-border block. */
+.panel--step { border-left: 3px solid var(--accent); }
+.panel--step > h3 {
+  font-family: var(--display); font-size: 0.7rem; color: var(--accent);
+  text-transform: uppercase; letter-spacing: 0.08em; margin: 0 0 0.5rem;
+}
+.panel__lead { font-size: 1.05rem; font-weight: 600; margin: 0 0 0.2rem; }
+.panel__note { color: var(--muted); font-size: 0.86rem; max-width: 68ch; }
+.panel__table { max-width: 34rem; }
+/* A row of controls inside a panel, under its title. Was an inline flex
+   declaration on the panel itself, which left that panel the only one on the
+   site with no heading. */
+.panel__controls {
+  display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: flex-end;
+}
+.panel__controls .field { margin: 0; }
 
 .split { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 0.9rem; }
 
@@ -549,11 +580,6 @@ code, kbd, samp, .mono { font-family: var(--data); font-size: 0.86em; }
 
 .schematic { width: 100%; height: auto; display: block; }
 .schematic text { font-family: var(--data); }
-.about-step { border-left: 3px solid var(--accent); padding-left: 0.85rem; margin: 1.4rem 0; }
-.about-step__n {
-  font-family: var(--display); font-size: 0.7rem; color: var(--accent);
-  text-transform: uppercase; letter-spacing: 0.08em;
-}
 
 /* -------------------------------------------------------------------------- */
 /* lens graph                                                                 */

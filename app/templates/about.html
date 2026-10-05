@@ -43,13 +43,14 @@
   {# ---------------------------------------------------------- 6.6.1 ------- #}
   <h2 id="workflow">Workflow</h2>
   <div class="panel">
+    <h3>Pipeline schematic</h3>
     {# Inlined, not <img>: an SVG loaded as an image cannot read the page's CSS
        custom properties, so the Depot tokens would resolve to nothing and every
        fill would render black. #}
     <div id="schematic-holder">{{ workflow_svg | safe }}</div>
     <details style="margin-top:0.6rem">
       <summary style="cursor:pointer;color:var(--accent)">Described in words</summary>
-      <p style="margin-bottom:0">{{ about.schematic_description }}</p>
+      <p>{{ about.schematic_description }}</p>
     </details>
   </div>
 
@@ -86,7 +87,7 @@
         {% endfor %}
       </tbody>
     </table>
-    <p style="margin:0.6rem 0 0;color:var(--muted);font-size:0.8rem">
+    <p class="panel__note">
       Stages that record a single run rather than a body of records are left
       out. All of them are in <code>data/manifests/</code>.
     </p>
@@ -94,10 +95,11 @@
 
   {# ---------------------------------------------------------- datasets ---- #}
   <h2 id="datasets">Ground truth</h2>
-  <p style="max-width:68ch;color:var(--muted)">
-    Every module is judged against independently curated published datasets.
-  </p>
-  <div class="panel" style="padding:0"><div id="dataset-table"></div></div>
+  <div class="panel panel--flush">
+    <h3>Validation datasets</h3>
+    <p>Every module is judged against independently curated published datasets.</p>
+    <div id="dataset-table"></div>
+  </div>
 
   {# ---------------------------------------------------------- 6.6.4 ------- #}
   <h2 id="example">Worked example</h2>
@@ -122,7 +124,7 @@
         </tbody>
       </table>
       {% if ex.relaxed %}
-        <p style="margin:0.6rem 0 0;color:var(--muted);font-size:0.86rem">
+        <p class="panel__note">
           {{ ex.relaxed | length }} criterion(a) were relaxed, in the documented
           order, because no record satisfied all of them. A worked example that
           quietly stops being true is worse than none, so the relaxation is shown
@@ -131,10 +133,10 @@
       {% endif %}
     </div>
 
-    <div class="about-step" id="example-step-1">
-      <div class="about-step__n">Step 1 · found in the atlas</div>
-      <h3 style="color:var(--ink)">{{ ex.pdb_id }} · {{ ex.ccd_id }}</h3>
-      <p style="margin-top:0">{{ ex.title }}</p>
+    <div class="panel panel--step" id="example-step-1">
+      <h3>Step 1 · found in the atlas</h3>
+      <p class="panel__lead">{{ ex.pdb_id }} · {{ ex.ccd_id }}</p>
+      <p>{{ ex.title }}</p>
       <div class="split">
         <div>
           <table class="grid-table">
@@ -153,7 +155,7 @@
           {# Derived from the chosen record. The sentence here used to describe
              a PEG oligomer in the same entry, which was true of the example it
              was written for and a fabrication about every other one. #}
-          <p style="font-size:0.86rem;color:var(--muted)">
+          <p class="panel__note">
             This passes the bridging filter because it buries more than the
             minimum area against <em>both</em> chains at once and makes enough
             heavy-atom contacts to each. Anything burying surface against only
@@ -176,8 +178,8 @@
       </div>
     </div>
 
-    <div class="about-step" id="example-step-2">
-      <div class="about-step__n">Step 2 · does its substrate carry a degron?</div>
+    <div class="panel panel--step" id="example-step-2">
+      <h3>Step 2 · does its substrate carry a degron?</h3>
       {% if ex.criteria | selectattr('key', 'equalto', 'substrate_has_degron')
             | selectattr('met') | list %}
         <p>The substrate carries a hairpin degron found by the Phase 2 scan.</p>
@@ -189,7 +191,7 @@
         </div>
       {% endif %}
       <div class="split">
-        <div><p style="color:var(--muted);font-size:0.86rem">
+        <div><p class="panel__note">
           Accessions in this entry: {% for acc in ex.accessions %}<code>{{ acc }}</code> {% endfor %}
         </p></div>
         <div>
@@ -201,8 +203,8 @@
       </div>
     </div>
 
-    <div class="about-step" id="example-step-3">
-      <div class="about-step__n">Step 3 · its ligase in context</div>
+    <div class="panel panel--step" id="example-step-3">
+      <h3>Step 3 · its ligase in context</h3>
       {# This step used to print "the E3 Triage stage has not run" with no
          condition on it at all. The stage had run, and the example is chosen
          partly because its ligase has a pocket score, so the page was stating
@@ -214,7 +216,7 @@
           {{ lig.family }} ligase, ranked {{ lig.triage_rank | thousands }} of
           {{ lig.total_ligases | thousands }} by the E3 Triage stage.
         </p>
-        <table class="grid-table" style="max-width:34rem"><tbody>
+        <table class="grid-table panel__table"><tbody>
           <tr><td>Pocket druggability score</td>
               <td class="num">{{ lig.pocket_score | sigfig }}</td></tr>
           <tr><td>Pocket volume</td>
@@ -236,8 +238,8 @@
       {% endif %}
     </div>
 
-    <div class="about-step" id="example-step-4">
-      <div class="about-step__n">Step 4 · is the target degradable?</div>
+    <div class="panel panel--step" id="example-step-4">
+      <h3>Step 4 · is the target degradable?</h3>
       {% set window = about.thresholds.degradability.reach_window %}
       {% if window.fitted %}
         <p>Held-out AUC {{ window.held_out_auc | sigfig }}, fitted
@@ -251,13 +253,16 @@
       {% endif %}
     </div>
 
-    <p>
-      <a class="btn btn--accent" id="try-it"
-         href="{{ url_for('ledger.index') }}#glue={{ ex.pdb_id }}:{{ ex.ccd_id }}:{{ ex.bridge_id }}">
-        Try it yourself: load this record into the live selection
-      </a>
-    </p>
-    <p style="max-width:68ch;color:var(--muted);font-size:0.9rem">{{ ex.honest_note }}</p>
+    <div class="panel">
+      <h3>Try it yourself</h3>
+      <p>
+        <a class="btn btn--accent" id="try-it"
+           href="{{ url_for('ledger.index') }}#glue={{ ex.pdb_id }}:{{ ex.ccd_id }}:{{ ex.bridge_id }}">
+          Load this record into the live selection
+        </a>
+      </p>
+      <p class="panel__note">{{ ex.honest_note }}</p>
+    </div>
   {% endif %}
 
   {# ---------------------------------------------------------- 6.6.2 ------- #}
@@ -278,16 +283,19 @@
 
   {# ---------------------------------------------------------- 6.6.3 ------- #}
   <h2 id="references">References</h2>
-  <div class="panel" style="padding:0"><div id="reference-table"></div></div>
-  <p>
-    <button class="btn" type="button" id="bibtex-export">Export BibTeX</button>
-  </p>
+  <div class="panel panel--flush">
+    <h3>Every source the build touched</h3>
+    <div id="reference-table"></div>
+    <div class="panel__foot">
+      <button class="btn" type="button" id="bibtex-export">Export BibTeX</button>
+    </div>
+  </div>
 
   <div class="panel">
     <h3>How to cite BINMAN</h3>
-    <p style="margin:0 0 0.4rem"><code>{{ about.citation.project }}</code><br>
+    <p><code>{{ about.citation.project }}</code><br>
       <a href="{{ about.citation.repository }}" target="_blank" rel="noopener noreferrer">{{ about.citation.repository }}</a></p>
-    <p style="margin:0;color:var(--muted)">{{ about.citation.instruction }}</p>
+    <p class="panel__note">{{ about.citation.instruction }}</p>
   </div>
 
 {% endif %}
