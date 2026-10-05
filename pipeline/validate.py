@@ -723,16 +723,40 @@ def section_94(connection: sqlite3.Connection, config) -> dict:
                 f"{report.get('n_held_out_positive')} observed sites held out."
             ),
             note=(
-                "**Accessibility only.** This is the AUC of lysine NZ relative "
+                "**SUPERSEDED, and reported because it is the last figure any "
+                "artefact holds.** D-067 remeasured exposure against lysines "
+                "assayed and found unmodified and got 0.5020, at chance. This "
+                "0.5458 was measured against lysines nobody had annotated, "
+                "which skew buried because buried lysines are also harder to "
+                "detect by mass spectrometry, so the negative set was enriched "
+                "for exactly what this feature measures and the number is "
+                "biased upward. Read it as an upper bound on a dead criterion, "
+                "not as the module's accuracy.\n\n"
+                "**Accessibility only.** It is the AUC of lysine NZ relative "
                 "accessibility as a predictor of whether a lysine carries an "
                 "observed ubiquitylation site. The three Cb-Cb reach boundaries "
                 "are unfitted and no reach verdict is emitted: an AlphaFold "
                 "monomer carrying an observed site has no ligand site for the "
-                "distance to be measured from. The negatives are lysines with no "
-                "annotation, not lysines assayed and found unmodified, so this "
-                "is a weaker construction than the matched screen behind 9.2."
+                "distance to be measured from."
             ),
         )
+        # The superseding measurement, named rather than silently absent.
+        #
+        # D-067's figures were computed against the assayed negatives in
+        # data/interim/acquire_ubiquitylome.json and written into DECISIONS.md
+        # and config/thresholds.toml as prose. No artefact holds them, so this
+        # section cannot read them, and reporting them here from a hand-typed
+        # literal is the one thing the whole file exists not to do.
+        out["exposure_vs_assayed_negatives"] = not_computed(
+            "D-067 measures exposure at 0.5020 within protein against 309,297 "
+            "lysines assayed and found unmodified, superseding the 0.5458 "
+            "above, and a per-lysine model at 0.6778. Those runs wrote no "
+            "artefact: the numbers are in DECISIONS.md and thresholds.toml as "
+            "prose. Re-running pipeline/degradability_features.py against "
+            "data/interim/acquire_ubiquitylome.json would make them readable "
+            "here. Until it does, this section reports no figure rather than "
+            "copying one out of a document.",
+            floors["degradability_auc_floor"])
         out["protein_level_split_honoured"] = computed(
             True, None,
             note=("A protein contributes wholly to train or wholly to test: "
