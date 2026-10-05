@@ -2987,3 +2987,29 @@ the sequence model at 0.6368 already is.
 
 What this does settle is that weight tuning is not the route to a better degron
 AUC, and now on a measurement rather than a suspicion.
+
+## D-076
+
+**The floor is reachable from a monomer, and the window still is not fitted.**
+
+`pipeline/degradability_features.py --assayed` has been run over the
+ubiquitylome: 405,207 lysines across 17,974 proteins, 107,653 ubiquitylated and
+297,554 assayed and found unmodified. D-067's figures are now in an artefact
+rather than in prose, and validate.py reads them instead of restating them.
+
+Exposure alone scores 0.4971 within protein, at chance, reproducing D-067's
+0.5020 on thirty-two times the data. A boosted model over the sixteen
+per-lysine features scores 0.6662, above the 0.65 floor, from an AlphaFold
+monomer alone. Adding protein-level terms moves it to 0.6678, a gain of 0.0016,
+so the result does not rest on ranking proteins by annotation prevalence.
+
+**Nothing is shipped on this.** Spec 5.4 defines the reach window as four
+thresholds and a model is not four thresholds; emitting its score would answer
+a different question from the one the module asks, and the four numbers still
+have no fit of their own (D-068). The lysine verdict column stays out.
+
+What it changes is the diagnosis. Until now the degradability module was
+blocked by an open question: whether any monomer-derivable signal reaches the
+floor at all. It does. What blocks a verdict is the shape spec 5.4 asks for,
+not an absence of signal, and that is a different problem with a different
+solution.

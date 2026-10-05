@@ -740,23 +740,51 @@ def section_94(connection: sqlite3.Connection, config) -> dict:
                 "distance to be measured from."
             ),
         )
-        # The superseding measurement, named rather than silently absent.
+        # The superseding measurement, read from the artefact that now holds it.
         #
-        # D-067's figures were computed against the assayed negatives in
-        # data/interim/acquire_ubiquitylome.json and written into DECISIONS.md
-        # and config/thresholds.toml as prose. No artefact holds them, so this
-        # section cannot read them, and reporting them here from a hand-typed
-        # literal is the one thing the whole file exists not to do.
-        out["exposure_vs_assayed_negatives"] = not_computed(
-            "D-067 measures exposure at 0.5020 within protein against 309,297 "
-            "lysines assayed and found unmodified, superseding the 0.5458 "
-            "above, and a per-lysine model at 0.6778. Those runs wrote no "
-            "artefact: the numbers are in DECISIONS.md and thresholds.toml as "
-            "prose. Re-running pipeline/degradability_features.py against "
-            "data/interim/acquire_ubiquitylome.json would make them readable "
-            "here. Until it does, this section reports no figure rather than "
-            "copying one out of a document.",
-            floors["degradability_auc_floor"])
+        # D-067's figures were prose in DECISIONS.md and thresholds.toml until
+        # degradability_features.py gained an --assayed mode and was run with
+        # it. This reads that report rather than restating its numbers.
+        assayed = _json_file(INTERIM / "degradability_features.json")
+        if assayed and assayed.get("negatives") == "assayed":
+            exposure = (assayed.get("feature_sets", {})
+                        .get("shipped_exposure_only", {})
+                        .get("logistic", {}).get("within_protein_auc"))
+            out["exposure_vs_assayed_negatives"] = computed(
+                exposure, floors["degradability_auc_floor"],
+                source=(
+                    f"{assayed.get('n_lysines', 0):,} lysines seen in identified "
+                    f"peptides across {assayed.get('n_proteins', 0):,} proteins, "
+                    f"{assayed.get('n_positive', 0):,} of them ubiquitylated and "
+                    "the rest assayed and found unmodified "
+                    f"({assayed.get('dataset')})."
+                ),
+                note=(
+                    "**This supersedes held_out_auc above.** It is the same "
+                    "question asked of a negative set that was measured rather "
+                    "than assumed, and exposure answers it at chance. Within "
+                    "protein, which is the only figure annotation prevalence "
+                    "cannot flatter."
+                ),
+            )
+            best = assayed.get("best_within_protein_auc")
+            out["best_monomer_feature_set"] = computed(
+                best, floors["degradability_auc_floor"],
+                note=(
+                    "A boosted model over the per-lysine features clears the "
+                    "floor where the single shipped criterion does not. It is "
+                    "reported and not shipped: spec 5.4 defines four window "
+                    "thresholds, and a model is not a window, so emitting its "
+                    "score would answer a different question from the one the "
+                    "module asks. See D-068."
+                ),
+            )
+        else:
+            out["exposure_vs_assayed_negatives"] = not_computed(
+                "pipeline/degradability_features.py has not been run with "
+                "--assayed, so no artefact holds the measurement against "
+                "lysines assayed and found unmodified.",
+                floors["degradability_auc_floor"])
         out["protein_level_split_honoured"] = computed(
             True, None,
             note=("A protein contributes wholly to train or wholly to test: "

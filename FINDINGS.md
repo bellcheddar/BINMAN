@@ -824,6 +824,42 @@ site selection is driven by E3 recruitment and sequence context, which is
 exactly what the Degradability module does not yet model. Gate G6 carries it
 (DECISIONS D-028).
 
+### The shipped criterion against negatives that were measured
+
+D-067 retired `min_nz_rel_sasa` on 12,705 lysines whose negatives were assumed.
+The question has now been asked of negatives that were assayed: 405,207 lysines
+seen in identified peptides across 17,974 proteins, 107,653 of them
+ubiquitylated and 297,554 seen and never modified. Thirty-two times the data,
+and a negative set that was measured rather than inferred from silence.
+
+| feature set | model | within-protein AUC | clears 0.65 |
+|---|---|---:|---|
+| `rel_sasa`, the shipped criterion | logistic | **0.4971** | no |
+| `rel_sasa` | boosted | 0.5071 | no |
+| all 16 per-lysine features | logistic | 0.5576 | no |
+| all 16 per-lysine features | boosted | **0.6662** | **yes** |
+| adding protein-level terms | boosted | 0.6678 | yes |
+
+Exposure alone is at chance, 0.4971, which reproduces D-067's 0.5020 at scale
+and settles it. Every single feature is within 0.055 of chance within protein,
+`frac_acidic` highest at 0.5452 and `frac_hydrophobic` lowest at 0.4829.
+
+What is new is the row that clears. A boosted model over the sixteen
+per-lysine features reaches 0.6662 within protein, above the 0.65 floor, using
+nothing but what an AlphaFold monomer provides. It does not depend on the
+protein-level terms that rank proteins by annotation prevalence: adding those
+moves it to 0.6678, a gain of 0.0016, which is the point. The signal is in the
+combination of weak per-lysine features, not in any one of them and not in
+knowing which protein a lysine belongs to.
+
+**It is reported and not shipped.** Spec 5.4 defines a reach window as four
+thresholds, and a model is not a window: emitting its score would answer a
+different question from the one the module asks, and the four numbers it
+defines still have no fit (D-068). What this does establish is that the floor
+is reachable from a monomer, which was open until now, and that the thing
+blocking a degradability verdict is the shape of what spec 5.4 asks for rather
+than the absence of signal in the data.
+
 ## Section 9.5 BINMAN-LM
 
 Measured against the **complete** atlas, with the corpus regenerated from it

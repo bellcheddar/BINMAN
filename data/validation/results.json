@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-05T08:03:35+00:00",
+  "generated_at": "2026-10-05T11:17:45+00:00",
   "atlas": "/Users/dellboy/Documents/Vibe_Coding/BINMAN/data/atlas/binman.sqlite",
   "atlas_bytes": 200654848,
   "note": "A metric whose dataset is unavailable is reported as computed: false with the reason. Nothing here is estimated, and no hand-written control was substituted for a missing published one (spec 4.1b).",
@@ -27,6 +27,12 @@
       "metric": "held_out_auc",
       "value": 0.5458,
       "floor": 0.65
+    },
+    {
+      "section": "9.4",
+      "metric": "exposure_vs_assayed_negatives",
+      "value": 0.4971,
+      "floor": 0.65
     }
   ],
   "metrics_not_computed": [
@@ -39,11 +45,6 @@
       "section": "9.3",
       "metric": "substrate_spearman",
       "reason": "The atlas `substrate_count` column is populated from the UbiBrowser literature set itself, so a Spearman correlation against UbiBrowser would be a tautology (rho = 1 by construction) rather than a test. A genuine version needs a second, independent substrate source."
-    },
-    {
-      "section": "9.4",
-      "metric": "exposure_vs_assayed_negatives",
-      "reason": "D-067 measures exposure at 0.5020 within protein against 309,297 lysines assayed and found unmodified, superseding the 0.5458 above, and a per-lysine model at 0.6778. Those runs wrote no artefact: the numbers are in DECISIONS.md and thresholds.toml as prose. Re-running pipeline/degradability_features.py against data/interim/acquire_ubiquitylome.json would make them readable here. Until it does, this section reports no figure rather than copying one out of a document."
     },
     {
       "section": "9.5",
@@ -896,10 +897,21 @@
       "note": "**SUPERSEDED, and reported because it is the last figure any artefact holds.** D-067 remeasured exposure against lysines assayed and found unmodified and got 0.5020, at chance. This 0.5458 was measured against lysines nobody had annotated, which skew buried because buried lysines are also harder to detect by mass spectrometry, so the negative set was enriched for exactly what this feature measures and the number is biased upward. Read it as an upper bound on a dead criterion, not as the module's accuracy.\n\n**Accessibility only.** It is the AUC of lysine NZ relative accessibility as a predictor of whether a lysine carries an observed ubiquitylation site. The three Cb-Cb reach boundaries are unfitted and no reach verdict is emitted: an AlphaFold monomer carrying an observed site has no ligand site for the distance to be measured from."
     },
     "exposure_vs_assayed_negatives": {
-      "computed": false,
-      "reason": "D-067 measures exposure at 0.5020 within protein against 309,297 lysines assayed and found unmodified, superseding the 0.5458 above, and a per-lysine model at 0.6778. Those runs wrote no artefact: the numbers are in DECISIONS.md and thresholds.toml as prose. Re-running pipeline/degradability_features.py against data/interim/acquire_ubiquitylome.json would make them readable here. Until it does, this section reports no figure rather than copying one out of a document.",
+      "computed": true,
+      "value": 0.4971,
       "floor": 0.65,
-      "value": null
+      "reason": "",
+      "passes": false,
+      "source": "405,207 lysines seen in identified peptides across 17,974 proteins, 107,653 of them ubiquitylated and the rest assayed and found unmodified (ubiquitylome (EBI Proteins, assayed)).",
+      "note": "**This supersedes held_out_auc above.** It is the same question asked of a negative set that was measured rather than assumed, and exposure answers it at chance. Within protein, which is the only figure annotation prevalence cannot flatter."
+    },
+    "best_monomer_feature_set": {
+      "computed": true,
+      "value": 0.6678,
+      "floor": 0.65,
+      "reason": "",
+      "passes": true,
+      "note": "A boosted model over the per-lysine features clears the floor where the single shipped criterion does not. It is reported and not shipped: spec 5.4 defines four window thresholds, and a model is not a window, so emitting its score would answer a different question from the one the module asks. See D-068."
     },
     "protein_level_split_honoured": {
       "computed": true,

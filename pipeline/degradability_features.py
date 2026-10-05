@@ -357,7 +357,10 @@ def run(limit: int | None = None, assayed: bool = False) -> dict:
     report: dict = {
         "question": ("does any feature derivable from an AlphaFold monomer predict "
                      "which lysine is ubiquitylated, to the spec 9.5 floor"),
-        "dataset": SITES,
+        # The label has to follow the negatives: the assayed run reads the
+        # ubiquitylome manifest, not digly_sites.tsv, and a report that
+        # names the wrong source is the fault this project keeps finding.
+        "dataset": "ubiquitylome (EBI Proteins, assayed)" if assayed else SITES,
         "n_lysines": len(rows),
         "n_positive": int(labels.sum()),
         "n_proteins": int(len(set(groups))),
