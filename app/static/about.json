@@ -1,12 +1,12 @@
 {
-  "generated_at": "2026-10-05T02:22:51+00:00",
+  "generated_at": "2026-10-05T03:59:11+00:00",
   "generator": "pipeline/build_about.py",
   "note": "A value that could not be read says 'not recorded' rather than a plausible guess.",
-  "schematic_description": "The pipeline runs left to right in four stages. Two kinds of input enter on the left: the primary data sources (RCSB, AlphaFold DB, UniProt, InterPro), and separately the validation datasets that serve as ground truth, of which 11 of 13 resolved. Stage 1, acquisition, catalogued 52,821 entries into priority tiers using httpx and tenacity. Stage 2, geometry, analysed 52,802 entries with gemmi and FreeSASA and found 283,131 bridges, with 19 entries failing. Stage 3, scan and triage, used DSSP and fpocket to produce 21,717 degron candidates, 650 triaged ligases and 1,650 scored lysines. Stage 4 trains BINMAN-LM with mlx-lm, which does text work only and never emits a number. Four modules leave on the right: Glue Atlas, Degron Scan, E3 Triage and Degradability.",
+  "schematic_description": "The pipeline runs left to right in four stages. Two kinds of input enter on the left: the primary data sources (RCSB, AlphaFold DB, UniProt, InterPro), and separately the validation datasets that serve as ground truth. Stage 1, acquisition, catalogued 130,391 entries into priority tiers using httpx and tenacity. Stage 2, geometry, analysed 55,449 entries with gemmi and FreeSASA and found 283,131 bridges, with 19 entries failing. Stage 3, scan and triage, used DSSP and fpocket to produce 21,717 degron candidates, 650 triaged ligases and 1,650 scored lysines. Stage 4 trains BINMAN-LM with mlx-lm, which does text work only and never emits a number. Four modules leave on the right: Glue Atlas, Degron Scan, E3 Triage and Degradability.",
   "stages": {
     "bridges": {
-      "total": 52821,
-      "ok": 52802,
+      "total": 55468,
+      "ok": 55449,
       "failed": 19,
       "failure_reasons": {
         "too_complex": 1062
@@ -25,13 +25,14 @@
       "failure_reasons": {}
     },
     "catalogue": {
-      "total": 52821,
-      "ok": 52821,
+      "total": 130391,
+      "ok": 130391,
       "failed": 0,
       "tiers": {
-        "1": 902,
-        "2": 34539,
-        "3": 17380
+        "1": 3871,
+        "2": 34222,
+        "3": 17375,
+        "4": 74923
       }
     },
     "catalogue_stage": {
@@ -88,8 +89,8 @@
       "failure_reasons": {}
     },
     "lm_eval": {
-      "total": 10,
-      "ok": 10,
+      "total": 12,
+      "ok": 12,
       "failed": 0,
       "failure_reasons": {}
     },
@@ -497,12 +498,12 @@
       "repo": "",
       "verified": true,
       "verification": "Crossref verified",
-      "authors": "Varadi, Mihaly and Anyango, Stephen and Deshpande, Mandar and Nair, Sreenath and Natassia, Cindy and Yordanova, Galabina and Yuan, David and Stroe, Oana and Wood, Gemma and Laydon, Agata and Žídek, Augustin and Green, Tim",
+      "authors": "Varadi, Mihaly and Anyango, Stephen and Deshpande, Mandar and Nair, Sreenath and Natassia, Cindy and Yordanova, Galabina and Yuan, David and Stroe, Oana and Wood, Gemma and Laydon, Agata and \u017d\u00eddek, Augustin and Green, Tim",
       "year": "2021",
       "container": "Nucleic Acids Research"
     },
     {
-      "name": "BioLiP2: an updated structure database for biologically relevant ligand–protein interactions",
+      "name": "BioLiP2: an updated structure database for biologically relevant ligand\u2013protein interactions",
       "key": "biolip2",
       "type": "database",
       "version": "weekly release, pinned by retrieval date",
@@ -548,7 +549,7 @@
       "repo": "",
       "verified": true,
       "verification": "Crossref verified",
-      "authors": "Szulc, Natalia A and Stefaniak, Filip and Piechota, Małgorzata and Soszyńska, Anna and Piórkowska, Gabriela and Cappannini, Andrea and Bujnicki, Janusz M and Maniaci, Chiara and Pokrzywa, Wojciech",
+      "authors": "Szulc, Natalia A and Stefaniak, Filip and Piechota, Ma\u0142gorzata and Soszy\u0144ska, Anna and Pi\u00f3rkowska, Gabriela and Cappannini, Andrea and Bujnicki, Janusz\u00a0M and Maniaci, Chiara and Pokrzywa, Wojciech",
       "year": "2024",
       "container": "Nucleic Acids Research"
     },
@@ -638,7 +639,7 @@
       "container": "Nucleic Acids Research"
     },
     {
-      "name": "Open Targets Platform: supporting systematic drug–target identification and prioritisation",
+      "name": "Open Targets Platform: supporting systematic drug\u2013target identification and prioritisation",
       "key": "open_targets",
       "type": "database",
       "version": "not recorded",
@@ -740,7 +741,7 @@
       "container": "Nucleic Acids Research"
     },
     {
-      "name": "UbiBrowser 2.0: a comprehensive resource for proteome-wide known and predicted ubiquitin ligase/deubiquitinase–substrate interactions in eukaryotic species",
+      "name": "UbiBrowser 2.0: a comprehensive resource for proteome-wide known and predicted ubiquitin ligase/deubiquitinase\u2013substrate interactions in eukaryotic species",
       "key": "ubibrowser2",
       "type": "database",
       "version": "UbiBrowser 2.0 / v3 web release",
@@ -769,7 +770,7 @@
       "repo": "",
       "verified": true,
       "verification": "Crossref verified",
-      "authors": "UniProt Consortium, The",
+      "authors": "UniProt\u00a0Consortium, The",
       "year": "2018",
       "container": "Nucleic Acids Research"
     },
@@ -876,7 +877,7 @@
       "container": "RCSB Protein Data Bank"
     },
     {
-      "name": "CK1α Degradation Underlies Lenalidomide Activity in del(5q) MDS",
+      "name": "CK1\u03b1 Degradation Underlies Lenalidomide Activity in del(5q) MDS",
       "key": "ck1a_lenalidomide",
       "type": "paper",
       "version": "not recorded",
@@ -905,7 +906,7 @@
       "repo": "",
       "verified": true,
       "verification": "Crossref verified",
-      "authors": "Sievers, Quinlan L. and Petzold, Georg and Bunker, Richard D. and Renneville, Aline and Słabicki, Mikołaj and Liddicoat, Brian J. and Abdulrahman, Wassim and Mikkelsen, Tarjei and Ebert, Benjamin L. and Thomä, Nicolas H.",
+      "authors": "Sievers, Quinlan L. and Petzold, Georg and Bunker, Richard D. and Renneville, Aline and S\u0142abicki, Miko\u0142aj and Liddicoat, Brian J. and Abdulrahman, Wassim and Mikkelsen, Tarjei and Ebert, Benjamin L. and Thom\u00e4, Nicolas H.",
       "year": "2018",
       "container": "Science"
     },
@@ -922,7 +923,7 @@
       "repo": "",
       "verified": true,
       "verification": "Crossref verified",
-      "authors": "Słabicki, Mikołaj and Park, Jiho and Nowak, Radosław P. and Roy Burman, Shourya S. and Pellman, Jesse and Zou, Charles and Razumkov, Hlib and Carreiro, Jeannie and Rastogi, Simran and Goldstein, Anna and Nagiec, Marek M. and Donovan, Katherine A.",
+      "authors": "S\u0142abicki, Miko\u0142aj and Park, Jiho and Nowak, Rados\u0142aw P. and Roy Burman, Shourya S. and Pellman, Jesse and Zou, Charles and Razumkov, Hlib and Carreiro, Jeannie and Rastogi, Simran and Goldstein, Anna and Nagiec, Marek M. and Donovan, Katherine A.",
       "year": "2025",
       "container": "Molecular Cell"
     },
@@ -939,7 +940,7 @@
       "repo": "",
       "verified": true,
       "verification": "Crossref verified",
-      "authors": "Krönke, Jan and Udeshi, Namrata D. and Narla, Anupama and Grauman, Peter and Hurst, Slater N. and McConkey, Marie and Svinkina, Tanya and Heckl, Dirk and Comer, Eamon and Li, Xiaoyu and Ciarlo, Christie and Hartman, Emily",
+      "authors": "Kr\u00f6nke, Jan and Udeshi, Namrata D. and Narla, Anupama and Grauman, Peter and Hurst, Slater N. and McConkey, Marie and Svinkina, Tanya and Heckl, Dirk and Comer, Eamon and Li, Xiaoyu and Ciarlo, Christie and Hartman, Emily",
       "year": "2014",
       "container": "Science"
     },
@@ -961,7 +962,7 @@
       "container": "PLoS ONE"
     },
     {
-      "name": "Structure of the DDB1–CRBN E3 ubiquitin ligase in complex with thalidomide",
+      "name": "Structure of the DDB1\u2013CRBN E3 ubiquitin ligase in complex with thalidomide",
       "key": "imid_zf_interface",
       "type": "paper",
       "version": "not recorded",
@@ -973,7 +974,7 @@
       "repo": "",
       "verified": true,
       "verification": "Crossref verified",
-      "authors": "Fischer, Eric S. and Böhm, Kerstin and Lydeard, John R. and Yang, Haidi and Stadler, Michael B. and Cavadini, Simone and Nagel, Jane and Serluca, Fabrizio and Acker, Vincent and Lingaraju, Gondichatnahalli M. and Tichkule, Ritesh B. and Schebesta, Michael",
+      "authors": "Fischer, Eric S. and B\u00f6hm, Kerstin and Lydeard, John R. and Yang, Haidi and Stadler, Michael B. and Cavadini, Simone and Nagel, Jane and Serluca, Fabrizio and Acker, Vincent and Lingaraju, Gondichatnahalli M. and Tichkule, Ritesh B. and Schebesta, Michael",
       "year": "2014",
       "container": "Nature"
     },
@@ -1007,7 +1008,7 @@
       "repo": "",
       "verified": true,
       "verification": "Crossref verified",
-      "authors": "Kim, Woong and Bennett, Eric J. and Huttlin, Edward L. and Guo, Ailan and Li, Jing and Possemato, Anthony and Sowa, Mathew E. and Rad, Ramin and Rush, John and Comb, Michael J. and Harper, J. Wade and Gygi, Steven P.",
+      "authors": "Kim, Woong and Bennett, Eric\u00a0J. and Huttlin, Edward\u00a0L. and Guo, Ailan and Li, Jing and Possemato, Anthony and Sowa, Mathew\u00a0E. and Rad, Ramin and Rush, John and Comb, Michael\u00a0J. and Harper, J.\u00a0Wade and Gygi, Steven\u00a0P.",
       "year": "2011",
       "container": "Molecular Cell"
     },
@@ -1024,12 +1025,12 @@
       "repo": "",
       "verified": true,
       "verification": "Crossref verified",
-      "authors": "Słabicki, Mikołaj and Kozicka, Zuzanna and Petzold, Georg and Li, Yen-Der and Manojkumar, Manisha and Bunker, Richard D. and Donovan, Katherine A. and Sievers, Quinlan L. and Koeppel, Jonas and Suchyta, Dakota and Sperling, Adam S. and Fink, Emma C.",
+      "authors": "S\u0142abicki, Miko\u0142aj and Kozicka, Zuzanna and Petzold, Georg and Li, Yen-Der and Manojkumar, Manisha and Bunker, Richard D. and Donovan, Katherine A. and Sievers, Quinlan L. and Koeppel, Jonas and Suchyta, Dakota and Sperling, Adam S. and Fink, Emma C.",
       "year": "2020",
       "container": "Nature"
     },
     {
-      "name": "The Eukaryotic Proteome Is Shaped by E3 Ubiquitin Ligases Targeting C-Terminal Degrons",
+      "name": "The Eukaryotic Proteome Is Shaped by E3\u00a0Ubiquitin Ligases Targeting C-Terminal Degrons",
       "key": "glycine_degron",
       "type": "paper",
       "version": "not recorded",
@@ -1080,7 +1081,7 @@
       "container": ""
     },
     {
-      "name": "Dictionary of protein secondary structure: Pattern recognition of hydrogen‐bonded and geometrical features",
+      "name": "Dictionary of protein secondary structure: Pattern recognition of hydrogen\u2010bonded and geometrical features",
       "key": "dssp",
       "type": "software",
       "version": "not recorded",
@@ -1109,12 +1110,12 @@
       "repo": "",
       "verified": true,
       "verification": "Crossref verified",
-      "authors": "Kohn, André and Moritz, Dominik and Raasveldt, Mark and Mühleisen, Hannes and Neumann, Thomas",
+      "authors": "Kohn, Andr\u00e9 and Moritz, Dominik and Raasveldt, Mark and M\u00fchleisen, Hannes and Neumann, Thomas",
       "year": "2022",
       "container": "Proceedings of the VLDB Endowment"
     },
     {
-      "name": "D³ Data-Driven Documents",
+      "name": "D\u00b3 Data-Driven Documents",
       "key": "d3",
       "type": "software",
       "version": "7.9.0",
@@ -1170,7 +1171,7 @@
       "type": "software",
       "version": "not recorded",
       "retrieved": "2026-10-05T02:22:47+00:00",
-      "used_for": "solvent accessible surface area and ΔSASA",
+      "used_for": "solvent accessible surface area and \u0394SASA",
       "licence": "MIT",
       "doi": "10.12688/f1000research.7931.1",
       "home": "https://doi.org/10.12688/f1000research.7931.1",
@@ -1245,7 +1246,7 @@
       "repo": "https://github.com/molstar/molstar",
       "verified": true,
       "verification": "Crossref verified",
-      "authors": "Sehnal, David and Bittrich, Sebastian and Deshpande, Mandar and Svobodová, Radka and Berka, Karel and Bazgier, Václav and Velankar, Sameer and Burley, Stephen K and Koča, Jaroslav and Rose, Alexander S",
+      "authors": "Sehnal, David and Bittrich, Sebastian and Deshpande, Mandar and Svobodov\u00e1, Radka and Berka, Karel and Bazgier, V\u00e1clav and Velankar, Sameer and Burley, Stephen K and Ko\u010da, Jaroslav and Rose, Alexander S",
       "year": "2021",
       "container": "Nucleic Acids Research"
     },
@@ -1279,12 +1280,12 @@
       "repo": "",
       "verified": true,
       "verification": "Crossref verified",
-      "authors": "Krivák, Radoslav and Hoksza, David",
+      "authors": "Kriv\u00e1k, Radoslav and Hoksza, David",
       "year": "2018",
       "container": "Journal of Cheminformatics"
     },
     {
-      "name": "PLIP 2021: expanding the scope of the protein–ligand interaction profiler to DNA and RNA",
+      "name": "PLIP 2021: expanding the scope of the protein\u2013ligand interaction profiler to DNA and RNA",
       "key": "plip",
       "type": "software",
       "version": "not recorded",
@@ -1296,7 +1297,7 @@
       "repo": "",
       "verified": true,
       "verification": "Crossref verified",
-      "authors": "Adasme, Melissa F and Linnemann, Katja L and Bolz, Sarah Naomi and Kaiser, Florian and Salentin, Sebastian and Haupt, V Joachim and Schroeder, Michael",
+      "authors": "Adasme, Melissa F and Linnemann, Katja L and Bolz, Sarah Naomi and Kaiser, Florian and Salentin, Sebastian and Haupt, V\u00a0Joachim and Schroeder, Michael",
       "year": "2021",
       "container": "Nucleic Acids Research"
     },
@@ -1444,60 +1445,36 @@
   },
   "worked_example": {
     "available": true,
-    "bridge_id": 21200,
-    "pdb_id": "9SAI",
-    "ccd_id": "A1JM3",
-    "ligand_name": "N-[(2S)-1-[[(3S)-2,5-bis(oxidanylidene)pyrrolidin-3-yl]amino]-1-oxidanylidene-propan-2-yl]-9-[2-[(9S)-7-(4-chlorophenyl)-4,5,13-trimethyl-3-thia-1,8,11,12-tetrazatricyclo[8.3.0.0^{2,6}]trideca-2(6),4,7,10,12-pentaen-9-yl]ethanoylamino]nonanamide",
-    "title": "Ternary PROTAC-mediated complex consisting of Cereblon, DDB1 and BRD4-BD1, non-covalently linked by JQ1-AcN",
-    "method": "ELECTRON MICROSCOPY",
-    "resolution": 2.66,
-    "chain_a": "B/A",
-    "chain_b": "C/C",
-    "dsasa_a": 794.38,
-    "dsasa_b": 798.84,
-    "dsasa_total": 1593.22,
-    "bridging_balance": 0.9944,
-    "buried_fraction": 0.8644,
-    "contacts_a": 87,
-    "contacts_b": 28,
-    "heavy_atoms": 50,
+    "bridge_id": 42560,
+    "pdb_id": "7OJX",
+    "ccd_id": "ME7",
+    "ligand_name": "1,1'-ethane-1,2-diylbis(1H-pyrrole-2,5-dione)",
+    "title": "E2 UBE2K covalently linked to donor Ub, acceptor di-Ub, and RING E3 primed for K48-linked Ub chain synthesis",
+    "method": "X-RAY DIFFRACTION",
+    "resolution": 2.4,
+    "chain_a": "B/B",
+    "chain_b": "D/D",
+    "dsasa_a": 137.48,
+    "dsasa_b": 116.59,
+    "dsasa_total": 254.07,
+    "bridging_balance": 0.848,
+    "buried_fraction": 0.3789,
+    "contacts_a": 15,
+    "contacts_b": 6,
+    "heavy_atoms": 16,
     "interface_residues_a": [
-      "ILE 371",
-      "GLY 372",
-      "HIS 397",
-      "GLN 390",
-      "TRP 400",
-      "VAL 388",
-      "TRP 386",
-      "ASN 351",
-      "TRP 380",
-      "HIS 378",
-      "SER 379",
-      "PHE 402",
-      "PRO 352"
+      "CYS 124",
+      "ASP 123"
     ],
     "interface_residues_b": [
-      "LEU 92",
-      "ILE 146",
-      "ASP 145",
-      "PRO 82",
-      "TRP 81",
-      "LEU 94",
-      "VAL 87",
-      "MET 149"
+      "CYS 48"
     ],
     "accessions": [
-      "O60885",
-      "Q16531",
-      "Q96SW2"
+      "P0CG47",
+      "P61086",
+      "Q9H0F5"
     ],
     "criteria": [
-      {
-        "key": "two_database_agreement",
-        "label": "present in at least two of the three curated glue databases",
-        "met": false,
-        "relaxed": true
-      },
       {
         "key": "passes_bridging_filter",
         "label": "passes the bridging filter",
@@ -1541,10 +1518,6 @@
         "label": "the highest-resolution structure among the candidates"
       },
       {
-        "key": "two_database_agreement",
-        "label": "present in at least two of the three curated glue databases"
-      },
-      {
         "key": "balance_above_threshold",
         "label": "bridging balance above the strong threshold"
       },
@@ -1553,7 +1526,12 @@
         "label": "its target has a mapped lysine with a favourable verdict"
       }
     ],
-    "candidate_pool": 400,
+    "candidate_pool": 3814,
+    "excluded_from_pool": {
+      "curated": 36,
+      "degrader_ligase": 60,
+      "titled": 90
+    },
     "honest_note": "This record was chosen because every stage that has run worked on it. A reader should look at the misses list and the novel-bridge set in FINDINGS.md for the cases where stages did not."
   },
   "validation": {
@@ -2588,7 +2566,7 @@
           {
             "question": "which ternary complexes were solved at high resolution",
             "raw": "{\"record_type\":\"bridge\",\"filters\":[{\"field\":\"resolution\",\"op\":\"eq\",\"value\":\"high\"}],\"sort\":{\"field\":\"dsasa_total\",\"direction\":\"desc\"},\"limit\":200}",
-            "error": "field 'resolution' takes a number in Å, got 'high'",
+            "error": "field 'resolution' takes a number in \u00c5, got 'high'",
             "stage": "parse"
           },
           {

@@ -850,3 +850,8 @@ One line per meaningful event, timestamped UTC (spec Section 0 rule 5).
 | 2026-10-05T03:47:17+00:00 | 9 | Validation run against binman.sqlite: 0 metric(s) not computed (dataset unavailable), 2 measured floor(s) missed. |
 | 2026-10-05T03:47:18+00:00 | 9 | Validation run against binman.sqlite: 4 metric(s) not computed (dataset unavailable), 5 measured floor(s) missed. |
 | 2026-10-05T03:50:51+00:00 | 1.3 | Bridge run starting: 2,647 entries pending of 130,391 catalogued (tiers 1 to 3), 16 IO workers, 14 geometry workers. |
+| 2026-10-05T03:55:51+00:00 | 1.3 | 2,297/2,647 entries, 1,331 bridges, 0 failed, 7.7 entries/s, ~0.0 h remaining. |
+| 2026-10-05T03:56:45+00:00 | 1.3 | Bridge run finished: 2,647 entries in 5.9 min, 2,865 bridges, 0 failed, 7.5 entries/s. |
+| 2026-10-05T03:59:11+00:00 | 4.1b | About tab generated: 53 references, 11/13 datasets resolved, worked example selected, 0 value(s) not recorded, 0 source(s) publish no licence. |
+| 2026-10-05T03:59:22+00:00 | 9 | Validation run against binman.sqlite: 0 metric(s) not computed (dataset unavailable), 2 measured floor(s) missed. |
+| 2026-10-05T03:59:23+00:00 | 9 | Validation run against binman.sqlite: 4 metric(s) not computed (dataset unavailable), 5 measured floor(s) missed. |

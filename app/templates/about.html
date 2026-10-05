@@ -92,13 +92,6 @@
   {% if not ex.available %}
     <div class="notice">{{ ex.note }}</div>
   {% else %}
-    <p style="max-width:68ch;color:var(--muted)">
-      One record carried end to end through all four modules, so a first-time
-      visitor understands what BINMAN does without pinning anything. The record
-      is chosen deterministically from
-      {{ ex.candidate_pool | thousands }} candidates, never hardcoded.
-    </p>
-
     <div class="panel">
       <h3>Which criteria this example meets</h3>
       <table class="grid-table">

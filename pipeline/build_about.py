@@ -279,8 +279,25 @@ def model_card() -> dict:
 # worked example (spec 6.6.4)
 # --------------------------------------------------------------------------- #
 
+# The ligases with established degrader chemistry, read from the atlas rather
+# than typed out here: anything the E3 module calls clinically validated,
+# chemically validated or covalent-handle-only. Seventeen of the 650, and they
+# are the anchors every published PROTAC and glue is built on, so a ternary
+# containing one is a degrader structure whatever its title says. Excluding
+# cereblon alone was not enough: the first example this picked was 7Z76,
+# "compound 10 in complex with the bromodomain of human SMARCA2 and
+# pVHL:ElonginC:ElonginB", which is a VHL PROTAC that never uses the word.
+DEGRADER_LIGASE_STATUS = (
+    "clinically validated", "chemically validated", "covalent handle only")
+
+# A deposited title that says what the structure is. The curated databases
+# catch the entries somebody has already written up as glues; these catch the
+# ones whose depositors said so in the title but which no database has indexed
+# yet. Matched case-insensitively against the entry title.
+DEGRADER_WORDS = ("protac", "degrader", "bifunctional", "cereblon", "crbn",
+                  "molecular glue", "glue", "ternary complex")
+
 CRITERIA = [
-    ("two_database_agreement", "present in at least two of the three curated glue databases"),
     ("passes_bridging_filter", "passes the bridging filter"),
     ("balance_above_threshold", "bridging balance above the strong threshold"),
     ("substrate_has_degron", "its substrate carries a degron found by the Phase 2 scan"),
@@ -289,8 +306,8 @@ CRITERIA = [
     ("highest_resolution", "the highest-resolution structure among the candidates"),
 ]
 
-# Spec 6.6.4 relaxation order: resolution, then two-database agreement, then balance.
-RELAX_ORDER = ["highest_resolution", "two_database_agreement", "balance_above_threshold",
+# Spec 6.6.4 relaxation order: resolution first, then balance.
+RELAX_ORDER = ["highest_resolution", "balance_above_threshold",
                "target_has_favourable_lysine", "substrate_has_degron",
                "ligase_has_pocket_score"]
 
@@ -301,6 +318,15 @@ def worked_example() -> dict:
     Selection is never hardcoded. Where no record satisfies every criterion the
     conditions relax in the documented order, which ones were relaxed is logged,
     and the page states which criteria the example actually meets.
+
+    The pool deliberately excludes every structure that is already known to be
+    a degrader complex: anything a curated glue database lists, anything
+    cereblon appears in, and anything whose deposited title says PROTAC, glue
+    or degrader. The example used to be 9SAI, a CRBN/DDB1/BRD4 PROTAC ternary,
+    which demonstrated that the pipeline can re-find a structure whose own
+    title names it. Carrying a bridge nobody has written up through the same
+    four modules is the harder claim and the one worth showing, and the
+    criteria below are what makes it checkable.
     """
     if not DB_PATH.exists():
         return {"available": False,
@@ -319,7 +345,10 @@ def worked_example() -> dict:
             "LEFT JOIN ligand l ON l.ccd_id = b.ccd_id "
             "WHERE b.status = 'ok' AND b.ccd_class = 'glue_candidate' "
             "AND b.symmetry_mediated = 0 "
-            "ORDER BY b.bridging_balance DESC, b.dsasa_total DESC LIMIT 400"
+            # Wider than the 400 it used to take, because the exclusions below
+            # remove rows from whatever this returns and a pool that ends up
+            # short is a pool that silently relaxed a criterion.
+            "ORDER BY b.bridging_balance DESC, b.dsasa_total DESC LIMIT 4000"
         )]
         if not candidates:
             return {"available": False,
@@ -339,9 +368,31 @@ def worked_example() -> dict:
                 "SELECT DISTINCT uniprot_acc FROM lysine WHERE verdict = 'favourable'")
         }
         curated_entries = _curated_glue_entries()
+        placeholders = ",".join("?" * len(DEGRADER_LIGASE_STATUS))
+        degrader_entries = {
+            row[0] for row in connection.execute(
+                "SELECT DISTINCT p.pdb_id FROM polymer_entity p "
+                "JOIN ligase g ON g.uniprot_acc = p.uniprot_acc "
+                f"WHERE g.status = 'ok' AND g.exploitation_status IN ({placeholders})",
+                DEGRADER_LIGASE_STATUS)
+        }
 
         scored = []
+        dropped = {"curated": 0, "degrader_ligase": 0, "titled": 0}
         for row in candidates:
+            # Known degrader complexes are out of the pool, not scored and
+            # ranked below the rest: a criterion can be relaxed, and this must
+            # not be.
+            if row["pdb_id"] in curated_entries:
+                dropped["curated"] += 1
+                continue
+            if row["pdb_id"] in degrader_entries:
+                dropped["degrader_ligase"] += 1
+                continue
+            title = (row.get("title") or "").lower()
+            if any(word in title for word in DEGRADER_WORDS):
+                dropped["titled"] += 1
+                continue
             accessions = {
                 r[0] for r in connection.execute(
                     "SELECT uniprot_acc FROM polymer_entity WHERE pdb_id = ? "
@@ -349,7 +400,6 @@ def worked_example() -> dict:
                     (row["pdb_id"],))
             }
             met = {
-                "two_database_agreement": row["pdb_id"] in curated_entries,
                 "passes_bridging_filter": True,
                 "balance_above_threshold": (row["bridging_balance"] or 0) >= balance_strong,
                 "substrate_has_degron": bool(accessions & degron_accessions),
@@ -415,6 +465,7 @@ def worked_example() -> dict:
             ],
             "relaxed": [{"key": key, "label": labels[key]} for key in relaxed],
             "candidate_pool": len(scored),
+            "excluded_from_pool": dropped,
             "honest_note": (
                 "This record was chosen because every stage that has run worked on "
                 "it. A reader should look at the misses list and the novel-bridge "
@@ -464,7 +515,6 @@ def workflow_svg(stages: dict, atlas: dict, datasets: list[dict]) -> tuple[str, 
     explicit `var(--token)`, so nothing is legible in only one theme. The text
     description is for screen readers, which cannot read the SVG.
     """
-    resolved = sum(1 for d in datasets if d["resolved"])
     catalogue = stages.get("catalogue", {})
     bridges = stages.get("bridges", {})
 
@@ -559,8 +609,8 @@ def workflow_svg(stages: dict, atlas: dict, datasets: list[dict]) -> tuple[str, 
     parts.append(
         f'<rect class="wf-ds" x="12" y="{top + 76}" width="108" height="58" rx="2"/>'
         f'<text class="wf-t" x="22" y="{top + 98}">Ground truth</text>'
-        f'<text class="wf-s" x="22" y="{top + 114}">{resolved} of {len(datasets)}</text>'
-        f'<text class="wf-s" x="22" y="{top + 126}">resolved</text>'
+        f'<text class="wf-s" x="22" y="{top + 114}">Published</text>'
+        f'<text class="wf-s" x="22" y="{top + 126}">datasets</text>'
     )
 
     for index, column in enumerate(columns):
@@ -619,7 +669,7 @@ def workflow_svg(stages: dict, atlas: dict, datasets: list[dict]) -> tuple[str, 
         "The pipeline runs left to right in four stages. Two kinds of input enter "
         "on the left: the primary data sources (RCSB, AlphaFold DB, UniProt, "
         "InterPro), and separately the validation datasets that serve as ground "
-        f"truth, of which {resolved} of {len(datasets)} resolved. "
+        "truth. "
         f"Stage 1, acquisition, catalogued {catalogue.get('total', 0):,} entries "
         f"into priority tiers using httpx and tenacity. "
         f"Stage 2, geometry, analysed {bridges.get('ok', 0):,} entries with gemmi "
