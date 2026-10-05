@@ -720,17 +720,46 @@ rather than a single gate. The published statistic is a shift across a sorted
 population, not a ratio between two conditions, so reproducing it needs the
 methods text in supplement 1 or 2 rather than a guess at the arithmetic.
 
-**Two routes, both open.** Reproduce the published statistic from the methods,
-which gives labels directly comparable to the 2 that survived; or define a
-depletion statistic of our own from the read counts and validate it against the
-positive calls of those 2 rather than against their LFC values. The second does
-not need the paper's arithmetic and is checkable, but it would produce labels
-that are ours rather than theirs, and that distinction would have to travel with
-every number built on them.
+**Both routes were run. Neither produces labels worth training on, and the
+reason is the same.**
 
-Either route turns 2 compounds into 17 on a full library of 9,098 constructs,
-which is the data the per-compound result needs and the 57-construct validation
-panel cannot provide.
+*Route 1, reproduce their statistic.* The first attempt correlated at r = -0.08
+because the join ignored a column: the ratio table carries two libraries,
+Cilantro and Lavender, and the read-count sheet carries only Cilantro, so half
+the published rows were being compared against the wrong library's reads. Keyed
+on library, log2 of drug CPM over DMSO CPM reproduces the published LFC at
+**r = -0.88 for ALV1 and -0.69 to -0.75 for Ace.4.Ph.Glu.Amide**. The sign
+confirms the algebra: `LFC = -log2(Ratio)` holds to machine precision over 2,000
+rows, and `Ratio` is drug over control.
+
+*Route 2, our own statistic against their calls.* Their rule is gate A, the
+better-evidenced of the two libraries, Benjamini-Hochberg at 0.05, and a
+negative LFC. A Welch statistic over replicates, which is what a published
+`Sd.Ratio` beside a `p_value` implies, recovers those calls at **AUC 0.849 for
+ALV1 and 0.803 for Ace**, improving on 0.782 and 0.725 for a plain ratio of
+means.
+
+**And it is still not enough.** Taken at matched prevalence, the reconstruction
+picks the same construct as a positive **138 of 316 times for ALV1 and 122 of
+257 for Ace**: fewer than half. An AUC of 0.82 at 3% prevalence cannot deliver
+better, and labels differing on 55% of positives are different labels.
+
+**The cause is missing data, not a missing method.** Their calls take the
+stronger evidence of two libraries, and `Screen.Primary_Read.Count` holds 254
+Cilantro columns and no Lavender at all. Roughly half the evidence behind every
+published call is absent from the file, so no statistic computed from it can
+reproduce them.
+
+**What would fix it is an acquisition, not a computation.** Supplement 4 is
+`.xls`, whose 65,536-row limit is the whole problem; supplements 5 to 8 are
+`.xlsx` at 1,048,576 rows and are not truncated. The same table in `.xlsx`, or
+the counts deposited in GEO, would carry all 17 compounds and both libraries
+with no reconstruction at all.
+
+Two smaller traps for whoever picks this up: `ZnF.Sequence` in supplement 4 is
+nucleotide, not protein, so it needs translating before any sequence model sees
+it; and supplement 5's validation table is 22,041 rows and supplement 6's
+alanine scan 174,641, both intact, because both are `.xlsx`.
 
 ### Why artefact precision stops at 0.9401, and why it should
 

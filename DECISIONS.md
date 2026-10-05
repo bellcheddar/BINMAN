@@ -3149,3 +3149,31 @@ test set.
 
 The floor is missed and reported as missed. CYC, which carries 5,504 of the
 bridges in this set, is probably BioLiP's error rather than the classifier's.
+
+## D-082
+
+**The Slabicki primary screen is not reconstructed: half its evidence is absent.**
+
+Both routes out of D-081's truncation were run. The statistic was found: keyed
+on library, log2 of drug CPM over DMSO CPM reproduces the published LFC at
+r = -0.88 for ALV1, and a Welch statistic over replicates recovers their
+positive calls at AUC 0.849. The first attempt scored r = -0.08 because the join
+ignored the Library column, which is the kind of error a correlation near zero
+should always be read as.
+
+It is still not enough to mint labels. At matched prevalence the reconstruction
+agrees on 138 of 316 positives for ALV1 and 122 of 257 for Ace, fewer than half.
+
+The cause is that `Screen.Primary_Read.Count` carries 254 Cilantro columns and
+no Lavender, while every published call takes the stronger evidence of the two
+libraries. No statistic computed from half the evidence reproduces a call made
+on all of it, so no further method work will close this.
+
+**No labels are generated for the other fifteen compounds.** Training a degron
+model on labels that disagree with the published ones on more than half their
+positives would put that disagreement into every number downstream, and the
+labels would carry our name while being read as the paper's.
+
+What unblocks it is an acquisition. Supplement 4 is `.xls` and its 65,536-row
+limit is the entire problem; supplements 5 to 8 are `.xlsx` and are intact. The
+same table as `.xlsx`, or the counts in GEO, needs no reconstruction.
