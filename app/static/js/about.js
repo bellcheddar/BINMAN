@@ -216,9 +216,30 @@
         ccdId: example.ccd_id,
         identifier: example.pdb_id + ' · ' + example.ccd_id,
         identifierHref: 'https://www.rcsb.org/structure/' + example.pdb_id,
-        overlay: 'ΔSASA ' + Util.num(example.dsasa_a) + ' / ' +
-          Util.num(example.dsasa_b) + ' Å² · balance ' +
-          Util.num(example.bridging_balance)
+        overlay: 'ΔSASA ' + Util.num2(example.dsasa_a) + ' / ' +
+          Util.num2(example.dsasa_b) + ' Å² · balance ' +
+          Util.num2(example.bridging_balance)
+      });
+    }
+
+    /* Step 2's viewer was in the template and mounted nowhere, so it sat on
+       its empty state for good. It shows the AlphaFold model of whichever
+       accession in the entry the scan placed a hairpin on, framed on that
+       hairpin and coloured by pLDDT, which is what the step claims. */
+    var second = document.getElementById('viewer-example-2');
+    var degron = example.degron;
+    if (second && degron) {
+      B.mountViewer(second, {
+        role: 'degron',
+        url: B.afdbCifUrl(degron.uniprot_acc),
+        format: 'mmcif',
+        focusResidues: [{ start: degron.start_res, end: degron.end_res }],
+        identifier: degron.gene + ' · ' + degron.afdb_id,
+        identifierHref: 'https://alphafold.ebi.ac.uk/entry/' + degron.uniprot_acc,
+        overlay: 'tip ' + degron.tip_aa + degron.tip_res +
+          ' · pLDDT ' + Util.num2(degron.mean_plddt) +
+          ' · exposure ' + Util.num2(degron.tip_rel_sasa),
+        plddt: true
       });
     }
   }

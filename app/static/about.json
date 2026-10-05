@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-05T04:38:11+00:00",
+  "generated_at": "2026-10-05T04:39:19+00:00",
   "generator": "pipeline/build_about.py",
   "schematic_description": "The pipeline runs left to right in four stages. Two kinds of input enter on the left: the primary data sources (RCSB, AlphaFold DB, UniProt, InterPro), and separately the validation datasets that serve as ground truth. Stage 1, acquisition, catalogued 130,391 entries into priority tiers using httpx and tenacity. Stage 2, geometry, analysed 55,449 entries with gemmi and FreeSASA and found 285,996 bridges, with 19 entries failing. Stage 3, scan and triage, used DSSP and fpocket to produce 21,717 degron candidates, 650 triaged ligases and 1,650 scored lysines. Stage 4 trains BINMAN-LM with mlx-lm, which does text work only and never emits a number. Four modules leave on the right: Glue Atlas, Degron Scan, E3 Triage and Degradability.",
   "stages": {
@@ -53,12 +53,12 @@
       "failure_reasons": {}
     },
     "degrons": {
-      "total": 816,
-      "ok": 648,
-      "failed": 168,
+      "total": 926,
+      "ok": 756,
+      "failed": 170,
       "failure_reasons": {
         "afdb_model_unavailable": 152,
-        "RuntimeError": 16
+        "RuntimeError": 18
       }
     },
     "edges": {
@@ -1473,6 +1473,18 @@
       "P61086",
       "Q9H0F5"
     ],
+    "degron": {
+      "uniprot_acc": "P0CG47",
+      "gene": "UBB",
+      "afdb_id": "AF-P0CG47-F1",
+      "start_res": 117,
+      "end_res": 125,
+      "tip_res": 123,
+      "tip_aa": "G",
+      "mean_plddt": 95.98,
+      "tip_rel_sasa": 0.7404,
+      "degron_geometry_score": 0.882084
+    },
     "ligase": {
       "uniprot_acc": "Q9H0F5",
       "gene": "RNF38",

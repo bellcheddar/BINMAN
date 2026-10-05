@@ -184,18 +184,40 @@
 
     <div class="panel panel--step" id="example-step-2">
       <h3>Step 2 · does its substrate carry a degron?</h3>
-      {% if ex.criteria | selectattr('key', 'equalto', 'substrate_has_degron')
-            | selectattr('met') | list %}
-        <p>The substrate carries a hairpin degron found by the Phase 2 scan.</p>
+      {# Named, not asserted. The step used to say "the substrate carries a
+         hairpin degron" without saying which chain or where, so there was
+         nothing to check it against and nothing for the viewer to frame. #}
+      {% if ex.degron %}
+        <p>
+          <code>{{ ex.degron.gene }}</code> ({{ ex.degron.uniprot_acc }}) carries
+          a hairpin at residues {{ ex.degron.start_res }} to
+          {{ ex.degron.end_res }}, tip {{ ex.degron.tip_aa }}{{ ex.degron.tip_res }}.
+        </p>
       {% else %}
         <div class="notice">
-          The Degron Scan has not run, so this step cannot be shown for this
-          record. It is listed above as a relaxed criterion rather than
-          illustrated with a number that does not exist.
+          No accession in this entry carries a hairpin the Degron Scan placed,
+          so there is nothing to show for this step. It is listed above as a
+          relaxed criterion rather than illustrated with a number that does not
+          exist.
         </div>
       {% endif %}
       <div class="split">
-        <div><p class="panel__note">
+        <div>
+          {% if ex.degron %}
+            <table class="grid-table panel__table"><tbody>
+              <tr><td>Tip residue</td>
+                  <td>{{ ex.degron.tip_aa }}{{ ex.degron.tip_res }}</td></tr>
+              <tr><td>Hairpin</td>
+                  <td>{{ ex.degron.start_res }}&ndash;{{ ex.degron.end_res }}</td></tr>
+              <tr><td>Mean pLDDT</td>
+                  <td>{{ ex.degron.mean_plddt | sigfig(4) }}</td></tr>
+              <tr><td>Tip relative SASA</td>
+                  <td>{{ ex.degron.tip_rel_sasa | sigfig }}</td></tr>
+              <tr><td>Geometry score</td>
+                  <td>{{ ex.degron.degron_geometry_score | sigfig }}</td></tr>
+            </tbody></table>
+          {% endif %}
+          <p class="panel__note">
           Accessions in this entry: {% for acc in ex.accessions %}<code>{{ acc }}</code> {% endfor %}
         </p></div>
         <div>

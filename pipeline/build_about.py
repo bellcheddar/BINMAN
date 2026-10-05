@@ -437,6 +437,21 @@ def worked_example() -> dict:
             return {"available": False,
                     "note": "No bridge satisfied even the relaxed criteria."}
 
+        # The example's own degron, so step 2 can show the hairpin it is
+        # asserting rather than an empty viewer. Best-scoring candidate on
+        # whichever accession in the entry the scan placed one on.
+        degron = None
+        if chosen.get("accessions"):
+            marks = ",".join("?" * len(chosen["accessions"]))
+            row = connection.execute(
+                f"SELECT uniprot_acc, gene, afdb_id, start_res, end_res, tip_res, "
+                f"tip_aa, mean_plddt, tip_rel_sasa, degron_geometry_score "
+                f"FROM degron WHERE status = 'ok' AND uniprot_acc IN ({marks}) "
+                f"ORDER BY degron_geometry_score DESC LIMIT 1",
+                chosen["accessions"]).fetchone()
+            if row is not None:
+                degron = dict(row)
+
         # The example's own ligase, so step 3 of the walkthrough can state its
         # triage numbers instead of claiming the stage has not run. Best-ranked
         # first, because an entry can carry more than one: 7OJX holds RNF38
@@ -495,6 +510,7 @@ def worked_example() -> dict:
             "interface_residues_a": _decode(chosen.get("interface_residues_a")),
             "interface_residues_b": _decode(chosen.get("interface_residues_b")),
             "accessions": chosen.get("accessions", []),
+            "degron": degron,
             "ligase": ligase,
             "entry_bridges": entry_bridges,
             "ligand_bridges": ligand_bridges,
