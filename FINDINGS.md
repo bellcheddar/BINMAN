@@ -693,6 +693,45 @@ regularity is computed it has been selected to its ceiling: the filter and the
 score are measuring the same thing twice, and the second time carries no
 information.
 
+### The Slabicki truncation is recoverable in principle, and not yet in practice
+
+`degron_slabicki.py` reads `Screen.Primary_Ratio_pval` from supplement 4, which
+Excel truncated at 65,535 rows, so 2 of the screen's drugs survive and the rest
+do not. That has been recorded as a limit. What had not been checked is whether
+the data behind it survived.
+
+It did. The same workbook carries `Screen.Primary_Read.Count`, 9,098 constructs
+by 256 columns, untruncated, and its column names name **18 compounds** where
+the derived table has 2:
+
+    ALV1, ALV2, AMINO.5.EM12, AMINO.5.THAL, AMINO.6.EM12, AMINO.7.EM12,
+    AVA, Ace.4.Ph.Glu.Amide, Br.4.Ph.Glu.Amide, CC885, CC90009, CC92480,
+    CPD946, EM12, FPFT, HY.4.EM12, HY.4.THAL, and DMSO as the control
+    across 60 columns.
+
+**Rebuilding the labels from them was attempted and failed its own check.**
+Counts per million, drug against DMSO within a gate, log2: correlated with the
+published LFC at r = -0.08 for ALV1 and +0.04 for Ace.4.Ph.Glu.Amide, over
+6,569 and 8,271 matched constructs. That is no relationship, so the method is
+wrong and nothing was extended to the other compounds on the strength of it.
+
+The diagnosis is in the table's own `Gate` column, which holds `A` and `A.B.C`
+rather than a single gate. The published statistic is a shift across a sorted
+population, not a ratio between two conditions, so reproducing it needs the
+methods text in supplement 1 or 2 rather than a guess at the arithmetic.
+
+**Two routes, both open.** Reproduce the published statistic from the methods,
+which gives labels directly comparable to the 2 that survived; or define a
+depletion statistic of our own from the read counts and validate it against the
+positive calls of those 2 rather than against their LFC values. The second does
+not need the paper's arithmetic and is checkable, but it would produce labels
+that are ours rather than theirs, and that distinction would have to travel with
+every number built on them.
+
+Either route turns 2 compounds into 17 on a full library of 9,098 constructs,
+which is the data the per-compound result needs and the 57-construct validation
+panel cannot provide.
+
 ### Why artefact precision stops at 0.9401, and why it should
 
 377 of 401 artefact CCDs are correctly not called glue. The floor is 0.95, so
