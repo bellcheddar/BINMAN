@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1194 412" style="background:#E9EAE5" preserveAspectRatio="xMidYMid meet" role="img" aria-labelledby="wf-title wf-desc">
+<title id="wf-title">BINMAN pipeline schematic</title>
+<desc id="wf-desc">Described in the text below the figure.</desc>
+<style>.wf-box{fill:#F7F7F4;stroke:#C9CBC3;stroke-width:1.5}.wf-ds{fill:#F6E3D3;stroke:#A64708;stroke-width:1.5;stroke-dasharray:4 3}.wf-t{fill:#15171A;font:600 13px Inter, Helvetica, Arial, sans-serif,sans-serif}.wf-s{fill:#61655F;font:10px ui-monospace, SFMono-Regular, Menlo, monospace,monospace}.wf-n{fill:#15171A;font:11px ui-monospace, SFMono-Regular, Menlo, monospace,monospace}.wf-bad{fill:#A33A2A;font:11px ui-monospace, SFMono-Regular, Menlo, monospace,monospace}.wf-arrow{stroke:#C9CBC3;stroke-width:1.5;fill:none}.wf-head{fill:#61655F;font:600 10px Inter, Helvetica, Arial, sans-serif,sans-serif;letter-spacing:.06em;text-transform:uppercase}.wf-lay-box{fill:none;stroke:#C9CBC3;stroke-width:1.5;stroke-dasharray:3 3}.wf-lay{fill:#61655F;font:11px Inter, Helvetica, Arial, sans-serif,sans-serif}.wf-lm-band{fill:#F6E3D3;stroke:#A64708;stroke-width:1.5}.wf-lm-head{fill:#F7F7F4;stroke:#A64708;stroke-width:1.5}.wf-lm-title{fill:#A64708;font:600 11px Inter, Helvetica, Arial, sans-serif,sans-serif;letter-spacing:.06em;text-transform:uppercase}.wf-lm-t{fill:#15171A;font:600 12px Inter, Helvetica, Arial, sans-serif,sans-serif}.wf-lm-s{fill:#61655F;font:10px Inter, Helvetica, Arial, sans-serif,sans-serif}.wf-lm-arrow{stroke:#A64708;stroke-width:1.5;fill:none}.wf-lm-name{fill:#A64708;font:10px ui-monospace, SFMono-Regular, Menlo, monospace,monospace}</style>
+<marker id="wf-tip" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7Z" fill="#C9CBC3"/></marker>
+<marker id="wf-tip-lm" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7Z" fill="#A64708"/></marker>
+<text class="wf-head" x="12" y="50">Inputs</text>
+<rect class="wf-box" x="12" y="74" width="108" height="68" rx="2"/><text class="wf-t" x="22" y="98">Sources</text><text class="wf-s" x="22" y="116">RCSB, AFDB,</text><text class="wf-s" x="22" y="130">UniProt</text>
+<rect class="wf-ds" x="12" y="154" width="108" height="68" rx="2"/><text class="wf-t" x="22" y="178">Ground truth</text><text class="wf-s" x="22" y="196">Published</text><text class="wf-s" x="22" y="210">datasets</text>
+<g class="wf-node" data-stage="1" tabindex="0"><rect class="wf-box" x="128" y="74" width="196" height="148" rx="2"/><text class="wf-t" x="140" y="98">1 · Acquisition</text><text class="wf-s" x="140" y="114">httpx, tenacity</text>
+<text class="wf-n" x="140" y="138">130,391 entries</text>
+<text class="wf-n" x="140" y="154">tier 1  3,871</text>
+<text class="wf-n" x="140" y="170">tier 2  34,222</text>
+<text class="wf-n" x="140" y="186">tier 3  17,375</text>
+</g>
+<rect class="wf-lay-box" x="128" y="234" width="196" height="46" rx="2"/>
+<text class="wf-lay" x="140" y="253">Fetch every PDB entry that</text>
+<text class="wf-lay" x="140" y="268">could hold a glue.</text>
+<path class="wf-arrow" d="M324,148.0 L352,148.0" marker-end="url(#wf-tip)"/>
+<g class="wf-node" data-stage="2" tabindex="0"><rect class="wf-box" x="358" y="74" width="196" height="148" rx="2"/><text class="wf-t" x="370" y="98">2 · Geometry</text><text class="wf-s" x="370" y="114">gemmi, FreeSASA</text>
+<text class="wf-n" x="370" y="138">55,449 entries analysed</text>
+<text class="wf-n" x="370" y="154">285,996 bridges found</text>
+<text class="wf-bad" x="370" y="208">19 failed</text>
+</g>
+<rect class="wf-lay-box" x="358" y="234" width="196" height="46" rx="2"/>
+<text class="wf-lay" x="370" y="253">Measure which ligands touch</text>
+<text class="wf-lay" x="370" y="268">two proteins at once.</text>
+<path class="wf-arrow" d="M554,148.0 L582,148.0" marker-end="url(#wf-tip)"/>
+<g class="wf-node" data-stage="3" tabindex="0"><rect class="wf-box" x="588" y="74" width="196" height="148" rx="2"/><text class="wf-t" x="600" y="98">3 · Scan and triage</text><text class="wf-s" x="600" y="114">DSSP, fpocket</text>
+<text class="wf-n" x="600" y="138">21,717 degrons scanned</text>
+<text class="wf-n" x="600" y="154">650 ligases triaged</text>
+<text class="wf-n" x="600" y="170">1,650 lysines scored</text>
+<text class="wf-bad" x="600" y="208">582 failed</text>
+</g>
+<rect class="wf-lay-box" x="588" y="234" width="196" height="46" rx="2"/>
+<text class="wf-lay" x="600" y="253">Score what a degrader needs:</text>
+<text class="wf-lay" x="600" y="268">tags, ligases, lysines.</text>
+<path class="wf-arrow" d="M784,148.0 L812,148.0" marker-end="url(#wf-tip)"/>
+<g class="wf-node" data-stage="4" tabindex="0"><rect class="wf-box" x="818" y="74" width="196" height="148" rx="2"/><text class="wf-t" x="830" y="98">4 · Model</text><text class="wf-s" x="830" y="114">mlx-lm, LoRA</text>
+<text class="wf-n" x="830" y="138">Qwen2.5-3B, 4-bit</text>
+<text class="wf-n" x="830" y="154">rank 8 over 32 layers</text>
+<text class="wf-n" x="830" y="170">one adapter, three heads</text>
+</g>
+<rect class="wf-lay-box" x="818" y="234" width="196" height="46" rx="2"/>
+<text class="wf-lay" x="830" y="253">Train one small model on the</text>
+<text class="wf-lay" x="830" y="268">atlas's own records.</text>
+<path class="wf-arrow" d="M120,108.0 L122,138.0" marker-end="url(#wf-tip)"/>
+<path class="wf-arrow" d="M120,188.0 L122,158.0" marker-end="url(#wf-tip)"/>
+<text class="wf-head" x="1058" y="50">Modules</text>
+<rect class="wf-box" x="1058" y="74" width="124" height="28" rx="2"/><text class="wf-n" x="1068" y="92.0">Glue Atlas</text>
+<rect class="wf-box" x="1058" y="114" width="124" height="28" rx="2"/><text class="wf-n" x="1068" y="132.0">Degron Scan</text>
+<rect class="wf-box" x="1058" y="154" width="124" height="28" rx="2"/><text class="wf-n" x="1068" y="172.0">E3 Triage</text>
+<rect class="wf-box" x="1058" y="194" width="124" height="28" rx="2"/><text class="wf-n" x="1068" y="212.0">Degradability</text>
+<path class="wf-arrow" d="M1014,148.0 L1052,148.0" marker-end="url(#wf-tip)"/>
+<rect class="wf-lm-band" x="128" y="300" width="886" height="96" rx="3"/><text class="wf-lm-title" x="142" y="318">BINMAN-LM · one adapter, three heads, no arithmetic</text><text class="wf-lm-name" x="1000" y="318" text-anchor="end">binman-qwen-2.5-3b-4bit-round07</text>
+<rect class="wf-lm-head" x="142" y="326" width="276" height="56" rx="2"/><text class="wf-lm-t" x="152" y="345">A · query</text>
+<text class="wf-lm-s" x="152" y="360">your question becomes a query object</text>
+<text class="wf-lm-s" x="152" y="373">when you ask, then the parser checks it</text>
+<rect class="wf-lm-head" x="432" y="326" width="276" height="56" rx="2"/><text class="wf-lm-t" x="442" y="345">B · triage</text>
+<text class="wf-lm-s" x="442" y="360">evidence class on 27,590 bridge rows</text>
+<text class="wf-lm-s" x="442" y="373">at build time, the one model-derived column</text>
+<rect class="wf-lm-head" x="722" y="326" width="276" height="56" rx="2"/><text class="wf-lm-t" x="732" y="345">C · abstain</text>
+<text class="wf-lm-s" x="732" y="360">answerable or not, and what is missing</text>
+<text class="wf-lm-s" x="732" y="373">when the parser rejects a proposal</text>
+<path class="wf-lm-arrow" d="M916.0,280 L916.0,294" marker-end="url(#wf-tip-lm)"/>
+<path class="wf-lm-arrow" d="M1014,348.0 L1120.0,348.0 L1120.0,228" marker-end="url(#wf-tip-lm)"/>
+</svg>

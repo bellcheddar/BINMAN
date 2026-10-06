@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-06T13:20:57+00:00",
+  "generated_at": "2026-10-06T13:37:56+00:00",
   "generator": "pipeline/build_about.py",
   "schematic_description": "The pipeline runs left to right in four stages. Two kinds of input enter on the left: the primary data sources (RCSB, AlphaFold DB, UniProt, InterPro), and separately the validation datasets that serve as ground truth. Stage 1, acquisition, catalogued 130,391 entries into priority tiers using httpx and tenacity. Stage 2, geometry, analysed 55,449 entries with gemmi and FreeSASA and found 285,996 bridges, with 19 entries failing. Stage 3, scan and triage, used DSSP and fpocket to produce 21,717 degron candidates, 650 triaged ligases and 1,650 scored lysines. Stage 4 trains BINMAN-LM with mlx-lm, which does text work only and never emits a number. Four modules leave on the right: Glue Atlas, Degron Scan, E3 Triage and Degradability. In plain terms: stage 1 fetches every PDB entry that could hold a glue, stage 2 measures which ligands touch two proteins at once, stage 3 scores what a degrader needs (tags, ligases and lysines), and stage 4 trains one small model on the atlas's own records. Below the four stages sits the trained layer: binman-qwen-2.5-3b-4bit-round07, one LoRA adapter with three heads. Head A, query, turns a question into a query object when somebody asks, and the parser then checks it. Head B, triage, assigns an evidence class to 27,590 bridge rows at build time, and is the only model-derived column in the atlas. Head C, abstain, says whether a question is answerable and what is missing when it is not, and is called when the parser rejects a proposal. None of the three produces a number.",
   "stages": {
@@ -1478,67 +1478,102 @@
   },
   "worked_example": {
     "available": true,
-    "bridge_id": 42560,
-    "pdb_id": "7OJX",
-    "ccd_id": "ME7",
-    "ligand_name": "1,1'-ethane-1,2-diylbis(1H-pyrrole-2,5-dione)",
-    "title": "E2 UBE2K covalently linked to donor Ub, acceptor di-Ub, and RING E3 primed for K48-linked Ub chain synthesis",
+    "bridge_id": 9488,
+    "pdb_id": "9OHL",
+    "ccd_id": "A1CBE",
+    "ligand_name": "N-(4-{[(3aS,4R,6S,6aR)-6-(3-chlorophenyl)-2-propanoyloctahydrocyclopenta[c]pyrrol-4-yl]oxy}phenyl)acetamide",
+    "title": "TRMT112-METTL5 bound to SAM and FWG-33B",
     "method": "X-RAY DIFFRACTION",
-    "resolution": 2.4,
-    "chain_a": "B/B",
-    "chain_b": "D/D",
-    "dsasa_a": 137.48,
-    "dsasa_b": 116.59,
-    "dsasa_total": 254.07,
-    "bridging_balance": 0.848,
-    "buried_fraction": 0.3789,
-    "contacts_a": 15,
-    "contacts_b": 6,
-    "heavy_atoms": 16,
+    "resolution": 1.286,
+    "chain_a": "C/A",
+    "chain_b": "D/B",
+    "dsasa_a": 442.33,
+    "dsasa_b": 581.25,
+    "dsasa_total": 1023.58,
+    "bridging_balance": 0.761,
+    "buried_fraction": 0.7948,
+    "contacts_a": 27,
+    "contacts_b": 44,
+    "heavy_atoms": 30,
     "interface_residues_a": [
-      "CYS 124",
-      "ASP 123"
+      "LEU 111",
+      "ARG 115",
+      "LEU 112",
+      "MET 116",
+      "CYS 107",
+      "VAL 105"
     ],
     "interface_residues_b": [
-      "CYS 48"
+      "LEU 118",
+      "LEU 117",
+      "MET 116",
+      "LEU 9",
+      "PHE 107",
+      "SER 119",
+      "CYS 100",
+      "GLU 102"
     ],
     "accessions": [
-      "P0CG47",
-      "P61086",
-      "Q9H0F5"
+      "Q9NRN9",
+      "Q9UI30"
     ],
-    "structure_file": "7OJX_ME7.cif.gz",
+    "structure_file": "9OHL_A1CBE.cif.gz",
     "degron": {
-      "uniprot_acc": "P0CG47",
-      "gene": "UBB",
-      "afdb_id": "AF-P0CG47-F1",
-      "start_res": 117,
-      "end_res": 125,
-      "tip_res": 123,
+      "uniprot_acc": "Q9UI30",
+      "gene": "TRMT112",
+      "afdb_id": "AF-Q9UI30-F1",
+      "start_res": 91,
+      "end_res": 110,
+      "tip_res": 104,
       "tip_aa": "G",
-      "mean_plddt": 95.98,
-      "tip_rel_sasa": 0.7404,
-      "degron_geometry_score": 0.882084
+      "mean_plddt": 88.37,
+      "tip_rel_sasa": 0.3077,
+      "degron_geometry_score": 0.632384
     },
-    "ligase": {
-      "uniprot_acc": "Q9H0F5",
-      "gene": "RNF38",
-      "family": "RING",
-      "pocket_score": 0.002,
-      "pocket_volume_a3": 315.144,
-      "triage_rank": 608,
-      "triage_score": 0.15244,
-      "exploitation_status": "ligandable unproven",
-      "substrate_count": 0,
-      "total_ligases": 638
-    },
-    "entry_bridges": 3,
-    "ligand_bridges": 3,
+    "ligase": null,
+    "entry_bridges": 1,
+    "ligand_bridges": 1,
     "is_largest_for_ligand": true,
     "criteria": [
       {
         "key": "passes_bridging_filter",
         "label": "passes the bridging filter",
+        "met": true,
+        "relaxed": false
+      },
+      {
+        "key": "two_proteins_only",
+        "label": "exactly two proteins in the entry",
+        "met": true,
+        "relaxed": false
+      },
+      {
+        "key": "one_bridging_ligand",
+        "label": "one bridging ligand, not a crowd",
+        "met": true,
+        "relaxed": false
+      },
+      {
+        "key": "no_ligase_in_the_entry",
+        "label": "neither protein is an E3 ligase",
+        "met": true,
+        "relaxed": false
+      },
+      {
+        "key": "novel_bridge",
+        "label": "listed by no curated glue database",
+        "met": true,
+        "relaxed": false
+      },
+      {
+        "key": "neither_protein_is_a_known_glue_target",
+        "label": "neither protein appears in any structure a curated glue database lists",
+        "met": true,
+        "relaxed": false
+      },
+      {
+        "key": "model_called_it_a_glue",
+        "label": "the triage head called it a molecular glue",
         "met": true,
         "relaxed": false
       },
@@ -1551,12 +1586,6 @@
       {
         "key": "substrate_has_degron",
         "label": "its substrate carries a degron found by the Phase 2 scan",
-        "met": true,
-        "relaxed": false
-      },
-      {
-        "key": "ligase_has_pocket_score",
-        "label": "its ligase has a pocket score",
         "met": true,
         "relaxed": false
       },
@@ -1587,11 +1616,11 @@
         "label": "its target has a mapped lysine with a favourable verdict"
       }
     ],
-    "candidate_pool": 3800,
+    "candidate_pool": 3781,
     "excluded_from_pool": {
       "curated": 51,
       "degrader_ligase": 60,
-      "titled": 89
+      "titled": 108
     },
     "honest_note": "This record was chosen because every stage that has run worked on it. A reader should look at the misses list and the novel-bridge set in FINDINGS.md for the cases where stages did not."
   },

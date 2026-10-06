@@ -308,21 +308,43 @@ DEGRADER_LIGASE_STATUS = (
 # ones whose depositors said so in the title but which no database has indexed
 # yet. Matched case-insensitively against the entry title.
 DEGRADER_WORDS = ("protac", "degrader", "bifunctional", "cereblon", "crbn",
-                  "molecular glue", "glue", "ternary complex")
+                  "molecular glue", "glue", "ternary complex",
+                  # The RAS(ON) series says "tricomplex" rather than "ternary
+                  # complex" and walked straight through the old list. The
+                  # depositors named what they had built; the filter exists to
+                  # take them at their word.
+                  "tricomplex", "tri-complex", "tri complex",
+                  "chemical inducer", "proximity inducer", "neosubstrate")
 
 CRITERIA = [
     ("passes_bridging_filter", "passes the bridging filter"),
+    # The three that keep the example simple enough to follow. A walkthrough
+    # whose first figure holds six chains and four ligands spends its reader's
+    # attention on working out what they are looking at.
+    ("two_proteins_only", "exactly two proteins in the entry"),
+    ("one_bridging_ligand", "one bridging ligand, not a crowd"),
+    ("no_ligase_in_the_entry", "neither protein is an E3 ligase"),
+    # And the two that make it worth showing: nobody has written this one up.
+    ("novel_bridge", "listed by no curated glue database"),
+    ("neither_protein_is_a_known_glue_target",
+     "neither protein appears in any structure a curated glue database lists"),
+    ("model_called_it_a_glue", "the triage head called it a molecular glue"),
     ("balance_above_threshold", "bridging balance above the strong threshold"),
     ("substrate_has_degron", "its substrate carries a degron found by the Phase 2 scan"),
-    ("ligase_has_pocket_score", "its ligase has a pocket score"),
     ("target_has_favourable_lysine", "its target has a mapped lysine with a favourable verdict"),
     ("highest_resolution", "the highest-resolution structure among the candidates"),
 ]
 
-# Spec 6.6.4 relaxation order: resolution first, then balance.
+# Spec 6.6.4 relaxation order: resolution first, then balance. The simplicity
+# and novelty criteria relax last, because they are the point of the example:
+# an entry with an E3 already in it demonstrates the pipeline re-finding a
+# degrader complex, which is the easy claim.
 RELAX_ORDER = ["highest_resolution", "balance_above_threshold",
                "target_has_favourable_lysine", "substrate_has_degron",
-               "ligase_has_pocket_score"]
+               "model_called_it_a_glue", "novel_bridge",
+               "neither_protein_is_a_known_glue_target",
+               "one_bridging_ligand", "no_ligase_in_the_entry",
+               "two_proteins_only"]
 
 
 def worked_example() -> dict:
@@ -381,6 +403,23 @@ def worked_example() -> dict:
                 "SELECT DISTINCT uniprot_acc FROM lysine WHERE verdict = 'favourable'")
         }
         curated_entries = _curated_glue_entries()
+        # The PROTEINS the curated glue databases already work on, not just the
+        # entries they list. 14-3-3 sigma passed every entry-level exclusion:
+        # no database lists this particular structure and its title does not
+        # say "glue", yet 14-3-3 stabilisers are one of the oldest glue classes
+        # there is. Excluding by title was turning into a list of famous names,
+        # which is this project's judgement rather than a derived fact. The
+        # curated databases know which proteins they are about, so they are
+        # asked.
+        curated_proteins: set[str] = set()
+        if curated_entries:
+            marks = ",".join("?" * len(curated_entries))
+            curated_proteins = {
+                r[0] for r in connection.execute(
+                    f"SELECT DISTINCT uniprot_acc FROM polymer_entity "
+                    f"WHERE pdb_id IN ({marks}) AND uniprot_acc IS NOT NULL "
+                    f"AND uniprot_acc != ''", tuple(curated_entries))
+            }
         placeholders = ",".join("?" * len(DEGRADER_LIGASE_STATUS))
         degrader_entries = {
             row[0] for row in connection.execute(
@@ -406,6 +445,19 @@ def worked_example() -> dict:
             if any(word in title for word in DEGRADER_WORDS):
                 dropped["titled"] += 1
                 continue
+            entity_names = {
+                (r[0] or "").strip() for r in connection.execute(
+                    "SELECT name FROM polymer_entity WHERE pdb_id = ?",
+                    (row["pdb_id"],)) if (r[0] or "").strip()
+            }
+            has_e3 = bool(connection.execute(
+                "SELECT 1 FROM polymer_entity WHERE pdb_id = ? AND is_e3 = 1 LIMIT 1",
+                (row["pdb_id"],)).fetchone())
+            bridging_ccds = {
+                r[0] for r in connection.execute(
+                    "SELECT DISTINCT ccd_id FROM bridge WHERE pdb_id = ? AND status = 'ok'",
+                    (row["pdb_id"],))
+            }
             accessions = {
                 r[0] for r in connection.execute(
                     "SELECT uniprot_acc FROM polymer_entity WHERE pdb_id = ? "
@@ -414,8 +466,19 @@ def worked_example() -> dict:
             }
             met = {
                 "passes_bridging_filter": True,
+                "two_proteins_only": len(entity_names) == 2,
+                "one_bridging_ligand": len(bridging_ccds) == 1,
+                "no_ligase_in_the_entry": not has_e3,
+                "novel_bridge": bool(row.get("novel_bridge")),
+                "neither_protein_is_a_known_glue_target":
+                    not (accessions & curated_proteins),
+                "model_called_it_a_glue": row.get("evidence_class") == "molecular_glue",
                 "balance_above_threshold": (row["bridging_balance"] or 0) >= balance_strong,
                 "substrate_has_degron": bool(accessions & degron_accessions),
+                # Kept as a reported fact rather than a requirement: the
+                # example is now chosen to have no E3 in it, and step 3 asks
+                # which ligase you would recruit rather than naming one that
+                # happens to be in the crystal.
                 "ligase_has_pocket_score": bool(accessions & pocket_accessions),
                 "target_has_favourable_lysine": bool(accessions & favourable_accessions),
                 "highest_resolution": row.get("resolution") is not None,
@@ -645,6 +708,35 @@ def _curated_glue_entries() -> set[str]:
 # --------------------------------------------------------------------------- #
 # the workflow schematic (spec 6.6.1)
 # --------------------------------------------------------------------------- #
+
+# GitHub strips <style> and does not resolve CSS custom properties, so the
+# schematic the app serves renders as black-on-black in a README. This is the
+# same drawing with the Depot light palette substituted in, read from
+# binman.css rather than typed, so the two cannot drift.
+README_SVG = ROOT / "docs" / "workflow.svg"
+_README_FONTS = {"--display": "Inter, Helvetica, Arial, sans-serif",
+                 "--data": "ui-monospace, SFMono-Regular, Menlo, monospace"}
+
+
+def _light_palette() -> dict[str, str]:
+    """The `:root` block of binman.css, as a token to value map."""
+    import re
+
+    css = (ROOT / "app" / "static" / "css" / "binman.css").read_text(encoding="utf-8")
+    start = css.index(":root {")
+    block = css[start:css.index("}", start)]
+    return dict(re.findall(r"(--[a-z0-9-]+):\s*([^;]+);", block))
+
+
+def readme_svg(svg: str) -> str:
+    """The schematic with every custom property resolved to a literal."""
+    palette = {**_light_palette(), **_README_FONTS}
+    for token, value in palette.items():
+        svg = svg.replace(f"var({token})", value.strip())
+    # Nothing should be left pointing at a property that no longer resolves.
+    return svg.replace('class="schematic"',
+                       f'style="background:{palette.get("--bg", "#E9EAE5").strip()}"')
+
 
 def shipped_adapter_name() -> str:
     """The run name of the adapter that actually serves, house convention.
@@ -993,6 +1085,8 @@ def build() -> dict:
     datasets = dataset_rows()
     references = reference_rows()
     svg, description = workflow_svg(stages, atlas, datasets)
+    README_SVG.parent.mkdir(parents=True, exist_ok=True)
+    README_SVG.write_text(readme_svg(svg) + "\n", encoding="utf-8")
     example = worked_example()
     results = _json(VALIDATION / "results.json", {}) or {}
 

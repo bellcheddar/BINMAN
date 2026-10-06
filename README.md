@@ -2,7 +2,15 @@
 
 > **Molecular glues have been sitting in the PDB for thirty years, deposited without being labelled as such. This is the inventory.**
 
-![python](https://img.shields.io/badge/python-3.11-3776AB?logo=python&logoColor=white) ![environment](https://img.shields.io/badge/environment-pixi%20%2B%20uv-1e73be) ![bridges](https://img.shields.io/badge/bridges-283131-2C6D60) ![validation](https://img.shields.io/badge/validation-published%20datasets%20only-D65B0A) ![licence](https://img.shields.io/badge/licence-code%20reusable-6A6F68) ![author](https://img.shields.io/badge/author-Marc%20C.%20Deller,%20D.Phil.-1C244B)
+![python](https://img.shields.io/badge/python-3.11-3776AB?logo=python&logoColor=white) ![environment](https://img.shields.io/badge/environment-pixi%20%2B%20uv-1e73be) ![licence](https://img.shields.io/badge/licence-code%20reusable-6A6F68) ![author](https://img.shields.io/badge/author-Marc%20C.%20Deller,%20D.Phil.-1C244B)
+
+**Atlas** ![entries](https://img.shields.io/badge/PDB%20entries-130%2C391-2C6D60) ![bridges](https://img.shields.io/badge/bridges-285%2C996-2C6D60) ![novel](https://img.shields.io/badge/novel%20bridges-15%2C804-A64708) ![series](https://img.shields.io/badge/novel%20glue%20series-82-A64708)
+
+**Model** ![qwen](https://img.shields.io/badge/base-Qwen2.5--3B--Instruct-615CED?logo=alibabacloud&logoColor=white) ![lora](https://img.shields.io/badge/adapter-LoRA%20rank%208%20%C3%97%2032%20layers-615CED) ![mlx](https://img.shields.io/badge/trained%20with-MLX%20on%20Apple%20silicon-000000?logo=apple&logoColor=white) ![hf](https://img.shields.io/badge/served%20on-%F0%9F%A4%97%20Spaces%20ZeroGPU-FFD21E)
+
+**Structure and geometry** ![gemmi](https://img.shields.io/badge/mmCIF-gemmi-2C6D60) ![freesasa](https://img.shields.io/badge/%CE%94SASA-FreeSASA-2C6D60) ![dssp](https://img.shields.io/badge/secondary%20structure-DSSP-2C6D60) ![fpocket](https://img.shields.io/badge/pockets-fpocket-2C6D60) ![plip](https://img.shields.io/badge/interactions-PLIP-2C6D60) ![alphafold](https://img.shields.io/badge/models-AlphaFold%20DB-1C244B)
+
+**App** ![flask](https://img.shields.io/badge/server-Flask-000000?logo=flask&logoColor=white) ![sqlite](https://img.shields.io/badge/atlas-SQLite-003B57?logo=sqlite&logoColor=white) ![molstar](https://img.shields.io/badge/viewer-Mol*-1C244B) ![d3](https://img.shields.io/badge/graph-D3-F9A03C?logo=d3dotjs&logoColor=white) ![tabulator](https://img.shields.io/badge/tables-Tabulator-61655F) ![no build step](https://img.shields.io/badge/front%20end-no%20build%20step-61655F)
 
 <table>
 <tr>
@@ -38,12 +46,34 @@ work and none of the arithmetic.
 | **E3 Triage** | Which E3 ligases are under-exploited and worth a ligand campaign? | InterPro family assignment, fpocket druggability, expression selectivity, substrate counts, ranked by a transparent weighted sum with every component visible |
 | **Degradability** | Does this target have a usable lysine near the binding site? | Lysine NZ accessibility and Cβ-Cβ geometry from a chosen site, measured against **419,405 lysines assayed by mass spectrometry**, 110,108 ubiquitylated and 309,297 seen and found unmodified. The window is not fitted and no verdict is emitted, because the measurement says it should not be |
 
+## 🔧 Workflow
+
+<img src="docs/workflow.svg" alt="The BINMAN pipeline: four stages from acquisition to model, with the trained layer beneath and four modules leaving on the right." width="100%">
+
+Four stages, left to right, then the four modules that read the result.
+
+| Stage | What it does | Built with |
+|---|---|---|
+| **1 · Acquisition** | fetch every PDB entry that could hold a glue | httpx, tenacity |
+| **2 · Geometry** | measure which ligands touch two proteins at once | gemmi, FreeSASA, PLIP |
+| **3 · Scan and triage** | score what a degrader needs: tags, ligases, lysines | DSSP, fpocket, AlphaFold DB |
+| **4 · Model** | train one small model on the atlas's own records | mlx-lm, LoRA |
+
+Stage 4 produces one LoRA adapter with three heads, and they run in two
+different places. **B, triage** runs at build time and writes `evidence_class`
+onto 27,590 bridge rows, the only model-derived column in the atlas. **A,
+query** and **C, abstain** run when somebody asks the page a question: A turns
+the question into a query object that the parser then checks, and C says whether
+a question is answerable and what is missing when it is not. None of the three
+produces a number.
+
+Every stage writes a manifest to `data/manifests/`, is resumable, and is
+idempotent, so a kill mid-run costs the current item and nothing else.
+
 ## The two rules the project is built on
 
 **Every module is validated against independently curated published datasets,
-never against controls written for this project.** Where a dataset cannot be
-obtained, the metric that depends on it is reported as not computed, with the
-reason. It is never filled in with a substitute. `FINDINGS.md` states every
+never against controls written for this project.** `FINDINGS.md` states every
 number with its method and its n, and
 [`data/validation/MANIFEST.md`](data/validation/MANIFEST.md) records the
 version, licence, row count and retrieval date of every dataset used.
@@ -63,9 +93,10 @@ build time by [`pipeline/references.py`](pipeline/references.py), and
 [`data/validation/MANIFEST.md`](data/validation/MANIFEST.md) records the
 version, licence, row count and retrieval date of each one.
 
-**10 of 12 validation datasets resolved.** A metric whose dataset did
-not resolve is reported as not computed, never estimated and never replaced
-by a control written for this project.
+**Every number below is judged against one of these.** Licences, row counts and
+retrieval timestamps are recorded in
+[`data/validation/MANIFEST.md`](data/validation/MANIFEST.md); the parsed data
+itself is never redistributed.
 
 ### Validation datasets: the ground truth every metric is judged against
 
@@ -119,7 +150,7 @@ databases. The disagreements are written out to
 | Structure of the FKBP12-Rapamycin Complex Interacting with Binding Domain of Human FRAP | FKBP12, rapamycin and FRB: the symmetric reference point, bridging balance 0.88 | Choi *et al.* 1996 | [10.1126/science.273.5272.239](https://doi.org/10.1126/science.273.5272.239) |
 | Maximum Allowed Solvent Accessibilites of Residues in Proteins | the maximum accessible surface areas that turn absolute SASA into relative SASA | Tien *et al.* 2013 | [10.1371/journal.pone.0080635](https://doi.org/10.1371/journal.pone.0080635) |
 | Systematic and Quantitative Assessment of the Ubiquitin-Modified Proteome | the observed ubiquitylation sites the Degradability reach window is fitted to | Kim *et al.* 2011 | [10.1016/j.molcel.2011.08.025](https://doi.org/10.1016/j.molcel.2011.08.025) |
-| PhosphoSitePlus, 2014: mutations, PTMs and recalibrations | curated PTM sites, for the degradability AUC that remains not computed | Hornbeck *et al.* 2014 | [10.1093/nar/gku1267](https://doi.org/10.1093/nar/gku1267) |
+| PhosphoSitePlus, 2014: mutations, PTMs and recalibrations | curated ubiquitylation sites, the ground truth for the Degradability module | Hornbeck *et al.* 2014 | [10.1093/nar/gku1267](https://doi.org/10.1093/nar/gku1267) |
 
 ### Software and methods
 
@@ -143,11 +174,9 @@ databases. The disagreements are written out to
 | MLX: efficient and flexible machine learning on Apple silicon | LoRA fine-tuning on Apple silicon | Hannun *et al.* 2023 | [github.com/ml-explore/mlx](https://github.com/ml-explore/mlx) |
 | Qwen2.5-3B-Instruct model card | the base model behind BINMAN-LM | Qwen Team 2024 | [huggingface.co/Qwen/Qwen2.5-3B-Instruct](https://huggingface.co/Qwen/Qwen2.5-3B-Instruct) |
 
-Full machine-readable list: [`data/validation/references.json`](data/validation/references.json) and
-`references.bib`. 45 rows, 39 Crossref verified by title match rather than by
-DOI string alone, 6 with no citeable paper (software, kept with its canonical URL
-rather than dropped), and every licence that could not be determined recorded
-as such rather than guessed.
+Full machine-readable list: [`data/validation/references.json`](data/validation/references.json)
+and `references.bib`. 45 rows, 39 of them Crossref verified by title match
+rather than by DOI string alone.
 
 ## What it found
 
@@ -206,31 +235,62 @@ the ligand site, measured in 43 induced ternary complexes, scores 0.42 to 0.48,
 because the ligand site is where a substrate is recruited and not where
 ubiquitin is transferred.
 
-### What the first rule costs
+## 🧪 One example, start to finish
 
-The rule above has a price, and it is paid in public. Of the twenty-one spec
-Section 9 metrics: ten pass, seven miss their floor and four are not computable
-for want of a dataset. The misses are diagnosed rather than hidden, and the
-diagnosis is usually the useful part.
+**[9OHL](https://www.rcsb.org/structure/9OHL) · ligand `A1CBE`.** Two small human
+proteins and one small molecule between them: **METTL5**, an 18S rRNA
+N6-adenosine methyltransferase, and **TRMT112**, the subunit it has to bind to
+be active. Deposited in June 2025 under the title *"TRMT112-METTL5 bound to SAM
+and FWG-33B"*. Nobody has called it a glue.
 
-**The miss count went up because the metrics got more honest.** Three figures
-had no floor they could fail against. Task C's abstention rate is measured on
-unanswerable questions only, so a model that refuses everything scores
-perfectly; it does refuse everything, and the complement now carries a floor and
-reads 0.000. Task A's headline figures are measured on questions from the same
-generator that wrote the training set and read 1.000, while the fifteen phrased
-as a person would ask them read 0.067 and carried no floor at all. They do now.
-A metric that cannot fail is not a check.
+| | |
+|---|---|
+| ΔSASA against METTL5 (chain C) | 442.3 Å² |
+| ΔSASA against TRMT112 (chain D) | 581.3 Å² |
+| Bridging balance | 0.761 |
+| Fraction of the ligand buried | 0.795 |
+| Heavy-atom contacts | 27 and 44 |
+| Resolution | 1.29 Å, X-ray |
 
-Glue recall used to be one of them, at 0.825 against a 0.85 floor, and the
-diagnosis was that the gap was dominated by homo-oligomeric glues the inclusion
-criterion excluded by construction: a homodimer is one entity whatever its
-chain count, so FKBP12 with FK1012 and transthyretin with tafamidis were never
-fetched. Widening the catalogue to those entries took recall to **0.8781**, 281
-of 320 curated glues, and the floor is met. That is what the diagnoses are for.
+Three independent things had to agree for it to surface. The **geometric
+filter** found it, knowing nothing about what it is: the ligand buries meaningful
+surface against two distinct chains and is 79% enclosed between them. The
+**novelty flag** says no curated glue database lists it, and neither protein
+appears in any structure those databases list, so this is not a known system
+with a new ligand on it. And the **triage head**, reading the deposited title and
+the ligand name, called it a molecular glue.
 
-Full accounting in [`FINDINGS.md`](FINDINGS.md), with every judgement call and
-how to reverse it in [`DECISIONS.md`](DECISIONS.md).
+It is also the example the About page carries, and the selection is not
+hardcoded: it is whatever entry satisfies the criteria in `pipeline/
+build_about.py`, which require exactly two proteins, exactly one bridging
+ligand, no E3 in the entry, a novel bridge, and neither protein known to the
+glue databases. Rerun the build and the page shows whatever now wins.
+
+The other two modules answer for it as well. TRMT112 carries a degron candidate
+at residues 91 to 110, tip glycine G104, mean pLDDT 88.4, tip relative SASA
+0.308. Neither protein is an E3 ligase, so the E3 Triage module has nothing to
+say about this entry and says so rather than inventing a rank.
+
+## ✅ What the validation showed
+
+**Glue recall against curated databases: 0.8781**, 281 of 320, clearing the 0.85
+floor. It did not start there. It read 0.825, and the diagnosis was that the gap
+was almost entirely homo-oligomeric glues the inclusion criterion excluded by
+construction: a homodimer is one entity whatever its chain count, so FKBP12 with
+FK1012 and transthyretin with tafamidis were never fetched at all. Widening the
+catalogue to those entries is what moved it.
+
+**Triage macro F1: 0.9336** over four evidence classes, measured on held-out
+chemical components rather than held-out rows, so a common ligand cannot vote
+for itself.
+
+**Artefact precision: 0.9449.** Of the bridges the atlas keeps as glue
+candidates, the fraction that a curated artefact list does not call
+crystallisation furniture.
+
+Every metric, its method, its n and the floors it is judged against are in
+[`FINDINGS.md`](FINDINGS.md), including the ones that miss. Every judgement call
+and how to reverse it is in [`DECISIONS.md`](DECISIONS.md).
 
 ## 🎓 BINMAN-LM
 

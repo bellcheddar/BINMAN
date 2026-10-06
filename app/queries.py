@@ -25,6 +25,7 @@ deliberate, because it is also the signal the LM is trained against.
 from __future__ import annotations
 
 import json
+import os
 import sqlite3
 from dataclasses import dataclass, field as dataclass_field
 from typing import Any, Iterable, Sequence
@@ -144,8 +145,18 @@ def _bridge_fields() -> dict[str, FieldSpec]:
         FieldSpec("novel_bridge", "bool", "Novel bridge",
                   description="passes every filter and is in no curated glue database"),
         FieldSpec("resolution", "number", "Resolution", unit="Å",
-                  description="from the entry table"),
-        FieldSpec("method", "text", "Experimental method"),
+                  # The direction has to be said. "High resolution" is a LOW
+                  # number, and the query head read it the other way and
+                  # proposed `resolution >= 8.0` for "solved at high
+                  # resolution", which is the worst structures in the atlas.
+                  description="from the entry table; lower is better, so high "
+                              "resolution means a small number"),
+        # A closed vocabulary that the atlas knows and the schema did not say.
+        # Declared enum with no values here and filled from the database by
+        # `load_vocabularies`, so the list is read rather than typed and an
+        # unbuilt atlas simply leaves it unconstrained.
+        FieldSpec("method", "enum", "Experimental method",
+                  description="the PDB's own method string, in capitals"),
         FieldSpec("organism", "text", "Source organism"),
         FieldSpec("release_date", "text", "Release date", description="ISO date"),
         FieldSpec("mw", "number", "Ligand MW", unit="Da"),
@@ -181,7 +192,8 @@ def _ligase_fields() -> dict[str, FieldSpec]:
     specs = [
         FieldSpec("uniprot_acc", "text", "UniProt accession"),
         FieldSpec("gene", "text", "Gene symbol"),
-        FieldSpec("family", "text", "Ligase family"),
+        FieldSpec("family", "enum", "Ligase family",
+                  description="filled from the atlas by load_vocabularies"),
         FieldSpec("subfamily", "text", "Subfamily"),
         FieldSpec("pdb_entries", "number", "PDB entries"),
         FieldSpec("pocket_score", "number", "Pocket druggability score",
@@ -349,6 +361,8 @@ class Query:
 
 def parse(payload: Any) -> Query:
     """Validate a query object. Raises QueryError with a message naming what was allowed."""
+    # The parser validates against the same vocabularies the model was shown.
+    load_vocabularies()
     if isinstance(payload, (str, bytes)):
         try:
             payload = json.loads(payload)
@@ -546,8 +560,70 @@ def refresh_vocabularies(connection: sqlite3.Connection) -> dict[str, list[str]]
     return vocabularies
 
 
+# Which FieldSpecs take their vocabulary from the atlas, and the query that
+# reads it. `ccd_class`, `evidence_class` and `verdict` are short fixed lists
+# written into the schema; these two are not, and leaving them unstated meant
+# the query head guessed `family eq "cullin"` against a stored "Cullin" and
+# `method eq "cryo-electron microscopy"` against a stored "ELECTRON MICROSCOPY".
+# Both parse, both match nothing, and nothing says why.
+_ATLAS_VOCABULARIES = {
+    ("bridge", "method"):
+        "SELECT DISTINCT method FROM entry WHERE method IS NOT NULL AND method != ''",
+    ("ligase", "family"):
+        "SELECT DISTINCT family FROM ligase WHERE family IS NOT NULL AND family != ''",
+}
+_VOCABULARIES_LOADED = False
+
+
+def load_vocabularies(force: bool = False) -> dict[str, list[str]]:
+    """Fill the open-vocabulary enums from the shipped database.
+
+    Called once, lazily. A missing or unreadable atlas leaves the enums empty,
+    and `FieldSpec.coerce` only validates against a non-empty enum, so the
+    degraded behaviour is exactly the old behaviour rather than a parser that
+    rejects everything.
+    """
+    global _VOCABULARIES_LOADED
+    if _VOCABULARIES_LOADED and not force:
+        return {}
+    _VOCABULARIES_LOADED = True
+
+    import dataclasses
+    import sqlite3
+    from pathlib import Path
+
+    path = Path(os.environ.get("BINMAN_DB") or
+                (Path(__file__).resolve().parents[1] / "data" / "atlas" / "binman.sqlite"))
+    if not path.exists():
+        return {}
+    loaded: dict[str, list[str]] = {}
+    try:
+        connection = sqlite3.connect(f"file:{path}?mode=ro", uri=True)
+    except sqlite3.Error:
+        return {}
+    try:
+        for (record_type, field), sql in _ATLAS_VOCABULARIES.items():
+            spec = RECORD_TYPES.get(record_type)
+            if spec is None or field not in spec.fields:
+                continue
+            try:
+                values = sorted({str(row[0]) for row in connection.execute(sql)
+                                 if row[0] is not None})
+            except sqlite3.Error:
+                continue
+            if not values:
+                continue
+            spec.fields[field] = dataclasses.replace(
+                spec.fields[field], enum=tuple(values))
+            loaded[f"{record_type}.{field}"] = values
+    finally:
+        connection.close()
+    return loaded
+
+
 def schema_summary() -> dict:
     """The schema as data, for the UI query builder and the LM corpus generator."""
+    load_vocabularies()
     return {
         name: {
             "label": spec.label,
