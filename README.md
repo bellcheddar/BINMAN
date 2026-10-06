@@ -158,7 +158,18 @@ classified rather than deleted, so the counts reconcile. 21,717 degron
 candidates over 8,983 proteins, 7,452 C2H2 zinc fingers scored individually,
 650 E3 ligases ranked, 30,057 edges in the shared network.
 
-Three results are worth stating on their own.
+**The atlas surfaced the RAS(ON) tri-complex glues unprompted.** 30 entries and
+19 ligands of the zoldonrasib and elironrasib series, which glue a KRAS mutant
+to cyclophilin A and are in clinical development, rank at the top of the novel
+bridges by buried area. Three independent signals had to agree: the geometric
+bridging filter found them with no knowledge of what they are, the novelty flag
+says no curated glue database lists them, and BINMAN-LM's triage head, reading
+only a title and a ligand name, called them molecular glues. Finding is not
+predicting, since these were deposited by people who already knew: what it
+measures is that the pipeline agrees with that knowledge without being given it,
+on a class the databases have not yet absorbed.
+
+Three further results are worth stating on their own.
 
 **A real CRBN neosubstrate glue is strongly asymmetric.** Bridging balance 0.33
 to 0.36, against 0.88 for rapamycin. An intuitive symmetry threshold would have

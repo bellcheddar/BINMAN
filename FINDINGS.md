@@ -1069,6 +1069,45 @@ is to explain a refusal that something else has already decided on. The 4 in 20
 stay uncaught, which is recorded above as the honest limit rather than traded
 for refusing the other 16 of 16.
 
+### The atlas found the RAS(ON) tri-complex glues, and the databases had not
+
+6,874 bridges are both `novel_bridge` and classed `molecular_glue` by the
+triage head: 1,879 ligands over 2,756 entries, found by geometry and absent
+from MGDB, MolGlueDB and MGTbind alike. Ranked by buried area, the top of that
+set is one coherent chemical class.
+
+| entry | ligand | ΔSASA | balance | |
+|---|---|---:|---:|---|
+| 9CTB | A1AZZ | 2135 Å² | 0.88 | zoldonrasib (RMC-9805), KRAS G12D, CypA |
+| 9E3S | A1BEA | 2077 Å² | 0.90 | RMC-9945, KRAS G12N, CypA |
+| 9CTA | A1AZW | 2042 Å² | 0.86 | RMC-9945, KRAS G12D, CypA |
+| 36OK | A1DKY | 1905 Å² | 0.94 | RMC-8839, KRAS G13C, CypA |
+| 9BFX | A1AOD | 1856 Å² | 0.90 | elironrasib (RMC-6291), KRAS G12C, CypA |
+
+**30 entries and 19 distinct ligands of the RAS(ON) tri-complex series.** They
+work by inducing an interface between a KRAS mutant and cyclophilin A, which is
+a molecular glue by any definition, and several are in clinical development.
+Every one of them is novel by this atlas's definition: present in none of the
+three curated glue databases the project validates against.
+
+Three independent things had to agree for them to surface, and they did. The
+bridging filter found them from geometry alone, with no knowledge of what they
+are. The novelty flag says no curated source lists them. The triage head, which
+reads only an entry title and a ligand name, called them molecular glues.
+
+This is the project's own claim tested on itself. A pipeline built to find
+molecular glues the databases have missed, run over the whole PDB, surfaces a
+clinically active glue class as its highest-buried novel hits. It did not need
+to be told the class existed.
+
+**The honest qualifier.** Finding them is not predicting them: these structures
+were deposited because somebody already knew what the compounds do. What this
+measures is that the filter and the classifier agree with that knowledge
+without being given it, on a class the curated sets have not yet absorbed. The
+remaining 1,860 novel ligands in that set have had no such check, and the
+bridging balance is the thing to read first: an induced ternary buries surface
+against both partners, and 0.86 to 0.94 is what that looks like.
+
 ### The triage head, applied to the atlas
 
 Task B was trained and scored and then used for nothing. `evidence_class`, which
