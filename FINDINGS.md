@@ -1108,37 +1108,45 @@ remaining 1,860 novel ligands in that set have had no such check, and the
 bridging balance is the thing to read first: an induced ternary buries surface
 against both partners, and 0.86 to 0.94 is what that looks like.
 
-### What the novel glues glue: 869 interfaces, 101 series
+### What the novel glues glue: 747 interfaces, 82 series
 
 The RAS(ON) result came from reading entry titles, which does not scale to 1,879
 ligands. `pipeline/novel_glue_classes.py` clusters them properly, on the
 interface each one induces rather than on its chemistry, because that is what
-defines a glue class. 4,125 balanced hetero-pair bridges resolve to **869
-distinct protein pairs, of which 101 carry three or more distinct ligands** and
+defines a glue class. 3,487 balanced hetero-pair bridges resolve to **747
+distinct protein pairs, of which 82 carry three or more distinct ligands** and
 are therefore series rather than single observations.
 
 | ligands | entries | median ΔSASA | interface |
 |---:|---:|---:|---|
-| **43** | 43 | 664 Å² | 14-3-3 sigma + transcription factor p65 |
-| 37 | 40 | 626 Å² | tubulin alpha-1B + tubulin beta-2B |
-| 16 | 17 | 452 Å² | Rho GEF + RhoA |
-| 15 | 20 | 1,148 Å² | RNA polymerase subunits |
+| **34** | 34 | 676 Å² | 14-3-3 sigma + transcription factor p65 |
+| 31 | 34 | 632 Å² | tubulin alpha-1B + tubulin beta-2B |
+| 15 | 20 | 1,148 Å² | RNA polymerase subunits beta and beta' |
 | 14 | 17 | 1,117 Å² | AMPK catalytic + regulatory subunit |
-| 13 | 16 | 1,028 Å² | proteasome beta-5 + beta-6 |
+| 13 | 14 | 465 Å² | Rho GEF 2 + RhoA |
+| 12 | 17 | 414 Å² | NMDA receptor GluN1 + GluN2B |
+| 11 | 12 | 1,056 Å² | proteasome beta-5 + beta-6 |
 | **11 + 9** | 26 | **1,861 / 1,669 Å²** | KRas and KRas isoform 2B + cyclophilin A |
 
-**The largest novel series in the atlas is 14-3-3σ with p65**, 43 distinct
-ligands across 43 entries, and inspection confirms a single analog series:
+The balance floor is `bridging.glue_balance_strong` (0.50), the threshold the
+spec names for a headline figure. At 0.30, the floor for something reported but
+not headline, the set is 128 series; at 0.40 it is 101. **The ranking is the
+same at all three**, so the floor sets how many rows are claimed and not which
+biology is found, and the stricter named threshold is the one that ships
+(D-088).
+
+**The largest novel series in the atlas is 14-3-3σ with p65**, 34 distinct
+ligands across 34 entries, and inspection confirms a single analog series:
 4-[(6-methoxy-3,4-dihydroquinolin-1-yl)...] and close variants, one titled "14-3-3
 sigma with RelA/p65 binding site pS45 and covalently bound TCF521-187". These
 are stabilisers of a 14-3-3 client interface, which is one of the oldest and
 most active molecular glue fields, and none of the three curated databases lists
 them.
 
-**The RAS(ON) series reappears without being looked for**, at rows 11 and 13,
+**The RAS(ON) series reappears without being looked for**, at rows 9 and 11,
 split across two KRas entity names. It carries the highest median buried area in
 the whole table by some margin, 1,861 and 1,669 Å² against a top-ten median
-nearer 700.
+nearer 800.
 
 **Not every row is a glue, and the buried area is the tell.** Tubulin α/β,
 proteasome β-subunits, DNA gyrase and the ionotropic receptors are ligands
@@ -1148,9 +1156,16 @@ atlas's definition is geometric and cannot separate induced proximity from a
 pre-existing interface, and it is not supposed to: that distinction is biology,
 and the module ships the measurement rather than the judgement.
 
-So the 1,879-ligand set is not an undifferentiated pile. It is roughly a hundred
-series, led by two that are unambiguously molecular glues and well populated,
-and the clustering is cheap enough to re-run whenever the atlas grows.
+So the 1,879-ligand set is not an undifferentiated pile. It is 82 series, led by
+two that are unambiguously molecular glues and well populated, and the
+clustering is cheap enough to re-run whenever the atlas grows.
+
+**It ships as a table rather than as this paragraph.** The twelve series
+carrying the most ligands are a panel on the Glue Atlas page, each row naming
+its widest bridge as a link that loads that structure into the viewer and its
+focus protein as a link into the Lens graph, with the caption stating all 82 so
+a table of twelve does not read as the whole set. `build_atlas._post_build`
+re-runs the clustering after every atlas build.
 
 ### The triage head, applied to the atlas
 

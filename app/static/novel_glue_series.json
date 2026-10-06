@@ -1,0 +1,760 @@
+{
+  "generated_at": "2026-10-06T02:40:20+00:00",
+  "bridging_balance_floor": 0.5,
+  "min_ligands_for_series": 3,
+  "bridges_considered": 3487,
+  "distinct_hetero_pairs": 747,
+  "series": 82,
+  "top_pairs": [
+    {
+      "interface": [
+        "14-3-3 protein sigma",
+        "Transcription factor p65"
+      ],
+      "n_ligands": 34,
+      "n_entries": 34,
+      "median_dsasa": 675.8,
+      "accessions": [
+        "P31947",
+        "Q04206"
+      ],
+      "widest": {
+        "dsasa": 915.0,
+        "pdb_id": "7BI3",
+        "ccd_id": "TQW",
+        "bridge_id": 12654
+      }
+    },
+    {
+      "interface": [
+        "Tubulin alpha-1B chain",
+        "Tubulin beta-2B chain"
+      ],
+      "n_ligands": 31,
+      "n_entries": 34,
+      "median_dsasa": 632.1,
+      "accessions": [
+        "P81947",
+        "Q2XVP4"
+      ],
+      "widest": {
+        "dsasa": 1502.6,
+        "pdb_id": "5H74",
+        "ccd_id": "7LG",
+        "bridge_id": 38931
+      }
+    },
+    {
+      "interface": [
+        "DNA-directed RNA polymerase subunit beta",
+        "DNA-directed RNA polymerase subunit beta'"
+      ],
+      "n_ligands": 15,
+      "n_entries": 20,
+      "median_dsasa": 1147.6,
+      "accessions": [
+        "A7ZUK1",
+        "A7ZUK2"
+      ],
+      "widest": {
+        "dsasa": 1933.7,
+        "pdb_id": "7L7B",
+        "ccd_id": "FI8",
+        "bridge_id": 45576
+      }
+    },
+    {
+      "interface": [
+        "5'-AMP-activated protein kinase catalytic subuni",
+        "5'-AMP-activated protein kinase subunit beta-1"
+      ],
+      "n_ligands": 14,
+      "n_entries": 17,
+      "median_dsasa": 1117.0,
+      "accessions": [
+        "P54645",
+        "P54646"
+      ],
+      "widest": {
+        "dsasa": 1245.2,
+        "pdb_id": "8BIK",
+        "ccd_id": "QTN",
+        "bridge_id": 20165
+      }
+    },
+    {
+      "interface": [
+        "Rho guanine nucleotide exchange factor 2",
+        "Transforming protein RhoA"
+      ],
+      "n_ligands": 13,
+      "n_entries": 14,
+      "median_dsasa": 464.7,
+      "accessions": [
+        "P61586",
+        "Q92974"
+      ],
+      "widest": {
+        "dsasa": 583.1,
+        "pdb_id": "7G88",
+        "ccd_id": "WKY",
+        "bridge_id": 8322
+      }
+    },
+    {
+      "interface": [
+        "Glutamate receptor ionotropic, NMDA 1",
+        "Glutamate receptor ionotropic, NMDA 2B"
+      ],
+      "n_ligands": 12,
+      "n_entries": 17,
+      "median_dsasa": 414.0,
+      "accessions": [
+        "A0A1L8F5J9",
+        "A0A8J0TPH2"
+      ],
+      "widest": {
+        "dsasa": 1365.9,
+        "pdb_id": "6E7U",
+        "ccd_id": "HX7",
+        "bridge_id": 7847
+      }
+    },
+    {
+      "interface": [
+        "Gamma-aminobutyric acid receptor subunit alpha-1",
+        "Gamma-aminobutyric acid receptor subunit gamma-2"
+      ],
+      "n_ligands": 11,
+      "n_entries": 19,
+      "median_dsasa": 783.3,
+      "accessions": [
+        "P08219",
+        "P14867"
+      ],
+      "widest": {
+        "dsasa": 1009.8,
+        "pdb_id": "9EQG",
+        "ccd_id": "A1H6W",
+        "bridge_id": 27771
+      }
+    },
+    {
+      "interface": [
+        "Proteasome subunit beta type-5",
+        "Proteasome subunit beta type-6"
+      ],
+      "n_ligands": 11,
+      "n_entries": 12,
+      "median_dsasa": 1056.1,
+      "accessions": [
+        "P23724",
+        "P30656"
+      ],
+      "widest": {
+        "dsasa": 1503.7,
+        "pdb_id": "9FT1",
+        "ccd_id": "A1IFK",
+        "bridge_id": 115185
+      }
+    },
+    {
+      "interface": [
+        "Isoform 2B of GTPase KRas",
+        "Peptidyl-prolyl cis-trans isomerase A"
+      ],
+      "n_ligands": 11,
+      "n_entries": 11,
+      "median_dsasa": 1861.3,
+      "accessions": [
+        "P01116",
+        "P62937"
+      ],
+      "widest": {
+        "dsasa": 2135.4,
+        "pdb_id": "9CTB",
+        "ccd_id": "A1AZZ",
+        "bridge_id": 9276
+      }
+    },
+    {
+      "interface": [
+        "Integrin alpha-IIb heavy chain",
+        "Isoform Beta-3C of Integrin beta-3"
+      ],
+      "n_ligands": 10,
+      "n_entries": 12,
+      "median_dsasa": 777.9,
+      "accessions": [
+        "P05106",
+        "P08514"
+      ],
+      "widest": {
+        "dsasa": 892.2,
+        "pdb_id": "7TCT",
+        "ccd_id": "I1F",
+        "bridge_id": 31133
+      }
+    },
+    {
+      "interface": [
+        "GTPase KRas",
+        "Peptidyl-prolyl cis-trans isomerase A"
+      ],
+      "n_ligands": 9,
+      "n_entries": 15,
+      "median_dsasa": 1668.8,
+      "accessions": [
+        "P01116",
+        "P62937"
+      ],
+      "widest": {
+        "dsasa": 1873.6,
+        "pdb_id": "9BFV",
+        "ccd_id": "A1AOV",
+        "bridge_id": 9232
+      }
+    },
+    {
+      "interface": [
+        "Glutamate receptor ionotropic, NMDA 1",
+        "Glutamate receptor ionotropic, NMDA 2A"
+      ],
+      "n_ligands": 9,
+      "n_entries": 14,
+      "median_dsasa": 1036.4,
+      "accessions": [
+        "P35436",
+        "P35438"
+      ],
+      "widest": {
+        "dsasa": 1158.4,
+        "pdb_id": "5KDT",
+        "ccd_id": "6RV",
+        "bridge_id": 7544
+      }
+    },
+    {
+      "interface": [
+        "Gamma-aminobutyric acid receptor subunit alpha-1",
+        "Gamma-aminobutyric acid receptor subunit beta-2"
+      ],
+      "n_ligands": 9,
+      "n_entries": 14,
+      "median_dsasa": 673.8,
+      "accessions": [
+        "P14867",
+        "P47870"
+      ],
+      "widest": {
+        "dsasa": 981.5,
+        "pdb_id": "8DD2",
+        "ccd_id": "R5R",
+        "bridge_id": 54589
+      }
+    },
+    {
+      "interface": [
+        "DNA gyrase subunit A",
+        "DNA gyrase subunit B"
+      ],
+      "n_ligands": 9,
+      "n_entries": 13,
+      "median_dsasa": 347.2,
+      "accessions": [
+        "P0A0K8",
+        "P0AES4"
+      ],
+      "widest": {
+        "dsasa": 963.2,
+        "pdb_id": "7Z9K",
+        "ccd_id": "IL1",
+        "bridge_id": 56553
+      }
+    },
+    {
+      "interface": [
+        "Tubulin alpha-1B chain",
+        "Tubulin beta chain"
+      ],
+      "n_ligands": 9,
+      "n_entries": 10,
+      "median_dsasa": 1068.9,
+      "accessions": [
+        "A0A8D0VN39",
+        "A0A8D1UIR5"
+      ],
+      "widest": {
+        "dsasa": 1378.7,
+        "pdb_id": "7CNO",
+        "ccd_id": "HOS",
+        "bridge_id": 40109
+      }
+    },
+    {
+      "interface": [
+        "DNA (5'-D(*TP*GP*CP*GP*AP*AP*AP*TP*TP*CP*CP*AP*T",
+        "PFV integrase"
+      ],
+      "n_ligands": 8,
+      "n_entries": 11,
+      "median_dsasa": 947.1,
+      "accessions": [
+        "P14350"
+      ],
+      "widest": {
+        "dsasa": 968.0,
+        "pdb_id": "3OYL",
+        "ccd_id": "ZZX",
+        "bridge_id": 38265
+      }
+    },
+    {
+      "interface": [
+        "Acetylcholine receptor subunit alpha",
+        "Acetylcholine receptor subunit delta"
+      ],
+      "n_ligands": 7,
+      "n_entries": 11,
+      "median_dsasa": 512.2,
+      "accessions": [
+        "P02708",
+        "P02710"
+      ],
+      "widest": {
+        "dsasa": 1184.5,
+        "pdb_id": "7SMS",
+        "ccd_id": "TC9",
+        "bridge_id": 36449
+      }
+    },
+    {
+      "interface": [
+        "Integrin alpha-IIb",
+        "Integrin beta-3"
+      ],
+      "n_ligands": 7,
+      "n_entries": 9,
+      "median_dsasa": 841.9,
+      "accessions": [
+        "P05106",
+        "P08514"
+      ],
+      "widest": {
+        "dsasa": 920.8,
+        "pdb_id": "9DER",
+        "ccd_id": "AGG",
+        "bridge_id": 9286
+      }
+    },
+    {
+      "interface": [
+        "A1 cistron-splicing factor AAR2",
+        "Pre-mRNA-splicing factor 8"
+      ],
+      "n_ligands": 7,
+      "n_entries": 8,
+      "median_dsasa": 508.7,
+      "accessions": [
+        "P32357",
+        "P33334"
+      ],
+      "widest": {
+        "dsasa": 624.1,
+        "pdb_id": "7FML",
+        "ccd_id": "VR6",
+        "bridge_id": 8320
+      }
+    },
+    {
+      "interface": [
+        "Glutamate receptor ionotropic, NMDA 1,Glutamate ",
+        "Glutamate receptor ionotropic, NMDA 2A,Glutamate"
+      ],
+      "n_ligands": 7,
+      "n_entries": 7,
+      "median_dsasa": 1076.7,
+      "accessions": [
+        "P35439",
+        "Q00959"
+      ],
+      "widest": {
+        "dsasa": 1155.9,
+        "pdb_id": "5I56",
+        "ccd_id": "67P",
+        "bridge_id": 7514
+      }
+    },
+    {
+      "interface": [
+        "Succinate dehydrogenase [ubiquinone] iron-sulfur",
+        "Succinate dehydrogenase cytochrome b560 subunit,"
+      ],
+      "n_ligands": 7,
+      "n_entries": 7,
+      "median_dsasa": 857.1,
+      "accessions": [
+        "D0VWV4",
+        "P21912"
+      ],
+      "widest": {
+        "dsasa": 908.6,
+        "pdb_id": "3AEB",
+        "ccd_id": "F7A",
+        "bridge_id": 28472
+      }
+    },
+    {
+      "interface": [
+        "Hemoglobin subunit alpha",
+        "Hemoglobin subunit beta"
+      ],
+      "n_ligands": 7,
+      "n_entries": 6,
+      "median_dsasa": 565.1,
+      "accessions": [
+        "P68871",
+        "P69905"
+      ],
+      "widest": {
+        "dsasa": 793.7,
+        "pdb_id": "4NI0",
+        "ccd_id": "2P3",
+        "bridge_id": 11609
+      }
+    },
+    {
+      "interface": [
+        "Succinate dehydrogenase [ubiquinone] cytochrome ",
+        "Succinate dehydrogenase [ubiquinone] iron-sulfur"
+      ],
+      "n_ligands": 6,
+      "n_entries": 7,
+      "median_dsasa": 520.8,
+      "accessions": [
+        "A5GZW8",
+        "O14521"
+      ],
+      "widest": {
+        "dsasa": 841.4,
+        "pdb_id": "9QDM",
+        "ccd_id": "A1I6X",
+        "bridge_id": 32896
+      }
+    },
+    {
+      "interface": [
+        "GP1",
+        "GP2"
+      ],
+      "n_ligands": 6,
+      "n_entries": 6,
+      "median_dsasa": 1044.2,
+      "accessions": [
+        "Q05320"
+      ],
+      "widest": {
+        "dsasa": 1134.3,
+        "pdb_id": "7SSQ",
+        "ccd_id": "ZQH",
+        "bridge_id": 24544
+      }
+    },
+    {
+      "interface": [
+        "Hemagglutinin HA1 chain",
+        "Hemagglutinin HA2 chain"
+      ],
+      "n_ligands": 6,
+      "n_entries": 6,
+      "median_dsasa": 1001.8,
+      "accessions": [
+        "P03452"
+      ],
+      "widest": {
+        "dsasa": 1020.5,
+        "pdb_id": "8VQM",
+        "ccd_id": "A1ADU",
+        "bridge_id": 36735
+      }
+    },
+    {
+      "interface": [
+        "Cytochrome b-large subunit",
+        "Succinate dehydrogenase [ubiquinone] iron-sulfur"
+      ],
+      "n_ligands": 6,
+      "n_entries": 6,
+      "median_dsasa": 765.7,
+      "accessions": [
+        "O44074",
+        "P92506"
+      ],
+      "widest": {
+        "dsasa": 866.7,
+        "pdb_id": "4YTM",
+        "ccd_id": "F6A",
+        "bridge_id": 29323
+      }
+    },
+    {
+      "interface": [
+        "Proteasome subunit beta type-2",
+        "Proteasome subunit beta type-3"
+      ],
+      "n_ligands": 6,
+      "n_entries": 6,
+      "median_dsasa": 1109.3,
+      "accessions": [
+        "P25043",
+        "P25451"
+      ],
+      "widest": {
+        "dsasa": 1615.1,
+        "pdb_id": "9FT1",
+        "ccd_id": "A1IFK",
+        "bridge_id": 115179
+      }
+    },
+    {
+      "interface": [
+        "DNA gyrase subunit B",
+        "DNA substrate 24-mer GGTCATGAATGACTATGCACGTAA"
+      ],
+      "n_ligands": 5,
+      "n_entries": 9,
+      "median_dsasa": 535.0,
+      "accessions": [
+        "P9WG45"
+      ],
+      "widest": {
+        "dsasa": 671.5,
+        "pdb_id": "5BS8",
+        "ccd_id": "MFX",
+        "bridge_id": 46973
+      }
+    },
+    {
+      "interface": [
+        "DNA gyrase subunit B",
+        "DNA substrate 24-mer TTACGTGCATAGTCATTCATGACC"
+      ],
+      "n_ligands": 5,
+      "n_entries": 9,
+      "median_dsasa": 540.7,
+      "accessions": [
+        "P9WG45"
+      ],
+      "widest": {
+        "dsasa": 651.9,
+        "pdb_id": "5BS8",
+        "ccd_id": "MFX",
+        "bridge_id": 46975
+      }
+    },
+    {
+      "interface": [
+        "DNA substrate 24-mer GGTCATGAATGACTATGCACGTAA",
+        "DNA substrate 24-mer TTACGTGCATAGTCATTCATGACC"
+      ],
+      "n_ligands": 5,
+      "n_entries": 9,
+      "median_dsasa": 691.5,
+      "accessions": [],
+      "widest": {
+        "dsasa": 838.9,
+        "pdb_id": "5BTA",
+        "ccd_id": "MFX",
+        "bridge_id": 46658
+      }
+    },
+    {
+      "interface": [
+        "Acetylcholine receptor subunit alpha",
+        "Acetylcholine receptor subunit gamma"
+      ],
+      "n_ligands": 5,
+      "n_entries": 7,
+      "median_dsasa": 891.4,
+      "accessions": [
+        "P02710",
+        "P02714"
+      ],
+      "widest": {
+        "dsasa": 1277.9,
+        "pdb_id": "7SMS",
+        "ccd_id": "TC9",
+        "bridge_id": 36457
+      }
+    },
+    {
+      "interface": [
+        "Heparanase 50 kDa subunit",
+        "Heparanase 8 kDa subunit"
+      ],
+      "n_ligands": 5,
+      "n_entries": 5,
+      "median_dsasa": 454.3,
+      "accessions": [
+        "Q9Y251"
+      ],
+      "widest": {
+        "dsasa": 775.4,
+        "pdb_id": "8B0C",
+        "ccd_id": "OV3",
+        "bridge_id": 8814
+      }
+    },
+    {
+      "interface": [
+        "Proteasome component C5",
+        "Proteasome component PRE2"
+      ],
+      "n_ligands": 5,
+      "n_entries": 5,
+      "median_dsasa": 1121.5,
+      "accessions": [
+        "P23724",
+        "P30656"
+      ],
+      "widest": {
+        "dsasa": 1323.8,
+        "pdb_id": "3MG8",
+        "ccd_id": "L3T",
+        "bridge_id": 113053
+      }
+    },
+    {
+      "interface": [
+        "ATP synthase subunit a",
+        "ATP synthase subunit c"
+      ],
+      "n_ligands": 4,
+      "n_entries": 13,
+      "median_dsasa": 683.8,
+      "accessions": [
+        "A0R205",
+        "A0R206"
+      ],
+      "widest": {
+        "dsasa": 990.6,
+        "pdb_id": "8G0A",
+        "ccd_id": "SQC",
+        "bridge_id": 1679
+      }
+    },
+    {
+      "interface": [
+        "PHD finger-like domain-containing protein 5A",
+        "Splicing factor 3B subunit 1"
+      ],
+      "n_ligands": 4,
+      "n_entries": 8,
+      "median_dsasa": 1107.1,
+      "accessions": [
+        "O75533",
+        "Q7RTV0"
+      ],
+      "widest": {
+        "dsasa": 1252.8,
+        "pdb_id": "6EN4",
+        "ccd_id": "BGZ",
+        "bridge_id": 30066
+      }
+    },
+    {
+      "interface": [
+        "Integrin alpha-V",
+        "Integrin beta-3"
+      ],
+      "n_ligands": 4,
+      "n_entries": 7,
+      "median_dsasa": 782.6,
+      "accessions": [
+        "P05106",
+        "P06756"
+      ],
+      "widest": {
+        "dsasa": 1030.9,
+        "pdb_id": "8ZDG",
+        "ccd_id": "A1D8D",
+        "bridge_id": 9222
+      }
+    },
+    {
+      "interface": [
+        "Gamma-aminobutyric acid receptor subunit alpha-1",
+        "Gamma-aminobutyric acid receptor subunit beta-3"
+      ],
+      "n_ligands": 4,
+      "n_entries": 6,
+      "median_dsasa": 590.6,
+      "accessions": [
+        "P08219",
+        "P14867"
+      ],
+      "widest": {
+        "dsasa": 864.2,
+        "pdb_id": "6HUK",
+        "ccd_id": "H0Z",
+        "bridge_id": 39806
+      }
+    },
+    {
+      "interface": [
+        "Serine protease NS3",
+        "Serine protease subunit NS2B"
+      ],
+      "n_ligands": 4,
+      "n_entries": 4,
+      "median_dsasa": 377.8,
+      "accessions": [
+        "Q32ZE1"
+      ],
+      "widest": {
+        "dsasa": 517.7,
+        "pdb_id": "7H2C",
+        "ccd_id": "J4Q",
+        "bridge_id": 8343
+      }
+    },
+    {
+      "interface": [
+        "Guanine-N7 methyltransferase nsp14",
+        "Non-structural protein 10"
+      ],
+      "n_ligands": 4,
+      "n_entries": 4,
+      "median_dsasa": 469.7,
+      "accessions": [
+        "P0DTC1",
+        "P0DTD1"
+      ],
+      "widest": {
+        "dsasa": 500.2,
+        "pdb_id": "9FWI",
+        "ccd_id": "A1IGP",
+        "bridge_id": 9350
+      }
+    },
+    {
+      "interface": [
+        "Protein cereblon",
+        "Zinc finger protein Helios"
+      ],
+      "n_ligands": 4,
+      "n_entries": 4,
+      "median_dsasa": 977.0,
+      "accessions": [
+        "Q53SU9",
+        "Q96SW2"
+      ],
+      "widest": {
+        "dsasa": 1180.1,
+        "pdb_id": "9E2U",
+        "ccd_id": "RN9",
+        "bridge_id": 20894
+      }
+    }
+  ]
+}

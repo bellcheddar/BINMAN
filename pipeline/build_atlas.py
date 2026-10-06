@@ -471,12 +471,33 @@ def _post_build() -> dict:
     only reason it is wired in rather than left as a step somebody has to
     remember. Running it costs about four minutes and needs the AlphaFold cache;
     when the cache is absent the reason is recorded rather than passed over.
+
+    Only the per-finger scan needs that cache. The triage load and the novel
+    glue clustering read the atlas and nothing else, so they sit outside the
+    gate: they used to sit inside it, which meant a build on a machine without
+    the AlphaFold cache silently shipped a Glue Atlas with no predicted
+    evidence class on any row.
     """
+    # Loads what pipeline/triage_predict.py produced, and does nothing when it
+    # has not run. The inference is its own stage; this is the file IO.
+    from pipeline.novel_glue_classes import build as cluster_novel
+    from pipeline.triage_predict import load_into_atlas as load_triage
+
+    triage = load_triage()
+    # After the triage load, because it selects on `evidence_class`. Run before
+    # it, and the Glue Atlas panel is empty with nothing to say why.
+    novel = cluster_novel()
+    out = {
+        "triage_predicted_rows": triage.get("bridge_rows", 0),
+        "novel_glue_series": novel.get("series", 0),
+    }
+
     cache = INTERIM / "afdb"
     if not cache.exists() or not any(cache.iterdir()):
         log_event("4.3", "Per-finger scan skipped: no AlphaFold cache, so "
                          "zinc_finger and is_known_neosubstrate are absent.")
-        return {"zinc_finger": 0, "zinc_finger_skipped": "no AlphaFold cache"}
+        return {**out, "zinc_finger": 0,
+                "zinc_finger_skipped": "no AlphaFold cache"}
     # `degron_predict` first: it ALTERs the degron table to add
     # `imid_degradation_score`, which a fresh build drops along with the rest.
     # Missing it left the Degron Scan page showing "query failed: no such
@@ -485,17 +506,13 @@ def _post_build() -> dict:
     # first pass and this one was not, which is the argument for the list
     # living here rather than in somebody's memory.
     from pipeline.degron_predict import run as predict
-    from pipeline.triage_predict import load_into_atlas as load_triage
     from pipeline.zinc_finger_scan import run as scan
 
     scored = predict()
     report = scan()
-    # Loads what pipeline/triage_predict.py produced, and does nothing when it
-    # has not run. The inference is its own stage; this is the file IO.
-    triage = load_triage()
     return {
+        **out,
         "imid_degradation_scored": scored.get("scored", 0),
-        "triage_predicted_rows": triage.get("bridge_rows", 0),
         "zinc_finger": report.get("n_fingers", 0),
         "known_neosubstrate_rows": (
             report.get("known_neosubstrates", {}).get("degron_rows_marked", 0)),

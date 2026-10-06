@@ -1,6 +1,58 @@
 {% extends "_ledger_shell.html" %}
 {% set record_count_key = 'bridge' %}
 
+{% block module_panels %}
+{% if series.rows %}
+<div class="panel panel--flush">
+  <h3>Novel glue series</h3>
+  {# The intersection of three independent signals: the geometric filter found
+     the bridge, novel_bridge says no curated glue database lists it, and the
+     triage head called it a molecular glue. Clustered on the interface each one
+     induces, because that is what defines a glue class.
+
+     Not every row is an induced interface. Tubulin and the proteasome subunits
+     are ligands binding a site that straddles two chains and exists without
+     them. The buried area is the best single tell and the caption says so,
+     because the atlas measures geometry and cannot make that call itself. #}
+  <p>
+    {{ series.total | thousands }} protein pairs are bridged by
+    {{ series.min_ligands }} or more distinct ligands that no curated glue
+    database lists, each burying at least {{ series.balance_floor }} as much
+    surface on its smaller chain as on its larger one. The
+    {{ series.rows | length }} carrying the most ligands are below. Buried area
+    separates an induced interface from a ligand sitting in a site that already
+    straddled two chains.
+  </p>
+  <table class="grid-table">
+    <thead><tr>
+      <th>Interface</th><th class="num">Ligands</th><th class="num">Entries</th>
+      <th class="num">Median ΔSASA</th><th>Widest</th>
+    </tr></thead>
+    <tbody>
+      {% for row in series.rows %}
+        <tr>
+          <td>{{ row.left }} <span style="color:var(--muted)">+</span> {{ row.right }}</td>
+          <td class="num"><strong>{{ row.ligands }}</strong></td>
+          <td class="num">{{ row.entries }}</td>
+          <td class="num">{{ row.median_dsasa | round | int | thousands }} Å²</td>
+          <td>
+            {% if row.widest.pdb_id %}
+              <a href="{{ url_for('ledger.index') }}#glue={{ row.widest.pdb_id }}:{{ row.widest.ccd_id }}:{{ row.widest.bridge_id }}"
+                 title="Load this bridge into the viewer">{{ row.widest.pdb_id }} · {{ row.widest.ccd_id }}</a>
+            {% endif %}
+            {% if row.focus %}
+              <a href="{{ url_for('lens.index') }}?focus={{ row.focus }}"
+                 style="margin-left:0.5rem" title="Open this interface in the Lens graph">lens</a>
+            {% endif %}
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+{% endblock %}
+
 {% block module_viewer %}
   {% with viewer_id='viewer-glue', role='glue', extra_class='viewer--tall',
           empty_message='Pin a bridge in the table to load its ternary complex. Two polymer chains render in distinct cartoon colours, the bridging ligand as ball-and-stick, and the interface residues as sticks coloured by the chain they belong to.' %}

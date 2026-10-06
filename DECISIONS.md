@@ -3348,3 +3348,49 @@ decides what counts as answerable, not an opinion.
 four and five.** The system did not get worse between those two counts. Three of
 its checks stopped being unfailable, which is a better project and a worse
 scoreboard, and the README says which happened.
+
+## D-088
+
+**The 1,860 unchecked novel ligands ship as 82 ranked series on the Glue Atlas
+page, not as a count in a log.**
+
+The novel, model-called glues were a figure in a report nobody opens. Clustered
+on the protein pair they bridge rather than on chemistry, because a glue class
+is defined by what it glues, the set resolves into **82 protein pairs carrying
+three or more distinct ligands each**: a medicinal chemistry series somebody is
+already running, visible in the PDB and absent from every curated glue database
+the build resolved.
+
+Three choices worth recording.
+
+**The balance floor is `bridging.glue_balance_strong` (0.50), not a new
+threshold.** The panel is a headline figure and the spec already names the
+threshold for one: `glue_balance_floor` (0.30) is "reported but not headline".
+At 0.30 the set is 128 pairs, at 0.40 it is 101, at 0.50 it is 82. The ranking
+is the same at all three, so the choice changes how many rows are claimed and
+not which biology is found. The stricter named threshold wins over the looser
+invented one.
+
+**The artefact lives in `app/static/`, not `data/interim/`.** `deploy/
+provision.sh` excludes the interim tree. A panel fed from an excluded path is
+correct locally and empty on the live host, which is the hardest version of
+this bug to notice, so the path is asserted in a test rather than remembered.
+
+**Each row deep-links as `pdb_id:ccd_id:bridge_id`.** The shared selection takes
+three parts (`app/static/js/selection.js`). A two-part link renders, looks
+right, and silently fails to find the row. A test resolves every link's id
+against the bridge table and insists the row it finds is the one the other two
+fields name.
+
+What the clustering does not do is separate induced proximity from a
+pre-existing interface. 14-3-3σ with p65 (34 ligands) is induced; α/β-tubulin
+(31 ligands) is a ligand binding a site that straddles two chains without it.
+Buried area sorts them better than anything else available, the median is a
+column, and the caption says the atlas measures geometry and cannot make that
+call. Fixing it properly needs apo comparison, which is a different stage.
+
+Wiring: `build_atlas._post_build` runs the clustering after the triage load,
+because it selects on `evidence_class`. Hoisting both out of the AlphaFold
+cache gate fixed a second defect found on the way: the triage load sat inside
+that gate, so a build on a machine without the cache shipped a Glue Atlas with
+no predicted evidence class on any row and nothing in the log to say so.

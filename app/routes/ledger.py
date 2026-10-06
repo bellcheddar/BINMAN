@@ -23,9 +23,52 @@ def index():
             "than deleted."
         ),
         stats=stats,
+        series=_novel_series(),
         compare=request.args.get("compare") == "1",
         **module_context("bridge"),
     )
+
+
+def _novel_series(limit: int = 12) -> dict:
+    """The novel glue series, from pipeline/novel_glue_classes.py.
+
+    Read from the artefact rather than recomputed per request: the clustering
+    walks every bridge and resolves both chains, which is a build-time job and
+    not something to do while someone waits for a page.
+
+    Returns an empty row list when the stage has not run, so the panel
+    disappears rather than the page failing.
+    """
+    import json
+    from pathlib import Path
+
+    empty = {"rows": [], "total": 0, "min_ligands": 0, "balance_floor": 0.0}
+    path = (Path(__file__).resolve().parents[1] / "static"
+            / "novel_glue_series.json")
+    try:
+        report = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return empty
+    out = []
+    for row in (report.get("top_pairs") or [])[:limit]:
+        interface = row.get("interface") or []
+        if len(interface) != 2:
+            continue
+        out.append({
+            "left": interface[0], "right": interface[1],
+            "ligands": row.get("n_ligands"), "entries": row.get("n_entries"),
+            "median_dsasa": row.get("median_dsasa"),
+            "focus": (row.get("accessions") or [""])[0],
+            "widest": row.get("widest") or {},
+        })
+    return {
+        "rows": out,
+        # The table is a window onto a larger set, and saying how much larger is
+        # the difference between a list and a finding.
+        "total": report.get("series") or 0,
+        "min_ligands": report.get("min_ligands_for_series") or 0,
+        "balance_floor": report.get("bridging_balance_floor") or 0.0,
+    }
 
 
 def _headline_stats() -> list[dict]:
