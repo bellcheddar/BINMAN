@@ -21,7 +21,9 @@
     fraction of the interface buried by the ligand rather than by chain-to-chain
     contact: near 1.0 the ligand is all that holds the pair together. It
     measures and does not classify, because a glue remodelling a large native
-    surface scores like a passenger.
+    surface scores like a passenger. <em>Retained</em> is what is left of that
+    interface in a structure holding both proteins and none of this series'
+    ligands: above 1 the bridged structure simply caught a small interface.
   </p>
   {# The phone layout is in the stylesheet, not here: at 720px and under each
      row becomes a block, the header row is hidden and every cell announces
@@ -33,6 +35,7 @@
       <th>Interface</th><th class="num">Ligands</th><th class="num">Entries</th>
       <th class="num">Median ΔSASA</th>
       <th class="num" title="Of the interface the widest bridge sits in, the fraction buried by the ligand rather than by chain-to-chain contact">Ligand share</th>
+      <th class="num" title="Chain-to-chain area in a structure holding both proteins and none of this series' ligands, over the area in the bridged structure. Above 1 means the bridged structure caught an unusually small interface.">Retained</th>
       <th>Widest</th>
     </tr></thead>
     <tbody>
@@ -43,6 +46,7 @@
           <td class="num" data-label="entries">{{ row.entries }}</td>
           <td class="num" data-label="median ΔSASA">{{ row.median_dsasa | round | int | thousands }} Å²</td>
           <td class="num" data-label="ligand share">{% if row.ligand_share is none %}not measured{% else %}{{ '%.2f' | format(row.ligand_share) }}{% endif %}</td>
+          <td class="num" data-label="retained">{% if row.retained is none %}no comparison{% else %}{{ '%.2f' | format(row.retained) }}{% endif %}</td>
           <td class="series__links">
             {% if row.widest.pdb_id %}
               <a href="{{ url_for('ledger.index') }}#glue={{ row.widest.pdb_id }}:{{ row.widest.ccd_id }}:{{ row.widest.bridge_id }}"

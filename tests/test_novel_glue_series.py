@@ -135,6 +135,61 @@ def test_the_known_cereblon_degrader_series_is_in_the_set(report, atlas):
     assert row["evidence_class"] == "molecular_glue"
 
 
+def test_interface_persistence_ran_after_the_clustering(report):
+    """The clustering writes the artefact and the persistence stage rewrites
+    it. Run them the other way round and the second write erases the first,
+    silently, leaving a page that looks complete."""
+    assert report.get("persistence_measured_at"), (
+        "pipeline/interface_persistence.py has not run since the last clustering")
+    measured = [p for p in report["top_pairs"]
+                if (p.get("persistence") or {}).get("status") == "ok"]
+    assert measured, "no series has a comparison structure"
+
+
+def test_a_retained_ratio_is_a_ratio_of_two_measured_areas(report):
+    for pair in report["top_pairs"]:
+        persistence = pair.get("persistence") or {}
+        if persistence.get("status") != "ok":
+            assert persistence.get("status") == "no comparison structure"
+            continue
+        bridged = pair["widest"]["protein_protein_dsasa"]
+        without = persistence["widest_without_series"]
+        assert without >= 0
+        if bridged:
+            expected = without / bridged
+            assert abs(persistence["interface_retained"] - expected) < 0.01
+
+
+def test_the_comparison_structure_is_not_in_the_series(report, atlas):
+    """It must hold neither of the series' ligands, or the comparison is with
+    itself. Checked against the atlas, not against the artefact's own claim."""
+    for pair in report["top_pairs"]:
+        persistence = pair.get("persistence") or {}
+        pdb_id = persistence.get("widest_without_series_pdb_id")
+        if not pdb_id:
+            continue
+        name_a, name_b = pair["interface"]
+        clash = atlas.execute(
+            """
+            SELECT 1 FROM bridge b WHERE b.pdb_id = ?
+              AND b.status = 'ok' AND b.novel_bridge = 1
+              AND b.evidence_class = 'molecular_glue'
+              AND b.ccd_id IN (
+                SELECT DISTINCT ccd_id FROM bridge
+                WHERE status = 'ok' AND novel_bridge = 1
+                  AND evidence_class = 'molecular_glue'
+                  AND pdb_id IN (
+                    SELECT pdb_id FROM polymer_entity
+                    WHERE substr(trim(name), 1, 48) = ?
+                    INTERSECT
+                    SELECT pdb_id FROM polymer_entity
+                    WHERE substr(trim(name), 1, 48) = ?))
+            LIMIT 1
+            """, (pdb_id, name_a, name_b)).fetchone()
+        assert clash is None, (
+            f"{pdb_id} carries a ligand of the series it is the comparison for")
+
+
 def test_the_panel_renders_a_row_per_pair_with_a_three_part_link(report):
     from app import create_app
 

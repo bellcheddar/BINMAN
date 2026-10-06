@@ -3479,3 +3479,41 @@ The honest method is superposition of the ligand-free deposition against the
 bridged one, which is a stage and not a column. Reversing this means building
 it. Until then the panel reports ligand share and says in the caption that it
 is a measurement and not a verdict.
+
+## D-091
+
+**D-089's gyrase reading was wrong, and the stage built to check it is what
+found that out.**
+
+D-089 shipped ligand share and read DNA gyrase A with B, 0.97 on 30 Å² of
+chain-to-chain contact, as "a ligand holding together two subunits that barely
+touch". `pipeline/interface_persistence.py` measures the same two chains at
+**3,284 Å² in 7UGW**, a ratio of 117. The pair was never in doubt. The one
+structure the ligand share happened to be measured on was unusual, and a
+single-structure measurement has no way to say so. The correction is in
+FINDINGS section 9.1 beside the original claim, not in place of it.
+
+**The stage is not the apo comparison D-090 said was needed, and is not named as
+one.** It was called `apo_interface` for an hour. The comparison structure is
+allowed to hold any other ligand, including a different glue on the same
+interface, and for the tri-complex series it does: KRas with cyclophilin A
+reads 1.06 and 1.14, cereblon with the Helios zinc fingers reads 1.10, because
+the only structures holding those pairs together are tri-complexes built on
+other chemistries. A field called `apo_ratio` would have been read as "the
+interface without a ligand" and it is not that. It is
+`interface_retained`, and the question it answers is whether an interface needs
+**this** series.
+
+The second question, whether it needs a ligand at all, is not answerable from
+the PDB for a pair whose proteins are only ever crystallised with something
+between them. That is now recorded as a property of the evidence rather than as
+a stage somebody still has to build.
+
+What the measurement does say: median 1.06 over 35 series, two below 0.5. **No
+series in this set makes an interface that only its own chemistry can make.**
+Where the proteins assemble natively they assemble natively, and where they do
+not, somebody else's glue has already been there.
+
+Ordering matters and is enforced by a test: the clustering writes the artefact
+and this stage rewrites it, so running the clustering afterwards erases the
+measurement silently and leaves a page that looks complete.

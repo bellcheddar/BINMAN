@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-06T02:50:15+00:00",
+  "generated_at": "2026-10-06T12:57:50+00:00",
   "bridging_balance_floor": 0.5,
   "min_ligands_for_series": 3,
   "bridges_considered": 3487,
@@ -26,6 +26,14 @@
         "status": "ok",
         "protein_protein_dsasa": 1175.8,
         "ligand_share": 0.438
+      },
+      "persistence": {
+        "status": "ok",
+        "series_ligands_excluded": 61,
+        "measured": 5,
+        "widest_without_series": 1280.9,
+        "widest_without_series_pdb_id": "6NV2",
+        "interface_retained": 1.089
       }
     },
     {
@@ -48,6 +56,14 @@
         "status": "ok",
         "protein_protein_dsasa": 1677.4,
         "ligand_share": 0.473
+      },
+      "persistence": {
+        "status": "ok",
+        "series_ligands_excluded": 128,
+        "measured": 5,
+        "widest_without_series": 3455.8,
+        "widest_without_series_pdb_id": "3J8X",
+        "interface_retained": 2.06
       }
     },
     {
@@ -70,6 +86,14 @@
         "status": "ok",
         "protein_protein_dsasa": 15783.8,
         "ligand_share": 0.109
+      },
+      "persistence": {
+        "status": "ok",
+        "series_ligands_excluded": 21,
+        "measured": 5,
+        "widest_without_series": 16052.5,
+        "widest_without_series_pdb_id": "10MD",
+        "interface_retained": 1.017
       }
     },
     {
@@ -92,6 +116,14 @@
         "status": "ok",
         "protein_protein_dsasa": 7972.8,
         "ligand_share": 0.135
+      },
+      "persistence": {
+        "status": "ok",
+        "series_ligands_excluded": 14,
+        "measured": 4,
+        "widest_without_series": 5947.9,
+        "widest_without_series_pdb_id": "4QFG",
+        "interface_retained": 0.746
       }
     },
     {
@@ -114,6 +146,14 @@
         "status": "ok",
         "protein_protein_dsasa": 2912.2,
         "ligand_share": 0.167
+      },
+      "persistence": {
+        "status": "ok",
+        "series_ligands_excluded": 18,
+        "measured": 5,
+        "widest_without_series": 2943.0,
+        "widest_without_series_pdb_id": "7G82",
+        "interface_retained": 1.011
       }
     },
     {
@@ -136,6 +176,14 @@
         "status": "ok",
         "protein_protein_dsasa": 2280.3,
         "ligand_share": 0.375
+      },
+      "persistence": {
+        "status": "ok",
+        "series_ligands_excluded": 14,
+        "measured": 5,
+        "widest_without_series": 6142.1,
+        "widest_without_series_pdb_id": "6WHU",
+        "interface_retained": 2.694
       }
     },
     {
@@ -158,6 +206,14 @@
         "status": "ok",
         "protein_protein_dsasa": 4532.0,
         "ligand_share": 0.182
+      },
+      "persistence": {
+        "status": "ok",
+        "series_ligands_excluded": 16,
+        "measured": 5,
+        "widest_without_series": 5030.5,
+        "widest_without_series_pdb_id": "6I53",
+        "interface_retained": 1.11
       }
     },
     {
@@ -180,6 +236,14 @@
         "status": "ok",
         "protein_protein_dsasa": 1353.2,
         "ligand_share": 0.526
+      },
+      "persistence": {
+        "status": "ok",
+        "series_ligands_excluded": 50,
+        "measured": 5,
+        "widest_without_series": 1390.0,
+        "widest_without_series_pdb_id": "4JSQ",
+        "interface_retained": 1.027
       }
     },
     {
@@ -202,6 +266,14 @@
         "status": "ok",
         "protein_protein_dsasa": 852.9,
         "ligand_share": 0.715
+      },
+      "persistence": {
+        "status": "ok",
+        "series_ligands_excluded": 11,
+        "measured": 4,
+        "widest_without_series": 900.8,
+        "widest_without_series_pdb_id": "9BHP",
+        "interface_retained": 1.056
       }
     },
     {
@@ -224,6 +296,11 @@
         "status": "ok",
         "protein_protein_dsasa": 3361.4,
         "ligand_share": 0.21
+      },
+      "persistence": {
+        "status": "no comparison structure",
+        "series_ligands_excluded": 10,
+        "candidates": 0
       }
     },
     {
@@ -246,6 +323,14 @@
         "status": "ok",
         "protein_protein_dsasa": 808.0,
         "ligand_share": 0.699
+      },
+      "persistence": {
+        "status": "ok",
+        "series_ligands_excluded": 9,
+        "measured": 5,
+        "widest_without_series": 924.5,
+        "widest_without_series_pdb_id": "8TBH",
+        "interface_retained": 1.144
       }
     },
     {
@@ -268,6 +353,14 @@
         "status": "ok",
         "protein_protein_dsasa": 1997.7,
         "ligand_share": 0.367
+      },
+      "persistence": {
+        "status": "ok",
+        "series_ligands_excluded": 11,
+        "measured": 5,
+        "widest_without_series": 2468.2,
+        "widest_without_series_pdb_id": "4NF4",
+        "interface_retained": 1.236
       }
     },
     {
@@ -290,6 +383,14 @@
         "status": "ok",
         "protein_protein_dsasa": 5149.7,
         "ligand_share": 0.16
+      },
+      "persistence": {
+        "status": "ok",
+        "series_ligands_excluded": 13,
+        "measured": 5,
+        "widest_without_series": 5526.7,
+        "widest_without_series_pdb_id": "6X3Z",
+        "interface_retained": 1.073
       }
     },
     {
@@ -312,6 +413,14 @@
         "status": "ok",
         "protein_protein_dsasa": 29.8,
         "ligand_share": 0.97
+      },
+      "persistence": {
+        "status": "ok",
+        "series_ligands_excluded": 14,
+        "measured": 5,
+        "widest_without_series": 3487.4,
+        "widest_without_series_pdb_id": "7UGW",
+        "interface_retained": 117.027
       }
     },
     {
@@ -334,6 +443,14 @@
         "status": "ok",
         "protein_protein_dsasa": 1581.9,
         "ligand_share": 0.466
+      },
+      "persistence": {
+        "status": "ok",
+        "series_ligands_excluded": 47,
+        "measured": 5,
+        "widest_without_series": 3714.9,
+        "widest_without_series_pdb_id": "3JAR",
+        "interface_retained": 2.348
       }
     },
     {
@@ -355,6 +472,14 @@
         "status": "ok",
         "protein_protein_dsasa": 625.7,
         "ligand_share": 0.607
+      },
+      "persistence": {
+        "status": "ok",
+        "series_ligands_excluded": 8,
+        "measured": 4,
+        "widest_without_series": 692.0,
+        "widest_without_series_pdb_id": "3OYK",
+        "interface_retained": 1.106
       }
     },
     {
@@ -377,6 +502,14 @@
         "status": "ok",
         "protein_protein_dsasa": 5996.8,
         "ligand_share": 0.165
+      },
+      "persistence": {
+        "status": "ok",
+        "series_ligands_excluded": 8,
+        "measured": 5,
+        "widest_without_series": 6205.1,
+        "widest_without_series_pdb_id": "6UWZ",
+        "interface_retained": 1.035
       }
     },
     {
@@ -399,6 +532,14 @@
         "status": "ok",
         "protein_protein_dsasa": 3758.4,
         "ligand_share": 0.197
+      },
+      "persistence": {
+        "status": "ok",
+        "series_ligands_excluded": 7,
+        "measured": 5,
+        "widest_without_series": 5208.4,
+        "widest_without_series_pdb_id": "11YB",
+        "interface_retained": 1.386
       }
     },
     {
@@ -421,6 +562,14 @@
         "status": "ok",
         "protein_protein_dsasa": 882.0,
         "ligand_share": 0.414
+      },
+      "persistence": {
+        "status": "ok",
+        "series_ligands_excluded": 7,
+        "measured": 4,
+        "widest_without_series": 2321.3,
+        "widest_without_series_pdb_id": "4ILG",
+        "interface_retained": 2.632
       }
     },
     {
@@ -443,6 +592,14 @@
         "status": "ok",
         "protein_protein_dsasa": 2009.2,
         "ligand_share": 0.365
+      },
+      "persistence": {
+        "status": "ok",
+        "series_ligands_excluded": 7,
+        "measured": 1,
+        "widest_without_series": 2109.3,
+        "widest_without_series_pdb_id": "5I57",
+        "interface_retained": 1.05
       }
     },
     {
@@ -465,6 +622,14 @@
         "status": "ok",
         "protein_protein_dsasa": 3304.5,
         "ligand_share": 0.216
+      },
+      "persistence": {
+        "status": "ok",
+        "series_ligands_excluded": 7,
+        "measured": 5,
+        "widest_without_series": 3448.0,
+        "widest_without_series_pdb_id": "2FBW",
+        "interface_retained": 1.043
       }
     },
     {
@@ -487,6 +652,14 @@
         "status": "ok",
         "protein_protein_dsasa": 1807.5,
         "ligand_share": 0.305
+      },
+      "persistence": {
+        "status": "ok",
+        "series_ligands_excluded": 27,
+        "measured": 5,
+        "widest_without_series": 1833.2,
+        "widest_without_series_pdb_id": "2QLS",
+        "interface_retained": 1.014
       }
     },
     {
@@ -509,6 +682,14 @@
         "status": "ok",
         "protein_protein_dsasa": 2805.2,
         "ligand_share": 0.231
+      },
+      "persistence": {
+        "status": "ok",
+        "series_ligands_excluded": 16,
+        "measured": 5,
+        "widest_without_series": 1257.1,
+        "widest_without_series_pdb_id": "3AE2",
+        "interface_retained": 0.448
       }
     },
     {
@@ -530,6 +711,11 @@
         "status": "ok",
         "protein_protein_dsasa": 5091.8,
         "ligand_share": 0.182
+      },
+      "persistence": {
+        "status": "no comparison structure",
+        "series_ligands_excluded": 6,
+        "candidates": 0
       }
     },
     {
@@ -551,6 +737,14 @@
         "status": "ok",
         "protein_protein_dsasa": 5377.0,
         "ligand_share": 0.16
+      },
+      "persistence": {
+        "status": "ok",
+        "series_ligands_excluded": 6,
+        "measured": 5,
+        "widest_without_series": 5820.1,
+        "widest_without_series_pdb_id": "3EYM",
+        "interface_retained": 1.082
       }
     },
     {
@@ -573,6 +767,14 @@
         "status": "ok",
         "protein_protein_dsasa": 3659.5,
         "ligand_share": 0.191
+      },
+      "persistence": {
+        "status": "ok",
+        "series_ligands_excluded": 6,
+        "measured": 2,
+        "widest_without_series": 3719.9,
+        "widest_without_series_pdb_id": "5C2T",
+        "interface_retained": 1.017
       }
     },
     {
@@ -595,6 +797,14 @@
         "status": "ok",
         "protein_protein_dsasa": 3306.0,
         "ligand_share": 0.328
+      },
+      "persistence": {
+        "status": "ok",
+        "series_ligands_excluded": 54,
+        "measured": 5,
+        "widest_without_series": 3235.3,
+        "widest_without_series_pdb_id": "4JSQ",
+        "interface_retained": 0.979
       }
     },
     {
@@ -616,6 +826,11 @@
         "status": "ok",
         "protein_protein_dsasa": 542.8,
         "ligand_share": 0.553
+      },
+      "persistence": {
+        "status": "no comparison structure",
+        "series_ligands_excluded": 5,
+        "candidates": 0
       }
     },
     {
@@ -637,6 +852,11 @@
         "status": "ok",
         "protein_protein_dsasa": 534.3,
         "ligand_share": 0.55
+      },
+      "persistence": {
+        "status": "no comparison structure",
+        "series_ligands_excluded": 5,
+        "candidates": 0
       }
     },
     {
@@ -656,6 +876,11 @@
         "status": "ok",
         "protein_protein_dsasa": 5035.4,
         "ligand_share": 0.143
+      },
+      "persistence": {
+        "status": "no comparison structure",
+        "series_ligands_excluded": 5,
+        "candidates": 0
       }
     },
     {
@@ -678,6 +903,14 @@
         "status": "ok",
         "protein_protein_dsasa": 5810.3,
         "ligand_share": 0.18
+      },
+      "persistence": {
+        "status": "ok",
+        "series_ligands_excluded": 5,
+        "measured": 5,
+        "widest_without_series": 6242.8,
+        "widest_without_series_pdb_id": "6UWZ",
+        "interface_retained": 1.074
       }
     },
     {
@@ -699,6 +932,14 @@
         "status": "ok",
         "protein_protein_dsasa": 8322.6,
         "ligand_share": 0.085
+      },
+      "persistence": {
+        "status": "ok",
+        "series_ligands_excluded": 8,
+        "measured": 5,
+        "widest_without_series": 8311.9,
+        "widest_without_series_pdb_id": "7RG8",
+        "interface_retained": 0.999
       }
     },
     {
@@ -721,6 +962,14 @@
         "status": "ok",
         "protein_protein_dsasa": 1339.5,
         "ligand_share": 0.497
+      },
+      "persistence": {
+        "status": "ok",
+        "series_ligands_excluded": 16,
+        "measured": 5,
+        "widest_without_series": 1391.5,
+        "widest_without_series_pdb_id": "1G65",
+        "interface_retained": 1.039
       }
     },
     {
@@ -743,6 +992,14 @@
         "status": "ok",
         "protein_protein_dsasa": 753.1,
         "ligand_share": 0.568
+      },
+      "persistence": {
+        "status": "ok",
+        "series_ligands_excluded": 4,
+        "measured": 5,
+        "widest_without_series": 155.6,
+        "widest_without_series_pdb_id": "5T4Q",
+        "interface_retained": 0.207
       }
     },
     {
@@ -765,6 +1022,14 @@
         "status": "ok",
         "protein_protein_dsasa": 2424.5,
         "ligand_share": 0.341
+      },
+      "persistence": {
+        "status": "ok",
+        "series_ligands_excluded": 6,
+        "measured": 5,
+        "widest_without_series": 2229.8,
+        "widest_without_series_pdb_id": "5IFE",
+        "interface_retained": 0.92
       }
     },
     {
@@ -787,6 +1052,14 @@
         "status": "ok",
         "protein_protein_dsasa": 6480.6,
         "ligand_share": 0.137
+      },
+      "persistence": {
+        "status": "ok",
+        "series_ligands_excluded": 4,
+        "measured": 5,
+        "widest_without_series": 8992.9,
+        "widest_without_series_pdb_id": "4G1E",
+        "interface_retained": 1.388
       }
     },
     {
@@ -809,6 +1082,14 @@
         "status": "ok",
         "protein_protein_dsasa": 5842.7,
         "ligand_share": 0.129
+      },
+      "persistence": {
+        "status": "ok",
+        "series_ligands_excluded": 6,
+        "measured": 5,
+        "widest_without_series": 6018.5,
+        "widest_without_series_pdb_id": "6I53",
+        "interface_retained": 1.03
       }
     },
     {
@@ -830,6 +1111,14 @@
         "status": "ok",
         "protein_protein_dsasa": 4025.7,
         "ligand_share": 0.114
+      },
+      "persistence": {
+        "status": "ok",
+        "series_ligands_excluded": 88,
+        "measured": 5,
+        "widest_without_series": 4657.5,
+        "widest_without_series_pdb_id": "5GJ4",
+        "interface_retained": 1.157
       }
     },
     {
@@ -852,6 +1141,14 @@
         "status": "ok",
         "protein_protein_dsasa": 4400.7,
         "ligand_share": 0.102
+      },
+      "persistence": {
+        "status": "ok",
+        "series_ligands_excluded": 8,
+        "measured": 5,
+        "widest_without_series": 4460.4,
+        "widest_without_series_pdb_id": "9FWJ",
+        "interface_retained": 1.014
       }
     },
     {
@@ -874,7 +1171,17 @@
         "status": "ok",
         "protein_protein_dsasa": 1343.2,
         "ligand_share": 0.468
+      },
+      "persistence": {
+        "status": "ok",
+        "series_ligands_excluded": 7,
+        "measured": 2,
+        "widest_without_series": 1481.8,
+        "widest_without_series_pdb_id": "8DEY",
+        "interface_retained": 1.103
       }
     }
-  ]
+  ],
+  "persistence_measured_at": "2026-10-06T12:59:33+00:00",
+  "max_candidates_per_series": 5
 }

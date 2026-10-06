@@ -94,5 +94,5 @@ tests and QC.
 1. `FINDINGS.md`, which states every number with its method and its n, and says
    plainly which metrics could not be computed and why.
 2. `GATE_OPEN.md`, which carries the one open gate, G7, and the decision it needs.
-3. `DECISIONS.md`, 90 entries, each with the alternatives considered and how to
+3. `DECISIONS.md`, 91 entries, each with the alternatives considered and how to
    reverse it.

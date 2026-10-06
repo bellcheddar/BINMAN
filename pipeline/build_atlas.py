@@ -480,6 +480,7 @@ def _post_build() -> dict:
     """
     # Loads what pipeline/triage_predict.py produced, and does nothing when it
     # has not run. The inference is its own stage; this is the file IO.
+    from pipeline.interface_persistence import build as measure_persistence
     from pipeline.novel_glue_classes import build as cluster_novel
     from pipeline.triage_predict import load_into_atlas as load_triage
 
@@ -487,9 +488,14 @@ def _post_build() -> dict:
     # After the triage load, because it selects on `evidence_class`. Run before
     # it, and the Glue Atlas panel is empty with nothing to say why.
     novel = cluster_novel()
+    # And after the clustering, because it reads and then rewrites the same
+    # artefact, adding the chain-chain area each interface keeps without its
+    # own chemistry. Run the clustering again afterwards and that is erased.
+    persistence = measure_persistence()
     out = {
         "triage_predicted_rows": triage.get("bridge_rows", 0),
         "novel_glue_series": novel.get("series", 0),
+        "series_persistence_measured": persistence.get("measured", 0),
     }
 
     cache = INTERIM / "afdb"

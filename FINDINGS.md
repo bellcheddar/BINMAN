@@ -1159,7 +1159,7 @@ probe radius, so the two divide. Call it **ligand share**:
 
 | ligand share | ligand ΔSASA | chain-chain ΔSASA | series |
 |---:|---:|---:|---|
-| **0.97** | 963 Å² | **30 Å²** | DNA gyrase A + B |
+| **0.97** | 963 Å² | **30 Å²** | DNA gyrase A + B (see below: this one is a conformational accident) |
 | **0.72** | 2,135 Å² | 853 Å² | KRas isoform 2B + cyclophilin A |
 | **0.70** | 1,874 Å² | 808 Å² | KRas + cyclophilin A |
 | 0.53 | 1,504 Å² | 1,353 Å² | proteasome beta-5 + beta-6 |
@@ -1177,11 +1177,13 @@ ligand bound in it.
 genuine CRBN degrader remodelling the large native CRBN surface lands at 0.47,
 indistinguishable from α/β-tubulin at 0.47. A glue that works by stabilising an
 interface the proteins already make is not separable from a passenger by area
-alone. The page says so in the caption rather than ranking on it, and the
-distinction that would settle it needs apo comparison, which the atlas cannot
-make: every entry it holds has at least one ligand by construction
-(`bridging_candidate_query` requires `nonpolymer_entity_count >= 1`), so there
-are no apo structures in it to compare against.
+alone. The page says so in the caption rather than ranking on it.
+
+**And it is measured on one structure, which is its other limit.** The gyrase
+row above is the worked example: 0.97 ligand share on 30 Å² of chain-to-chain
+contact read as the clearest induced-proximity case in the set, and gyrase A and
+B bury 3,284 Å² on each other in 7UGW. Nothing in a single-structure measurement
+can say that. What can is below.
 
 **A positive control the method was not tuned on.** 9E2U is DDB1-CRBN with the
 triple zinc finger of Helios and the glutarimide degrader ALV1 (`RN9`). It is a
@@ -1226,7 +1228,49 @@ exists, and measure whether the interface survives. That is a stage with a
 superposition step in it, not a column, and it is recorded here as not done
 rather than approximated (D-089).
 
-One defect was found on the way and fixed. A zero-hit RCSB search returns 204
+### Measuring it instead: what each interface keeps without its own chemistry
+
+For each series, the structures that hold both proteins and none of that
+series' ligands, and the area the two chains bury on each other there, in the
+same convention and with the same probe radius. The ratio against the bridged
+structure is **interface retained**. 35 of the 40 kept pairs have a comparison
+structure, every assembly needed was already cached, and the stage costs 90
+seconds.
+
+| retained | ligand share | series |
+|---:|---:|---|
+| **117.0** | 0.97 | DNA gyrase A + B |
+| 2.69 | 0.38 | NMDA receptor GluN1 + GluN2B |
+| 2.35 | 0.47 | tubulin alpha-1B + beta |
+| 1.14 | 0.70 | KRas + cyclophilin A |
+| 1.10 | 0.47 | cereblon + Helios zinc fingers |
+| 1.09 | 0.44 | 14-3-3 sigma + p65 |
+| 0.75 | 0.14 | AMPK catalytic + regulatory |
+| **0.21** | 0.57 | ATP synthase subunit a + c |
+
+Median 1.06 over 35 series, two below 0.5.
+
+**The gyrase reading was a conformational accident, and this is what found it.**
+The pair was never in doubt; the one structure the ligand share was measured on
+was unusual, and only a second structure could say so.
+
+**It is not an apo comparison and must not be read as one.** The comparison
+structure may hold any other ligand, including a different glue on the same
+interface, and for the tri-complex series it does: KRas with cyclophilin A reads
+1.06 and 1.14 because the only structures holding both proteins are
+tri-complexes built on other chemistries, and cereblon with Helios reads 1.10
+for the same reason. The ratio answers "does this interface need THIS series",
+not "does it need a ligand at all". The second question is not answerable from
+the PDB for a pair whose proteins are only ever crystallised with something
+between them, and this build does not pretend otherwise.
+
+Read correctly it says something worth saying: **no series in this set makes an
+interface that only its own chemistry can make.** Where the proteins assemble
+natively, they assemble natively; where they do not, somebody else's glue has
+already been there. That is a statement about what the PDB contains, not about
+what is possible.
+
+One further defect was found on the way and fixed. A zero-hit RCSB search returns 204
 with an empty body, which `Fetcher.fetch_json` read as a truncated transfer and
 raised on, so a question whose honest answer was "none" killed the stage asking
 it. Callers now declare what an empty body means to them and the default stays

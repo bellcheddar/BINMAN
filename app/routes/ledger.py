@@ -61,6 +61,10 @@ def _novel_series(limit: int = 12) -> dict:
             # None when the assembly was not cached, which the template shows
             # as "not measured" rather than as a zero.
             "ligand_share": (row.get("widest") or {}).get("ligand_share"),
+            # How much of that interface survives in a structure holding both
+            # proteins and none of this series' ligands. It is what stops
+            # ligand share being over-read: see pipeline/interface_persistence.
+            "retained": (row.get("persistence") or {}).get("interface_retained"),
             "focus": (row.get("accessions") or [""])[0],
             "widest": row.get("widest") or {},
         })
