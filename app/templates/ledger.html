@@ -30,7 +30,7 @@
      itself from `data-label`. Six columns and two 48-character protein names
      cannot fit 360px as a table, and a sideways-scrolling table is worse than
      a stacked one. #}
-  <table class="grid-table series-table">
+  <table class="grid-table grid-table--stack">
     <thead><tr>
       <th>Interface</th><th class="num">Ligands</th><th class="num">Entries</th>
       <th class="num">Median ΔSASA</th>
@@ -41,13 +41,13 @@
     <tbody>
       {% for row in series.rows %}
         <tr>
-          <td class="series__interface">{{ row.left }} <span class="series__plus">+</span> {{ row.right }}</td>
+          <td class="stack__title">{{ row.left }} <span class="series__plus">+</span> {{ row.right }}</td>
           <td class="num" data-label="ligands"><strong>{{ row.ligands }}</strong></td>
           <td class="num" data-label="entries">{{ row.entries }}</td>
           <td class="num" data-label="median ΔSASA">{{ row.median_dsasa | round | int | thousands }} Å²</td>
           <td class="num" data-label="ligand share">{% if row.ligand_share is none %}not measured{% else %}{{ '%.2f' | format(row.ligand_share) }}{% endif %}</td>
           <td class="num" data-label="retained">{% if row.retained is none %}no comparison{% else %}{{ '%.2f' | format(row.retained) }}{% endif %}</td>
-          <td class="series__links">
+          <td class="stack__links">
             {% if row.widest.pdb_id %}
               <a href="{{ url_for('ledger.index') }}#glue={{ row.widest.pdb_id }}:{{ row.widest.ccd_id }}:{{ row.widest.bridge_id }}"
                  title="Load this bridge into the viewer">{{ row.widest.pdb_id }} · {{ row.widest.ccd_id }}</a>
@@ -73,7 +73,7 @@
 
   <div class="panel" id="bridge-detail" hidden>
     <h3>Selected bridge</h3>
-    <table class="grid-table" id="bridge-detail-table"><tbody></tbody></table>
+    <table class="grid-table grid-table--pairs" id="bridge-detail-table"><tbody></tbody></table>
   </div>
 {% endblock %}
 

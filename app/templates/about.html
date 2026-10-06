@@ -67,17 +67,18 @@
        The succeeded column went with them. It was always the total minus the
        failures, so it said nothing the other two columns did not, and the
        failure reasons now sit with the number they explain. #}
-    <table class="grid-table">
+    <table class="grid-table grid-table--stack">
       <thead><tr><th>Stage</th><th class="num">Records</th>
         <th class="num">Failed</th><th>Why</th></tr></thead>
       <tbody>
         {% for name, stage in about.stages.items() if stage.total > 1 %}
           <tr>
-            <td><code>{{ name }}</code></td>
-            <td class="num">{{ stage.total | thousands }}</td>
-            <td class="num" {% if stage.failed %}style="color:var(--bad)"{% endif %}>
+            <td class="stack__title"><code>{{ name }}</code></td>
+            <td class="num" data-label="records">{{ stage.total | thousands }}</td>
+            <td class="num" data-label="failed"
+                {% if stage.failed %}style="color:var(--bad)"{% endif %}>
               {{ stage.failed | thousands }}</td>
-            <td>
+            <td class="stack__links">
               {% for reason, count in (stage.failure_reasons or {}).items() %}
                 <span class="pill pill--bad">{{ reason }} × {{ count }}</span>
               {% endfor %}
@@ -108,7 +109,7 @@
       <p>{{ ex.title }}</p>
       <div class="split">
         <div>
-          <table class="grid-table">
+          <table class="grid-table grid-table--pairs">
             <tbody>
               <tr><td>Ligand</td><td>{{ value(ex.ligand_name) }}</td></tr>
               <tr><td>Method</td><td>{{ value(ex.method) }}</td></tr>
@@ -169,7 +170,7 @@
       <div class="split">
         <div>
           {% if ex.degron %}
-            <table class="grid-table panel__table"><tbody>
+            <table class="grid-table grid-table--pairs panel__table"><tbody>
               <tr><td>Tip residue</td>
                   <td>{{ ex.degron.tip_aa }}{{ ex.degron.tip_res }}</td></tr>
               <tr><td>Hairpin</td>
@@ -211,7 +212,7 @@
            edge of a 34rem table, a column's width away from the labels they
            belong to. Nothing here is being compared down the column, which is
            the only thing right alignment buys. #}
-        <table class="grid-table panel__table"><tbody>
+        <table class="grid-table grid-table--pairs panel__table"><tbody>
           <tr><td>Pocket druggability score</td>
               <td>{{ lig.pocket_score | sigfig }}</td></tr>
           <tr><td>Pocket volume</td>
@@ -263,7 +264,7 @@
   {% else %}
     <div class="panel">
       <h2 id="model">BINMAN-LM model card</h2>
-      <table class="grid-table"><tbody>
+      <table class="grid-table grid-table--pairs"><tbody>
         {% for key, item in card.identity.items() %}
           <tr><td>{{ key | replace('_', ' ') }}</td><td>{{ value(item) }}</td></tr>
         {% endfor %}

@@ -5,7 +5,7 @@
 {% if weights %}
 <div class="panel">
   <h3>Ranking weights</h3>
-  <table class="grid-table">
+  <table class="grid-table grid-table--pairs">
     <thead><tr><th>Component</th><th class="num">Weight</th></tr></thead>
     <tbody>
       {% for weight in weights %}
@@ -24,6 +24,6 @@
   {% endwith %}
   <div class="panel" id="ligase-detail" hidden>
     <h3>Selected ligase</h3>
-    <table class="grid-table" id="ligase-detail-table"><tbody></tbody></table>
+    <table class="grid-table grid-table--pairs" id="ligase-detail-table"><tbody></tbody></table>
   </div>
 {% endblock %}

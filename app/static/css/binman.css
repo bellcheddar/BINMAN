@@ -613,10 +613,16 @@ code, kbd, samp, .mono { font-family: var(--data); font-size: 0.86em; }
 .grid-table td.num, .grid-table th.num { text-align: right; font-family: var(--data); }
 .grid-table tbody tr:hover { background: var(--surface-2); }
 
-/* the novel glue series table (Glue Atlas page) */
+/* Two table shapes, and every table on the site is one of them.
+   `--pairs` is a label and a value: the label reads as a caption, the value is
+   right-aligned in the data font. `--stack` is a table with a header row, and
+   it becomes a list of blocks on a phone (see the responsive section). */
+.grid-table--pairs td:first-child { color: var(--muted); }
+.grid-table--pairs td:last-child { text-align: right; font-family: var(--data); }
+.grid-table--pairs td:last-child a { font-family: var(--display); }
+.grid-table--stack .stack__title { min-width: 14rem; }
 .series__plus { color: var(--muted); }
 .series__lens { margin-left: 0.5rem; }
-.series-table .series__interface { min-width: 14rem; }
 
 /* -------------------------------------------------------------------------- */
 /* About tab                                                                  */
@@ -670,29 +676,38 @@ code, kbd, samp, .mono { font-family: var(--data); font-size: 0.86em; }
   .builder__row { grid-template-columns: minmax(0, 1fr); }
   .viewer { min-height: 280px; }
 
-  /* Six columns and two 48-character protein names do not fit 360px, and a
-     table that scrolls sideways inside a page that does not is worse than a
-     stacked one. Each row becomes a block, the header row goes, and every
-     figure announces itself from its `data-label`. */
-  .series-table thead { display: none; }
-  .series-table tr { display: block; padding: 0.55rem 0.8rem; }
-  .series-table tbody tr:not(:last-child) { border-bottom: 1px solid var(--line); }
-  .series-table td {
+  /* Every table: tighter, and a long value wraps rather than widening the
+     page. A table that scrolls sideways inside a page that does not is the
+     thing being avoided here. */
+  .grid-table { font-size: 0.78rem; }
+  .grid-table th, .grid-table td { padding: 0.3rem 0.4rem; overflow-wrap: anywhere; }
+  .grid-table--pairs td:first-child { width: 45%; }
+
+  /* A table with a header row cannot keep its columns at 360px: six of them,
+     or four with two 48-character protein names, will not fit. Each row
+     becomes a block, the header row goes, and every figure announces itself
+     from its `data-label`. */
+  .grid-table--stack thead { display: none; }
+  .grid-table--stack tr { display: block; padding: 0.55rem 0.8rem; }
+  .grid-table--stack tbody tr:not(:last-child) { border-bottom: 1px solid var(--line); }
+  .grid-table--stack td {
     display: block; border: 0; padding: 0; text-align: left;
   }
-  .series-table .series__interface {
+  .grid-table--stack .stack__title {
     min-width: 0; font-weight: 600; margin-bottom: 0.3rem;
   }
-  /* The four figures share one wrapped line rather than taking four. */
-  .series-table td.num {
+  /* The figures share one wrapped line rather than taking one line each. */
+  .grid-table--stack td.num {
     display: inline-block; margin: 0 0.9rem 0.2rem 0; text-align: left;
   }
-  .series-table td.num::before {
+  .grid-table--stack td[data-label]::before {
     content: attr(data-label) " ";
     font-family: var(--display); font-size: 0.62rem; color: var(--muted);
     text-transform: uppercase; letter-spacing: 0.04em;
   }
-  .series-table .series__links { margin-top: 0.25rem; }
+  .grid-table--stack .stack__links { margin-top: 0.25rem; }
+  /* An empty cell in a stacked row would otherwise print its label alone. */
+  .grid-table--stack td:empty { display: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {
