@@ -40,7 +40,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from pipeline.common import INTERIM, log_event, utcnow  # noqa: E402
+from pipeline.common import INTERIM, Manifest, log_event, utcnow  # noqa: E402
 
 STAGE = "lm_phrasing_check"
 REPORT = INTERIM / "lm_phrasing_check.json"
@@ -172,6 +172,12 @@ def run() -> dict:
                    "marks as the project's own phrasing"),
     }
     REPORT.write_text(json.dumps(report, indent=2) + "\n")
+    Manifest(STAGE).record(
+        "check", status="ok", n_questions=n,
+        record_type_accuracy=report["record_type_accuracy"],
+        field_set_accuracy=report["field_set_accuracy"],
+        set_equality=report["set_equality"],
+        set_equality_ceiling=report["set_equality_ceiling"])
     log_event("3.8", f"Project-phrased queries: record type "
                      f"{report['record_type_accuracy']}, fields "
                      f"{report['field_set_accuracy']}, set equality "

@@ -32,7 +32,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from pipeline.common import (  # noqa: E402
-    ATLAS, INTERIM, VALIDATION, load_config, log_event, utcnow,
+    ATLAS, INTERIM, VALIDATION, Manifest, load_config, log_event, utcnow,
 )
 from pipeline.degron_sequence import evaluate, featurise, permutation_null  # noqa: E402
 
@@ -149,6 +149,12 @@ def run(repeats: int = 25, permutations: int = 200,
     out["gain_in_units_of_sequence_sd"] = round(
         float(gain / max(out["sequence_only"]["auc_std"], 1e-9)), 2)
     REPORT.write_text(json.dumps(out, indent=2) + "\n")
+    Manifest(STAGE).record(
+        "fit", status="ok",
+        sequence_auc=out["sequence_only"]["auc_mean"],
+        geometry_auc=(out.get("geometry_only") or {}).get("auc_mean"),
+        combined_auc=out["combined"]["auc_mean"],
+        gain_over_sequence=out["gain_over_sequence"])
     return out
 
 

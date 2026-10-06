@@ -26,7 +26,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from pipeline.common import INTERIM, log_event, utcnow  # noqa: E402
+from pipeline.common import INTERIM, Manifest, log_event, utcnow  # noqa: E402
 
 STAGE = "lm_abstention_check"
 REPORT = INTERIM / "lm_abstention_check.json"
@@ -159,6 +159,10 @@ def run(limit: int = 20, adapter: str | None = None,
         "asked_of": served,
     }
     REPORT.write_text(json.dumps(report, indent=2) + "\n")
+    Manifest(STAGE).record(
+        "check", status="ok", recall=report["abstention_recall"],
+        specificity=report["abstention_specificity"],
+        n_answerable=n_ans, n_unanswerable=n_un, asked_of=served)
     log_event("3.8", f"Abstention recall {report['abstention_recall']}, "
                      f"specificity {report['abstention_specificity']}.")
     return report
