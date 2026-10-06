@@ -437,6 +437,14 @@ def build(fresh: bool = True) -> dict:
         )
         counts["provenance"] = record_provenance(connection)
         connection.commit()
+        # ANALYZE, and not just PRAGMA optimize. Without stored statistics the
+        # planner met `status = 'ok' AND novel_bridge = 1` with two usable
+        # indexes and no way to tell which was selective, picked the status one,
+        # and scanned 286,000 rows to count 15,804: 319 ms a go on a query the
+        # Glue Atlas page footer makes on every filter change. With stats it
+        # picks the novel index and the same count takes 7 ms. It costs 274 ms
+        # once, here.
+        connection.execute("ANALYZE")
         connection.execute("PRAGMA optimize")
         connection.execute("VACUUM")
         connection.commit()

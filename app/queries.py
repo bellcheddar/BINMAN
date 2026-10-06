@@ -92,6 +92,14 @@ class RecordType:
     default_direction: str
     default_columns: tuple[str, ...]
     identity_columns: tuple[str, ...]   # what "the same row set" means for set equality
+    # Set when `table` is a join rather than a plain table. `base_table` is the
+    # one the rows come from and `joined_columns` are the names the join adds.
+    # With both, a query touching only base columns can be filtered, sorted and
+    # limited on the base table first and joined afterwards, which is the
+    # difference between sorting 200 rows and sorting 286,000.
+    base_table: str = ""
+    base_join: str = ""
+    joined_columns: tuple[str, ...] = ()
 
 
 class QueryError(ValueError):
@@ -239,6 +247,13 @@ RECORD_TYPES: dict[str, RecordType] = {
             "LEFT JOIN entry e ON e.pdb_id = b.pdb_id "
             "LEFT JOIN ligand l ON l.ccd_id = b.ccd_id)"
         ),
+        base_table="bridge",
+        base_join=(
+            "LEFT JOIN entry e ON e.pdb_id = b.pdb_id "
+            "LEFT JOIN ligand l ON l.ccd_id = b.ccd_id"
+        ),
+        joined_columns=("resolution", "method", "organism", "release_date",
+                        "tier", "mw", "ligand_name"),
         fields=_bridge_fields(), default_sort="dsasa_total",
         default_direction="desc",
         default_columns=(
@@ -479,10 +494,38 @@ def build_sql(query: Query, columns: Sequence[str] | None = None) -> tuple[str, 
         where.append(f"{item.field} {OPERATORS[item.op]} ?")
         params.append(item.value)
 
+    direction = query.sort_direction.upper()
+
+    # The fast path, and why it exists. The bridge record type is a join, so
+    # `SELECT ... FROM (join) ORDER BY dsasa_total LIMIT 200` made SQLite join
+    # all 286,000 rows to entry and ligand and then sort the lot in a temp
+    # B-tree to return 200. That was 90 ms locally and 1.2 s on the droplet, on
+    # the endpoint every page view fires.
+    #
+    # When nothing in the query touches a joined column, the same answer comes
+    # from filtering, sorting and limiting the base table first, which uses its
+    # indexes, and joining the 200 survivors afterwards. The outer ORDER BY
+    # repeats the sort because a join does not promise to preserve order, and
+    # sorting 200 rows is free.
+    touched = {f.field for f in query.filters} | {query.sort_field}
+    if spec.base_table and not (touched & set(spec.joined_columns)):
+        inner_where = " AND ".join(where)
+        sql = (
+            f"SELECT {select} FROM ("
+            f"SELECT b.*, e.resolution, e.method, e.organism, e.release_date, "
+            f"e.tier, l.mw, l.name AS ligand_name FROM ("
+            f"SELECT * FROM {spec.base_table} WHERE {inner_where} "
+            f"ORDER BY {query.sort_field} {direction} LIMIT ?"
+            f") b {spec.base_join}"
+            f") ORDER BY {query.sort_field} {direction}"
+        )
+        params.append(query.limit)
+        return sql, params
+
     sql = (
         f"SELECT {select} FROM {spec.table} "
         f"WHERE {' AND '.join(where)} "
-        f"ORDER BY {query.sort_field} {query.sort_direction.upper()} "
+        f"ORDER BY {query.sort_field} {direction} "
         f"LIMIT ?"
     )
     params.append(query.limit)
@@ -498,13 +541,28 @@ def execute(connection: sqlite3.Connection, query: Query,
 
 
 def count(connection: sqlite3.Connection, query: Query) -> int:
+    """How many rows the query selects, for the table's footer.
+
+    This counted over the join, and a LEFT JOIN cannot change how many bridge
+    rows there are, so it joined 286,000 rows to entry and to ligand in order
+    to arrive at the number of rows in `bridge`. 514 ms locally and 2.0 s on
+    the droplet, which was the whole of the API's response time after the page
+    itself had been fixed. Counting the base table is the same answer.
+
+    The fallback is not an optimisation that can be skipped: a filter on a
+    joined column genuinely needs the join to decide which rows match.
+    """
     spec = query.spec
     where = ["status = 'ok'"]
     params: list = []
     for item in query.filters:
         where.append(f"{item.field} {OPERATORS[item.op]} ?")
         params.append(item.value)
-    sql = f"SELECT COUNT(*) FROM {spec.table} WHERE {' AND '.join(where)}"
+    touched = {f.field for f in query.filters}
+    table = spec.table
+    if spec.base_table and not (touched & set(spec.joined_columns)):
+        table = spec.base_table
+    sql = f"SELECT COUNT(*) FROM {table} WHERE {' AND '.join(where)}"
     return int(connection.execute(sql, params).fetchone()[0])
 
 

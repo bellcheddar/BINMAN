@@ -118,6 +118,12 @@ CREATE INDEX IF NOT EXISTS idx_bridge_novel     ON bridge(novel_bridge);
 CREATE INDEX IF NOT EXISTS idx_bridge_sym       ON bridge(symmetry_mediated);
 CREATE INDEX IF NOT EXISTS idx_bridge_evidence  ON bridge(evidence_class);
 CREATE INDEX IF NOT EXISTS idx_bridge_status    ON bridge(status);
+-- Compound, and the order matters: every served query filters on status and
+-- then sorts, so an index on status alone leaves SQLite sorting the whole table
+-- in a temp B-tree to return a page of 200. With these it walks the index.
+-- Measured on the default Glue Atlas page: 37 ms to 1 ms.
+CREATE INDEX IF NOT EXISTS idx_bridge_status_dsasa   ON bridge(status, dsasa_total DESC);
+CREATE INDEX IF NOT EXISTS idx_bridge_status_balance ON bridge(status, bridging_balance DESC);
 CREATE INDEX IF NOT EXISTS idx_entry_res        ON entry(resolution);
 CREATE INDEX IF NOT EXISTS idx_entry_tier       ON entry(tier);
 CREATE INDEX IF NOT EXISTS idx_entry_method     ON entry(method);
