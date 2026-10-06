@@ -52,12 +52,7 @@ BASE_MODEL = "mlx-community/Qwen2.5-3B-Instruct-4bit"
 # models/binman-lm/adapters, which a later 32B run overwrote.
 ADAPTER = ROOT / "models" / "binman-lm" / "runs" / "binman-qwen-2.5-3b-4bit-round07"
 
-SYSTEM_TRIAGE = (
-    "<task>triage</task>\n"
-    "You classify a structure into exactly one evidence class. Reply with a "
-    "single class token and nothing else. The classes are: "
-    "molecular_glue, protac, native_cofactor, crystallisation_artefact."
-)
+from app.lm import TRIAGE_SYSTEM as SYSTEM_TRIAGE  # noqa: E402
 CLASSES = ["crystallisation_artefact", "molecular_glue", "native_cofactor", "protac"]
 
 

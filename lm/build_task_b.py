@@ -67,12 +67,10 @@ BIVALENT_NOTE = (
     "plainly rather than presented as if it were five."
 )
 
-SYSTEM_TRIAGE = (
-    "<task>triage</task>\n"
-    "You classify a structure into exactly one evidence class. Reply with a "
-    "single class token and nothing else. The classes are: "
-    + ", ".join(CLASSES) + "."
-)
+# One definition, in the module that serves it. The corpus, the build-time
+# inference stage and the app must send byte-identical prompts or the macro F1
+# measured on one does not describe the others.
+from app.lm import TRIAGE_SYSTEM as SYSTEM_TRIAGE  # noqa: E402
 
 
 def skeleton(inchikey: str) -> str:

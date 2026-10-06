@@ -1,8 +1,14 @@
 {
-  "generated_at": "2026-10-06T12:50:12+00:00",
+  "generated_at": "2026-10-06T13:11:30+00:00",
   "generator": "pipeline/build_about.py",
   "schematic_description": "The pipeline runs left to right in four stages. Two kinds of input enter on the left: the primary data sources (RCSB, AlphaFold DB, UniProt, InterPro), and separately the validation datasets that serve as ground truth. Stage 1, acquisition, catalogued 130,391 entries into priority tiers using httpx and tenacity. Stage 2, geometry, analysed 55,449 entries with gemmi and FreeSASA and found 285,996 bridges, with 19 entries failing. Stage 3, scan and triage, used DSSP and fpocket to produce 21,717 degron candidates, 650 triaged ligases and 1,650 scored lysines. Stage 4 trains BINMAN-LM with mlx-lm, which does text work only and never emits a number. Four modules leave on the right: Glue Atlas, Degron Scan, E3 Triage and Degradability. In plain terms: stage 1 fetches every PDB entry that could hold a glue, stage 2 measures which ligands touch two proteins at once, stage 3 scores what a degrader needs (tags, ligases and lysines), and stage 4 reads the question and writes the query without ever producing the number.",
   "stages": {
+    "apo_interface": {
+      "total": 40,
+      "ok": 35,
+      "failed": 0,
+      "failure_reasons": {}
+    },
     "bridges": {
       "total": 55468,
       "ok": 55449,
@@ -70,6 +76,12 @@
     "external_queries": {
       "total": 1,
       "ok": 1,
+      "failed": 0,
+      "failure_reasons": {}
+    },
+    "interface_persistence": {
+      "total": 40,
+      "ok": 35,
       "failed": 0,
       "failure_reasons": {}
     },
@@ -1435,12 +1447,12 @@
       },
       {
         "tag": "<task>triage</task>",
-        "description": "evidence-class triage",
-        "status": "NOT TRAINED: three of five classes have no published label source in this build (see lm/corpus/corpus_report.json)"
+        "description": "evidence-class triage over four classes",
+        "status": "TRAINED over four classes. `bivalent_inhibitor` is not built: spec 3.4 defines it as two binding sites within one chain, which stage 1.3's geometry does not detect, and inventing the label would be this project's judgement rather than a published source. Macro F1 is reported over the four that exist."
       },
       {
         "tag": "<task>abstain</task>",
-        "description": "structured abstention naming exactly what is missing"
+        "description": "answerable or not, and what is missing when not"
       }
     ],
     "results": {},

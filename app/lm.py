@@ -16,6 +16,24 @@ import json
 import os
 from dataclasses import dataclass
 
+# The four classes Task B ships. `bivalent_inhibitor` is a fifth in the spec and
+# is not built, because its label cannot be derived from what the pipeline
+# produces and inventing it would be this project's judgement.
+TRIAGE_CLASSES = ("molecular_glue", "protac", "native_cofactor",
+                  "crystallisation_artefact")
+
+# The canonical triage prompt, and the reason it is here rather than copied.
+# app/lm.py carried a SHORTER version of this that omitted the class list. It
+# was dead code, which is the only reason it did no harm: anything wired to it
+# would have asked the model a prompt it was never trained on and been scored
+# against a 0.9336 macro F1 measured on a different one.
+TRIAGE_SYSTEM = (
+    "<task>triage</task>\n"
+    "You classify a structure into exactly one evidence class. Reply with a "
+    "single class token and nothing else. The classes are: "
+    + ", ".join(TRIAGE_CLASSES) + "."
+)
+
 # The canonical abstain prompt. Imported by lm/build_corpus.py and
 # lm/evaluate.py rather than copied: it was written out three times, and a
 # training corpus whose system message has drifted from the serving one is a
@@ -37,11 +55,7 @@ SYSTEM_PROMPTS = {
         "in the schema. Never invent a field, a ligase or a PDB identifier. "
         "Never compute or estimate a numeric value."
     ),
-    "triage": (
-        "<task>triage</task>\n"
-        "You classify a structure or abstract into exactly one evidence class. "
-        "Reply with a single class token and nothing else."
-    ),
+    "triage": TRIAGE_SYSTEM,
     # The old wording was "you state precisely what is missing when a question
     # cannot be answered", which presupposes the answer. Trained on refusals
     # only and prompted as though refusing were the job, the head refused every

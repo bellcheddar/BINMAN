@@ -751,12 +751,22 @@ def run(iters: int | None = None, skip_stage_two: bool = False,
         "tasks": [
             {"tag": "<task>query</task>",
              "description": "natural language to a BINMAN query object"},
+            # This said "NOT TRAINED: three of five classes have no published
+            # label source" until 2026-10-06, and the About page printed it.
+            # It was true when written and had not been revisited: the label
+            # sources resolved, Task B trained, and its predictions fill
+            # `evidence_class` on 27,590 bridge rows. What remains true is
+            # narrower, and is the sentence below.
             {"tag": "<task>triage</task>",
-             "description": "evidence-class triage",
-             "status": "NOT TRAINED: three of five classes have no published label "
-                       "source in this build (see lm/corpus/corpus_report.json)"},
+             "description": "evidence-class triage over four classes",
+             "status": "TRAINED over four classes. `bivalent_inhibitor` is not "
+                       "built: spec 3.4 defines it as two binding sites within "
+                       "one chain, which stage 1.3's geometry does not detect, "
+                       "and inventing the label would be this project's "
+                       "judgement rather than a published source. Macro F1 is "
+                       "reported over the four that exist."},
             {"tag": "<task>abstain</task>",
-             "description": "structured abstention naming exactly what is missing"},
+             "description": "answerable or not, and what is missing when not"},
         ],
     }
 
