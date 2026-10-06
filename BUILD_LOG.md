@@ -1118,3 +1118,20 @@ One line per meaningful event, timestamped UTC (spec Section 0 rule 5).
 | 2026-10-06T14:05:08+00:00 | 3.8 | Project-phrased queries: record type 1.0, fields 0.3333, set equality 0.0667 against a ceiling of 0.5333. |
 | 2026-10-06T14:05:45+00:00 | 9 | Validation run against binman.sqlite: 0 metric(s) not computed (dataset unavailable), 2 measured floor(s) missed. |
 | 2026-10-06T14:05:46+00:00 | 9 | Validation run against binman.sqlite: 4 metric(s) not computed (dataset unavailable), 7 measured floor(s) missed. |
+| 2026-10-06T14:28:00+00:00 | 3.8 | Abstention check: 12 answerable and 20 unanswerable questions, asked of local adapter models/binman-lm/adapters over mlx-community/Qwen2.5-3B-Instruct-4bit. |
+| 2026-10-06T14:28:00+00:00 | 3.8 | Abstention recall 1.0, specificity 1.0. |
+| 2026-10-06T14:28:31+00:00 | 3.8 | Abstention check: 12 answerable and 5 unanswerable questions, asked of local adapter models/binman-lm/adapters over mlx-community/Qwen2.5-3B-Instruct-4bit. |
+| 2026-10-06T14:28:31+00:00 | 3.8 | Abstention recall 1.0, specificity 1.0. |
+| 2026-10-06T14:28:31+00:00 | 3.8 | Abstention check: 12 answerable and 5 unanswerable questions, asked of local adapter adapters over base. |
+| 2026-10-06T14:28:31+00:00 | 3.8 | Abstention recall 1.0, specificity 1.0. |
+| 2026-10-06T14:28:31+00:00 | 3.8 | Abstention check: 12 answerable and 20 unanswerable questions, asked of local adapter adapters over base. |
+| 2026-10-06T14:28:31+00:00 | 3.8 | Abstention recall 1.0, specificity 1.0. |
+| 2026-10-06T14:29:18+00:00 | 4.1b | About tab generated: 53 references, 11/13 datasets resolved, worked example selected, 0 value(s) not recorded, 0 source(s) publish no licence. |
+| 2026-10-06T14:29:31+00:00 | 3.8 | Abstention check: 12 answerable and 5 unanswerable questions, asked of local adapter models/binman-lm/adapters over mlx-community/Qwen2.5-3B-Instruct-4bit. |
+| 2026-10-06T14:29:31+00:00 | 3.8 | Abstention recall 1.0, specificity 1.0. |
+| 2026-10-06T14:29:31+00:00 | 3.8 | Abstention check: 12 answerable and 5 unanswerable questions, asked of local adapter adapters over base. |
+| 2026-10-06T14:29:31+00:00 | 3.8 | Abstention recall 1.0, specificity 1.0. |
+| 2026-10-06T14:29:31+00:00 | 3.8 | Abstention check: 12 answerable and 20 unanswerable questions, asked of local adapter adapters over base. |
+| 2026-10-06T14:29:31+00:00 | 3.8 | Abstention recall 1.0, specificity 1.0. |
+| 2026-10-06T14:29:33+00:00 | 9 | Validation run against binman.sqlite: 0 metric(s) not computed (dataset unavailable), 2 measured floor(s) missed. |
+| 2026-10-06T14:29:34+00:00 | 9 | Validation run against binman.sqlite: 4 metric(s) not computed (dataset unavailable), 6 measured floor(s) missed. |

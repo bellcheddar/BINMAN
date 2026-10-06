@@ -196,7 +196,9 @@
     </div>
 
     <div class="panel panel--step" id="example-step-3">
-      <h3>Step 3 · its ligase in context</h3>
+      {# The heading follows the content: "its ligase" is wrong when the entry
+         holds no E3, which is the usual case. #}
+      <h3>Step 3 · {% if ex.ligase %}its ligase in context{% else %}which ligase would you recruit?{% endif %}</h3>
       {# This step used to print "the E3 Triage stage has not run" with no
          condition on it at all. The stage had run, and the example is chosen
          partly because its ligase has a pocket score, so the page was stating
@@ -227,10 +229,39 @@
               <td>{{ lig.exploitation_status }}</td></tr>
         </tbody></table>
       {% else %}
-        <div class="notice">
-          No entity in this structure is in the E3 Triage table, so there is no
-          pocket score, volume or triage rank to show for it.
-        </div>
+        {# "No entity in this structure is in the E3 Triage table" was true and
+           was not an answer. A bridge found by geometry usually holds no E3:
+           the module's question is which ligase you would recruit, so the step
+           answers that instead of reporting an absence. #}
+        <p>
+          Neither protein here is an E3 ligase, which is the usual case for a
+          bridge found by geometry rather than by annotation. The question this
+          module answers is which ligase you would recruit, and it ranks the
+          human repertoire on ligandability, structural coverage, expression
+          selectivity and family. The top of that ranking:
+        </p>
+        <table class="grid-table grid-table--stack panel__table">
+          <thead><tr><th>Ligase</th><th class="num">Rank</th>
+            <th class="num">Pocket</th><th>Status</th></tr></thead>
+          <tbody>
+            {% for cand in ex.ligase_candidates %}
+              <tr>
+                <td class="stack__title"><code>{{ cand.gene }}</code>
+                  {% if cand.family and cand.family != cand.gene %}
+                    <span class="series__plus">{{ cand.family }}</span>
+                  {% endif %}</td>
+                <td class="num" data-label="rank">{{ cand.triage_rank | thousands }}</td>
+                <td class="num" data-label="pocket">{{ cand.pocket_score | sigfig }}</td>
+                <td class="stack__links">{{ cand.exploitation_status }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        <p class="note">
+          This ranking is of the repertoire, not of its fit to this particular
+          target. Pairing a ligase with a substrate is what the Lens graph is
+          for.
+        </p>
       {% endif %}
     </div>
 

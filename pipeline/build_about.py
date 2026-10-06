@@ -528,6 +528,15 @@ def worked_example() -> dict:
             if row is not None:
                 degron = dict(row)
 
+        # The top of the triage ranking, for the common case where the entry
+        # holds no E3 at all.
+        ligase_candidates = [
+            dict(row) for row in connection.execute(
+                "SELECT gene, uniprot_acc, family, pocket_score, triage_rank, "
+                "exploitation_status FROM ligase WHERE status = 'ok' "
+                "AND triage_rank IS NOT NULL ORDER BY triage_rank LIMIT 4")
+        ]
+
         # The example's own ligase, so step 3 of the walkthrough can state its
         # triage numbers instead of claiming the stage has not run. Best-ranked
         # first, because an entry can carry more than one: 7OJX holds RNF38
@@ -593,6 +602,15 @@ def worked_example() -> dict:
             "structure_file": chosen.get("structure_file") or "",
             "degron": degron,
             "ligase": ligase,
+            # What the E3 Triage module answers when the entry holds no E3,
+            # which is the usual case for a bridge found by geometry. The step
+            # used to print "no entity in this structure is in the E3 Triage
+            # table" and stop, which is true and is not an answer. The module's
+            # question was never "which ligase is in this crystal": it ranks the
+            # repertoire on ligandability, so the answer is which ones you would
+            # reach for. Global ranking, not target-specific, and the page says
+            # so rather than implying these were chosen for this target.
+            "ligase_candidates": ligase_candidates,
             "entry_bridges": entry_bridges,
             "ligand_bridges": ligand_bridges,
             "is_largest_for_ligand": is_largest,
