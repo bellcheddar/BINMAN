@@ -124,6 +124,34 @@ def encode(core: str, columns: list[str]):
     return np.asarray(values, dtype=float)
 
 
+def _shipped_validation() -> dict:
+    """The pomalidomide figures this column is thresholded on, from the fit.
+
+    `degron_sequence_fit.json` measures them: a gene-grouped repeated fit with a
+    permutation null, and an operating point chosen against spec 9.2's own
+    asymmetric objective rather than Youden's J (D-048).
+    """
+    path = INTERIM / "degron_sequence_fit.json"
+    try:
+        pom = json.loads(path.read_text(encoding="utf-8"))["per_compound"]["POM"]
+    except (OSError, json.JSONDecodeError, KeyError):
+        return {"computed": False,
+                "reason": "degron_sequence_fit.json has no POM record; "
+                          "run pipeline/degron_sequence.py"}
+    point = pom.get("clears_spec_92_floors") or {}
+    return {
+        "computed": True,
+        "auc_mean": pom.get("auc_mean"),
+        "auc_std": pom.get("auc_std"),
+        "beats_null_by_sd": pom.get("beats_null_by_sd"),
+        "n_positive": pom.get("n_positive"),
+        "sensitivity": point.get("sensitivity"),
+        "specificity": point.get("specificity"),
+        "cut": point.get("cut"),
+        "source": "pipeline/degron_sequence.py, per_compound POM",
+    }
+
+
 def run(limit: int | None = None) -> dict:
     import numpy as np
 
@@ -188,8 +216,12 @@ def run(limit: int | None = None) -> dict:
         "model": ("logistic regression on C2H2-anchored chemical-group features, "
                   "weighted by the Slabicki alanine scan, trained on the Sievers "
                   "pomalidomide degrome"),
-        "validation": ("nested held-out AUC 0.830, sensitivity 0.867 at "
-                       "specificity 0.613 (DECISIONS D-048, D-049)"),
+        # Read from the fit, not restated. This was a hard-coded string saying
+        # "AUC 0.830, sensitivity 0.867 at specificity 0.613", which was both
+        # typed rather than computed and stale: the fit now measures 0.8259,
+        # 0.8571 and 0.6001. A shipped artefact quoting its own validation from
+        # a literal cannot go out of date loudly, only quietly.
+        "validation": _shipped_validation(),
     }
     log_event("5.2", f"imid_degradation_score written for {scored:,} degron "
                      f"candidates; {skipped_no_zf:,} carry no C2H2 motif and are "

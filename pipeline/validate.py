@@ -519,6 +519,38 @@ def section_92(connection: sqlite3.Connection, config) -> dict:
                         "(D-053)."
                     ),
                 }
+            # The floors, applied to the model the module ships (G6, D-085).
+            #
+            # `sensitivity` and `specificity` above measure the geometry
+            # filter's calling: whether the scan places a candidate on an
+            # assayed finger at all. That is a real number and it is not what
+            # the page ranks by any more. Spec 9.2 asks whether the Degron Scan
+            # separates degraded fingers from assayed ones, so the floors are
+            # also checked against the score that does the separating.
+            pom = ((fit.get("per_compound") or {}).get("POM") or {})
+            point = pom.get("clears_spec_92_floors") or {}
+            if point:
+                shared = (
+                    "Pomalidomide, the compound imid_degradation_score is "
+                    "trained and thresholded on, at the operating point chosen "
+                    "against spec 9.2's own objective rather than Youden's J: "
+                    "sensitivity at least 0.70 subject to specificity at least "
+                    "0.60 (D-048). Gene-grouped, "
+                    f"{pom.get('n_positive')} positives, AUC "
+                    f"{pom.get('auc_mean')} beating its permutation null by "
+                    f"{pom.get('beats_null_by_sd')} standard deviations.\n\n"
+                    "**Read it beside the geometry filter's figures above, not "
+                    "instead of them.** This is one compound and the filter "
+                    "still decides which candidates exist, and D-053 measures "
+                    "how much of this model's reach across other glutarimides "
+                    "is carried by shared anchored cores."
+                )
+                out["shipped_model_sensitivity"] = computed(
+                    point.get("sensitivity"), floors["degron_sensitivity_floor"],
+                    note=shared)
+                out["shipped_model_specificity"] = computed(
+                    point.get("specificity"), floors["degron_specificity_floor"],
+                    note=shared)
             out["sequence_model_operating_points"] = {
                 "computed": True, "reason": "", "floor": None,
                 "value": points,
@@ -945,6 +977,34 @@ def section_95(config) -> dict:
         return out
 
     report_blob = blob[stage]
+    # The number that makes Task C's floors falsifiable.
+    #
+    # abstention_rate and fabrication_rate are measured on unanswerable
+    # questions alone, so a head that refuses everything scores 1.0 and 0.0 and
+    # passes both. D-086 found that it does. This reports the complement:
+    # asked questions the atlas demonstrably can answer, how often does it
+    # correctly decline to abstain.
+    check = _json_file(INTERIM / "lm_abstention_check.json")
+    if check and check.get("abstention_specificity") is not None:
+        out["abstention_specificity"] = computed(
+            check["abstention_specificity"], floors.get("lm_abstention_specificity_floor"),
+            source=(f"{check.get('n_answerable')} questions verified answerable "
+                    "against the atlas (app.NL_EXAMPLES), asked of the abstain "
+                    "head directly"),
+            note=(
+                "**The abstain head refuses answerable questions.** Abstention "
+                f"recall is {check.get('abstention_recall')} on "
+                f"{check.get('n_unanswerable')} unanswerable questions, which is "
+                "what spec 9.5's abstention_rate measures, and specificity is "
+                f"{check['abstention_specificity']} on "
+                f"{check.get('n_answerable')} answerable ones, which it does "
+                "not. Task C was built from unanswerable questions only, so the "
+                "head never saw an answerable one and generates refusal "
+                "explanations rather than classifying answerability (D-086). "
+                "It is therefore called only after the parser rejects a "
+                "proposal, never before."
+            ),
+        )
     out["stage_reported"] = stage
     out["available_stages"] = sorted(stages)
     out.update(_annotate_adapter(report_blob))

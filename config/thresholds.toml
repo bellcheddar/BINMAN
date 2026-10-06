@@ -189,6 +189,11 @@ held_out_auc_floor           = 0.65   # spec 9.4 floor, not a fitted value
 glue_recall_floor            = 0.85
 glue_artefact_precision_floor = 0.95
 glue_packing_specificity_floor = 0.90
+# A head that refuses everything scores perfectly on abstention_rate, so the
+# complement carries the floor: of the questions the atlas can answer, how many
+# it correctly lets through. Set at 0.90 because a natural-language box that
+# refuses one good question in ten is already hard to use (D-086).
+lm_abstention_specificity_floor = 0.90
 degron_sensitivity_floor     = 0.70
 degron_specificity_floor     = 0.60
 e3_enrichment_p_max          = 0.01

@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-05T21:10:54+00:00",
+  "generated_at": "2026-10-06T00:04:44+00:00",
   "atlas": "/Users/dellboy/Documents/Vibe_Coding/BINMAN/data/atlas/binman.sqlite",
   "atlas_bytes": 204562432,
   "note": "A metric whose dataset is unavailable is reported as computed: false with the reason. Nothing here is estimated, and no hand-written control was substituted for a missing published one (spec 4.1b).",
@@ -33,6 +33,12 @@
       "metric": "exposure_vs_assayed_negatives",
       "value": 0.4971,
       "floor": 0.65
+    },
+    {
+      "section": "9.5",
+      "metric": "abstention_specificity",
+      "value": 0.0,
+      "floor": 0.9
     }
   ],
   "metrics_not_computed": [
@@ -361,6 +367,22 @@
         "panel_core_disjoint_permutation_p": 0.15792
       },
       "note": "The third degron model, and the only one that clears spec 9.2's floors: nested held-out AUC 0.830, sensitivity 0.867 at specificity 0.613 (D-048, D-049). Trained on the Sievers pomalidomide degrome with features weighted by the Slabicki alanine scan, so it answers a per-compound question where `roc_auc` above answers a pooled one.\n\n**Its transfer is partly carried by core identity.** Against the 29-glutarimide panel it averages 0.7963 naive and 0.7789 gene-disjoint, both at permutation p=0.0005. Removing every training row that shares an anchored core with the panel takes it to 0.5793 at p=0.15792, which is not distinguishable from chance. A size-matched control separates the causes: 200 gene-disjoint fits subsampled to the same 5 positives average 0.7162, putting the core-disjoint result at the 6.5th percentile, so most of the drop is the smaller training set and a real residual is the core sharing (D-053)."
+    },
+    "shipped_model_sensitivity": {
+      "computed": true,
+      "value": 0.8571,
+      "floor": 0.7,
+      "reason": "",
+      "passes": true,
+      "note": "Pomalidomide, the compound imid_degradation_score is trained and thresholded on, at the operating point chosen against spec 9.2's own objective rather than Youden's J: sensitivity at least 0.70 subject to specificity at least 0.60 (D-048). Gene-grouped, 14 positives, AUC 0.8259 beating its permutation null by 2.91 standard deviations.\n\n**Read it beside the geometry filter's figures above, not instead of them.** This is one compound and the filter still decides which candidates exist, and D-053 measures how much of this model's reach across other glutarimides is carried by shared anchored cores."
+    },
+    "shipped_model_specificity": {
+      "computed": true,
+      "value": 0.6001,
+      "floor": 0.6,
+      "reason": "",
+      "passes": true,
+      "note": "Pomalidomide, the compound imid_degradation_score is trained and thresholded on, at the operating point chosen against spec 9.2's own objective rather than Youden's J: sensitivity at least 0.70 subject to specificity at least 0.60 (D-048). Gene-grouped, 14 positives, AUC 0.8259 beating its permutation null by 2.91 standard deviations.\n\n**Read it beside the geometry filter's figures above, not instead of them.** This is one compound and the filter still decides which candidates exist, and D-053 measures how much of this model's reach across other glutarimides is carried by shared anchored cores."
     },
     "sequence_model_operating_points": {
       "computed": true,
@@ -955,6 +977,15 @@
   },
   "9.5": {
     "title": "BINMAN-LM",
+    "abstention_specificity": {
+      "computed": true,
+      "value": 0.0,
+      "floor": 0.9,
+      "reason": "",
+      "passes": false,
+      "source": "12 questions verified answerable against the atlas (app.NL_EXAMPLES), asked of the abstain head directly",
+      "note": "**The abstain head refuses answerable questions.** Abstention recall is 1.0 on 20 unanswerable questions, which is what spec 9.5's abstention_rate measures, and specificity is 0.0 on 12 answerable ones, which it does not. Task C was built from unanswerable questions only, so the head never saw an answerable one and generates refusal explanations rather than classifying answerability (D-086). It is therefore called only after the parser rejects a proposal, never before."
+    },
     "stage_reported": "round07-32layers",
     "available_stages": [
       "baseline",
