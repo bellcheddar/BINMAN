@@ -1108,6 +1108,50 @@ remaining 1,860 novel ligands in that set have had no such check, and the
 bridging balance is the thing to read first: an induced ternary buries surface
 against both partners, and 0.86 to 0.94 is what that looks like.
 
+### What the novel glues glue: 869 interfaces, 101 series
+
+The RAS(ON) result came from reading entry titles, which does not scale to 1,879
+ligands. `pipeline/novel_glue_classes.py` clusters them properly, on the
+interface each one induces rather than on its chemistry, because that is what
+defines a glue class. 4,125 balanced hetero-pair bridges resolve to **869
+distinct protein pairs, of which 101 carry three or more distinct ligands** and
+are therefore series rather than single observations.
+
+| ligands | entries | median ΔSASA | interface |
+|---:|---:|---:|---|
+| **43** | 43 | 664 Å² | 14-3-3 sigma + transcription factor p65 |
+| 37 | 40 | 626 Å² | tubulin alpha-1B + tubulin beta-2B |
+| 16 | 17 | 452 Å² | Rho GEF + RhoA |
+| 15 | 20 | 1,148 Å² | RNA polymerase subunits |
+| 14 | 17 | 1,117 Å² | AMPK catalytic + regulatory subunit |
+| 13 | 16 | 1,028 Å² | proteasome beta-5 + beta-6 |
+| **11 + 9** | 26 | **1,861 / 1,669 Å²** | KRas and KRas isoform 2B + cyclophilin A |
+
+**The largest novel series in the atlas is 14-3-3σ with p65**, 43 distinct
+ligands across 43 entries, and inspection confirms a single analog series:
+4-[(6-methoxy-3,4-dihydroquinolin-1-yl)...] and close variants, one titled "14-3-3
+sigma with RelA/p65 binding site pS45 and covalently bound TCF521-187". These
+are stabilisers of a 14-3-3 client interface, which is one of the oldest and
+most active molecular glue fields, and none of the three curated databases lists
+them.
+
+**The RAS(ON) series reappears without being looked for**, at rows 11 and 13,
+split across two KRas entity names. It carries the highest median buried area in
+the whole table by some margin, 1,861 and 1,669 Å² against a top-ten median
+nearer 700.
+
+**Not every row is a glue, and the buried area is the tell.** Tubulin α/β,
+proteasome β-subunits, DNA gyrase and the ionotropic receptors are ligands
+binding an interface that exists without them: colchicine-site and active-site
+chemistry, bridging two chains because the site happens to straddle them. The
+atlas's definition is geometric and cannot separate induced proximity from a
+pre-existing interface, and it is not supposed to: that distinction is biology,
+and the module ships the measurement rather than the judgement.
+
+So the 1,879-ligand set is not an undifferentiated pile. It is roughly a hundred
+series, led by two that are unambiguously molecular glues and well populated,
+and the clustering is cheap enough to re-run whenever the atlas grows.
+
 ### The triage head, applied to the atlas
 
 Task B was trained and scored and then used for nothing. `evidence_class`, which
