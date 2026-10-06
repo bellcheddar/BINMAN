@@ -118,6 +118,12 @@ def atlas_counts() -> dict:
             }
             out["novel_bridges"] = int(connection.execute(
                 "SELECT COUNT(*) FROM bridge WHERE novel_bridge = 1").fetchone()[0])
+            # The triage head's footprint in the atlas. It is the only
+            # model-derived column, so the schematic names how far it reaches
+            # rather than leaving "triage" as an unquantified claim.
+            out["triage_predicted"] = int(connection.execute(
+                "SELECT COUNT(*) FROM bridge WHERE evidence_class IS NOT NULL"
+            ).fetchone()[0])
         except sqlite3.Error:
             pass
     finally:
@@ -691,12 +697,12 @@ def workflow_svg(stages: dict, atlas: dict, datasets: list[dict]) -> tuple[str, 
             "title": "4 · Model",
             "software": "mlx-lm, LoRA",
             "lines": [
-                "BINMAN-LM 3B, 32 layers",
-                "query, triage, abstain",
-                "never emits a number",
+                "Qwen2.5-3B, 4-bit",
+                "rank 8 over 32 layers",
+                "one adapter, three heads",
             ],
             "failed": 0,
-            "plain": ["Reads the question, writes", "the query. Never the number."],
+            "plain": ["Train one small model on the", "atlas's own records."],
         },
     ]
 
@@ -727,13 +733,47 @@ def workflow_svg(stages: dict, atlas: dict, datasets: list[dict]) -> tuple[str, 
     lay_h = 46
     lay_top = top + box_h + lay_gap
 
+    # The trained layer. Stage 4 produces one LoRA adapter, and the adapter has
+    # three heads that run in two different places: the triage head at build
+    # time, filling a column of the atlas, and the query and abstain heads when
+    # somebody asks the page a question. Listing them as three words inside
+    # stage 4 said none of that.
+    heads = [
+        {
+            "title": "A · query",
+            "lines": ["your question becomes a query object",
+                      "when you ask, then the parser checks it"],
+        },
+        {
+            "title": "B · triage",
+            "lines": [f"evidence class on "
+                      f"{atlas.get('triage_predicted', 0):,} bridge rows",
+                      "at build time, the one model-derived column"],
+        },
+        {
+            "title": "C · abstain",
+            "lines": ["answerable or not, and what is missing",
+                      "when the parser rejects a proposal"],
+        },
+    ]
+    band_gap = 20
+    band_pad = 14
+    band_head = 26
+    head_h = 56
+    band_h = band_head + head_h + band_pad
+    band_top = lay_top + lay_h + band_gap
+    band_x = left_margin
+    band_w = (len(columns) - 1) * (box_w + gap) + box_w
+    head_gap = 14
+    head_w = (band_w - 2 * band_pad - (len(heads) - 1) * head_gap) // len(heads)
+
     # The canvas is COMPUTED from the layout rather than fixed. A hardcoded
     # 1060x460 left a third of the height empty and, once widened by hand, cut
     # two pixels off the module column. Deriving both from the content means a
     # layout change cannot silently clip or pad the figure again.
     out_x = left_margin + (len(columns) - 1) * (box_w + gap) + box_w + gap + 10
     width = out_x + module_w + 12
-    height = max(lay_top + lay_h,
+    height = max(band_top + band_h,
                  top + (len(modules) - 1) * module_step + module_h) + 16
 
     parts = [
@@ -754,9 +794,18 @@ def workflow_svg(stages: dict, atlas: dict, datasets: list[dict]) -> tuple[str, 
         'letter-spacing:.06em;text-transform:uppercase}'
         '.wf-lay-box{fill:none;stroke:var(--line);stroke-width:1.5;stroke-dasharray:3 3}'
         '.wf-lay{fill:var(--muted);font:11px var(--display),sans-serif}'
+        '.wf-lm-band{fill:var(--accent-soft);stroke:var(--accent);stroke-width:1.5}'
+        '.wf-lm-head{fill:var(--surface);stroke:var(--accent);stroke-width:1.5}'
+        '.wf-lm-title{fill:var(--accent);font:600 11px var(--display),sans-serif;'
+        'letter-spacing:.06em;text-transform:uppercase}'
+        '.wf-lm-t{fill:var(--ink);font:600 12px var(--display),sans-serif}'
+        '.wf-lm-s{fill:var(--muted);font:10px var(--display),sans-serif}'
+        '.wf-lm-arrow{stroke:var(--accent);stroke-width:1.5;fill:none}'
         '</style>',
         f'<marker id="wf-tip" markerWidth="7" markerHeight="7" refX="6" refY="3.5" '
         f'orient="auto"><path d="M0,0 L7,3.5 L0,7Z" fill="var(--line)"/></marker>',
+        f'<marker id="wf-tip-lm" markerWidth="7" markerHeight="7" refX="6" refY="3.5" '
+        f'orient="auto"><path d="M0,0 L7,3.5 L0,7Z" fill="var(--accent)"/></marker>',
     ]
 
     # Inputs on the left: primary sources, and validation sets as a distinct shape.
@@ -838,6 +887,43 @@ def workflow_svg(stages: dict, atlas: dict, datasets: list[dict]) -> tuple[str, 
         f'<path class="wf-arrow" d="M{last_box_right},{top + box_h / 2} '
         f'L{out_x - 6},{top + box_h / 2}" marker-end="url(#wf-tip)"/>'
     )
+    # The trained layer, drawn after the pipeline so its accent sits on top.
+    parts.append(
+        f'<rect class="wf-lm-band" x="{band_x}" y="{band_top}" width="{band_w}" '
+        f'height="{band_h}" rx="3"/>'
+        f'<text class="wf-lm-title" x="{band_x + band_pad}" '
+        f'y="{band_top + 18}">BINMAN-LM · one trained adapter, three heads, no arithmetic</text>'
+    )
+    for index, head in enumerate(heads):
+        hx = band_x + band_pad + index * (head_w + head_gap)
+        hy = band_top + band_head
+        parts.append(
+            f'<rect class="wf-lm-head" x="{hx}" y="{hy}" width="{head_w}" '
+            f'height="{head_h}" rx="2"/>'
+            f'<text class="wf-lm-t" x="{hx + 10}" y="{hy + 19}">{head["title"]}</text>'
+        )
+        for line_index, line in enumerate(head["lines"]):
+            parts.append(
+                f'<text class="wf-lm-s" x="{hx + 10}" '
+                f'y="{hy + 34 + line_index * 13}">{line}</text>'
+            )
+
+    # Stage 4 makes the adapter: an arrow down from it into the band.
+    stage4_x = left_margin + (len(columns) - 1) * (box_w + gap)
+    parts.append(
+        f'<path class="wf-lm-arrow" d="M{stage4_x + box_w / 2},{lay_top + lay_h} '
+        f'L{stage4_x + box_w / 2},{band_top - 6}" marker-end="url(#wf-tip-lm)"/>'
+    )
+    # And the heads serve the modules: one arrow from the band's right edge up
+    # to the module column, because that is where A and C are called and where
+    # B's column is read.
+    parts.append(
+        f'<path class="wf-lm-arrow" d="M{band_x + band_w},{band_top + band_h / 2} '
+        f'L{out_x + module_w / 2},{band_top + band_h / 2} '
+        f'L{out_x + module_w / 2},{top + (len(modules) - 1) * module_step + module_h + 6}" '
+        f'marker-end="url(#wf-tip-lm)"/>'
+    )
+
     parts.append('</svg>')
 
     description = (
@@ -859,7 +945,15 @@ def workflow_svg(stages: dict, atlas: dict, datasets: list[dict]) -> tuple[str, 
         "In plain terms: stage 1 fetches every PDB entry that could hold a glue, "
         "stage 2 measures which ligands touch two proteins at once, stage 3 scores "
         "what a degrader needs (tags, ligases and lysines), and stage 4 reads the "
-        "question and writes the query without ever producing the number."
+        "question and writes the query without ever producing the number. "
+        "Below the four stages sits the trained layer: one LoRA adapter with "
+        "three heads. Head A, query, turns a question into a query object when "
+        "somebody asks, and the parser then checks it. Head B, triage, assigns "
+        f"an evidence class to {atlas.get('triage_predicted', 0):,} bridge rows "
+        "at build time, and is the only model-derived column in the atlas. "
+        "Head C, abstain, says whether a question is answerable and what is "
+        "missing when it is not, and is called when the parser rejects a "
+        "proposal. None of the three produces a number."
     )
     return "\n".join(parts), description
 
