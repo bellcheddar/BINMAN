@@ -1080,3 +1080,12 @@ One line per meaningful event, timestamped UTC (spec Section 0 rule 5).
 | 2026-10-06T02:51:03+00:00 | 9 | Validation run against binman.sqlite: 4 metric(s) not computed (dataset unavailable), 7 measured floor(s) missed. |
 | 2026-10-06T02:55:20+00:00 | 9 | Validation run against binman.sqlite: 0 metric(s) not computed (dataset unavailable), 2 measured floor(s) missed. |
 | 2026-10-06T02:55:21+00:00 | 9 | Validation run against binman.sqlite: 4 metric(s) not computed (dataset unavailable), 7 measured floor(s) missed. |
+| 2026-10-06T12:45:42+00:00 | 3.2 | Corpus grounding: 29 numeric field ranges read from the atlas, vocabularies {'ccd_id': 4000, 'ccd_class': 11, 'ligase_gene': 650, 'ligase_acc': 650, 'ligase_family': 13, 'verdict': 0, 'evidence_class': 4, 'motif_family': 1, 'method': 20}. |
+| 2026-10-06T12:45:42+00:00 | 3.2 | Task A generated 6,000 pairs, 6,000 validated by the app parser, 0 rejected and dropped (the corpus therefore has zero label noise by construction). |
+| 2026-10-06T12:45:42+00:00 | 3.2 | Corpus written: Task A 4,837/587/576, 1,400 preference pairs across 7 modes, Task C 1,568 train. Task B buildable: True. |
+| 2026-10-06T12:46:51+00:00 | 3.7 | SFT corpus assembled: 31,610 train (oversampling {'task_a': 2, 'task_c': 4}), task mix abstain 20%, query 31%, triage 50% |
+| 2026-10-06T12:48:31+00:00 | 3.7 | SFT corpus assembled: 31,610 train (oversampling {'task_a': 2, 'task_c': 4}), task mix abstain 20%, query 31%, triage 50% |
+| 2026-10-06T12:48:31+00:00 | 3.7 | Stage 1 LoRA SFT starting: 31,610 train / 2,497 valid examples, rank 8, 32 layers, lr 1e-05, batch 4, 15806 iterations. |
+| 2026-10-06T12:50:12+00:00 | 4.1b | About tab generated: 53 references, 11/13 datasets resolved, worked example selected, 0 value(s) not recorded, 0 source(s) publish no licence. |
+| 2026-10-06T12:52:03+00:00 | 9 | Validation run against binman.sqlite: 0 metric(s) not computed (dataset unavailable), 2 measured floor(s) missed. |
+| 2026-10-06T12:52:05+00:00 | 9 | Validation run against binman.sqlite: 4 metric(s) not computed (dataset unavailable), 7 measured floor(s) missed. |

@@ -1,0 +1,3 @@
+wandb: [wandb.Api()] Loaded credentials for https://api.wandb.ai from /Users/dellboy/.netrc.
+[3.7] SFT corpus assembled: 31,610 train (oversampling {'task_a': 2, 'task_c': 4}), task mix abstain 20%, query 31%, triage 50%
+[3.7] Stage 1 LoRA SFT starting: 31,610 train / 2,497 valid examples, rank 8, 32 layers, lr 1e-05, batch 4, 15806 iterations.

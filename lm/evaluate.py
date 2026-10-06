@@ -123,11 +123,7 @@ TRAINED_SYSTEM = (
 # Spec 3.7: the three tasks are distinguished by a task tag in the system turn.
 # Evaluating Task C under <task>query</task> asks the model to write a query and
 # then measures whether it refused, which is not a test of abstention.
-ABSTAIN_SYSTEM = (
-    "<task>abstain</task>\n"
-    "You state precisely what is missing when a question cannot be answered "
-    "from the atlas. Never fabricate a ligase, a PDB identifier or a number."
-)
+from app.lm import ABSTAIN_SYSTEM  # noqa: E402
 
 
 def generate_one(model, tokenizer, question: str, schema_text: str,

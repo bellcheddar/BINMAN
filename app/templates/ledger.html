@@ -15,19 +15,20 @@
      them. The buried area is the best single tell and the caption says so,
      because the atlas measures geometry and cannot make that call itself. #}
   <p>
-    {{ series.total | thousands }} protein pairs are bridged by
-    {{ series.min_ligands }} or more distinct ligands that no curated glue
-    database lists, each burying at least {{ series.balance_floor }} as much
-    surface on its smaller chain as on its larger one. The
-    {{ series.rows | length }} carrying the most ligands are below.
-    <em>Ligand share</em> is how much of the interface the widest bridge buries
-    itself, against how much the two chains bury on each other: near 1.0 the
-    ligand is the only thing holding them together, and an obligate complex
-    with a ligand bound in it sits lower. It is a measurement and not a verdict,
-    because a real glue remodelling a large native surface lands in the same
-    place as a passenger.
+    {{ series.total | thousands }} pairs carry {{ series.min_ligands }} or more
+    novel glues each, balance {{ series.balance_floor }} and up. The
+    {{ series.rows | length }} largest are below. <em>Ligand share</em> is the
+    fraction of the interface buried by the ligand rather than by chain-to-chain
+    contact: near 1.0 the ligand is all that holds the pair together. It
+    measures and does not classify, because a glue remodelling a large native
+    surface scores like a passenger.
   </p>
-  <table class="grid-table">
+  {# The phone layout is in the stylesheet, not here: at 720px and under each
+     row becomes a block, the header row is hidden and every cell announces
+     itself from `data-label`. Six columns and two 48-character protein names
+     cannot fit 360px as a table, and a sideways-scrolling table is worse than
+     a stacked one. #}
+  <table class="grid-table series-table">
     <thead><tr>
       <th>Interface</th><th class="num">Ligands</th><th class="num">Entries</th>
       <th class="num">Median ΔSASA</th>
@@ -37,19 +38,19 @@
     <tbody>
       {% for row in series.rows %}
         <tr>
-          <td>{{ row.left }} <span style="color:var(--muted)">+</span> {{ row.right }}</td>
-          <td class="num"><strong>{{ row.ligands }}</strong></td>
-          <td class="num">{{ row.entries }}</td>
-          <td class="num">{{ row.median_dsasa | round | int | thousands }} Å²</td>
-          <td class="num">{% if row.ligand_share is none %}not measured{% else %}{{ '%.2f' | format(row.ligand_share) }}{% endif %}</td>
-          <td>
+          <td class="series__interface">{{ row.left }} <span class="series__plus">+</span> {{ row.right }}</td>
+          <td class="num" data-label="ligands"><strong>{{ row.ligands }}</strong></td>
+          <td class="num" data-label="entries">{{ row.entries }}</td>
+          <td class="num" data-label="median ΔSASA">{{ row.median_dsasa | round | int | thousands }} Å²</td>
+          <td class="num" data-label="ligand share">{% if row.ligand_share is none %}not measured{% else %}{{ '%.2f' | format(row.ligand_share) }}{% endif %}</td>
+          <td class="series__links">
             {% if row.widest.pdb_id %}
               <a href="{{ url_for('ledger.index') }}#glue={{ row.widest.pdb_id }}:{{ row.widest.ccd_id }}:{{ row.widest.bridge_id }}"
                  title="Load this bridge into the viewer">{{ row.widest.pdb_id }} · {{ row.widest.ccd_id }}</a>
             {% endif %}
             {% if row.focus %}
-              <a href="{{ url_for('lens.index') }}?focus={{ row.focus }}"
-                 style="margin-left:0.5rem" title="Open this interface in the Lens graph">lens</a>
+              <a class="series__lens" href="{{ url_for('lens.index') }}?focus={{ row.focus }}"
+                 title="Open this interface in the Lens graph">lens</a>
             {% endif %}
           </td>
         </tr>

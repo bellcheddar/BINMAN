@@ -1,15 +1,15 @@
 {
-  "generated_at": "2026-10-03T21:40:16+00:00",
+  "generated_at": "2026-10-06T12:45:42+00:00",
   "seed": 20261003,
   "counts": {
-    "task_a_train": 4752,
-    "task_a_valid": 574,
-    "task_a_test": 674,
+    "task_a_train": 4837,
+    "task_a_valid": 587,
+    "task_a_test": 576,
     "task_a_preference": 1400,
-    "task_c_train": 784,
-    "task_c_valid": 98,
-    "task_c_test": 98,
-    "task_c_preference": 980,
+    "task_c_train": 1568,
+    "task_c_valid": 196,
+    "task_c_test": 196,
+    "task_c_preference": 1960,
     "rejected_by_parser": 0
   },
   "preference_modes": {
@@ -28,32 +28,36 @@
     "ligase_acc": 650,
     "ligase_family": 13,
     "verdict": 0,
-    "evidence_class": 0,
+    "evidence_class": 4,
     "motif_family": 1,
-    "method": 15
+    "method": 20
   },
-  "numeric_ranges": 28,
+  "numeric_ranges": 29,
   "split_rule": "Compositions are held out, not tokens. Every field, operator and record type appears in training; the valid and test sets contain unseen combinations of them (spec 3.6).",
   "label_noise": "Zero by construction: all 6,000 shipped Task A pairs were validated by the same parser the app uses, and 0 generated pairs that failed it were dropped.",
   "task_b": {
-    "buildable": false,
+    "buildable": true,
     "available_label_sources": {
-      "molecular_glue": [],
-      "protac": [],
+      "molecular_glue": [
+        "mgdb_glues",
+        "molgluedb_glues",
+        "mgtbind_ternary"
+      ],
+      "protac": [
+        "protacdb_protacs"
+      ],
       "native_cofactor": [
         "biolip2_annotations"
       ],
       "crystallisation_artefact": [
         "biolip2_artefacts"
       ],
-      "bivalent_inhibitor": []
+      "bivalent_inhibitor": [
+        "protacdb_protacs"
+      ]
     },
-    "classes_without_a_label_source": [
-      "molecular_glue",
-      "protac",
-      "bivalent_inhibitor"
-    ],
-    "reason": "Spec 3.4 requires every Task B label to come from a published curated source, and the glue label specifically from the intersection of at least two of MGDB, MolGlueDB and MGTbind. None of those resolved, and PROTAC-DB did not either, so three of the five classes have no label source. Spec 4.1b forbids substituting hand-written labels, so the Task B corpus is NOT built and the 9.5 macro-F1 is reported as not computed."
+    "classes_without_a_label_source": [],
+    "reason": ""
   },
   "external_query_set": {
     "built": true,

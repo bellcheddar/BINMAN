@@ -25,6 +25,7 @@ import json
 import random
 import sqlite3
 import sys
+from collections.abc import Sequence
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -60,11 +61,10 @@ SYSTEM_QUERY = (
     "schema. Never invent a field, a ligase or a PDB identifier. Never compute "
     "or estimate a numeric value."
 )
-SYSTEM_ABSTAIN = (
-    "<task>abstain</task>\n"
-    "You state precisely what is missing when a question cannot be answered from "
-    "the atlas. Never fabricate a ligase, a PDB identifier or a number."
-)
+# One definition, in the module that serves it. A corpus trained on a different
+# system message from the one the app sends is a model measured on a prompt it
+# never saw (D-091).
+from app.lm import ABSTAIN_SYSTEM as SYSTEM_ABSTAIN  # noqa: E402
 
 
 # --------------------------------------------------------------------------- #
@@ -604,8 +604,24 @@ UNANSWERABLE = [
 
 
 def generate_task_c(grounding: Grounding, rng: random.Random,
+                    answerable: Sequence[Sample] = (),
                     target: int = 900) -> tuple[list[dict], list[dict]]:
-    """Partial triads and genuinely unanswerable questions."""
+    """Partial triads, genuinely unanswerable questions, and answerable ones.
+
+    The answerable third is the point of this signature. Trained on refusals
+    alone the head learned that the answer is always no: abstention recall
+    1.0000 and specificity 0.0000, refusing all twelve of BINMAN's own presets
+    (D-086). A classifier shown one class is not a classifier.
+
+    The positives come from the Task A samples, which are the only questions in
+    this build whose answerability is established rather than assumed: each one
+    was generated against the live atlas and then parsed by the app's own
+    parser, and anything the parser rejected was dropped. So "answerable" here
+    means a query object the app will execute, not an opinion.
+
+    They carry no numeric answer, only the decision and the record type that
+    holds it, because the model never reports a number (spec 3.8).
+    """
     samples: list[dict] = []
     pairs: list[dict] = []
 
@@ -683,6 +699,41 @@ def generate_task_c(grounding: Grounding, rng: random.Random,
                     "pdb_id": f"{rng.randrange(1,9)}{''.join(rng.choices('ABCDEFGHJKLMNPQRSTUVWXYZ0123456789', k=3))}",
                 }, separators=(",", ":")),
             })
+    # The answerable class, balanced against the refusals so neither answer is
+    # the safe one. A refusal on one of these is the failure this adds: it is
+    # the rejected side of every pair below.
+    refusals = len(samples)
+    pool = list(answerable)
+    rng.shuffle(pool)
+    for sample in pool[:refusals]:
+        accepted = {
+            "answerable": True,
+            "missing": [],
+            "explanation": (
+                f"The atlas holds this: it is a {sample.record_type} query."
+            ),
+        }
+        samples.append({
+            "messages": [
+                {"role": "system", "content": SYSTEM_ABSTAIN},
+                {"role": "user", "content": sample.prompt},
+                {"role": "assistant",
+                 "content": json.dumps(accepted, separators=(",", ":"))},
+            ],
+            "kind": "answerable",
+        })
+        pairs.append({
+            "mode": "refused_an_answerable_question",
+            "prompt": sample.prompt, "system": SYSTEM_ABSTAIN,
+            "chosen": json.dumps(accepted, separators=(",", ":")),
+            "rejected": json.dumps({
+                "answerable": False,
+                "missing": [sample.record_type],
+                "explanation": ("The atlas does not hold the records this "
+                                "question asks about."),
+            }, separators=(",", ":")),
+        })
+
     rng.shuffle(samples)
     return samples, pairs
 
@@ -752,7 +803,11 @@ def build(target_a: int = 6000) -> dict:
 
     train, valid, test = split_by_composition(samples, rng)
     preference = generate_preference_pairs(train, grounding, rng, per_mode=200)
-    task_c, task_c_pairs = generate_task_c(grounding, rng)
+    # Only the Task A training split feeds the answerable class, so the Task A
+    # held-out questions stay held out and the twelve app presets that
+    # pipeline/lm_abstention_check.py measures specificity on are not in the
+    # corpus at all.
+    task_c, task_c_pairs = generate_task_c(grounding, rng, answerable=train)
 
     c_split = int(len(task_c) * 0.8)
     c_valid_split = int(len(task_c) * 0.9)

@@ -661,6 +661,9 @@ def workflow_svg(stages: dict, atlas: dict, datasets: list[dict]) -> tuple[str, 
                 f"tier 3  {catalogue.get('tiers', {}).get('3', 0):,}",
             ],
             "failed": 0,
+            # One line of plain English per stage, drawn as a second row under
+            # the boxes. The numbers above say how much; these say what for.
+            "plain": ["Fetch every PDB entry that", "could hold a glue."],
         },
         {
             "title": "2 · Geometry",
@@ -670,6 +673,7 @@ def workflow_svg(stages: dict, atlas: dict, datasets: list[dict]) -> tuple[str, 
                 f"{atlas.get('bridge', 0):,} bridges found",
             ],
             "failed": bridges.get("failed", 0),
+            "plain": ["Measure which ligands touch", "two proteins at once."],
         },
         {
             "title": "3 · Scan and triage",
@@ -681,6 +685,7 @@ def workflow_svg(stages: dict, atlas: dict, datasets: list[dict]) -> tuple[str, 
             ],
             "failed": (stages.get("degrons", {}).get("failed", 0)
                        + stages.get("ligases", {}).get("failed", 0)),
+            "plain": ["Score what a degrader needs:", "tags, ligases, lysines."],
         },
         {
             "title": "4 · Model",
@@ -691,6 +696,7 @@ def workflow_svg(stages: dict, atlas: dict, datasets: list[dict]) -> tuple[str, 
                 "never emits a number",
             ],
             "failed": 0,
+            "plain": ["Reads the question, writes", "the query. Never the number."],
         },
     ]
 
@@ -715,13 +721,19 @@ def workflow_svg(stages: dict, atlas: dict, datasets: list[dict]) -> tuple[str, 
     module_step = 40
     module_h = box_h - (len(modules) - 1) * module_step
 
+    # The plain-English row, under the stage boxes only. Derived from the stage
+    # row so it cannot drift from it.
+    lay_gap = 12
+    lay_h = 46
+    lay_top = top + box_h + lay_gap
+
     # The canvas is COMPUTED from the layout rather than fixed. A hardcoded
     # 1060x460 left a third of the height empty and, once widened by hand, cut
     # two pixels off the module column. Deriving both from the content means a
     # layout change cannot silently clip or pad the figure again.
     out_x = left_margin + (len(columns) - 1) * (box_w + gap) + box_w + gap + 10
     width = out_x + module_w + 12
-    height = max(top + box_h,
+    height = max(lay_top + lay_h,
                  top + (len(modules) - 1) * module_step + module_h) + 16
 
     parts = [
@@ -740,6 +752,8 @@ def workflow_svg(stages: dict, atlas: dict, datasets: list[dict]) -> tuple[str, 
         '.wf-arrow{stroke:var(--line);stroke-width:1.5;fill:none}'
         '.wf-head{fill:var(--muted);font:600 10px var(--display),sans-serif;'
         'letter-spacing:.06em;text-transform:uppercase}'
+        '.wf-lay-box{fill:none;stroke:var(--line);stroke-width:1.5;stroke-dasharray:3 3}'
+        '.wf-lay{fill:var(--muted);font:11px var(--display),sans-serif}'
         '</style>',
         f'<marker id="wf-tip" markerWidth="7" markerHeight="7" refX="6" refY="3.5" '
         f'orient="auto"><path d="M0,0 L7,3.5 L0,7Z" fill="var(--line)"/></marker>',
@@ -779,6 +793,17 @@ def workflow_svg(stages: dict, atlas: dict, datasets: list[dict]) -> tuple[str, 
                 f'{column["failed"]:,} failed</text>'
             )
         parts.append('</g>')
+        # Plain English under the box, in a dashed outline so it reads as a
+        # gloss on the stage rather than as a fifth stage.
+        parts.append(
+            f'<rect class="wf-lay-box" x="{x}" y="{lay_top}" width="{box_w}" '
+            f'height="{lay_h}" rx="2"/>'
+        )
+        for line_index, line in enumerate(column.get("plain") or []):
+            parts.append(
+                f'<text class="wf-lay" x="{x + 12}" '
+                f'y="{lay_top + 19 + line_index * 15}">{line}</text>'
+            )
         if index < len(columns) - 1:
             start = x + box_w
             parts.append(
@@ -830,7 +855,11 @@ def workflow_svg(stages: dict, atlas: dict, datasets: list[dict]) -> tuple[str, 
         f"triaged ligases and {atlas.get('lysine', 0):,} scored lysines. "
         "Stage 4 trains BINMAN-LM with mlx-lm, which does text work only and never "
         "emits a number. Four modules leave on the right: Glue Atlas, Degron Scan, "
-        "E3 Triage and Degradability."
+        "E3 Triage and Degradability. "
+        "In plain terms: stage 1 fetches every PDB entry that could hold a glue, "
+        "stage 2 measures which ligands touch two proteins at once, stage 3 scores "
+        "what a degrader needs (tags, ligases and lysines), and stage 4 reads the "
+        "question and writes the query without ever producing the number."
     )
     return "\n".join(parts), description
 

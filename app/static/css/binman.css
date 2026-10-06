@@ -613,6 +613,11 @@ code, kbd, samp, .mono { font-family: var(--data); font-size: 0.86em; }
 .grid-table td.num, .grid-table th.num { text-align: right; font-family: var(--data); }
 .grid-table tbody tr:hover { background: var(--surface-2); }
 
+/* the novel glue series table (Glue Atlas page) */
+.series__plus { color: var(--muted); }
+.series__lens { margin-left: 0.5rem; }
+.series-table .series__interface { min-width: 14rem; }
+
 /* -------------------------------------------------------------------------- */
 /* About tab                                                                  */
 /* -------------------------------------------------------------------------- */
@@ -664,6 +669,30 @@ code, kbd, samp, .mono { font-family: var(--data); font-size: 0.86em; }
   h1 { font-size: 1.2rem; }
   .builder__row { grid-template-columns: minmax(0, 1fr); }
   .viewer { min-height: 280px; }
+
+  /* Six columns and two 48-character protein names do not fit 360px, and a
+     table that scrolls sideways inside a page that does not is worse than a
+     stacked one. Each row becomes a block, the header row goes, and every
+     figure announces itself from its `data-label`. */
+  .series-table thead { display: none; }
+  .series-table tr { display: block; padding: 0.55rem 0.8rem; }
+  .series-table tbody tr:not(:last-child) { border-bottom: 1px solid var(--line); }
+  .series-table td {
+    display: block; border: 0; padding: 0; text-align: left;
+  }
+  .series-table .series__interface {
+    min-width: 0; font-weight: 600; margin-bottom: 0.3rem;
+  }
+  /* The four figures share one wrapped line rather than taking four. */
+  .series-table td.num {
+    display: inline-block; margin: 0 0.9rem 0.2rem 0; text-align: left;
+  }
+  .series-table td.num::before {
+    content: attr(data-label) " ";
+    font-family: var(--display); font-size: 0.62rem; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.04em;
+  }
+  .series-table .series__links { margin-top: 0.25rem; }
 }
 
 @media (prefers-reduced-motion: reduce) {

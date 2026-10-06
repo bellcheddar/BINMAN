@@ -1426,9 +1426,45 @@ rather than substituted. See the Gates section.
 | `binman-qwen-2.5-3b-4bit-round06` | rank 8, 16 layers, 14,152 iterations | evaluated |
 | `binman-qwen-2.5-3b-4bit-round07` | rank 8, 32 layers, 14,152 iterations | **shipped** |
 | `binman-qwen-2.5-3b-4bit-round08` | rank 32, 16 layers | evaluated, not shipped |
-| `binman-qwen-2.5-3b-4bit-round09` | rank 32, 16 layers | evaluated, not shipped |
+| `binman-qwen-2.5-3b-4bit-round09` | rank 32, 32 layers | evaluated, not shipped |
 | `binman-qwen-2.5-3b-4bit-round10` to `round13` | rank 32 and rank 8 at 32 layers | trained, not in the evaluated set |
 | `binman-qwen-2.5-32b-4bit-round14` | the 32B experiment | rejected, see above |
+| `binman-qwen-2.5-3b-4bit-round15` | round 07's recipe, balanced Task C | training, see below |
+
+The round 09 row read "rank 32, 16 layers" until 2026-10-06, duplicating round
+08's description. The run is `round09-32layers-rank32`, and the correction
+matters because the two rows together are the rank ablation: **at the same 32
+layers, rank 32 scored 0.8711 triage macro F1 against rank 8's 0.9336.** Rank 8
+is the measured choice, not an unexamined default.
+
+### Round 15: the abstain head is given a second class
+
+The defect is in the corpus, not the capacity. Task C held 784 training rows and
+every one of them was a refusal, so the only rule available to learn was that
+the answer is always no, and the head learned it: recall 1.0000, specificity
+0.0000. A classifier shown one class is not a classifier.
+
+Two changes, and no others. Task C now carries 980 answerable rows against 980
+refusals, drawn from the Task A training questions, which are the only
+questions in this build whose answerability is established rather than assumed:
+each was generated against the live atlas and then parsed by the app's own
+parser, and anything the parser rejected was dropped. And the abstain system
+prompt asks for a decision instead of presupposing one: it used to open "you
+state precisely what is missing when a question cannot be answered", which
+answers the question inside the prompt.
+
+Every hyperparameter is round 07's: rank 8, 32 layers, batch 4, lr 1e-5, two
+epochs of the corpus. If specificity moves, the corpus moved it.
+
+Neither the twelve app presets that specificity is measured on nor the Task A
+held-out split is in the corpus, so the measurement stays out of sample.
+
+One bug was found in the measurement itself while making the change.
+`pipeline/lm_abstention_check.py` read the unanswerable set by taking Task C
+test rows in order, which was safe while every row was a refusal and wrong the
+moment one was not. It reads `kind` now. It also takes `--adapter`, so a round
+can be measured on this machine before anything is converted, pushed to the Hub
+and loaded by the Space on the strength of a number nobody has yet.
 
 **This table was wrong until 2026-10-05.** It named round 04 as shipped at rank
 16 over 16 layers, and round 04 has no artefact left: `models/binman-lm/runs/`

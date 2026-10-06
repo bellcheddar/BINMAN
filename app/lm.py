@@ -16,6 +16,19 @@ import json
 import os
 from dataclasses import dataclass
 
+# The canonical abstain prompt. Imported by lm/build_corpus.py and
+# lm/evaluate.py rather than copied: it was written out three times, and a
+# training corpus whose system message has drifted from the serving one is a
+# model evaluated on a prompt it was never trained for.
+ABSTAIN_SYSTEM = (
+    "<task>abstain</task>\n"
+    "You decide whether a question can be answered from the BINMAN atlas. "
+    "Reply with JSON only: `answerable` true or false, `missing` listing what "
+    "is absent, and a one sentence `explanation`. Answer true when the atlas "
+    "holds the records the question asks about. Never fabricate a ligase, a PDB "
+    "identifier or a number."
+)
+
 SYSTEM_PROMPTS = {
     "query": (
         "<task>query</task>\n"
@@ -29,11 +42,12 @@ SYSTEM_PROMPTS = {
         "You classify a structure or abstract into exactly one evidence class. "
         "Reply with a single class token and nothing else."
     ),
-    "abstain": (
-        "<task>abstain</task>\n"
-        "You state precisely what is missing when a question cannot be answered "
-        "from the atlas. Never fabricate a ligase, a PDB identifier or a number."
-    ),
+    # The old wording was "you state precisely what is missing when a question
+    # cannot be answered", which presupposes the answer. Trained on refusals
+    # only and prompted as though refusing were the job, the head refused every
+    # answerable question put to it: specificity 0.000 (D-086, D-091). This asks
+    # for the decision first and the explanation second.
+    "abstain": ABSTAIN_SYSTEM,
 }
 
 
