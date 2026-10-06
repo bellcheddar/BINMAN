@@ -169,6 +169,24 @@ predicting, since these were deposited by people who already knew: what it
 measures is that the pipeline agrees with that knowledge without being given it,
 on a class the databases have not yet absorbed.
 
+**That anecdote generalises to 82 series.** Clustered on the protein pair they
+bridge rather than on their chemistry, the novel model-called glues resolve into
+82 pairs carrying three or more distinct ligands each: medicinal chemistry
+somebody is already running, visible in the PDB and absent from every curated
+glue database the build resolved. The largest is 14-3-3σ with the p65
+transactivation domain, 34 ligands over 34 entries. A real cereblon degrader
+series, DDB1-CRBN with the Helios zinc fingers, falls out without being looked
+for. The twelve largest are a table on the Glue Atlas page with the structure
+behind each one a click away.
+
+Each row carries two measurements rather than a verdict: how much of the
+interface the ligand buries against how much the two chains bury on each other,
+and how much of that interface survives in a structure holding both proteins and
+none of that series' ligands. The second exists because the first can mislead.
+DNA gyrase A and B read 0.97 on 30 Å² of chain-to-chain contact, which looked
+like a ligand holding apart subunits that barely touch, and the same two chains
+bury 3,284 Å² on each other in another entry. One structure could not say so.
+
 Three further results are worth stating on their own.
 
 **A real CRBN neosubstrate glue is strongly asymmetric.** Bridging balance 0.33
