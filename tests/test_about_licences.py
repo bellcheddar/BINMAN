@@ -63,3 +63,49 @@ def test_the_built_page_does_not_call_a_finding_unreadable():
     for entry in about.get("licences_not_published", []):
         assert entry.get("key")
         assert entry.get("reason"), f"{entry['key']} has no recorded reason"
+
+
+# --------------------------------------------------------------------------- #
+# the schematic names the adapter that actually serves
+# --------------------------------------------------------------------------- #
+
+def test_the_schematic_names_the_served_adapter_in_house_convention():
+    """`binman-<model-slug>-roundNN`, read and not typed.
+
+    There are three plausible sources and two of them are wrong.
+    `models/binman-lm/training.json` describes the most recent training run,
+    which is the 32B experiment that is not deployed, and tuning.toml's
+    `shipped_stage` is an evaluation stage name in a different convention. The
+    adapter that serves is the one that was converted and pushed, which
+    `deploy/hf-adapter/conversion.json` records.
+    """
+    import re
+    from pathlib import Path
+
+    from pipeline.build_about import ROOT, shipped_adapter_name
+
+    name = shipped_adapter_name()
+    assert re.fullmatch(r"binman-[a-z0-9.\-]+-round\d{2}", name), name
+
+    conversion = json.loads(
+        (ROOT / "deploy" / "hf-adapter" / "conversion.json").read_text(encoding="utf-8"))
+    assert conversion["source_adapter"].rstrip("/").endswith(name)
+
+    svg = Path(ROOT / "app" / "static" / "workflow.svg").read_text(encoding="utf-8")
+    assert name in svg, "the schematic does not name the served adapter"
+
+
+def test_the_schematic_describes_all_three_heads_for_a_screen_reader():
+    """The SVG is unreadable to assistive tech, so the heads have to be in the
+    text description too, not only in the drawing."""
+    blob = json.loads(ABOUT_JSON.read_text(encoding="utf-8"))
+    description = blob["schematic_description"]
+    for head in ("Head A, query", "Head B, triage", "Head C, abstain"):
+        assert head in description
+    assert shipped_in(description), "the description does not name the adapter"
+
+
+def shipped_in(text: str) -> bool:
+    from pipeline.build_about import shipped_adapter_name
+
+    return shipped_adapter_name() in text

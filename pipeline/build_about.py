@@ -646,6 +646,23 @@ def _curated_glue_entries() -> set[str]:
 # the workflow schematic (spec 6.6.1)
 # --------------------------------------------------------------------------- #
 
+def shipped_adapter_name() -> str:
+    """The run name of the adapter that actually serves, house convention.
+
+    `binman-<model-slug>-roundNN`, from `lm/train.py:run_name`. Read from
+    deploy/hf-adapter/conversion.json, which records the adapter that was
+    converted and pushed to the Hub, because that is the one the Space loads.
+
+    Not from models/binman-lm/training.json: that describes the most recent
+    training run, which is the 32B experiment, and the 32B experiment is not
+    what is deployed. Not from tuning.toml's `shipped_stage` either, which is
+    the evaluation stage name and a different convention.
+    """
+    blob = _json(ROOT / "deploy" / "hf-adapter" / "conversion.json", {}) or {}
+    source = str(blob.get("source_adapter") or "").rstrip("/")
+    return source.rsplit("/", 1)[-1] if source else "not recorded"
+
+
 def workflow_svg(stages: dict, atlas: dict, datasets: list[dict]) -> tuple[str, str]:
     """Draw the four-stage schematic from the manifests, plus a text description.
 
@@ -756,6 +773,7 @@ def workflow_svg(stages: dict, atlas: dict, datasets: list[dict]) -> tuple[str, 
                       "when the parser rejects a proposal"],
         },
     ]
+    adapter_name = shipped_adapter_name()
     band_gap = 20
     band_pad = 14
     band_head = 26
@@ -801,6 +819,7 @@ def workflow_svg(stages: dict, atlas: dict, datasets: list[dict]) -> tuple[str, 
         '.wf-lm-t{fill:var(--ink);font:600 12px var(--display),sans-serif}'
         '.wf-lm-s{fill:var(--muted);font:10px var(--display),sans-serif}'
         '.wf-lm-arrow{stroke:var(--accent);stroke-width:1.5;fill:none}'
+        '.wf-lm-name{fill:var(--accent);font:10px var(--data),monospace}'
         '</style>',
         f'<marker id="wf-tip" markerWidth="7" markerHeight="7" refX="6" refY="3.5" '
         f'orient="auto"><path d="M0,0 L7,3.5 L0,7Z" fill="var(--line)"/></marker>',
@@ -892,7 +911,11 @@ def workflow_svg(stages: dict, atlas: dict, datasets: list[dict]) -> tuple[str, 
         f'<rect class="wf-lm-band" x="{band_x}" y="{band_top}" width="{band_w}" '
         f'height="{band_h}" rx="3"/>'
         f'<text class="wf-lm-title" x="{band_x + band_pad}" '
-        f'y="{band_top + 18}">BINMAN-LM · one trained adapter, three heads, no arithmetic</text>'
+        f'y="{band_top + 18}">BINMAN-LM · one adapter, three heads, no arithmetic</text>'
+        # The run name itself, right-aligned and in the data font. The title is
+        # uppercased by its class and an identifier should not be shouted.
+        f'<text class="wf-lm-name" x="{band_x + band_w - band_pad}" '
+        f'y="{band_top + 18}" text-anchor="end">{adapter_name}</text>'
     )
     for index, head in enumerate(heads):
         hx = band_x + band_pad + index * (head_w + head_gap)
@@ -944,9 +967,10 @@ def workflow_svg(stages: dict, atlas: dict, datasets: list[dict]) -> tuple[str, 
         "E3 Triage and Degradability. "
         "In plain terms: stage 1 fetches every PDB entry that could hold a glue, "
         "stage 2 measures which ligands touch two proteins at once, stage 3 scores "
-        "what a degrader needs (tags, ligases and lysines), and stage 4 reads the "
-        "question and writes the query without ever producing the number. "
-        "Below the four stages sits the trained layer: one LoRA adapter with "
+        "what a degrader needs (tags, ligases and lysines), and stage 4 trains one "
+        "small model on the atlas's own records. "
+        f"Below the four stages sits the trained layer: {adapter_name}, one "
+        "LoRA adapter with "
         "three heads. Head A, query, turns a question into a query object when "
         "somebody asks, and the parser then checks it. Head B, triage, assigns "
         f"an evidence class to {atlas.get('triage_predicted', 0):,} bridge rows "

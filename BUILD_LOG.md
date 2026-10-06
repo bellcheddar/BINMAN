@@ -1104,3 +1104,7 @@ One line per meaningful event, timestamped UTC (spec Section 0 rule 5).
 | 2026-10-06T13:17:38+00:00 | 4.1b | About tab generated: 53 references, 11/13 datasets resolved, worked example selected, 0 value(s) not recorded, 0 source(s) publish no licence. |
 | 2026-10-06T13:18:05+00:00 | 9 | Validation run against binman.sqlite: 0 metric(s) not computed (dataset unavailable), 2 measured floor(s) missed. |
 | 2026-10-06T13:18:06+00:00 | 9 | Validation run against binman.sqlite: 4 metric(s) not computed (dataset unavailable), 7 measured floor(s) missed. |
+| 2026-10-06T13:20:28+00:00 | 4.1b | About tab generated: 53 references, 11/13 datasets resolved, worked example selected, 0 value(s) not recorded, 0 source(s) publish no licence. |
+| 2026-10-06T13:20:57+00:00 | 4.1b | About tab generated: 53 references, 11/13 datasets resolved, worked example selected, 0 value(s) not recorded, 0 source(s) publish no licence. |
+| 2026-10-06T13:21:35+00:00 | 9 | Validation run against binman.sqlite: 0 metric(s) not computed (dataset unavailable), 2 measured floor(s) missed. |
+| 2026-10-06T13:21:36+00:00 | 9 | Validation run against binman.sqlite: 4 metric(s) not computed (dataset unavailable), 7 measured floor(s) missed. |
