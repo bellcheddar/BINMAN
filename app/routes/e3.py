@@ -28,23 +28,23 @@ def index():
 
 
 def _stats() -> list[dict]:
-    if not db.available() or db.scalar("SELECT COUNT(*) FROM ligase") == 0:
+    if not db.available() or db.counted("SELECT COUNT(*) FROM ligase") == 0:
         return []
     return [
-        {"label": "ligases", "value": db.scalar(
+        {"label": "ligases", "value": db.counted(
             "SELECT COUNT(*) FROM ligase WHERE status = 'ok'")},
-        {"label": "with a pocket score", "value": db.scalar(
+        {"label": "with a pocket score", "value": db.counted(
             "SELECT COUNT(*) FROM ligase WHERE status = 'ok' AND pocket_score IS NOT NULL"),
          "tone": "good"},
         # Both of these count an exact value of one field, so the filter
         # reproduces the figure exactly. "with a pocket score" counts a NOT
         # NULL, which the query grammar has no operator for, so it stays a
         # plain figure rather than clicking through to a different number.
-        {"label": "orphan", "value": db.scalar(
+        {"label": "orphan", "value": db.counted(
             "SELECT COUNT(*) FROM ligase WHERE status = 'ok' AND exploitation_status = 'orphan'"),
          "tone": "warn",
          "filter": {"field": "exploitation_status", "op": "eq", "value": "orphan"}},
-        {"label": "clinically validated", "value": db.scalar(
+        {"label": "clinically validated", "value": db.counted(
             "SELECT COUNT(*) FROM ligase WHERE status = 'ok' "
             "AND exploitation_status = 'clinically validated'"), "tone": "good",
          "filter": {"field": "exploitation_status", "op": "eq",

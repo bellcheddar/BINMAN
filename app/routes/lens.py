@@ -22,6 +22,6 @@ def index():
         ),
         focus=request.args.get("focus", ""),
         depth=request.args.get("depth", "2"),
-        node_count=db.scalar("SELECT COUNT(*) FROM edge WHERE status = 'ok'"),
+        node_count=db.counted("SELECT COUNT(*) FROM edge WHERE status = 'ok'"),
         **module_context("ligase"),
     )

@@ -27,7 +27,7 @@ def index():
 
 
 def _stats() -> list[dict]:
-    if not db.available() or db.scalar("SELECT COUNT(*) FROM lysine") == 0:
+    if not db.available() or db.counted("SELECT COUNT(*) FROM lysine") == 0:
         return []
     rows = db.many(
         "SELECT verdict, COUNT(*) AS n FROM lysine WHERE status = 'ok' GROUP BY verdict"
@@ -38,11 +38,11 @@ def _stats() -> list[dict]:
     # measured; the reach window is unfitted, so every verdict is null and that
     # single card was the whole summary.
     stats = [
-        {"label": "lysines", "value": db.scalar(
+        {"label": "lysines", "value": db.counted(
             "SELECT COUNT(*) FROM lysine WHERE status = 'ok'")},
-        {"label": "proteins", "value": db.scalar(
+        {"label": "proteins", "value": db.counted(
             "SELECT COUNT(DISTINCT uniprot_acc) FROM lysine WHERE status = 'ok'")},
-        {"label": "structures", "value": db.scalar(
+        {"label": "structures", "value": db.counted(
             "SELECT COUNT(DISTINCT structure_id) FROM lysine WHERE status = 'ok'")},
     ]
     # A verdict card filters to its own verdict, which is the same predicate

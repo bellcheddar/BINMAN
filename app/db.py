@@ -45,6 +45,58 @@ def close(_exception=None) -> None:
         connection.close()
 
 
+# --------------------------------------------------------------------------- #
+# the counted-once cache
+# --------------------------------------------------------------------------- #
+
+# Every page was running seven COUNT(*) scans over a 286,000-row bridge table,
+# two of them joined, before it rendered anything: 1.27 s of a 1.40 s response,
+# repeated for every visitor and every reload. The atlas is a read-only file
+# that changes only when a build replaces it, so these are constants between
+# builds and there is no reason to recount them per request.
+#
+# Keyed on the database's path, size and mtime, so a rebuilt atlas invalidates
+# the cache by existing rather than by anyone remembering to clear it. Keyed in
+# a module-level dict rather than on `g`, because `g` is per request and that is
+# exactly the scope the problem had.
+_COUNT_CACHE: dict = {}
+
+
+def _atlas_fingerprint() -> tuple | None:
+    path = db_path()
+    try:
+        stat = path.stat()
+    except OSError:
+        return None
+    return (str(path), stat.st_size, stat.st_mtime_ns)
+
+
+def counted(sql: str, params: tuple = (), default=0):
+    """A scalar that is cached until the atlas file changes.
+
+    For figures derived from the whole table: counts, sums, extremes. The key is
+    the query itself, so two different questions cannot collide on one hand
+    written label, and a query that varies with the request varies its own key
+    and so is simply never reused. Do not use it for anything unbounded: a
+    per-row lookup would grow the cache without limit.
+    """
+    fingerprint = _atlas_fingerprint()
+    if fingerprint is None:
+        return default
+    key = (sql, params)
+    cached = _COUNT_CACHE.get(key)
+    if cached is not None and cached[0] == fingerprint:
+        return cached[1]
+    value = scalar(sql, params, default)
+    _COUNT_CACHE[key] = (fingerprint, value)
+    return value
+
+
+def clear_cache() -> None:
+    """Drop the cached counts. For tests, and for a process that outlives a build."""
+    _COUNT_CACHE.clear()
+
+
 def one(sql: str, params: tuple = ()) -> dict | None:
     connection = get()
     if connection is None:
@@ -70,24 +122,25 @@ def scalar(sql: str, params: tuple = (), default=0):
     return row[0]
 
 
+TABLES = ("entry", "bridge", "ligand", "degron", "ligase", "lysine", "edge")
+
+
 def table_counts() -> dict[str, int]:
     """Row counts per table, for the rail and the About tab.
+
+    Cached with the rest: this runs in `inject_globals`, so it was seven table
+    scans on every page of every module, not just the ones that show counts.
 
     Returns zeroes rather than raising when the atlas is absent, so every page
     renders an honest empty state instead of a 500.
     """
-    connection = get()
-    if connection is None:
-        return {name: 0 for name in
-                ("entry", "bridge", "ligand", "degron", "ligase", "lysine", "edge")}
+    if get() is None:
+        return {name: 0 for name in TABLES}
     counts: dict[str, int] = {}
-    for name in ("entry", "bridge", "ligand", "degron", "ligase", "lysine", "edge"):
+    for name in TABLES:
         try:
-            counts[name] = int(
-                connection.execute(
-                    f"SELECT COUNT(*) FROM {name} WHERE status = 'ok'"
-                ).fetchone()[0]
-            )
+            counts[name] = int(counted(
+                f"SELECT COUNT(*) FROM {name} WHERE status = 'ok'"))
         except sqlite3.Error:
             counts[name] = 0
     return counts

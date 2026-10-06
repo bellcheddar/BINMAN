@@ -81,20 +81,20 @@ def _novel_series(limit: int = 12) -> dict:
 def _headline_stats() -> list[dict]:
     if not db.available():
         return []
-    total = db.scalar("SELECT COUNT(*) FROM bridge WHERE status = 'ok'")
-    glue = db.scalar(
+    total = db.counted("SELECT COUNT(*) FROM bridge WHERE status = 'ok'")
+    glue = db.counted(
         "SELECT COUNT(*) FROM bridge WHERE status = 'ok' AND ccd_class = 'glue_candidate'"
     )
-    furniture = db.scalar(
+    furniture = db.counted(
         "SELECT COUNT(*) FROM bridge b JOIN ligand l ON l.ccd_id = b.ccd_id "
         "WHERE b.status = 'ok' AND l.is_furniture = 1"
     )
-    symmetry = db.scalar(
+    symmetry = db.counted(
         "SELECT COUNT(*) FROM bridge WHERE status = 'ok' AND symmetry_mediated = 1"
     )
-    entries = db.scalar("SELECT COUNT(DISTINCT pdb_id) FROM bridge WHERE status = 'ok'")
-    novel = db.scalar("SELECT COUNT(*) FROM bridge WHERE status = 'ok' AND novel_bridge = 1")
-    balanced = db.scalar(
+    entries = db.counted("SELECT COUNT(DISTINCT pdb_id) FROM bridge WHERE status = 'ok'")
+    novel = db.counted("SELECT COUNT(*) FROM bridge WHERE status = 'ok' AND novel_bridge = 1")
+    balanced = db.counted(
         "SELECT COUNT(*) FROM bridge WHERE status = 'ok' AND bridging_balance >= 0.5 "
         "AND ccd_class = 'glue_candidate'"
     )

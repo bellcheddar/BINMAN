@@ -68,6 +68,11 @@ NL_EXAMPLES = {
 }
 
 
+def url_for_endpoint(app, endpoint: str) -> str:
+    """The path for an endpoint without needing a request context."""
+    return app.url_map.bind("warmup").build(endpoint)
+
+
 def create_app(config: dict | None = None) -> Flask:
     app = Flask(__name__, static_folder="static", template_folder="templates")
     app.config.update(
@@ -172,6 +177,26 @@ def create_app(config: dict | None = None) -> Flask:
     def server_error(_error):
         return render_template("error.html", code=500,
                                message="Something failed while reading the atlas."), 500
+
+    # Warm the whole-table counts before the first request rather than on it.
+    # Each gunicorn worker has its own cache, so without this the first request
+    # to each cold worker pays the full 1.2 s scan. With two workers that is two
+    # slow responses after every deploy, and the launcher's health check landing
+    # on one of them is exactly how this was noticed.
+    # Each module page counts different things, so warming `table_counts` alone
+    # left the first real request paying for the rest. Asking the app for each
+    # page once is the only warm-up that cannot drift from what the pages
+    # actually query.
+    if os.environ.get("BINMAN_SKIP_WARMUP") != "1":
+        try:
+            client = app.test_client()
+            for module in MODULES:
+                client.get(url_for_endpoint(app, module["endpoint"]))
+        except Exception:  # noqa: BLE001
+            # A warm-up that fails must not stop the app serving. Whatever is
+            # wrong with the atlas will surface on the page, where it is
+            # already handled, instead of as a worker that will not boot.
+            pass
 
     return app
 

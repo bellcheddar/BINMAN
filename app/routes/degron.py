@@ -28,18 +28,18 @@ def index():
 
 
 def _stats() -> list[dict]:
-    if not db.available() or db.scalar("SELECT COUNT(*) FROM degron") == 0:
+    if not db.available() or db.counted("SELECT COUNT(*) FROM degron") == 0:
         return []
     # The cut was written into the SQL as a literal 70, which is a threshold in
     # Python by any reading of it. It comes from the file, and the same value
     # drives the card's note and its filter so all three cannot drift apart.
     plddt = float(table("degron").get("min_mean_plddt", 70.0))
     return [
-        {"label": "candidates", "value": db.scalar(
+        {"label": "candidates", "value": db.counted(
             "SELECT COUNT(*) FROM degron WHERE status = 'ok'")},
-        {"label": "proteins", "value": db.scalar(
+        {"label": "proteins", "value": db.counted(
             "SELECT COUNT(DISTINCT uniprot_acc) FROM degron WHERE status = 'ok'")},
-        {"label": "high confidence", "value": db.scalar(
+        {"label": "high confidence", "value": db.counted(
             "SELECT COUNT(*) FROM degron WHERE status = 'ok' AND mean_plddt >= ?",
             (plddt,)),
          "tone": "good", "note": f"tip pLDDT ≥ {plddt:g}",
@@ -47,7 +47,7 @@ def _stats() -> list[dict]:
         # Populated from the two screens the repository carries rather than
         # from a hand-typed list (D-058). It read 0 for every row until then,
         # which is a claim that none of these are known, and a wrong one.
-        {"label": "known neosubstrates", "value": db.scalar(
+        {"label": "known neosubstrates", "value": db.counted(
             "SELECT COUNT(*) FROM degron WHERE status = 'ok' AND is_known_neosubstrate = 1"),
          "tone": "good", "note": "reported degraded in Sievers or Slabicki",
          "filter": {"field": "is_known_neosubstrate", "op": "eq", "value": 1}},
