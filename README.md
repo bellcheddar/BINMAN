@@ -179,10 +179,19 @@ ubiquitin is transferred.
 
 ### What the first rule costs
 
-The rule above has a price, and it is paid in public. Of the sixteen spec
-Section 9 metrics: seven pass, four miss their floor and five are not
-computable for want of a dataset. The misses are diagnosed rather than hidden,
-and the diagnosis is usually the useful part.
+The rule above has a price, and it is paid in public. Of the twenty-one spec
+Section 9 metrics: ten pass, seven miss their floor and four are not computable
+for want of a dataset. The misses are diagnosed rather than hidden, and the
+diagnosis is usually the useful part.
+
+**The miss count went up because the metrics got more honest.** Three figures
+had no floor they could fail against. Task C's abstention rate is measured on
+unanswerable questions only, so a model that refuses everything scores
+perfectly; it does refuse everything, and the complement now carries a floor and
+reads 0.000. Task A's headline figures are measured on questions from the same
+generator that wrote the training set and read 1.000, while the fifteen phrased
+as a person would ask them read 0.067 and carried no floor at all. They do now.
+A metric that cannot fail is not a check.
 
 Glue recall used to be one of them, at 0.825 against a 0.85 floor, and the
 diagnosis was that the gap was dominated by homo-oligomeric glues the inclusion

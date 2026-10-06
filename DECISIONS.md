@@ -3317,3 +3317,34 @@ is better than refusing 16 of 16 good questions to catch them.
 **What would actually fix it** is a Task C test set containing answerable
 questions, so the metric can see a model that refuses everything, and training
 examples where the answer is "yes, here is the query". Neither exists today.
+
+## D-087
+
+**Three metrics could not fail, and now can. The miss count rose from four to seven.**
+
+D-086 found Task C's abstention rate unable to detect a head that refuses
+everything. Asked the same question of the rest of Section 9, two more had the
+same shape:
+
+| metric | value | measured on | could it fail? |
+|---|---:|---|---|
+| `parse_rate` | 1.000 | 120 synthetic, from the training generator | barely |
+| `set_equality_synthetic` | 1.000 | the same 120 | barely |
+| `fabrication_rate` | 0.000 | 40 unanswerable only | no: always-abstain scores 0 |
+| `task_a_project_phrased` | 0.067 | 15 realistically phrased | **no floor attached** |
+| `triage_macro_f1` | 0.9336 | 240 held-out chemical components | yes, an honest split |
+
+Two floors added. `abstention_specificity`, of the questions the atlas can
+answer how many the head lets through, against 0.90, reading **0.000**. And
+`set_equality_project_phrased` against the existing external floor of 0.80,
+reading **0.067**, because spec 9.5 sets that floor for non-synthetic phrasing
+and the external harvest produced nothing usable. It is a proxy and says so.
+
+The answerable set is BINMAN's own twelve presets, each already verified end to
+end: it parses, returns its page's record type, and returns rows. The atlas
+decides what counts as answerable, not an opinion.
+
+**Section 9 now reads ten pass, seven miss, four not computable, from seven,
+four and five.** The system did not get worse between those two counts. Three of
+its checks stopped being unfailable, which is a better project and a worse
+scoreboard, and the README says which happened.

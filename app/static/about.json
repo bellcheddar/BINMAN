@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-06T00:05:12+00:00",
+  "generated_at": "2026-10-06T00:07:21+00:00",
   "generator": "pipeline/build_about.py",
   "schematic_description": "The pipeline runs left to right in four stages. Two kinds of input enter on the left: the primary data sources (RCSB, AlphaFold DB, UniProt, InterPro), and separately the validation datasets that serve as ground truth. Stage 1, acquisition, catalogued 130,391 entries into priority tiers using httpx and tenacity. Stage 2, geometry, analysed 55,449 entries with gemmi and FreeSASA and found 285,996 bridges, with 19 entries failing. Stage 3, scan and triage, used DSSP and fpocket to produce 21,717 degron candidates, 650 triaged ligases and 1,650 scored lysines. Stage 4 trains BINMAN-LM with mlx-lm, which does text work only and never emits a number. Four modules leave on the right: Glue Atlas, Degron Scan, E3 Triage and Degradability.",
   "stages": {
@@ -1577,7 +1577,7 @@
     "honest_note": "This record was chosen because every stage that has run worked on it. A reader should look at the misses list and the novel-bridge set in FINDINGS.md for the cases where stages did not."
   },
   "validation": {
-    "generated_at": "2026-10-06T00:04:44+00:00",
+    "generated_at": "2026-10-06T00:06:31+00:00",
     "atlas": "/Users/dellboy/Documents/Vibe_Coding/BINMAN/data/atlas/binman.sqlite",
     "atlas_bytes": 204562432,
     "note": "A metric whose dataset is unavailable is reported as computed: false with the reason. Nothing here is estimated, and no hand-written control was substituted for a missing published one (spec 4.1b).",
@@ -1611,6 +1611,12 @@
         "metric": "exposure_vs_assayed_negatives",
         "value": 0.4971,
         "floor": 0.65
+      },
+      {
+        "section": "9.5",
+        "metric": "set_equality_project_phrased",
+        "value": 0.0667,
+        "floor": 0.8
       },
       {
         "section": "9.5",
@@ -2555,6 +2561,15 @@
     },
     "9.5": {
       "title": "BINMAN-LM",
+      "set_equality_project_phrased": {
+        "computed": true,
+        "value": 0.0667,
+        "floor": 0.8,
+        "reason": "",
+        "passes": false,
+        "source": "15 questions phrased as a person would ask them, not drawn from the training generator",
+        "note": "**This is the register gap, as a number with a floor on it.** Parse rate 0.2 and set equality 0.0667 here, against 1.000 and 1.000 on the synthetic set, which shares a generator with the training data. The model answers questions shaped like its training and degrades sharply on questions shaped like a person's.\n\nMeasured against the external floor because spec 9.5 sets that floor for non-synthetic phrasing and the external harvest yielded nothing: 463 sentences from open-access reviews, 18 interrogative, none answerable by this schema. A proxy, and reported as one."
+      },
       "abstention_specificity": {
         "computed": true,
         "value": 0.0,

@@ -977,6 +977,39 @@ def section_95(config) -> dict:
         return out
 
     report_blob = blob[stage]
+    # The only Task A figure measured on questions a person phrased.
+    #
+    # parse_rate and set_equality_synthetic are measured on 120 questions from
+    # the same generator that produced the training set, and both read 1.000.
+    # The project-phrased set is 15 questions written as someone would ask them,
+    # and it reads 0.2 and 0.067. It carried no floor, so the one realistic
+    # number in this section could not fail.
+    #
+    # Checked against the EXTERNAL floor rather than a new one. Spec 9.5 sets
+    # that floor for non-synthetic phrasing, the external harvest produced
+    # nothing usable, and this is the nearest thing to the question it was
+    # written for. It is a proxy and the note says so.
+    phrased = (report_blob.get("task_a_project_phrased") or {})
+    if phrased.get("set_equality") is not None:
+        out["set_equality_project_phrased"] = computed(
+            phrased["set_equality"], floors["lm_set_equality_external_floor"],
+            source=(f"{phrased.get('n')} questions phrased as a person would ask "
+                    "them, not drawn from the training generator"),
+            note=(
+                "**This is the register gap, as a number with a floor on it.** "
+                f"Parse rate {phrased.get('parse_rate')} and set equality "
+                f"{phrased.get('set_equality')} here, against 1.000 and 1.000 on "
+                "the synthetic set, which shares a generator with the training "
+                "data. The model answers questions shaped like its training and "
+                "degrades sharply on questions shaped like a person's.\n\n"
+                "Measured against the external floor because spec 9.5 sets that "
+                "floor for non-synthetic phrasing and the external harvest "
+                "yielded nothing: 463 sentences from open-access reviews, 18 "
+                "interrogative, none answerable by this schema. A proxy, and "
+                "reported as one."
+            ),
+        )
+
     # The number that makes Task C's floors falsifiable.
     #
     # abstention_rate and fabrication_rate are measured on unanswerable
