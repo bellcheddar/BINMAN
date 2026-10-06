@@ -3394,3 +3394,47 @@ because it selects on `evidence_class`. Hoisting both out of the AlphaFold
 cache gate fixed a second defect found on the way: the triage load sat inside
 that gate, so a build on a machine without the cache shipped a Glue Atlas with
 no predicted evidence class on any row and nothing in the log to say so.
+
+## D-089
+
+**The novel series panel reports ligand share, a measured ratio, and does not
+rank on it.**
+
+D-088 shipped the panel with a caveat in prose: the geometric filter cannot
+separate a ligand glueing two proteins together from a ligand sitting in a
+pocket of an interface that was already there. The caveat is now a column.
+
+Ligand share is the widest bridge's ligand ΔSASA over that plus the ΔSASA
+between the same two chains with the ligand excluded, both in the spec 5.1
+two-sided convention and with the same probe radius from thresholds.toml, so
+the two divide. The assemblies are already cached, 40 of them, and the stage
+costs ten seconds.
+
+Three readings and one limit.
+
+**DNA gyrase A + B reads 0.97 on 30 Å² of chain-to-chain contact**, which is a
+ligand holding two subunits together that barely touch. **KRas + cyclophilin A
+reads 0.70 and 0.72** and tops the twelve the page shows, which is the right
+answer for the one series nobody disputes is a tri-complex glue.
+**Haemoglobin α + β reads 0.31**, the right answer for an obligate heterodimer
+with a ligand bound in it.
+
+**The limit, and the reason this is not a classifier: cereblon with the Helios
+zinc fingers reads 0.47, and α/β-tubulin reads 0.47.** One is a textbook
+molecular glue degrader (9E2U, ALV1) and the other is a passenger in a
+colchicine-site pocket. A glue that works by stabilising an interface the
+proteins already make is not separable from a passenger by buried area alone.
+So the column is reported beside the ligand count, the caption says plainly
+that it is a measurement and not a verdict, and the table is still ranked on
+how many distinct ligands the interface carries.
+
+**What would settle it is apo comparison, and the atlas cannot do it.** Every
+entry it holds has at least one ligand by construction:
+`rcsb.bridging_candidate_query` requires `nonpolymer_entity_count >= 1`, so
+there are no apo structures in it to compare against. Reversing this means a
+second catalogue pass for the ligand-free depositions of the 82 pairs, which is
+a stage and not a column.
+
+A by-product worth keeping: 9E2U/ALV1 is now a positive control with a test on
+it. The method recovers a real CRBN degrader series that no curated glue
+database lists, without being tuned to.

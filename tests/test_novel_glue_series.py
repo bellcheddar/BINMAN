@@ -83,6 +83,58 @@ def test_a_series_carries_at_least_the_declared_number_of_ligands(report):
         assert pair["n_ligands"] >= floor
 
 
+def test_the_interface_was_measured_for_every_cached_assembly(report):
+    """`protein_protein_dsasa` and `ligand_share` are present, or the row says
+    why not. A silent zero would read as "these chains do not touch", which is
+    the most interesting thing this column can say and so the worst thing to
+    fabricate."""
+    for pair in report["top_pairs"]:
+        widest = pair["widest"]
+        assert widest.get("status"), f"{pair['interface']}: no measurement status"
+        if widest["status"] != "ok":
+            assert "cached" in widest["status"] or "absent" in widest["status"]
+            assert "protein_protein_dsasa" not in widest
+            continue
+        assert widest["protein_protein_dsasa"] >= 0
+        assert 0.0 <= widest["ligand_share"] <= 1.0
+
+
+def test_ligand_share_is_the_ratio_it_claims_to_be(report):
+    """share = ligand area / (ligand area + chain-chain area), both in the
+    spec 5.1 two-sided convention. Asserted rather than trusted, because a
+    ratio of two areas measured in different conventions looks plausible and
+    is wrong."""
+    for pair in report["top_pairs"]:
+        widest = pair["widest"]
+        if widest.get("status") != "ok":
+            continue
+        ligand = widest["dsasa"]
+        chains = widest["protein_protein_dsasa"]
+        expected = ligand / (ligand + chains)
+        assert abs(widest["ligand_share"] - expected) < 0.002, pair["interface"]
+
+
+def test_the_known_cereblon_degrader_series_is_in_the_set(report, atlas):
+    """A positive control the method was not tuned on.
+
+    9E2U is DDB1-CRBN with the triple zinc finger of Helios and a glutarimide
+    degrader. It is a textbook molecular glue, no curated glue database the
+    build resolved lists its ligand, and the clustering finds it without being
+    told to look. If this row disappears, the novel set has stopped containing
+    real glues.
+    """
+    pairs = {tuple(p["interface"]) for p in report["top_pairs"]}
+    assert any("cereblon" in " ".join(p).lower() for p in pairs), (
+        "the CRBN degrader series is no longer in the top pairs")
+    row = atlas.execute(
+        "SELECT novel_bridge, evidence_class FROM bridge "
+        "WHERE pdb_id = '9E2U' AND ccd_id = 'RN9' AND status = 'ok' LIMIT 1"
+    ).fetchone()
+    assert row is not None, "9E2U/RN9 is not in the atlas"
+    assert row["novel_bridge"] == 1
+    assert row["evidence_class"] == "molecular_glue"
+
+
 def test_the_panel_renders_a_row_per_pair_with_a_three_part_link(report):
     from app import create_app
 

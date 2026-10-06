@@ -58,6 +58,9 @@ def _novel_series(limit: int = 12) -> dict:
             "left": interface[0], "right": interface[1],
             "ligands": row.get("n_ligands"), "entries": row.get("n_entries"),
             "median_dsasa": row.get("median_dsasa"),
+            # None when the assembly was not cached, which the template shows
+            # as "not measured" rather than as a zero.
+            "ligand_share": (row.get("widest") or {}).get("ligand_share"),
             "focus": (row.get("accessions") or [""])[0],
             "widest": row.get("widest") or {},
         })

@@ -112,9 +112,84 @@ def cluster(connection: sqlite3.Connection, balance_floor: float) -> tuple[dict,
             if accession:
                 group["accessions"].add(accession)
         area = row["dsasa_total"] or 0
-        if group["widest"] is None or area > group["widest"][0]:
-            group["widest"] = (area, row["pdb_id"], row["ccd_id"], row["id"])
+        if group["widest"] is None or area > group["widest"]["dsasa"]:
+            group["widest"] = {
+                "dsasa": area, "pdb_id": row["pdb_id"], "ccd_id": row["ccd_id"],
+                "bridge_id": row["id"],
+                # The chain labels as the bridge recorded them, which is what
+                # the assembly's polymer units are keyed on, so the
+                # protein-protein interface can be measured on the same pair of
+                # chains the ligand was measured against.
+                "chain_a": row["chain_a"], "chain_b": row["chain_b"],
+            }
     return pairs, len(bridges)
+
+
+def protein_protein_dsasa(widest: dict) -> dict:
+    """The buried area between the two bridged chains, ligand excluded.
+
+    The caveat this closes: a bridging ligand can be glueing two proteins
+    together or sitting in a pocket of an interface that was already there.
+    Both bury surface against two chains and the geometric filter cannot tell
+    them apart. What separates them is how much of the sticking the ligand is
+    doing, and that is the ratio of the two interface areas.
+
+    Measured in the same convention as `dsasa_total` (both sides of the
+    contact, spec 5.1), on the same two chains, with the same probe radius from
+    thresholds.toml, so the two numbers divide.
+
+    Alpha/beta-tubulin buries thousands of square Angstroms chain to chain and
+    the colchicine-site ligand adds a few hundred: the interface is obligate
+    and the ligand is a passenger. A chemically induced dimer is the other way
+    round. Nothing here decides which is which: it reports the ratio and the
+    page shows it.
+    """
+    from pipeline.geometry import SasaCalculator
+    from pipeline.rcsb import ASSEMBLY_DIR
+    from pipeline.structures import load_assembly
+
+    pdb_id = str(widest.get("pdb_id") or "").upper()
+    path = ASSEMBLY_DIR / f"{pdb_id}-assembly1.cif.gz"
+    if not path.exists():
+        path = ASSEMBLY_DIR / f"{pdb_id}-deposited.cif.gz"
+    if not pdb_id or not path.exists():
+        # Recorded, not fetched: this runs inside the atlas post-build and a
+        # stage that quietly reaches for the network there is a stage that
+        # fails on a machine without one.
+        return {"status": "assembly not cached"}
+
+    assembly = load_assembly(path, pdb_id=pdb_id)
+    units = {unit.label: unit for unit in assembly.polymers}
+    first, second = widest.get("chain_a"), widest.get("chain_b")
+    if first not in units or second not in units:
+        return {"status": "chains absent from the cached assembly"}
+
+    calculator = SasaCalculator()
+    area = calculator.delta(units[first].atoms, units[second].atoms,
+                            f"{pdb_id}:{first}", f"{pdb_id}:{second}")
+    ligand_area = float(widest.get("dsasa") or 0)
+    total = area + ligand_area
+    return {
+        "status": "ok",
+        "protein_protein_dsasa": round(area, 1),
+        # How much of the interface the ligand accounts for. 1.0 means the two
+        # chains do not touch at all and the ligand is the only thing holding
+        # them together.
+        "ligand_share": round(ligand_area / total, 3) if total > 0 else None,
+    }
+
+
+def _widest(group: dict) -> dict:
+    widest = dict(group.get("widest") or {})
+    out = {
+        "dsasa": round(float(widest.get("dsasa") or 0), 1),
+        "pdb_id": widest.get("pdb_id") or "",
+        "ccd_id": widest.get("ccd_id") or "",
+        "bridge_id": widest.get("bridge_id") or "",
+    }
+    if out["pdb_id"]:
+        out.update(protein_protein_dsasa(widest))
+    return out
 
 
 def build() -> dict:
@@ -154,12 +229,7 @@ def build() -> dict:
                 "n_entries": len(group["entries"]),
                 "median_dsasa": round(statistics.median(group["dsasa"]), 1),
                 "accessions": sorted(group["accessions"])[:2],
-                "widest": {
-                    "dsasa": round((group["widest"] or (0,))[0], 1),
-                    "pdb_id": (group["widest"] or (0, "", "", ""))[1],
-                    "ccd_id": (group["widest"] or (0, "", "", ""))[2],
-                    "bridge_id": (group["widest"] or (0, "", "", ""))[3],
-                },
+                "widest": _widest(group),
             }
             for key, group in ranked[:PAIRS_KEPT]
         ],

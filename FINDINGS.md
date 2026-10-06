@@ -1148,13 +1148,47 @@ split across two KRas entity names. It carries the highest median buried area in
 the whole table by some margin, 1,861 and 1,669 Å² against a top-ten median
 nearer 800.
 
-**Not every row is a glue, and the buried area is the tell.** Tubulin α/β,
-proteasome β-subunits, DNA gyrase and the ionotropic receptors are ligands
-binding an interface that exists without them: colchicine-site and active-site
-chemistry, bridging two chains because the site happens to straddle them. The
-atlas's definition is geometric and cannot separate induced proximity from a
-pre-existing interface, and it is not supposed to: that distinction is biology,
-and the module ships the measurement rather than the judgement.
+**Not every row is a glue, so the chain-to-chain interface is measured too.**
+Tubulin α/β, proteasome β-subunits, DNA gyrase and the ionotropic receptors are
+ligands binding an interface that exists without them: colchicine-site and
+active-site chemistry, bridging two chains because the site happens to straddle
+them. The quantity that bears on this is how much of the interface the ligand
+buries itself against how much the two chains bury on each other, both in the
+spec 5.1 two-sided convention, on the same pair of chains and with the same
+probe radius, so the two divide. Call it **ligand share**:
+
+| ligand share | ligand ΔSASA | chain-chain ΔSASA | series |
+|---:|---:|---:|---|
+| **0.97** | 963 Å² | **30 Å²** | DNA gyrase A + B |
+| **0.72** | 2,135 Å² | 853 Å² | KRas isoform 2B + cyclophilin A |
+| **0.70** | 1,874 Å² | 808 Å² | KRas + cyclophilin A |
+| 0.53 | 1,504 Å² | 1,353 Å² | proteasome beta-5 + beta-6 |
+| 0.47 | 1,503 Å² | 1,677 Å² | tubulin alpha-1B + beta-2B |
+| 0.47 | 1,180 Å² | 1,343 Å² | cereblon + Helios zinc fingers |
+| 0.44 | 915 Å² | 1,176 Å² | 14-3-3 sigma + p65 |
+| 0.31 | 794 Å² | 1,808 Å² | haemoglobin alpha + beta |
+
+**The RAS(ON) series tops the twelve the page shows**, which is the right answer
+for the one series nobody disputes is a tri-complex glue, and haemoglobin sits
+at the bottom, which is the right answer for an obligate heterodimer with a
+ligand bound in it.
+
+**It is a measurement and not a classifier, and the cereblon row is why.** A
+genuine CRBN degrader remodelling the large native CRBN surface lands at 0.47,
+indistinguishable from α/β-tubulin at 0.47. A glue that works by stabilising an
+interface the proteins already make is not separable from a passenger by area
+alone. The page says so in the caption rather than ranking on it, and the
+distinction that would settle it needs apo comparison, which the atlas cannot
+make: every entry it holds has at least one ligand by construction
+(`bridging_candidate_query` requires `nonpolymer_entity_count >= 1`), so there
+are no apo structures in it to compare against.
+
+**A positive control the method was not tuned on.** 9E2U is DDB1-CRBN with the
+triple zinc finger of Helios and the glutarimide degrader ALV1 (`RN9`). It is a
+textbook molecular glue, none of the three curated glue databases lists that
+ligand, and the clustering finds it without being told to look: four ligands
+over four entries on the cereblon-Helios interface. A test asserts the row,
+because if it vanishes the novel set has stopped containing real glues.
 
 So the 1,879-ligand set is not an undifferentiated pile. It is 82 series, led by
 two that are unambiguously molecular glues and well populated, and the

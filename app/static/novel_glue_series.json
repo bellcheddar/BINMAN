@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-06T02:40:20+00:00",
+  "generated_at": "2026-10-06T02:50:15+00:00",
   "bridging_balance_floor": 0.5,
   "min_ligands_for_series": 3,
   "bridges_considered": 3487,
@@ -22,7 +22,10 @@
         "dsasa": 915.0,
         "pdb_id": "7BI3",
         "ccd_id": "TQW",
-        "bridge_id": 12654
+        "bridge_id": 12654,
+        "status": "ok",
+        "protein_protein_dsasa": 1175.8,
+        "ligand_share": 0.438
       }
     },
     {
@@ -41,7 +44,10 @@
         "dsasa": 1502.6,
         "pdb_id": "5H74",
         "ccd_id": "7LG",
-        "bridge_id": 38931
+        "bridge_id": 38931,
+        "status": "ok",
+        "protein_protein_dsasa": 1677.4,
+        "ligand_share": 0.473
       }
     },
     {
@@ -60,7 +66,10 @@
         "dsasa": 1933.7,
         "pdb_id": "7L7B",
         "ccd_id": "FI8",
-        "bridge_id": 45576
+        "bridge_id": 45576,
+        "status": "ok",
+        "protein_protein_dsasa": 15783.8,
+        "ligand_share": 0.109
       }
     },
     {
@@ -79,7 +88,10 @@
         "dsasa": 1245.2,
         "pdb_id": "8BIK",
         "ccd_id": "QTN",
-        "bridge_id": 20165
+        "bridge_id": 20165,
+        "status": "ok",
+        "protein_protein_dsasa": 7972.8,
+        "ligand_share": 0.135
       }
     },
     {
@@ -98,7 +110,10 @@
         "dsasa": 583.1,
         "pdb_id": "7G88",
         "ccd_id": "WKY",
-        "bridge_id": 8322
+        "bridge_id": 8322,
+        "status": "ok",
+        "protein_protein_dsasa": 2912.2,
+        "ligand_share": 0.167
       }
     },
     {
@@ -117,7 +132,10 @@
         "dsasa": 1365.9,
         "pdb_id": "6E7U",
         "ccd_id": "HX7",
-        "bridge_id": 7847
+        "bridge_id": 7847,
+        "status": "ok",
+        "protein_protein_dsasa": 2280.3,
+        "ligand_share": 0.375
       }
     },
     {
@@ -136,7 +154,10 @@
         "dsasa": 1009.8,
         "pdb_id": "9EQG",
         "ccd_id": "A1H6W",
-        "bridge_id": 27771
+        "bridge_id": 27771,
+        "status": "ok",
+        "protein_protein_dsasa": 4532.0,
+        "ligand_share": 0.182
       }
     },
     {
@@ -155,7 +176,10 @@
         "dsasa": 1503.7,
         "pdb_id": "9FT1",
         "ccd_id": "A1IFK",
-        "bridge_id": 115185
+        "bridge_id": 115185,
+        "status": "ok",
+        "protein_protein_dsasa": 1353.2,
+        "ligand_share": 0.526
       }
     },
     {
@@ -174,7 +198,10 @@
         "dsasa": 2135.4,
         "pdb_id": "9CTB",
         "ccd_id": "A1AZZ",
-        "bridge_id": 9276
+        "bridge_id": 9276,
+        "status": "ok",
+        "protein_protein_dsasa": 852.9,
+        "ligand_share": 0.715
       }
     },
     {
@@ -193,7 +220,10 @@
         "dsasa": 892.2,
         "pdb_id": "7TCT",
         "ccd_id": "I1F",
-        "bridge_id": 31133
+        "bridge_id": 31133,
+        "status": "ok",
+        "protein_protein_dsasa": 3361.4,
+        "ligand_share": 0.21
       }
     },
     {
@@ -212,7 +242,10 @@
         "dsasa": 1873.6,
         "pdb_id": "9BFV",
         "ccd_id": "A1AOV",
-        "bridge_id": 9232
+        "bridge_id": 9232,
+        "status": "ok",
+        "protein_protein_dsasa": 808.0,
+        "ligand_share": 0.699
       }
     },
     {
@@ -231,7 +264,10 @@
         "dsasa": 1158.4,
         "pdb_id": "5KDT",
         "ccd_id": "6RV",
-        "bridge_id": 7544
+        "bridge_id": 7544,
+        "status": "ok",
+        "protein_protein_dsasa": 1997.7,
+        "ligand_share": 0.367
       }
     },
     {
@@ -250,7 +286,10 @@
         "dsasa": 981.5,
         "pdb_id": "8DD2",
         "ccd_id": "R5R",
-        "bridge_id": 54589
+        "bridge_id": 54589,
+        "status": "ok",
+        "protein_protein_dsasa": 5149.7,
+        "ligand_share": 0.16
       }
     },
     {
@@ -269,7 +308,10 @@
         "dsasa": 963.2,
         "pdb_id": "7Z9K",
         "ccd_id": "IL1",
-        "bridge_id": 56553
+        "bridge_id": 56553,
+        "status": "ok",
+        "protein_protein_dsasa": 29.8,
+        "ligand_share": 0.97
       }
     },
     {
@@ -288,7 +330,10 @@
         "dsasa": 1378.7,
         "pdb_id": "7CNO",
         "ccd_id": "HOS",
-        "bridge_id": 40109
+        "bridge_id": 40109,
+        "status": "ok",
+        "protein_protein_dsasa": 1581.9,
+        "ligand_share": 0.466
       }
     },
     {
@@ -306,7 +351,10 @@
         "dsasa": 968.0,
         "pdb_id": "3OYL",
         "ccd_id": "ZZX",
-        "bridge_id": 38265
+        "bridge_id": 38265,
+        "status": "ok",
+        "protein_protein_dsasa": 625.7,
+        "ligand_share": 0.607
       }
     },
     {
@@ -325,7 +373,10 @@
         "dsasa": 1184.5,
         "pdb_id": "7SMS",
         "ccd_id": "TC9",
-        "bridge_id": 36449
+        "bridge_id": 36449,
+        "status": "ok",
+        "protein_protein_dsasa": 5996.8,
+        "ligand_share": 0.165
       }
     },
     {
@@ -344,7 +395,10 @@
         "dsasa": 920.8,
         "pdb_id": "9DER",
         "ccd_id": "AGG",
-        "bridge_id": 9286
+        "bridge_id": 9286,
+        "status": "ok",
+        "protein_protein_dsasa": 3758.4,
+        "ligand_share": 0.197
       }
     },
     {
@@ -363,7 +417,10 @@
         "dsasa": 624.1,
         "pdb_id": "7FML",
         "ccd_id": "VR6",
-        "bridge_id": 8320
+        "bridge_id": 8320,
+        "status": "ok",
+        "protein_protein_dsasa": 882.0,
+        "ligand_share": 0.414
       }
     },
     {
@@ -382,7 +439,10 @@
         "dsasa": 1155.9,
         "pdb_id": "5I56",
         "ccd_id": "67P",
-        "bridge_id": 7514
+        "bridge_id": 7514,
+        "status": "ok",
+        "protein_protein_dsasa": 2009.2,
+        "ligand_share": 0.365
       }
     },
     {
@@ -401,7 +461,10 @@
         "dsasa": 908.6,
         "pdb_id": "3AEB",
         "ccd_id": "F7A",
-        "bridge_id": 28472
+        "bridge_id": 28472,
+        "status": "ok",
+        "protein_protein_dsasa": 3304.5,
+        "ligand_share": 0.216
       }
     },
     {
@@ -420,7 +483,10 @@
         "dsasa": 793.7,
         "pdb_id": "4NI0",
         "ccd_id": "2P3",
-        "bridge_id": 11609
+        "bridge_id": 11609,
+        "status": "ok",
+        "protein_protein_dsasa": 1807.5,
+        "ligand_share": 0.305
       }
     },
     {
@@ -439,7 +505,10 @@
         "dsasa": 841.4,
         "pdb_id": "9QDM",
         "ccd_id": "A1I6X",
-        "bridge_id": 32896
+        "bridge_id": 32896,
+        "status": "ok",
+        "protein_protein_dsasa": 2805.2,
+        "ligand_share": 0.231
       }
     },
     {
@@ -457,7 +526,10 @@
         "dsasa": 1134.3,
         "pdb_id": "7SSQ",
         "ccd_id": "ZQH",
-        "bridge_id": 24544
+        "bridge_id": 24544,
+        "status": "ok",
+        "protein_protein_dsasa": 5091.8,
+        "ligand_share": 0.182
       }
     },
     {
@@ -475,7 +547,10 @@
         "dsasa": 1020.5,
         "pdb_id": "8VQM",
         "ccd_id": "A1ADU",
-        "bridge_id": 36735
+        "bridge_id": 36735,
+        "status": "ok",
+        "protein_protein_dsasa": 5377.0,
+        "ligand_share": 0.16
       }
     },
     {
@@ -494,7 +569,10 @@
         "dsasa": 866.7,
         "pdb_id": "4YTM",
         "ccd_id": "F6A",
-        "bridge_id": 29323
+        "bridge_id": 29323,
+        "status": "ok",
+        "protein_protein_dsasa": 3659.5,
+        "ligand_share": 0.191
       }
     },
     {
@@ -513,7 +591,10 @@
         "dsasa": 1615.1,
         "pdb_id": "9FT1",
         "ccd_id": "A1IFK",
-        "bridge_id": 115179
+        "bridge_id": 115179,
+        "status": "ok",
+        "protein_protein_dsasa": 3306.0,
+        "ligand_share": 0.328
       }
     },
     {
@@ -531,7 +612,10 @@
         "dsasa": 671.5,
         "pdb_id": "5BS8",
         "ccd_id": "MFX",
-        "bridge_id": 46973
+        "bridge_id": 46973,
+        "status": "ok",
+        "protein_protein_dsasa": 542.8,
+        "ligand_share": 0.553
       }
     },
     {
@@ -549,7 +633,10 @@
         "dsasa": 651.9,
         "pdb_id": "5BS8",
         "ccd_id": "MFX",
-        "bridge_id": 46975
+        "bridge_id": 46975,
+        "status": "ok",
+        "protein_protein_dsasa": 534.3,
+        "ligand_share": 0.55
       }
     },
     {
@@ -565,7 +652,10 @@
         "dsasa": 838.9,
         "pdb_id": "5BTA",
         "ccd_id": "MFX",
-        "bridge_id": 46658
+        "bridge_id": 46658,
+        "status": "ok",
+        "protein_protein_dsasa": 5035.4,
+        "ligand_share": 0.143
       }
     },
     {
@@ -584,7 +674,10 @@
         "dsasa": 1277.9,
         "pdb_id": "7SMS",
         "ccd_id": "TC9",
-        "bridge_id": 36457
+        "bridge_id": 36457,
+        "status": "ok",
+        "protein_protein_dsasa": 5810.3,
+        "ligand_share": 0.18
       }
     },
     {
@@ -602,7 +695,10 @@
         "dsasa": 775.4,
         "pdb_id": "8B0C",
         "ccd_id": "OV3",
-        "bridge_id": 8814
+        "bridge_id": 8814,
+        "status": "ok",
+        "protein_protein_dsasa": 8322.6,
+        "ligand_share": 0.085
       }
     },
     {
@@ -621,7 +717,10 @@
         "dsasa": 1323.8,
         "pdb_id": "3MG8",
         "ccd_id": "L3T",
-        "bridge_id": 113053
+        "bridge_id": 113053,
+        "status": "ok",
+        "protein_protein_dsasa": 1339.5,
+        "ligand_share": 0.497
       }
     },
     {
@@ -640,7 +739,10 @@
         "dsasa": 990.6,
         "pdb_id": "8G0A",
         "ccd_id": "SQC",
-        "bridge_id": 1679
+        "bridge_id": 1679,
+        "status": "ok",
+        "protein_protein_dsasa": 753.1,
+        "ligand_share": 0.568
       }
     },
     {
@@ -659,7 +761,10 @@
         "dsasa": 1252.8,
         "pdb_id": "6EN4",
         "ccd_id": "BGZ",
-        "bridge_id": 30066
+        "bridge_id": 30066,
+        "status": "ok",
+        "protein_protein_dsasa": 2424.5,
+        "ligand_share": 0.341
       }
     },
     {
@@ -678,7 +783,10 @@
         "dsasa": 1030.9,
         "pdb_id": "8ZDG",
         "ccd_id": "A1D8D",
-        "bridge_id": 9222
+        "bridge_id": 9222,
+        "status": "ok",
+        "protein_protein_dsasa": 6480.6,
+        "ligand_share": 0.137
       }
     },
     {
@@ -697,7 +805,10 @@
         "dsasa": 864.2,
         "pdb_id": "6HUK",
         "ccd_id": "H0Z",
-        "bridge_id": 39806
+        "bridge_id": 39806,
+        "status": "ok",
+        "protein_protein_dsasa": 5842.7,
+        "ligand_share": 0.129
       }
     },
     {
@@ -715,7 +826,10 @@
         "dsasa": 517.7,
         "pdb_id": "7H2C",
         "ccd_id": "J4Q",
-        "bridge_id": 8343
+        "bridge_id": 8343,
+        "status": "ok",
+        "protein_protein_dsasa": 4025.7,
+        "ligand_share": 0.114
       }
     },
     {
@@ -734,7 +848,10 @@
         "dsasa": 500.2,
         "pdb_id": "9FWI",
         "ccd_id": "A1IGP",
-        "bridge_id": 9350
+        "bridge_id": 9350,
+        "status": "ok",
+        "protein_protein_dsasa": 4400.7,
+        "ligand_share": 0.102
       }
     },
     {
@@ -753,7 +870,10 @@
         "dsasa": 1180.1,
         "pdb_id": "9E2U",
         "ccd_id": "RN9",
-        "bridge_id": 20894
+        "bridge_id": 20894,
+        "status": "ok",
+        "protein_protein_dsasa": 1343.2,
+        "ligand_share": 0.468
       }
     }
   ]

@@ -19,14 +19,20 @@
     {{ series.min_ligands }} or more distinct ligands that no curated glue
     database lists, each burying at least {{ series.balance_floor }} as much
     surface on its smaller chain as on its larger one. The
-    {{ series.rows | length }} carrying the most ligands are below. Buried area
-    separates an induced interface from a ligand sitting in a site that already
-    straddled two chains.
+    {{ series.rows | length }} carrying the most ligands are below.
+    <em>Ligand share</em> is how much of the interface the widest bridge buries
+    itself, against how much the two chains bury on each other: near 1.0 the
+    ligand is the only thing holding them together, and an obligate complex
+    with a ligand bound in it sits lower. It is a measurement and not a verdict,
+    because a real glue remodelling a large native surface lands in the same
+    place as a passenger.
   </p>
   <table class="grid-table">
     <thead><tr>
       <th>Interface</th><th class="num">Ligands</th><th class="num">Entries</th>
-      <th class="num">Median ΔSASA</th><th>Widest</th>
+      <th class="num">Median ΔSASA</th>
+      <th class="num" title="Of the interface the widest bridge sits in, the fraction buried by the ligand rather than by chain-to-chain contact">Ligand share</th>
+      <th>Widest</th>
     </tr></thead>
     <tbody>
       {% for row in series.rows %}
@@ -35,6 +41,7 @@
           <td class="num"><strong>{{ row.ligands }}</strong></td>
           <td class="num">{{ row.entries }}</td>
           <td class="num">{{ row.median_dsasa | round | int | thousands }} Å²</td>
+          <td class="num">{% if row.ligand_share is none %}not measured{% else %}{{ '%.2f' | format(row.ligand_share) }}{% endif %}</td>
           <td>
             {% if row.widest.pdb_id %}
               <a href="{{ url_for('ledger.index') }}#glue={{ row.widest.pdb_id }}:{{ row.widest.ccd_id }}:{{ row.widest.bridge_id }}"
