@@ -1190,6 +1190,49 @@ ligand, and the clustering finds it without being told to look: four ligands
 over four entries on the cereblon-Helios interface. A test asserts the row,
 because if it vanishes the novel set has stopped containing real glues.
 
+### Counting apo depositions does not answer it, and this is why
+
+The obvious cheap test for "does this interface exist without the ligand" is to
+count PDB entries holding both proteins and no ligand. Three framings were
+tried against four pairs whose answer is known: KRas with cyclophilin A and
+cereblon with Helios are induced, haemoglobin α with β is obligate, 14-3-3σ
+with p65 is a native groove.
+
+| framing | KRas + PPIA | CRBN + Helios | haemoglobin | 14-3-3σ + p65 |
+|---|---:|---:|---:|---:|
+| entries with both proteins | 40 | 9 | 343 | 75 |
+| of those, with no ligand at all | 0 | 0 | **0** | 1 |
+| with none of the series' ligands | 14 | 3 | **312** | 16 |
+| with no bridging ligand at all | 0 | 0 | **4** | 5 |
+
+**Every framing fails on a cofactor.** No ligand at all puts haemoglobin at
+zero, because haem is a ligand: the obligate pair looks induced. No bridging
+ligand at all puts it back at 4, because haem also bridges α and β
+geometrically, so excluding bridging ligands excludes nearly every haemoglobin
+structure. Only the middle framing ranks haemoglobin correctly, and it leaves
+the other three muddy: the 14 KRas entries without a novel series ligand are
+mostly other tri-complex glues, already curated, which the exclusion list does
+not cover.
+
+Two further confounds, both structural rather than fixable by a better query.
+Non-human orthologue accessions split a pair that the name-based clustering
+joins: human tubulin α-1B with β-2B returns 2 entries, because tubulin is
+usually deposited as the bovine or porcine protein. And both proteins being
+present in an entry does not mean they touch in it.
+
+**So the question is not answerable by counting, and the honest method is
+structural**: superpose the ligand-free deposition of the same pair, where one
+exists, and measure whether the interface survives. That is a stage with a
+superposition step in it, not a column, and it is recorded here as not done
+rather than approximated (D-089).
+
+One defect was found on the way and fixed. A zero-hit RCSB search returns 204
+with an empty body, which `Fetcher.fetch_json` read as a truncated transfer and
+raised on, so a question whose honest answer was "none" killed the stage asking
+it. Callers now declare what an empty body means to them and the default stays
+fatal, because reading an empty body as zero everywhere would let a real
+truncation under-count in silence.
+
 So the 1,879-ligand set is not an undifferentiated pile. It is 82 series, led by
 two that are unambiguously molecular glues and well populated, and the
 clustering is cheap enough to re-run whenever the atlas grows.

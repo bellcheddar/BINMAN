@@ -3438,3 +3438,44 @@ a stage and not a column.
 A by-product worth keeping: 9E2U/ALV1 is now a positive control with a test on
 it. The method recovers a real CRBN degrader series that no curated glue
 database lists, without being tuned to.
+
+## D-090
+
+**A zero-hit RCSB search killed the stage asking the question. The empty body is
+now the caller's to interpret.**
+
+The Search API answers a zero-hit query with 204 and no body.
+`Fetcher.fetch_json` read that as a truncated transfer and raised, so asking a
+question whose honest answer was "none" was fatal. Found while counting apo
+depositions for the novel series: the first pair with no ligand-free structure
+at all took the stage down.
+
+Reading an empty body as zero everywhere was the tempting fix and is wrong: a
+genuinely truncated response would then under-count in silence, which is the
+failure this project has spent two decisions avoiding elsewhere. So
+`fetch_json` takes `no_content`, the caller's declaration of what an empty body
+means to it, and the default stays fatal. `search_count` and `search_entries`
+declare zero, because for them it is. The sentinel is an object rather than
+None, because None is the natural thing a caller wants an empty body to mean
+and has to be distinguishable from not passing the argument at all.
+
+**The apo count it was found through does not work, and is recorded as not
+done.** Three framings were tried against four pairs with known answers. Every
+one fails on a cofactor: "no ligand at all" puts haemoglobin α+β at zero
+ligand-free entries, because haem is a ligand, so the most obligate pair in the
+set looks induced; "no bridging ligand at all" puts it at four, because haem
+bridges α and β geometrically too. Only "none of the series' ligands" ranks
+haemoglobin correctly, and it leaves KRas with cyclophilin A muddy, because the
+14 entries it finds are mostly other tri-complex glues that are already
+curated and so not in the exclusion list.
+
+Two confounds are structural rather than query-shaped: non-human orthologue
+accessions split a pair the name-based clustering joins (human tubulin α-1B
+with β-2B returns two entries, because tubulin is usually deposited as the
+bovine or porcine protein), and both proteins appearing in one entry does not
+mean they touch in it.
+
+The honest method is superposition of the ligand-free deposition against the
+bridged one, which is a stage and not a column. Reversing this means building
+it. Until then the panel reports ligand share and says in the caption that it
+is a measurement and not a verdict.

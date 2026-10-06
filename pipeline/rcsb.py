@@ -157,6 +157,7 @@ def search_entries(
         payload = fetcher.fetch_json(
             SEARCH_URL, method="POST", json_body=body,
             key=f"search_{request_hash('POST', SEARCH_URL, None, body)}",
+            no_content={},
         )
         if total is None:
             total = int(payload.get("total_count", 0))
@@ -179,7 +180,12 @@ def search_entries(
 
 
 def search_count(query: dict, *, fetcher: Fetcher | None = None) -> int:
-    """Total hits for a query without pulling the identifiers."""
+    """Total hits for a query without pulling the identifiers.
+
+    A zero-hit query comes back as 204 with no body, so the empty response is
+    declared as zero here rather than raising. Without this a question whose
+    honest answer is "none" killed the stage asking it.
+    """
     fetcher = fetcher or Fetcher("rcsb")
     body = {
         "query": query, "return_type": "entry",
@@ -191,6 +197,7 @@ def search_count(query: dict, *, fetcher: Fetcher | None = None) -> int:
     payload = fetcher.fetch_json(
         SEARCH_URL, method="POST", json_body=body,
         key=f"count_{request_hash('POST', SEARCH_URL, None, body)}",
+        no_content={},
     )
     return int(payload.get("total_count", 0))
 

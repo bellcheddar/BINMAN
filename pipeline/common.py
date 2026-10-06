@@ -221,6 +221,12 @@ class Manifest:
 # polite, cached IO
 # --------------------------------------------------------------------------- #
 
+# The sentinel for "an empty body is still an error here", which is the default.
+# A plain None would make `no_content=None` indistinguishable from not passing it,
+# and None is the natural thing a caller wants an empty body to mean.
+_RAISE_ON_EMPTY = object()
+
+
 class RateLimiter:
     """A simple thread-safe minimum-interval gate."""
 
@@ -388,7 +394,17 @@ class Fetcher:
         json_body: Any = None,
         headers: dict | None = None,
         key: str | None = None,
+        no_content: Any = _RAISE_ON_EMPTY,
     ) -> Any:
+        """Fetch and parse JSON, caching the parsed body.
+
+        `no_content` is what an empty 2xx body means to this caller. The RCSB
+        Search API answers a zero-hit query with 204 and no body at all, so
+        "nothing matched" and "the transfer was truncated" look identical on the
+        wire, and a stage that guessed would under-count in silence. A caller
+        that knows an empty body is a legitimate answer says so and gets that
+        value; every other caller still gets the exception.
+        """
         key = key or request_hash(method, url, params, json_body)
         blob_path, meta_path = self._paths(key, binary=False)
         if blob_path.exists() and not self.refresh:
@@ -401,10 +417,14 @@ class Fetcher:
         content, meta = self._attempt(method, url, params, json_body, headers)
         content = _maybe_gunzip(content)
         text = content.decode("utf-8", errors="replace")
-        try:
-            parsed = json.loads(text)
-        except json.JSONDecodeError as exc:
-            raise RuntimeError(f"{self.source}: {url} returned non-JSON: {text[:200]}") from exc
+        if not text.strip() and no_content is not _RAISE_ON_EMPTY:
+            parsed = no_content
+        else:
+            try:
+                parsed = json.loads(text)
+            except json.JSONDecodeError as exc:
+                raise RuntimeError(
+                    f"{self.source}: {url} returned non-JSON: {text[:200]}") from exc
         blob_path.write_text(json.dumps(parsed, separators=(",", ":")))
         meta_path.write_text(json.dumps(meta, indent=2) + "\n")
         self.misses += 1
