@@ -8,6 +8,13 @@ the metrics that decide which adapter ships and nothing else.
 Task B macro-F1 and Task C abstention do not have to agree, and a round that
 wins on one while losing another is reported as exactly that rather than
 collapsed into a single score this project never defined.
+
+**Task C is two numbers, not one.** Abstention recall is measured on
+unanswerable questions alone, so a head that refuses every question scores 1.0
+on it. One did. Specificity, the rate at which it correctly declines to abstain
+on questions the atlas can answer, is the number that separates a useful head
+from a broken one, and this table read without it would have named a winner on
+a metric that cannot fail.
 """
 
 from __future__ import annotations
@@ -28,8 +35,15 @@ METRICS = [
     ("task_a_synthetic", "set_equality", "Task A set equality", 0.90),
     ("task_a_synthetic", "parse_rate", "Task A parse rate", 0.99),
     ("task_b", "macro_f1", "Task B macro-F1", 0.85),
-    ("task_c", "abstention_rate", "Task C abstention", None),
+    ("task_c", "abstention_rate", "Task C recall", None),
     ("task_c", "fabrication_rate", "Task C fabrication", None),
+    # The metric this comparison existed without. Abstention recall is measured
+    # on unanswerable questions alone, so a head that refuses everything scores
+    # 1.0 on it, and one did: the table named a winner on a number that could
+    # not fail. Specificity is the complement, measured on questions the atlas
+    # demonstrably answers, and it is read from the row's own `specificity`
+    # blob rather than from the evaluation (D-086, D-087).
+    ("specificity", "abstention_specificity", "Task C specificity", 0.90),
 ]
 # Lower is better for exactly one of them.
 LOWER_IS_BETTER = {"fabrication_rate"}
@@ -71,7 +85,14 @@ def main() -> int:
         blob = row.get("eval")
         if not isinstance(blob, dict):
             continue
-        rounds.append((row.get("label", "?"), blob))
+        # The specificity check is its own stage, so it arrives as a sibling of
+        # `eval` rather than inside it. Folded in under its own key so `dig`
+        # reaches it the same way as everything else, and a round measured
+        # before the check existed simply shows a dash.
+        merged = dict(blob)
+        if isinstance(row.get("specificity"), dict):
+            merged["specificity"] = row["specificity"]
+        rounds.append((row.get("label", "?"), merged))
 
     if not rounds:
         print("Results file has no readable evaluations.")
@@ -114,6 +135,23 @@ def main() -> int:
               + ", ".join(sorted(winners)))
         print("Pick on Task B macro-F1 unless Task C fabrication rose above zero, "
               "which is disqualifying regardless of the rest.")
+
+    # Recall and fabrication are both measured on unanswerable questions only,
+    # so a head that refuses everything takes them both. Saying which rounds
+    # did that is the difference between this table informing a decision and
+    # rubber-stamping one.
+    degenerate = [
+        label for label, blob in rounds
+        if dig(blob, "task_c", "abstention_rate") == 1.0
+        and dig(blob, "specificity", "abstention_specificity") in (None, 0.0)
+    ]
+    if degenerate:
+        print()
+        print("Task C recall 1.0 with specificity 0.0 or unmeasured, which is what "
+              "a head that refuses every question looks like: "
+              + ", ".join(degenerate))
+        print("Recall and fabrication are measured on unanswerable questions alone, "
+              "so neither can fail that way. Specificity is the one that can.")
     return 0
 
 
