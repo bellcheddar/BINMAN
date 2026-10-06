@@ -3517,3 +3517,47 @@ not, somebody else's glue has already been there.
 Ordering matters and is enforced by a test: the clustering writes the artefact
 and this stage rewrites it, so running the clustering afterwards erases the
 measurement silently and leaves a page that looks complete.
+
+## D-092
+
+**One Section 9 metric cannot pass. The ceiling is 0.5333 and the floor is 0.80.**
+
+`set_equality_project_phrased` scores a query object against a gold object by
+exact filter-set equality, over fifteen questions phrased as a person would ask
+them. Seven of those fifteen gold objects carry a numeric threshold that the
+question never states: "the most reported substrates" is scored against
+`substrate_count >= 10`, "a handful of tissues" against `expression_breadth <=
+10`, "close to the binding site" against `nz_centroid_distance <= 15` and
+`nz_rel_sasa >= 0.3`. The test is mechanical, not a judgement: the number is not
+in the sentence, so no reading of the sentence recovers it.
+
+D-087 added this floor so the metric could fail, which was right. The floor is
+borrowed from spec 9.5's external-phrasing requirement because the external
+harvest produced nothing usable, and nobody checked whether the proxy set could
+reach it. It cannot.
+
+**Not fixed by moving the floor.** A floor chosen to be reachable by the current
+model is not a check either, and that is the trap D-087 was about. The spec's
+metric and its floor stay exactly as they are, reported as a miss.
+`pipeline/lm_phrasing_check.py` reports the decomposition alongside: record type
+correct **15 of 15**, right fields whatever the cutoff **5 of 15**, exact set
+equality **1 of 15**. Neither of the first two carries a floor or is proposed as
+a replacement. They say which part of the task is failing.
+
+Rewriting the seven gold objects to state their thresholds in the question would
+raise the ceiling honestly, and is the reversal condition. It was not done here
+because the questions were written to read like real questions, and "which
+ligases have at least ten reported substrates" does not.
+
+**Two schema gaps found on the way, both fixed.** `family` and `method` are
+closed vocabularies in the atlas whose FieldSpecs declared them free text, so
+the head guessed `cullin` against `Cullin` and `cryo-electron microscopy`
+against `ELECTRON MICROSCOPY`: parses, matches nothing, says nothing.
+`load_vocabularies` reads both from the database now, and the manual query
+builder gets the same list. And `resolution` did not say which way it runs, so
+"high resolution" became `resolution >= 8.0`, the worst structures in the atlas.
+
+Neither fix moved set equality, which is reported rather than buried. What they
+changed is the failure mode: two proposals that used to parse into a silently
+empty result set now fail loudly and route to the abstain head, so the user
+reads a sentence instead of staring at an empty table.

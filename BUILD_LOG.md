@@ -1115,3 +1115,6 @@ One line per meaningful event, timestamped UTC (spec Section 0 rule 5).
 | 2026-10-06T13:39:20+00:00 | 9 | Validation run against binman.sqlite: 4 metric(s) not computed (dataset unavailable), 7 measured floor(s) missed. |
 | 2026-10-06T13:49:59+00:00 | 9 | Validation run against binman.sqlite: 0 metric(s) not computed (dataset unavailable), 2 measured floor(s) missed. |
 | 2026-10-06T13:50:00+00:00 | 9 | Validation run against binman.sqlite: 4 metric(s) not computed (dataset unavailable), 7 measured floor(s) missed. |
+| 2026-10-06T14:05:08+00:00 | 3.8 | Project-phrased queries: record type 1.0, fields 0.3333, set equality 0.0667 against a ceiling of 0.5333. |
+| 2026-10-06T14:05:45+00:00 | 9 | Validation run against binman.sqlite: 0 metric(s) not computed (dataset unavailable), 2 measured floor(s) missed. |
+| 2026-10-06T14:05:46+00:00 | 9 | Validation run against binman.sqlite: 4 metric(s) not computed (dataset unavailable), 7 measured floor(s) missed. |

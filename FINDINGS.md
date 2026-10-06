@@ -1330,6 +1330,74 @@ builder, because the number beside it is 0.9336 and not 1.
 
 ## Section 9.5 BINMAN-LM
 
+### The project-phrased query metric cannot pass, and this is why
+
+`set_equality_project_phrased` reads **0.0667**, one of fifteen, against a floor
+of 0.80. The floor is borrowed: spec 9.5 sets 0.80 for externally phrased
+questions, the external harvest produced nothing usable, and D-087 attached that
+floor to this proxy set so the metric could fail at all. It can fail. What it
+cannot do is pass.
+
+**Seven of the fifteen gold objects carry a numeric threshold the question never
+states.** This is mechanical, not a judgement: the number is simply not in the
+sentence.
+
+| question | scored against |
+|---|---|
+| which ligases have the most reported substrates | `substrate_count >= 10` |
+| which ligases are expressed in only a handful of tissues | `expression_breadth <= 10` |
+| which surface lysines lie close to the binding site | `nz_centroid_distance <= 15`, `nz_rel_sasa >= 0.3` |
+| which degron candidates sit in high-confidence regions | `mean_plddt >= 90` |
+| which ternary complexes were solved at high resolution | `resolution <= 2.0` |
+| how many glues bury a comparable surface against both partners | `bridging_balance >= 0.5` |
+| which degrons carry an exposed glycine at the hairpin tip | `tip_rel_sasa >= 0.4` |
+
+A model that understood every one of these perfectly would still have to guess
+the number. **The ceiling on exact set equality over this set is 0.5333, and the
+floor is 0.80.** That is the mirror image of D-087's problem: there the metrics
+could not fail, here one cannot pass.
+
+So `pipeline/lm_phrasing_check.py` reports the decomposition instead of the
+single number:
+
+| | |
+|---:|---|
+| **1.0000** | record type correct, 15 of 15 |
+| **0.3333** | right fields, whatever the cutoff, 5 of 15 |
+| 0.0667 | exact set equality, the specified metric |
+
+**The head understands what is being asked about every single time.** It picks
+the right columns a third of the time, and the remaining failures are six where
+it chose a plausible but wrong field, three where it had the right fields and a
+different cutoff, and five the parser rejected outright. Neither of the first
+two figures is proposed as a replacement for the spec's metric and neither
+carries a floor. They say which part of the task is failing, which the single
+number cannot.
+
+### Two schema gaps the diagnosis found
+
+The head was being marked on vocabulary the schema never gave it.
+
+**`family` and `method` had no enum.** Both are closed vocabularies in the
+atlas, and the schema sent to the model declared them as free text, so it
+proposed `family eq "cullin"` against a stored `Cullin` and `method eq
+"cryo-electron microscopy"` against a stored `ELECTRON MICROSCOPY`. Both parse,
+both match nothing, and nothing says why. `app.queries.load_vocabularies` now
+reads both from the shipped database, lazily and once, and a missing atlas
+leaves them empty so the degraded behaviour is exactly the old behaviour. The
+same list reaches the manual query builder, so the UI gains the vocabulary too.
+
+**`resolution` did not say which way it runs.** Asked for structures "solved at
+high resolution" the head proposed `resolution >= 8.0`, which is the worst
+structures in the atlas. The field description now says lower is better.
+
+Neither fix moved set equality, and that is reported rather than buried: the
+numbers above are after both. What they changed is the failure mode. Two
+proposals that used to parse into a silently empty result set now fail loudly,
+which routes them to the abstain head and gives the user a sentence instead of
+an empty table.
+
+
 Measured against the **complete** atlas, with the corpus regenerated from it
 (the ligase vocabulary went from 10 to 650 once the E3 stage finished).
 
