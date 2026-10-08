@@ -24,6 +24,8 @@
 
 **Blind-spot INventory of Molecular Adhesives and Neosubstrates**
 
+[![GitHub](https://img.shields.io/badge/GitHub-bellcheddar%2FBINMAN-1C244B?style=flat-square&logo=github&logoColor=white)](https://github.com/bellcheddar/BINMAN) [![website](https://img.shields.io/badge/website-marcdeller.com-2C6D60?style=flat-square&logo=wordpress&logoColor=white)](https://marcdeller.com) [![live apps](https://img.shields.io/badge/live%20apps-mdeller.com-00D084?style=flat-square&logo=html5&logoColor=white)](https://mdeller.com) [![email](https://img.shields.io/badge/email-marc%40marcdeller.com-6A6F68?style=flat-square&logo=maildotru&logoColor=white)](mailto:marc@marcdeller.com)
+
 Why it matters: a molecular glue is just a small molecule that happens to bury surface against two protein chains at once, and the PDB is full of them sitting unlabelled next to the cryoprotectants. BINMAN mines them out by geometry rather than by annotation, classifies the crystallisation furniture instead of deleting it so the counts reconcile, and refuses to report a number it cannot derive from published data. It is useful for: finding chemotypes that already bridge two proteins, triaging which E3 ligases are worth a ligand campaign, and asking at nomination whether a target even has a usable lysine.
 
 Molecular glues have been sitting in the PDB for thirty years, deposited by

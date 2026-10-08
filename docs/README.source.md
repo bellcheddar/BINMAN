@@ -2,6 +2,8 @@
 
 **Blind-spot INventory of Molecular Adhesives and Neosubstrates**
 
+[![GitHub](https://img.shields.io/badge/GitHub-bellcheddar%2FBINMAN-1C244B?style=flat-square&logo=github&logoColor=white)](https://github.com/bellcheddar/BINMAN) [![website](https://img.shields.io/badge/website-marcdeller.com-2C6D60?style=flat-square&logo=wordpress&logoColor=white)](https://marcdeller.com) [![live apps](https://img.shields.io/badge/live%20apps-mdeller.com-00D084?style=flat-square&logo=html5&logoColor=white)](https://mdeller.com) [![email](https://img.shields.io/badge/email-marc%40marcdeller.com-6A6F68?style=flat-square&logo=maildotru&logoColor=white)](mailto:marc@marcdeller.com)
+
 Molecular glues have been sitting in the PDB for thirty years, deposited by
 crystallographers who were solving something else and had no reason to label the
 ligand as one. BINMAN is the inventory: an empirical atlas of every non-polymer
