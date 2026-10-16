@@ -25,3 +25,9 @@
 [22:28:03] EVALUATED round13-32b-1epoch
 [22:28:03] === round13-32b-1epoch finished ===
 [08:48:28] START round15-3b-abstain-balanced :: 3B, 32 layers, rank 8, batch 4, 15806 iters (two epochs)
+[12:47:31] TRAINED round15-3b-abstain-balanced in 239 min
+[12:47:31] EVAL round15-3b-abstain-balanced
+[12:52:49] EVALUATED round15-3b-abstain-balanced
+[12:52:49] SPECIFICITY round15-3b-abstain-balanced
+[12:53:20] SPECIFICITY MEASURED round15-3b-abstain-balanced
+[12:53:20] DONE round15-3b-abstain-balanced in 244 min total

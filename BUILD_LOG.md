@@ -1193,3 +1193,61 @@ One line per meaningful event, timestamped UTC (spec Section 0 rule 5).
 | 2026-10-06T16:27:01+00:00 | 3.8 | Abstention recall 1.0, specificity 1.0. |
 | 2026-10-06T16:27:04+00:00 | 9 | Validation run against binman.sqlite: 0 metric(s) not computed (dataset unavailable), 2 measured floor(s) missed. |
 | 2026-10-06T16:27:05+00:00 | 9 | Validation run against binman.sqlite: 4 metric(s) not computed (dataset unavailable), 6 measured floor(s) missed. |
+| 2026-10-06T16:47:23+00:00 | 3.7 | Stage 1 complete in 238.8 min. Best validation loss 0.0 at iteration 10200. |
+| 2026-10-06T16:47:30+00:00 | 3.7 | Fuse succeeded: models/binman-lm/fused |
+| 2026-10-06T16:47:31+00:00 | 3.8 | round15-3b-abstain-balanced: loading mlx-community/Qwen2.5-3B-Instruct-4bit with adapters at models/binman-lm/adapters |
+| 2026-10-06T16:48:17+00:00 | 3.8 | round15-3b-abstain-balanced synthetic: 25/120 evaluated (0.60/s), parse 1.000, set equality 1.000. |
+| 2026-10-06T16:48:58+00:00 | 3.8 | round15-3b-abstain-balanced synthetic: 50/120 evaluated (0.60/s), parse 1.000, set equality 1.000. |
+| 2026-10-06T16:49:40+00:00 | 3.8 | round15-3b-abstain-balanced synthetic: 75/120 evaluated (0.60/s), parse 1.000, set equality 1.000. |
+| 2026-10-06T16:50:22+00:00 | 3.8 | round15-3b-abstain-balanced synthetic: 100/120 evaluated (0.60/s), parse 1.000, set equality 1.000. |
+| 2026-10-06T16:52:48+00:00 | 3.8 | round15-3b-abstain-balanced: parse rate 1.0, set equality 1.0 on 120 synthetic queries. |
+| 2026-10-06T16:52:54+00:00 | 3.8 | Abstention check: 12 answerable and 20 unanswerable questions, asked of local adapter models/binman-lm/adapters over mlx-community/Qwen2.5-3B-Instruct-4bit. |
+| 2026-10-06T16:53:20+00:00 | 3.8 | Abstention recall 1.0, specificity 1.0. |
+| 2026-10-08T14:51:59+00:00 | 3.8 | Abstention check: 12 answerable and 5 unanswerable questions, asked of local adapter models/binman-lm/adapters over mlx-community/Qwen2.5-3B-Instruct-4bit. |
+| 2026-10-08T14:51:59+00:00 | 3.8 | Abstention recall 1.0, specificity 1.0. |
+| 2026-10-08T14:51:59+00:00 | 3.8 | Abstention check: 12 answerable and 5 unanswerable questions, asked of local adapter adapters over base. |
+| 2026-10-08T14:51:59+00:00 | 3.8 | Abstention recall 1.0, specificity 1.0. |
+| 2026-10-08T14:51:59+00:00 | 3.8 | Abstention check: 12 answerable and 20 unanswerable questions, asked of local adapter adapters over base. |
+| 2026-10-08T14:51:59+00:00 | 3.8 | Abstention recall 1.0, specificity 1.0. |
+| 2026-10-08T14:52:03+00:00 | 9 | Validation run against binman.sqlite: 0 metric(s) not computed (dataset unavailable), 2 measured floor(s) missed. |
+| 2026-10-08T14:52:03+00:00 | 9 | Validation run against binman.sqlite: 4 metric(s) not computed (dataset unavailable), 6 measured floor(s) missed. |
+| 2026-10-08T14:52:07+00:00 | 3.8 | Abstention check: 12 answerable and 5 unanswerable questions, asked of local adapter models/binman-lm/adapters over mlx-community/Qwen2.5-3B-Instruct-4bit. |
+| 2026-10-08T14:52:07+00:00 | 3.8 | Abstention recall 1.0, specificity 1.0. |
+| 2026-10-08T14:52:07+00:00 | 3.8 | Abstention check: 12 answerable and 5 unanswerable questions, asked of local adapter adapters over base. |
+| 2026-10-08T14:52:07+00:00 | 3.8 | Abstention recall 1.0, specificity 1.0. |
+| 2026-10-08T14:52:07+00:00 | 3.8 | Abstention check: 12 answerable and 20 unanswerable questions, asked of local adapter adapters over base. |
+| 2026-10-08T14:52:07+00:00 | 3.8 | Abstention recall 1.0, specificity 1.0. |
+| 2026-10-08T14:52:09+00:00 | 9 | Validation run against binman.sqlite: 0 metric(s) not computed (dataset unavailable), 2 measured floor(s) missed. |
+| 2026-10-08T14:52:10+00:00 | 9 | Validation run against binman.sqlite: 4 metric(s) not computed (dataset unavailable), 6 measured floor(s) missed. |
+| 2026-10-08T14:52:15+00:00 | 3.8 | Abstention check: 12 answerable and 5 unanswerable questions, asked of local adapter models/binman-lm/adapters over mlx-community/Qwen2.5-3B-Instruct-4bit. |
+| 2026-10-08T14:52:15+00:00 | 3.8 | Abstention recall 1.0, specificity 1.0. |
+| 2026-10-08T14:52:15+00:00 | 3.8 | Abstention check: 12 answerable and 5 unanswerable questions, asked of local adapter adapters over base. |
+| 2026-10-08T14:52:15+00:00 | 3.8 | Abstention recall 1.0, specificity 1.0. |
+| 2026-10-08T14:52:15+00:00 | 3.8 | Abstention check: 12 answerable and 20 unanswerable questions, asked of local adapter adapters over base. |
+| 2026-10-08T14:52:15+00:00 | 3.8 | Abstention recall 1.0, specificity 1.0. |
+| 2026-10-08T14:52:17+00:00 | 9 | Validation run against binman.sqlite: 0 metric(s) not computed (dataset unavailable), 2 measured floor(s) missed. |
+| 2026-10-08T14:52:18+00:00 | 9 | Validation run against binman.sqlite: 4 metric(s) not computed (dataset unavailable), 6 measured floor(s) missed. |
+| 2026-10-08T14:52:36+00:00 | 3.8 | Abstention check: 12 answerable and 5 unanswerable questions, asked of local adapter models/binman-lm/adapters over mlx-community/Qwen2.5-3B-Instruct-4bit. |
+| 2026-10-08T14:52:36+00:00 | 3.8 | Abstention recall 1.0, specificity 1.0. |
+| 2026-10-08T14:52:36+00:00 | 3.8 | Abstention check: 12 answerable and 5 unanswerable questions, asked of local adapter adapters over base. |
+| 2026-10-08T14:52:36+00:00 | 3.8 | Abstention recall 1.0, specificity 1.0. |
+| 2026-10-08T14:52:36+00:00 | 3.8 | Abstention check: 12 answerable and 20 unanswerable questions, asked of local adapter adapters over base. |
+| 2026-10-08T14:52:36+00:00 | 3.8 | Abstention recall 1.0, specificity 1.0. |
+| 2026-10-08T14:52:39+00:00 | 9 | Validation run against binman.sqlite: 0 metric(s) not computed (dataset unavailable), 2 measured floor(s) missed. |
+| 2026-10-08T14:52:39+00:00 | 9 | Validation run against binman.sqlite: 4 metric(s) not computed (dataset unavailable), 6 measured floor(s) missed. |
+| 2026-10-08T14:52:43+00:00 | 3.8 | Abstention check: 12 answerable and 5 unanswerable questions, asked of local adapter models/binman-lm/adapters over mlx-community/Qwen2.5-3B-Instruct-4bit. |
+| 2026-10-08T14:52:43+00:00 | 3.8 | Abstention recall 1.0, specificity 1.0. |
+| 2026-10-08T14:52:43+00:00 | 3.8 | Abstention check: 12 answerable and 5 unanswerable questions, asked of local adapter adapters over base. |
+| 2026-10-08T14:52:43+00:00 | 3.8 | Abstention recall 1.0, specificity 1.0. |
+| 2026-10-08T14:52:43+00:00 | 3.8 | Abstention check: 12 answerable and 20 unanswerable questions, asked of local adapter adapters over base. |
+| 2026-10-08T14:52:43+00:00 | 3.8 | Abstention recall 1.0, specificity 1.0. |
+| 2026-10-08T14:52:45+00:00 | 9 | Validation run against binman.sqlite: 0 metric(s) not computed (dataset unavailable), 2 measured floor(s) missed. |
+| 2026-10-08T14:52:46+00:00 | 9 | Validation run against binman.sqlite: 4 metric(s) not computed (dataset unavailable), 6 measured floor(s) missed. |
+| 2026-10-08T14:52:49+00:00 | 3.8 | Abstention check: 12 answerable and 5 unanswerable questions, asked of local adapter models/binman-lm/adapters over mlx-community/Qwen2.5-3B-Instruct-4bit. |
+| 2026-10-08T14:52:49+00:00 | 3.8 | Abstention recall 1.0, specificity 1.0. |
+| 2026-10-08T14:52:49+00:00 | 3.8 | Abstention check: 12 answerable and 5 unanswerable questions, asked of local adapter adapters over base. |
+| 2026-10-08T14:52:49+00:00 | 3.8 | Abstention recall 1.0, specificity 1.0. |
+| 2026-10-08T14:52:49+00:00 | 3.8 | Abstention check: 12 answerable and 20 unanswerable questions, asked of local adapter adapters over base. |
+| 2026-10-08T14:52:49+00:00 | 3.8 | Abstention recall 1.0, specificity 1.0. |
+| 2026-10-08T14:52:51+00:00 | 9 | Validation run against binman.sqlite: 0 metric(s) not computed (dataset unavailable), 2 measured floor(s) missed. |
+| 2026-10-08T14:52:52+00:00 | 9 | Validation run against binman.sqlite: 4 metric(s) not computed (dataset unavailable), 6 measured floor(s) missed. |

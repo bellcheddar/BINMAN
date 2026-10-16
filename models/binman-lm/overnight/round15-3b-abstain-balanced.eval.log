@@ -1,0 +1,199 @@
+[3.8] round15-3b-abstain-balanced: loading mlx-community/Qwen2.5-3B-Instruct-4bit with adapters at models/binman-lm/adapters
+Fetching 9 files:   0%|          | 0/9 [00:00<?, ?it/s]Fetching 9 files: 100%|██████████| 9/9 [00:00<00:00, 2313.46it/s]
+[3.8] round15-3b-abstain-balanced synthetic: 25/120 evaluated (0.60/s), parse 1.000, set equality 1.000.
+[3.8] round15-3b-abstain-balanced synthetic: 50/120 evaluated (0.60/s), parse 1.000, set equality 1.000.
+[3.8] round15-3b-abstain-balanced synthetic: 75/120 evaluated (0.60/s), parse 1.000, set equality 1.000.
+[3.8] round15-3b-abstain-balanced synthetic: 100/120 evaluated (0.60/s), parse 1.000, set equality 1.000.
+[3.8] round15-3b-abstain-balanced: parse rate 1.0, set equality 1.0 on 120 synthetic queries.
+{
+  "stage": "round15-3b-abstain-balanced",
+  "generated_at": "2026-10-06T16:47:35+00:00",
+  "model": "mlx-community/Qwen2.5-3B-Instruct-4bit",
+  "adapter": "models/binman-lm/adapters",
+  "adapter_run": "adapters",
+  "atlas": "/Users/dellboy/Documents/Vibe_Coding/BINMAN/data/atlas/binman.sqlite",
+  "prompt_style": "trained system turn, no schema in context",
+  "prompt_tokens_approx": 83,
+  "task_a_external": {
+    "computed": false,
+    "n_review_phrased": 0,
+    "reason": "Not computable: no externally phrased query survived the harvest. 463 candidate sentences were pulled from open-access reviews and 18 are genuinely interrogative, but none asks a question BINMAN's schema can answer: they ask about linker composition, ubiquitin chain architecture, alternative splicing and metabolite-specific teratogenicity. Review articles pose mechanistic questions, not database queries. Reporting a number measured on project-phrased rows would claim a register-mismatch result the data does not support."
+  },
+  "register_mismatch_gap": null,
+  "task_a_project_phrased": {
+    "n": 15,
+    "parse_rate": 0.0667,
+    "set_equality": 0.0667,
+    "exact_match": 0.0,
+    "failures": [
+      {
+        "question": "which E3 ligases show tumour-restricted expression",
+        "raw": "{\"record_type\":\"ligase\",\"filters\":[{\"field\":\"expression\",\"op\":\"eq\",\"value\":\"tumour-restricted\"}],\"sort\":{\"field\":\"triage_rank\",\"direction\":\"asc\"},\"limit\":200}",
+        "error": "filters[0]: field 'expression' is not a field of ligase. Allowed: ['exploitation_status', 'expression_breadth', 'family', 'gene', 'has_ligand', 'pdb_entries', 'pocket_score', 'pocket_volume_a3', 'subf",
+        "stage": "parse"
+      },
+      {
+        "question": "how many deposited ternary structures involve a non-IMiD chemotype",
+        "raw": "{\"record_type\":\"bridge\",\"filters\":[{\"field\":\"ccd_class\",\"op\":\"ne\",\"value\":\"IMiD\"}],\"sort\":{\"field\":\"dsasa_total\",\"direction\":\"desc\"},\"limit\":200}",
+        "error": "field 'ccd_class' takes one of ['glue_candidate', 'cofactor', 'metal', 'cryoprotectant', 'buffer', 'detergent', 'lipid', 'sugar', 'peptide_like', 'covalent_modifier', 'unknown'], got 'IMiD'",
+        "stage": "parse"
+      },
+      {
+        "question": "which E3 ligases have no ligand reported",
+        "raw": "{\"record_type\":\"ligase\",\"filters\":[{\"field\":\"ccd_class\",\"op\":\"eq\",\"value\":\"no\"}],\"sort\":{\"field\":\"triage_rank\",\"direction\":\"asc\"},\"limit\":200}",
+        "error": "filters[0]: field 'ccd_class' is not a field of ligase. Allowed: ['exploitation_status', 'expression_breadth', 'family', 'gene', 'has_ligand', 'pdb_entries', 'pocket_score', 'pocket_volume_a3', 'subfa",
+        "stage": "parse"
+      },
+      {
+        "question": "which ligases remain structurally uncharacterised",
+        "raw": "{\"record_type\":\"ligase\",\"filters\":[{\"field\":\"exploitation_status\",\"op\":\"eq\",\"value\":\"structurally uncharacterised\"}],\"sort\":{\"field\":\"triage_rank\",\"direction\":\"asc\"},\"limit\":200}",
+        "error": "field 'exploitation_status' takes one of ['clinically validated', 'chemically validated', 'covalent handle only', 'ligandable unproven', 'orphan'], got 'structurally uncharacterised'",
+        "stage": "parse"
+      },
+      {
+        "question": "how many glues bury a comparable surface against both partners",
+        "raw": "{\"record_type\":\"bridge\",\"filters\":[{\"field\":\"buried_surface_a\",\"op\":\"eq\",\"value\":0.0},{\"field\":\"buried_surface_b\",\"op\":\"eq\",\"value\":0.0}],\"sort\":{\"field\":\"dsasa_total\",\"direction\":\"desc\"},\"limit\":200}",
+        "error": "filters[0]: field 'buried_surface_a' is not a field of bridge. Allowed: ['bridging_balance', 'buried_fraction', 'ccd_class', 'ccd_id', 'contacts_a', 'contacts_b', 'dsasa_a', 'dsasa_b', 'dsasa_total', ",
+        "stage": "parse"
+      },
+      {
+        "question": "which ligases are druggable but have not been exploited",
+        "raw": "{\"record_type\":\"ligase\",\"filters\":[{\"field\":\"exploitation_status\",\"op\":\"eq\",\"value\":\"druggable\"},{\"field\":\"exploitation_status\",\"op\":\"ne\",\"value\":\"exploited\"}],\"sort\":{\"field\":\"triage_rank\",\"direction\":\"asc\"},\"limit\":200}",
+        "error": "field 'exploitation_status' takes one of ['clinically validated', 'chemically validated', 'covalent handle only', 'ligandable unproven', 'orphan'], got 'druggable'",
+        "stage": "parse"
+      },
+      {
+        "question": "which degron candidates sit in high-confidence regions",
+        "raw": "{\"record_type\":\"degron\",\"filters\":[{\"field\":\"conf\",\"op\":\"gt\",\"value\":0.9}],\"sort\":{\"field\":\"imid_degradation_score\",\"direction\":\"desc\"},\"limit\":200}",
+        "error": "filters[0]: field 'conf' is not a field of degron. Allowed: ['afdb_id', 'degron_geometry_score', 'gene', 'imid_degradation_score', 'is_known_neosubstrate', 'mean_plddt', 'motif_family', 'tip_aa', 'tip",
+        "stage": "parse"
+      },
+      {
+        "question": "how many bridging ligands are crystallisation additives rather than glues",
+        "raw": "{\"record_type\":\"bridge\",\"filters\":[{\"field\":\"ccd_class\",\"op\":\"eq\",\"value\":\"crystallisation additive\"},{\"field\":\"ccd_class\",\"op\":\"ne\",\"value\":\"glue\"}],\"sort\":{\"field\":\"dsasa_total\",\"direction\":\"desc\"},\"limit\":200}",
+        "error": "field 'ccd_class' takes one of ['glue_candidate', 'cofactor', 'metal', 'cryoprotectant', 'buffer', 'detergent', 'lipid', 'sugar', 'peptide_like', 'covalent_modifier', 'unknown'], got 'crystallisation ",
+        "stage": "parse"
+      },
+      {
+        "question": "which ternary complexes were solved at high resolution",
+        "raw": "{\"record_type\":\"bridge\",\"filters\":[{\"field\":\"resolution\",\"op\":\"eq\",\"value\":\"high\"}],\"sort\":{\"field\":\"dsasa_total\",\"direction\":\"desc\"},\"limit\":200}",
+        "error": "field 'resolution' takes a number in \u00c5, got 'high'",
+        "stage": "parse"
+      },
+      {
+        "question": "which surface lysines lie close to the binding site",
+        "raw": "{\"record_type\":\"lysine\",\"filters\":[{\"field\":\"distance\",\"op\":\"eq\",\"value\":0.5}],\"sort\":{\"field\":\"nz_centroid_distance\",\"direction\":\"asc\"},\"limit\":200}",
+        "error": "filters[0]: field 'distance' is not a field of lysine. Allowed: ['cb_cb_distance', 'nz_centroid_distance', 'nz_rel_sasa', 'observed_diGly', 'res_num', 'site_id', 'structure_id', 'uniprot_acc', 'verdic",
+        "stage": "parse"
+      },
+      {
+        "question": "which degrons carry an exposed glycine at the hairpin tip",
+        "raw": "{\"record_type\":\"degron\",\"filters\":[{\"field\":\"ccd_class\",\"op\":\"eq\",\"value\":\"exposed\"},{\"field\":\"motif_family\",\"op\":\"eq\",\"value\":\"glycine\"}],\"sort\":{\"field\":\"imid_degradation_score\",\"direction\":\"desc\"},\"limit\":200}",
+        "error": "filters[0]: field 'ccd_class' is not a field of degron. Allowed: ['afdb_id', 'degron_geometry_score', 'gene', 'imid_degradation_score', 'is_known_neosubstrate', 'mean_plddt', 'motif_family', 'tip_aa',",
+        "stage": "parse"
+      },
+      {
+        "question": "how many cullin-RING ligases are represented",
+        "raw": "{\"record_type\":\"ligase\",\"filters\":[{\"field\":\"family\",\"op\":\"eq\",\"value\":\"cullin\"}],\"sort\":{\"field\":\"triage_rank\",\"direction\":\"asc\"},\"limit\":200}",
+        "error": "field 'family' takes one of ['BTB', 'CULT', 'Cullin', 'DCAF', 'DCAF15', 'DCAF16', 'F-box', 'HECT', 'RBR', 'RING', 'SOCS-box', 'U-box', 'VHL-box'], got 'cullin'",
+        "stage": "parse"
+      },
+      {
+        "question": "which glues were determined by cryo-electron microscopy",
+        "raw": "{\"record_type\":\"bridge\",\"filters\":[{\"field\":\"method\",\"op\":\"eq\",\"value\":\"cryo-electron microscopy\"}],\"sort\":{\"field\":\"dsasa_total\",\"direction\":\"desc\"},\"limit\":200}",
+        "error": "field 'method' takes one of ['ELECTRON CRYSTALLOGRAPHY', 'ELECTRON MICROSCOPY', 'ELECTRON MICROSCOPY; SOLID-STATE NMR', 'ELECTRON MICROSCOPY; SOLUTION NMR', 'FIBER DIFFRACTION', 'Integrative', 'NEUTRO",
+        "stage": "parse"
+      },
+      {
+        "question": "which ligases are expressed in only a handful of tissues",
+        "raw": "{\"record_type\":\"ligase\",\"filters\":[{\"field\":\"tissue_expression\",\"op\":\"eq\",\"value\":\"a handful\"}],\"sort\":{\"field\":\"triage_rank\",\"direction\":\"asc\"},\"limit\":200}",
+        "error": "filters[0]: field 'tissue_expression' is not a field of ligase. Allowed: ['exploitation_status', 'expression_breadth', 'family', 'gene', 'has_ligand', 'pdb_entries', 'pocket_score', 'pocket_volume_a3'",
+        "stage": "parse"
+      }
+    ],
+    "seconds": 17.6,
+    "note": "Hand-written questions against the schema, not harvested phrasing. Measures schema coverage, not register mismatch."
+  },
+  "task_b": {
+    "n": 240,
+    "classes": [
+      "crystallisation_artefact",
+      "molecular_glue",
+      "native_cofactor",
+      "protac"
+    ],
+    "macro_f1": 0.9295,
+    "accuracy": 0.9292,
+    "per_class": {
+      "crystallisation_artefact": {
+        "precision": 0.9455,
+        "recall": 0.8667,
+        "f1": 0.9043,
+        "support": 60
+      },
+      "molecular_glue": {
+        "precision": 0.9655,
+        "recall": 0.9333,
+        "f1": 0.9492,
+        "support": 60
+      },
+      "native_cofactor": {
+        "precision": 0.8507,
+        "recall": 0.95,
+        "f1": 0.8976,
+        "support": 60
+      },
+      "protac": {
+        "precision": 0.9667,
+        "recall": 0.9667,
+        "f1": 0.9667,
+        "support": 60
+      }
+    },
+    "confusion_matrix": {
+      "crystallisation_artefact": {
+        "crystallisation_artefact": 52,
+        "molecular_glue": 0,
+        "native_cofactor": 8,
+        "protac": 0,
+        "unparseable": 0
+      },
+      "molecular_glue": {
+        "crystallisation_artefact": 0,
+        "molecular_glue": 56,
+        "native_cofactor": 2,
+        "protac": 2,
+        "unparseable": 0
+      },
+      "native_cofactor": {
+        "crystallisation_artefact": 3,
+        "molecular_glue": 0,
+        "native_cofactor": 57,
+        "protac": 0,
+        "unparseable": 0
+      },
+      "protac": {
+        "crystallisation_artefact": 0,
+        "molecular_glue": 2,
+        "native_cofactor": 0,
+        "protac": 58,
+        "unparseable": 0
+      }
+    },
+    "glue_vs_protac": {
+      "glue_called_protac": 2,
+      "protac_called_glue": 2,
+      "note": "Spec 9.5 calls this cell out explicitly: PROTAC against glue is the confusion that matters, because a PROTAC is bivalent by design and a glue is not."
+    },
+    "unbalanced": true,
+    "note": "The corpus is deliberately unbalanced (D-022), so per-class figures carry the meaning and the macro-F1 is a summary of them."
+  },
+  "task_c": {
+    "n": 40,
+    "fabrication_rate": 0.0,
+    "abstention_rate": 1.0,
+    "fabrications": []
+  }
+}
+
+synthetic: n=120 parse=1.0 set_equality=1.0 exact=0.9417
