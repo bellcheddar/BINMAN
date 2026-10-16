@@ -3561,3 +3561,71 @@ Neither fix moved set equality, which is reported rather than buried. What they
 changed is the failure mode: two proposals that used to parse into a silently
 empty result set now fail loudly and route to the abstain head, so the user
 reads a sentence instead of staring at an empty table.
+
+## D-093
+
+**Round 15 ships. The abstain head goes from refusing everything to refusing
+exactly the right things.**
+
+Specificity **0.0000 to 1.0000**, recall held at 1.0000, zero false abstentions
+on the twelve presets the atlas demonstrably answers. The 0.90 floor is cleared
+and D-086's defect is closed.
+
+**The first comparison was misleading and the control is the point.** Round 07's
+recorded Task A figures were measured on the corpus as it stood on 4 October,
+and the corpus changed on 6 October when the schema began declaring `family` and
+`method` as the closed vocabularies the atlas holds (D-092). Comparing a new
+adapter on a new corpus against an old adapter's old numbers measures the
+corpus, not the adapter. So round 07 was re-evaluated on today's corpus, same
+code, same data.
+
+| | parse | set equality | exact match | Task B macro F1 |
+|---|---:|---:|---:|---:|
+| round 07, 4 October corpus | 1.0000 | 1.0000 | 0.9750 | 0.9336 |
+| round 07, today's corpus | 0.9583 | 0.9500 | 0.3750 | 0.9336 |
+| round 15, today's corpus | 1.0000 | 1.0000 | 0.9417 | 0.9295 |
+
+**Task B reads 0.9336 for round 07 on both corpora**, because `build_task_b.py`
+was not re-run and its test split is the same file round 07 was scored on
+originally. That is what makes the control trustworthy: the harness is
+deterministic, so the whole Task A difference is the corpus.
+
+Two readings follow. Round 07's exact match collapsing to 0.375 is the measured
+cost of the schema drift D-092 fixed: it is marked against enum values it was
+never shown. And round 15's Task B at 0.9295 against 0.9336 is one sample out of
+240, with both far above the 0.85 floor.
+
+**What this decision is not.** Round 15 is not a better model than round 07 in
+the abstract; it is the model trained on the schema the application serves, and
+that is the right basis for choosing what to serve. A future schema change
+invalidates this comparison in exactly the same way, which is the argument for
+re-running the control each time rather than quoting the table.
+
+`set_equality_project_phrased` is unchanged at 0.0667 and remains a miss, for
+the reason D-092 gives: its ceiling is below its floor.
+
+Also fixed: the round 15 script stored the whole of `lm_eval.json` under that
+round's `eval` key, so `lm/compare_rounds.py` read a dash for every metric on
+the one round it most needed to read. It takes the round's own section now.
+
+**A failure mode the corpus created, found by probing out of sample.** Asked
+"what is the IC50 of lenalidomide against CRBN", the new head answers
+`answerable: true` with "it is a ligase query". Asked "What is the IC50?" or
+"what is the binding affinity of pomalidomide", it refuses correctly. It has
+latched onto the named protein and classified by record type instead of asking
+whether the atlas holds the quantity requested.
+
+That is traceable to how the answerable class was minted: every positive carries
+the same explanation template, "The atlas holds this: it is a <record_type>
+query", so the head could learn "a named entity I recognise means answerable".
+The old head got this question right by accident, because it refused
+everything.
+
+It does not change the decision. Head C is only reached after the parser has
+already rejected a proposal, so the user sees an error either way, and the
+difference is whether the message is plain English or the parser's complaint.
+Against that, twelve presets that used to be refused now work. But the head is
+not fixed in general, and the fix for round 16 is in the corpus rather than the
+model: vary the answerable explanations, and ground them in the fields the
+question actually asks for rather than in the record type alone.
+

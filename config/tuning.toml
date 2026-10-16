@@ -19,7 +19,7 @@ mlx_available = true
 gate_g1_candidate = false
 # The evaluation stage describing the shipped adapter, so Section 9.5 floors
 # report the model on the Hub rather than the last evaluation that ran.
-shipped_stage = "round07-32layers"
+shipped_stage = "round15-3b-abstain-balanced"
 
 [io]
 rcsb_rate_limit_per_sec = 8

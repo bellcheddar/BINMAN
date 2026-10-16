@@ -17,8 +17,8 @@
     4,
     35
   ],
-  "source_adapter": "models/binman-lm/runs/binman-qwen-2.5-3b-4bit-round07",
+  "source_adapter": "models/binman-lm/runs/binman-qwen-2.5-3b-4bit-round15",
   "mlx_base": "mlx-community/Qwen2.5-3B-Instruct-4bit",
   "cuda_base": "Qwen/Qwen2.5-3B-Instruct",
-  "out": "/private/tmp/claude-501/-Users-dellboy-Documents-Vibe-Coding-BINMAN/02d5f083-d26f-4b61-8c6c-1bb61949dddf/scratchpad/hf-round07"
+  "out": "deploy/hf-adapter"
 }

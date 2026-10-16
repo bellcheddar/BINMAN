@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-10-06T14:32:23+00:00",
+  "generated_at": "2026-10-16T05:25:18+00:00",
   "generator": "pipeline/build_about.py",
-  "schematic_description": "The pipeline runs left to right in four stages. Two kinds of input enter on the left: the primary data sources (RCSB, AlphaFold DB, UniProt, InterPro), and separately the validation datasets that serve as ground truth. Stage 1, acquisition, catalogued 130,391 entries into priority tiers using httpx and tenacity. Stage 2, geometry, analysed 55,449 entries with gemmi and FreeSASA and found 285,996 bridges, with 19 entries failing. Stage 3, scan and triage, used DSSP and fpocket to produce 21,717 degron candidates, 650 triaged ligases and 1,650 scored lysines. Stage 4 trains BINMAN-LM with mlx-lm, which does text work only and never emits a number. Four modules leave on the right: Glue Atlas, Degron Scan, E3 Triage and Degradability. In plain terms: stage 1 fetches every PDB entry that could hold a glue, stage 2 measures which ligands touch two proteins at once, stage 3 scores what a degrader needs (tags, ligases and lysines), and stage 4 trains one small model on the atlas's own records. Below the four stages sits the trained layer: binman-qwen-2.5-3b-4bit-round07, one LoRA adapter with three heads. Head A, query, turns a question into a query object when somebody asks, and the parser then checks it. Head B, triage, assigns an evidence class to 27,590 bridge rows at build time, and is the only model-derived column in the atlas. Head C, abstain, says whether a question is answerable and what is missing when it is not, and is called when the parser rejects a proposal. None of the three produces a number.",
+  "schematic_description": "The pipeline runs left to right in four stages. Two kinds of input enter on the left: the primary data sources (RCSB, AlphaFold DB, UniProt, InterPro), and separately the validation datasets that serve as ground truth. Stage 1, acquisition, catalogued 130,391 entries into priority tiers using httpx and tenacity. Stage 2, geometry, analysed 55,449 entries with gemmi and FreeSASA and found 285,996 bridges, with 19 entries failing. Stage 3, scan and triage, used DSSP and fpocket to produce 21,717 degron candidates, 650 triaged ligases and 1,650 scored lysines. Stage 4 trains BINMAN-LM with mlx-lm, which does text work only and never emits a number. Four modules leave on the right: Glue Atlas, Degron Scan, E3 Triage and Degradability. In plain terms: stage 1 fetches every PDB entry that could hold a glue, stage 2 measures which ligands touch two proteins at once, stage 3 scores what a degrader needs (tags, ligases and lysines), and stage 4 trains one small model on the atlas's own records. Below the four stages sits the trained layer: binman-qwen-2.5-3b-4bit-round15, one LoRA adapter with three heads. Head A, query, turns a question into a query object when somebody asks, and the parser then checks it. Head B, triage, assigns an evidence class to 27,590 bridge rows at build time, and is the only model-derived column in the atlas. Head C, abstain, says whether a question is answerable and what is missing when it is not, and is called when the parser rejects a proposal. None of the three produces a number.",
   "stages": {
     "bridges": {
       "total": 55468,
@@ -100,8 +100,8 @@
       "failure_reasons": {}
     },
     "lm_eval": {
-      "total": 12,
-      "ok": 12,
+      "total": 14,
+      "ok": 14,
       "failed": 0,
       "failure_reasons": {}
     },
@@ -188,7 +188,7 @@
   },
   "atlas": {
     "available": true,
-    "size_mb": 195.1,
+    "size_mb": 206.0,
     "entry": 130391,
     "entry_failed": 1043,
     "bridge": 285996,
@@ -1437,13 +1437,13 @@
     },
     "identity_source": "the adapter the Space loads",
     "last_training_run": {
-      "base_model": "mlx-community/Qwen2.5-32B-Instruct-4bit",
+      "base_model": "mlx-community/Qwen2.5-3B-Instruct-4bit",
       "quantisation": "4-bit",
       "adapter_rank": 8,
       "adapter_layers": 32,
       "fine_tune_type": "lora",
       "fused": true,
-      "build_date": "2026-10-04",
+      "build_date": "2026-10-06",
       "shipped_adapter": "models/binman-lm/adapters"
     },
     "training": {},
@@ -3156,7 +3156,7 @@
       "mlx_batch_size": 4,
       "mlx_available": true,
       "gate_g1_candidate": false,
-      "shipped_stage": "round07-32layers"
+      "shipped_stage": "round15-3b-abstain-balanced"
     },
     "io": {
       "rcsb_rate_limit_per_sec": 8,

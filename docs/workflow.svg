@@ -52,7 +52,7 @@
 <rect class="wf-box" x="1058" y="154" width="124" height="28" rx="2"/><text class="wf-n" x="1068" y="172.0">E3 Triage</text>
 <rect class="wf-box" x="1058" y="194" width="124" height="28" rx="2"/><text class="wf-n" x="1068" y="212.0">Degradability</text>
 <path class="wf-arrow" d="M1014,148.0 L1052,148.0" marker-end="url(#wf-tip)"/>
-<rect class="wf-lm-band" x="128" y="300" width="886" height="96" rx="3"/><text class="wf-lm-title" x="142" y="318">BINMAN-LM · one adapter, three heads, no arithmetic</text><text class="wf-lm-name" x="1000" y="318" text-anchor="end">binman-qwen-2.5-3b-4bit-round07</text>
+<rect class="wf-lm-band" x="128" y="300" width="886" height="96" rx="3"/><text class="wf-lm-title" x="142" y="318">BINMAN-LM · one adapter, three heads, no arithmetic</text><text class="wf-lm-name" x="1000" y="318" text-anchor="end">binman-qwen-2.5-3b-4bit-round15</text>
 <rect class="wf-lm-head" x="142" y="326" width="276" height="56" rx="2"/><text class="wf-lm-t" x="152" y="345">A · query</text>
 <text class="wf-lm-s" x="152" y="360">your question becomes a query object</text>
 <text class="wf-lm-s" x="152" y="373">when you ask, then the parser checks it</text>

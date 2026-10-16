@@ -1536,12 +1536,12 @@ rather than substituted. See the Gates section.
 | `binman-qwen-2.5-3b-4bit-round03` | DPO, lr 5e-7, 150 steps | rejected: still degraded |
 | `binman-qwen-2.5-3b-4bit-round05` | LoRA SFT, rank 8, 16 layers, 1,200 iterations | superseded |
 | `binman-qwen-2.5-3b-4bit-round06` | rank 8, 16 layers, 14,152 iterations | evaluated |
-| `binman-qwen-2.5-3b-4bit-round07` | rank 8, 32 layers, 14,152 iterations | **shipped** |
+| `binman-qwen-2.5-3b-4bit-round07` | rank 8, 32 layers, 14,152 iterations | superseded by round 15 |
 | `binman-qwen-2.5-3b-4bit-round08` | rank 32, 16 layers | evaluated, not shipped |
 | `binman-qwen-2.5-3b-4bit-round09` | rank 32, 32 layers | evaluated, not shipped |
 | `binman-qwen-2.5-3b-4bit-round10` to `round13` | rank 32 and rank 8 at 32 layers | trained, not in the evaluated set |
 | `binman-qwen-2.5-32b-4bit-round14` | the 32B experiment | rejected, see above |
-| `binman-qwen-2.5-3b-4bit-round15` | round 07's recipe, balanced Task C | training, see below |
+| `binman-qwen-2.5-3b-4bit-round15` | round 07's recipe, balanced Task C | **shipped**, see below |
 
 The round 09 row read "rank 32, 16 layers" until 2026-10-06, duplicating round
 08's description. The run is `round09-32layers-rank32`, and the correction
@@ -1570,6 +1570,53 @@ epochs of the corpus. If specificity moves, the corpus moved it.
 
 Neither the twelve app presets that specificity is measured on nor the Task A
 held-out split is in the corpus, so the measurement stays out of sample.
+
+### Round 15 measured, and what the control showed
+
+Specificity moved from **0.0000 to 1.0000**: the head now lets all twelve
+answerable presets through and still refuses all twenty unanswerable questions.
+Zero false abstentions. That clears the 0.90 floor.
+
+The rest of Section 9.5 had to be checked before swapping the adapter in, and
+the first comparison was misleading. Round 07's recorded figures were measured
+on the corpus as it stood on 4 October, and the corpus has changed since: the
+schema now declares `family` and `method` as the closed vocabularies the atlas
+actually holds, and `resolution` says which way it runs. So round 07 was
+re-evaluated on **today's** corpus, same code, same data, as a control.
+
+| | parse | set equality | exact match | Task B macro F1 |
+|---|---:|---:|---:|---:|
+| round 07, on the 4 October corpus | 1.0000 | 1.0000 | 0.9750 | 0.9336 |
+| round 07, re-run on today's corpus | 0.9583 | 0.9500 | **0.3750** | 0.9336 |
+| **round 15, on today's corpus** | **1.0000** | **1.0000** | **0.9417** | 0.9295 |
+
+**Task B is identical for round 07 on both corpora, 0.9336 either way**, because
+`lm/build_task_b.py` was not re-run and its test split is byte-for-byte the one
+round 07 was scored on. That is the control working: the harness is
+deterministic, so every difference in the Task A row is the corpus and not the
+measurement.
+
+**Round 07's exact match falls to 0.375 on the current schema.** It was never
+shown the enum values it is now marked against, so it proposes `family eq
+"cullin"` where the gold says `Cullin`. That is the cost of the schema drift
+fixed in D-092, measured.
+
+**Task B moves 0.9336 to 0.9295 on the identical 240-sample split**, a
+difference of one sample, and both sit well above the 0.85 floor.
+
+So round 15 is better on the schema the application actually serves, unchanged
+within noise on triage, and fixes the head that refused every answerable
+question. It ships.
+
+**It is not fixed in general, and probing out of sample shows how.** Asked "what
+is the IC50 of lenalidomide against CRBN" the head answers `answerable: true`,
+"it is a ligase query", while refusing "What is the IC50?" and "what is the
+binding affinity of pomalidomide" correctly. Every answerable row in the corpus
+carries the same explanation template naming a record type, so the head can
+learn that a recognised protein name means answerable. The old head got this
+question right only because it refused everything. Round 16's fix belongs in the
+corpus: vary the explanations and ground them in the fields the question asks
+for (D-093).
 
 One bug was found in the measurement itself while making the change.
 `pipeline/lm_abstention_check.py` read the unanswerable set by taking Task C

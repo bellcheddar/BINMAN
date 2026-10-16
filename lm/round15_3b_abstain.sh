@@ -94,8 +94,14 @@ blob = {"label": label}
 for key, name in (("eval", "lm_eval.json"),
                   ("specificity", "lm_abstention_check.json")):
     source = pathlib.Path("data/interim") / name
-    if source.exists():
-        blob[key] = json.loads(source.read_text(encoding="utf-8"))
+    if not source.exists():
+        continue
+    loaded = json.loads(source.read_text(encoding="utf-8"))
+    # lm_eval.json is keyed by stage label and accumulates every round, so
+    # storing it whole put the entire history under this round's "eval" and
+    # lm/compare_rounds.py read dashes for every metric. Take this round's own
+    # section when there is one.
+    blob[key] = loaded.get(label, loaded) if isinstance(loaded, dict) else loaded
 with results.open("a", encoding="utf-8") as handle:
     handle.write(json.dumps(blob, default=str) + "\n")
 print(json.dumps({k: v for k, v in blob.items() if k != "eval"},
