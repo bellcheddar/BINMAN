@@ -507,26 +507,22 @@ s.addNotes("DECISIONS.md carries 92 entries, each with the alternatives consider
 /* ------------------------------------------------------------- 11 · wrap-up */
 
 pres.addSection({ title: "Working together" });
-s = pres.addSlide({ masterName: "DARK", sectionTitle: "Working together" });
-
-s.addText("Where this could go", {
-  x: M, y: 0.52, w: 9, h: 0.68, fontSize: 34, bold: true, color: "FFFFFF",
-  fontFace: THEME.headFontFace, isTextBox: true, margin: 0, valign: "middle",
-});
-s.addText("Everything below is already built, measured and public.", {
-  x: M, y: 1.2, w: 9, h: 0.34, fontSize: 14, italic: true,
-  color: THEME.colors.accent1, isTextBox: true, margin: 0,
-});
+s = pres.addSlide({ masterName: "LIGHT", sectionTitle: "Working together" });
+heading(s, "\u2192", "Where this could go");
+strapline(s, "Everything below is already built, measured and public.");
 
 const closing = [
   { t: "WHAT YOU CAN USE TODAY", lines: [
-    "The whole atlas is one SQLite file, 195 MB, that opens in any tool you already have.",
-    "A live interface at binman.mdeller.com, the code on GitHub, the adapter on Hugging Face.",
+    "The whole atlas is one SQLite file that opens in any tool you already have.",
+    "A live interface at binman.mdeller.com, the code on GitHub, the trained adapter on Hugging Face.",
   ] },
   { t: "WHERE TO START READING", lines: [
-    "README — what it is and what it found.",
-    "FINDINGS.md — every number with its method and its n, including the ones that miss.",
-    "DECISIONS.md — 92 entries, each with how to reverse it.",
+    { text: "README", options: { bold: true } },
+    "what it is and what it found.",
+    { text: "FINDINGS.md", options: { bold: true } },
+    "every number with its method and its n, misses included.",
+    { text: "DECISIONS.md", options: { bold: true } },
+    "92 entries, each with how to reverse it.",
   ] },
   { t: "THE OBVIOUS NEXT MOVES", lines: [
     "Pick a series from the 82 and put it in front of a crystallographer.",
@@ -535,37 +531,20 @@ const closing = [
   ] },
 ];
 closing.forEach((c, i) => {
-  const x = M + i * 4.15;
-  s.addShape(pres.ShapeType.roundRect, {
-    x, y: 1.78, w: 3.85, h: 2.18, rectRadius: 0.04,
-    fill: { color: "20242A" }, line: { color: "20242A" }, objectName: `close-${i}`,
-  });
-  s.addText(c.t, {
-    x: x + 0.26, y: 1.96, w: 3.33, h: 0.5, fontSize: 11, bold: true,
-    color: THEME.colors.accent1, charSpacing: 1.4, isTextBox: true, margin: 0,
-  });
-  s.addText(c.lines.map((l, j) => ({
-    text: l, options: { bullet: false, breakLine: j < c.lines.length - 1, paraSpaceAfter: 7 },
-  })), {
-    x: x + 0.26, y: 2.50, w: 3.33, h: 1.38, fontSize: 12, color: "D8DAD4",
-    isTextBox: true, margin: 0, valign: "top",
-  });
+  card(s, { x: M + i * 4.15, y: 1.84, w: 3.85, h: 2.48,
+            title: c.t, lines: c.lines, name: `close-${i}` });
 });
 
-s.addText("The two rules the whole project is built on", {
-  x: M, y: 4.32, w: 11, h: 0.32, fontSize: 11, bold: true, color: THEME.colors.accent1,
-  charSpacing: 1.4, isTextBox: true, margin: 0,
-});
-s.addText([
-  B("1 · "), T("Every module is validated against independently curated published datasets, never against controls written for this project."), BR,
-  B("2 · "), T("The language model never computes, estimates or reports a number. Every figure you have seen was computed deterministically in Python."),
-], {
-  x: M, y: 4.70, w: 12.2, h: 1.18, fontSize: 13, color: "E9EAE5",
-  isTextBox: true, margin: 0, lineSpacingMultiple: 1.2,
+card(s, {
+  x: M, y: 4.58, w: W - M * 2, h: 1.42, title: "THE TWO RULES THE WHOLE PROJECT IS BUILT ON",
+  lines: [
+    { text: "1 · Every module is validated against independently curated published datasets, never against controls written for this project.", options: {} },
+    { text: "2 · The language model never computes, estimates or reports a number. Every figure you have seen was computed deterministically in Python.", options: {} },
+  ],
 });
 
-s.addText("Marc C. Deller, D.Phil.  ·  marc@marcdeller.com  ·  binman.mdeller.com  ·  github.com/bellcheddar/BINMAN", {
-  x: M, y: 6.40, w: 12, h: 0.34, fontSize: 11.5, color: "9AA096",
+s.addText("Marc C. Deller, D.Phil.  \u00b7  marc@marcdeller.com  \u00b7  binman.mdeller.com  \u00b7  github.com/bellcheddar/BINMAN", {
+  x: M, y: 6.20, w: 12, h: 0.34, fontSize: 11.5, color: THEME.colors.dk2,
   isTextBox: true, margin: 0,
 });
 s.addNotes("Offer: a half-day walkthrough of the code with the atlas open, so the numbers can be checked live rather than taken on trust.");
