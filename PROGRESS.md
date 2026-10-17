@@ -94,5 +94,10 @@ tests and QC.
 1. `FINDINGS.md`, which states every number with its method and its n, and says
    plainly which metrics could not be computed and why.
 2. `GATE_OPEN.md`, which carries the one open gate, G7, and the decision it needs.
-3. `DECISIONS.md`, 93 entries, each with the alternatives considered and how to
+3. `DECISIONS.md`, 94 entries, each with the alternatives considered and how to
    reverse it.
+4. `docs/BINMAN-how-it-works.pptx`, sixteen slides for a collaborator who does
+   not read code. Slides 2 to 6 are the build drawn five ways by
+   `pipeline/deck_schematics.py`, which parses the figures out of the source
+   rather than taking them from a drawing. It found four dependencies that are
+   installed and credited and never called: see D-094.

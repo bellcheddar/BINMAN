@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1330 698" width="1330" height="698" role="img" aria-label="Where each piece runs">
+<style>.ttl{fill:#15171A;font:600 31px Inter, Helvetica, Arial, sans-serif}.sub{fill:#A64708;font:italic 18px Inter, Helvetica, Arial, sans-serif}.foot{fill:#61655F;font:13px Inter, Helvetica, Arial, sans-serif}.lane{fill:#61655F;font:600 14px Inter, Helvetica, Arial, sans-serif;letter-spacing:.08em}.hd{fill:#15171A;font:600 17px Inter, Helvetica, Arial, sans-serif}.hdn{fill:#1C244B;font:600 17px Inter, Helvetica, Arial, sans-serif}.n{fill:#15171A;font:15px ui-monospace, SFMono-Regular, Menlo, monospace}.s{fill:#61655F;font:15px ui-monospace, SFMono-Regular, Menlo, monospace}.sm{fill:#61655F;font:14px Inter, Helvetica, Arial, sans-serif}.ac{fill:#A64708;font:15px ui-monospace, SFMono-Regular, Menlo, monospace}.gd{fill:#2C6D60;font:15px ui-monospace, SFMono-Regular, Menlo, monospace}.bd{fill:#A33A2A;font:15px ui-monospace, SFMono-Regular, Menlo, monospace}.card{fill:#FFFFFF;stroke:#C9CBC3;stroke-width:1.6}.card2{fill:#F7F7F4;stroke:#C9CBC3;stroke-width:1.6}.src{fill:#F6E3D3;stroke:#A64708;stroke-width:1.6;stroke-dasharray:6 4}.band{fill:#F6E3D3;stroke:#A64708;stroke-width:1.6}.a{stroke:#C9CBC3;stroke-width:1.8;fill:none}.aa{stroke:#A64708;stroke-width:1.6;fill:none}.dot{stroke:#C9CBC3;stroke-width:1.4;fill:none;stroke-dasharray:3 4}.rule{stroke:#15171A;stroke-width:1.6}.tri{fill:#C9CBC3}.e-pipeline{stroke:#C9CBC3;stroke-width:1.6;fill:none}.e-lm{stroke:#A64708;stroke-width:1.6;fill:none;opacity:.75}.e-app{stroke:#2C6D60;stroke-width:1.6;fill:none;opacity:.75}</style>
+<marker id="tip" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#C9CBC3"/></marker>
+<marker id="tipa" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#A64708"/></marker>
+<rect x="0" y="0" width="1330" height="698" fill="#E9EAE5"/>
+<text class="ttl" x="60" y="74">Where each piece runs</text>
+<text class="sub" x="60" y="102">Nothing is computed at request time. The droplet serves what the Studio already built.</text>
+<line class="rule" x1="60" y1="120" x2="1270" y2="120"/>
+<rect class="card" x="60" y="126" width="430" height="436" rx="2"/>
+<rect class="band" x="60" y="126" width="430" height="42" rx="2"/>
+<text class="hd" x="74" y="154">Apple M2 Ultra · 24 cores · 128 GB</text>
+<text class="s" x="74" y="192">pixi, Python 3.11.16, osx-arm64</text>
+<rect class="card2" x="76" y="208" width="398" height="116" rx="2"/>
+<text class="hd" x="88" y="232">Pipeline, stages 1 to 3</text>
+<text class="n" x="88" y="256">DSSP (mkdssp), fpocket, FreeSASA, gemmi,</text>
+<text class="n" x="88" y="278">httpx, numpy, RDKit, scikit-learn, SQLite</text>
+<text class="s" x="88" y="300">14 worker processes, 96 h compute budget</text>
+<rect class="card2" x="76" y="336" width="398" height="116" rx="2"/>
+<text class="hd" x="88" y="360">Training, stage 4</text>
+<text class="n" x="88" y="384">mlx, mlx-lm, numpy, peft, RDKit,</text>
+<text class="n" x="88" y="406">safetensors, SQLite, torch, transformers</text>
+<text class="s" x="88" y="428">Qwen2.5-3B-Instruct-4bit, rank 8 over 32 layers, 239 min</text>
+<rect class="card2" x="76" y="464" width="398" height="82" rx="2"/>
+<text class="hd" x="88" y="488">Atlas build, then the checks</text>
+<text class="n" x="88" y="512">build_atlas.py, SQLite, ANALYZE, indexes</text>
+<text class="s" x="88" y="534">pytest (117), preflight.sh, validate.py</text>
+<rect class="card" x="530" y="126" width="372" height="234" rx="2"/>
+<rect class="band" x="530" y="126" width="372" height="42" rx="2"/>
+<text class="hd" x="544" y="154">Droplet · Ubuntu, one vCPU</text>
+<text class="n" x="544" y="192">nginx and certbot (TLS)</text>
+<path class="a" d="M560,200 L560,216" marker-end="url(#tip)"/>
+<text class="n" x="544" y="232">gunicorn, systemd unit</text>
+<path class="a" d="M560,240 L560,256" marker-end="url(#tip)"/>
+<text class="n" x="544" y="272">Flask app, app/routes/*</text>
+<path class="a" d="M560,280 L560,296" marker-end="url(#tip)"/>
+<text class="n" x="544" y="312">SQLite, opened read only</text>
+<text class="s" x="544" y="344">No gemmi, no FreeSASA, no fpocket here.</text>
+<rect class="card" x="530" y="380" width="372" height="182" rx="2"/>
+<rect class="band" x="530" y="380" width="372" height="42" rx="2"/>
+<text class="hd" x="544" y="408">Hugging Face Space · ZeroGPU</text>
+<text class="n" x="544" y="448">gradio, transformers, peft, torch</text>
+<text class="n" x="544" y="472">Dellboy/binman-lm-adapter</text>
+<text class="s" x="544" y="496">Loads the base model and the adapter on</text>
+<text class="s" x="544" y="520">demand. Text only, never arithmetic.</text>
+<rect class="card" x="942" y="126" width="328" height="234" rx="2"/>
+<rect class="band" x="942" y="126" width="328" height="42" rx="2"/>
+<text class="hd" x="956" y="154">Viewer's browser</text>
+<text class="n" x="956" y="192">Mol*</text>
+<text class="n" x="956" y="218">D3</text>
+<text class="n" x="956" y="244">Plotly.js</text>
+<text class="n" x="956" y="270">Tabulator</text>
+<text class="n" x="956" y="296">Depot CSS, no framework</text>
+<text class="s" x="956" y="344">Vendored and pinned: no third-party request.</text>
+<rect class="band" x="942" y="380" width="328" height="182" rx="2"/>
+<text class="hd" x="956" y="408">What never crosses</text>
+<text class="sm" x="956" y="442">The raw structures. All 130,391</text>
+<text class="sm" x="956" y="464">entries stay on the Studio; the droplet</text>
+<text class="sm" x="956" y="486">gets the atlas and 3,839 trimmed</text>
+<text class="sm" x="956" y="508">files. The training corpus is not</text>
+<text class="sm" x="956" y="530">published either, only the adapter.</text>
+<path class="aa" d="M490,240 L524,240" marker-end="url(#tipa)"/>
+<circle cx="507" cy="214" r="11" fill="#FFFFFF" stroke="#A64708" stroke-width="1.6"/>
+<text x="507" y="219" text-anchor="middle" fill="#A64708" font="600 13px Inter, Helvetica, Arial, sans-serif" style="font:600 13px Inter, Helvetica, Arial, sans-serif">1</text>
+<path class="aa" d="M490,470 L524,470" marker-end="url(#tipa)"/>
+<circle cx="507" cy="444" r="11" fill="#FFFFFF" stroke="#A64708" stroke-width="1.6"/>
+<text x="507" y="449" text-anchor="middle" fill="#A64708" font="600 13px Inter, Helvetica, Arial, sans-serif" style="font:600 13px Inter, Helvetica, Arial, sans-serif">2</text>
+<path class="aa" d="M820,380 L820,356" marker-end="url(#tipa)"/>
+<circle cx="852" cy="370" r="11" fill="#FFFFFF" stroke="#A64708" stroke-width="1.6"/>
+<text x="852" y="375" text-anchor="middle" fill="#A64708" font="600 13px Inter, Helvetica, Arial, sans-serif" style="font:600 13px Inter, Helvetica, Arial, sans-serif">3</text>
+<path class="aa" d="M902,240 L936,240" marker-end="url(#tipa)"/>
+<circle cx="919" cy="214" r="11" fill="#FFFFFF" stroke="#A64708" stroke-width="1.6"/>
+<text x="919" y="219" text-anchor="middle" fill="#A64708" font="600 13px Inter, Helvetica, Arial, sans-serif" style="font:600 13px Inter, Helvetica, Arial, sans-serif">4</text>
+<rect class="band" x="60" y="582" width="1210" height="68" rx="2"/>
+<circle cx="86" cy="616" r="11" fill="#FFFFFF" stroke="#A64708" stroke-width="1.6"/>
+<text x="86" y="621" text-anchor="middle" fill="#A64708" font="600 13px Inter, Helvetica, Arial, sans-serif" style="font:600 13px Inter, Helvetica, Arial, sans-serif">1</text>
+<text class="hd" x="106" y="612">rsync -az</text>
+<text class="sm" x="106" y="634">app/, the atlas and the trimmed structures</text>
+<circle cx="388" cy="616" r="11" fill="#FFFFFF" stroke="#A64708" stroke-width="1.6"/>
+<text x="388" y="621" text-anchor="middle" fill="#A64708" font="600 13px Inter, Helvetica, Arial, sans-serif" style="font:600 13px Inter, Helvetica, Arial, sans-serif">2</text>
+<text class="hd" x="408" y="612">lm/export_hf.py</text>
+<text class="sm" x="408" y="634">the adapter, sha256 verified on the Hub</text>
+<circle cx="690" cy="616" r="11" fill="#FFFFFF" stroke="#A64708" stroke-width="1.6"/>
+<text x="690" y="621" text-anchor="middle" fill="#A64708" font="600 13px Inter, Helvetica, Arial, sans-serif" style="font:600 13px Inter, Helvetica, Arial, sans-serif">3</text>
+<text class="hd" x="710" y="612">HTTPS, Flask asks the Space</text>
+<text class="sm" x="710" y="634">a question in, a query object out</text>
+<circle cx="992" cy="616" r="11" fill="#FFFFFF" stroke="#A64708" stroke-width="1.6"/>
+<text x="992" y="621" text-anchor="middle" fill="#A64708" font="600 13px Inter, Helvetica, Arial, sans-serif" style="font:600 13px Inter, Helvetica, Arial, sans-serif">4</text>
+<text class="hd" x="1012" y="612">HTTPS, nginx to the browser</text>
+<text class="sm" x="1012" y="634">JSON rows and the HTML page</text>
+<text class="foot" x="60" y="678">Counts read from app/static/about.json as generated 2026-10-16, from the model card and from the repository itself. Library names are parsed from the imports.</text>
+</svg>

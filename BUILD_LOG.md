@@ -1285,3 +1285,21 @@ One line per meaningful event, timestamped UTC (spec Section 0 rule 5).
 | 2026-10-16T05:28:27+00:00 | 3.8 | Abstention recall 1.0, specificity 1.0. |
 | 2026-10-16T05:28:29+00:00 | 9 | Validation run against binman.sqlite: 0 metric(s) not computed (dataset unavailable), 2 measured floor(s) missed. |
 | 2026-10-16T05:28:30+00:00 | 9 | Validation run against binman.sqlite: 4 metric(s) not computed (dataset unavailable), 6 measured floor(s) missed. |
+| 2026-10-17T03:10:40+00:00 | 6.5 | Deck schematics: 6 figures, 82 imports across 46 modules. |
+| 2026-10-17T03:11:41+00:00 | 6.5 | Deck schematics: 6 figures, 75 imports across 44 modules. |
+| 2026-10-17T03:12:26+00:00 | 6.5 | Deck schematics: 5 figures, 75 imports across 44 modules. |
+| 2026-10-17T03:12:27+00:00 | 6.5 | Deck schematics: 6 figures, 75 imports across 44 modules. |
+| 2026-10-17T03:15:01+00:00 | 6.5 | Deck schematics: 6 figures, 75 imports across 44 modules. |
+| 2026-10-17T03:15:34+00:00 | 6.5 | Deck schematics: 6 figures, 75 imports across 44 modules. |
+| 2026-10-17T03:16:00+00:00 | 6.5 | Deck schematics: 6 figures, 75 imports across 44 modules. |
+| 2026-10-17T03:16:19+00:00 | 6.5 | Deck schematics: 6 figures, 75 imports across 44 modules. |
+| 2026-10-17T03:18:57+00:00 | 6.5 | Deck schematics: 6 figures, 75 imports across 44 modules. |
+| 2026-10-17T03:19:11+00:00 | 3.8 | Abstention check: 12 answerable and 5 unanswerable questions, asked of local adapter models/binman-lm/adapters over mlx-community/Qwen2.5-3B-Instruct-4bit. |
+| 2026-10-17T03:19:11+00:00 | 3.8 | Abstention recall 1.0, specificity 1.0. |
+| 2026-10-17T03:19:11+00:00 | 3.8 | Abstention check: 12 answerable and 5 unanswerable questions, asked of local adapter adapters over base. |
+| 2026-10-17T03:19:11+00:00 | 3.8 | Abstention recall 1.0, specificity 1.0. |
+| 2026-10-17T03:19:11+00:00 | 3.8 | Abstention check: 12 answerable and 20 unanswerable questions, asked of local adapter adapters over base. |
+| 2026-10-17T03:19:11+00:00 | 3.8 | Abstention recall 1.0, specificity 1.0. |
+| 2026-10-17T03:19:14+00:00 | 9 | Validation run against binman.sqlite: 0 metric(s) not computed (dataset unavailable), 2 measured floor(s) missed. |
+| 2026-10-17T03:19:15+00:00 | 9 | Validation run against binman.sqlite: 4 metric(s) not computed (dataset unavailable), 6 measured floor(s) missed. |
+| 2026-10-17T03:19:56+00:00 | 6.5 | Deck schematics: 6 figures, 75 imports across 44 modules. |

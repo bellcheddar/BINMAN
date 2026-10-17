@@ -1,0 +1,96 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1330 698" width="1330" height="698" role="img" aria-label="One file at a time">
+<style>.ttl{fill:#15171A;font:600 31px Inter, Helvetica, Arial, sans-serif}.sub{fill:#A64708;font:italic 18px Inter, Helvetica, Arial, sans-serif}.foot{fill:#61655F;font:13px Inter, Helvetica, Arial, sans-serif}.lane{fill:#61655F;font:600 14px Inter, Helvetica, Arial, sans-serif;letter-spacing:.08em}.hd{fill:#15171A;font:600 17px Inter, Helvetica, Arial, sans-serif}.hdn{fill:#1C244B;font:600 17px Inter, Helvetica, Arial, sans-serif}.n{fill:#15171A;font:15px ui-monospace, SFMono-Regular, Menlo, monospace}.s{fill:#61655F;font:15px ui-monospace, SFMono-Regular, Menlo, monospace}.sm{fill:#61655F;font:14px Inter, Helvetica, Arial, sans-serif}.ac{fill:#A64708;font:15px ui-monospace, SFMono-Regular, Menlo, monospace}.gd{fill:#2C6D60;font:15px ui-monospace, SFMono-Regular, Menlo, monospace}.bd{fill:#A33A2A;font:15px ui-monospace, SFMono-Regular, Menlo, monospace}.card{fill:#FFFFFF;stroke:#C9CBC3;stroke-width:1.6}.card2{fill:#F7F7F4;stroke:#C9CBC3;stroke-width:1.6}.src{fill:#F6E3D3;stroke:#A64708;stroke-width:1.6;stroke-dasharray:6 4}.band{fill:#F6E3D3;stroke:#A64708;stroke-width:1.6}.a{stroke:#C9CBC3;stroke-width:1.8;fill:none}.aa{stroke:#A64708;stroke-width:1.6;fill:none}.dot{stroke:#C9CBC3;stroke-width:1.4;fill:none;stroke-dasharray:3 4}.rule{stroke:#15171A;stroke-width:1.6}.tri{fill:#C9CBC3}.e-pipeline{stroke:#C9CBC3;stroke-width:1.6;fill:none}.e-lm{stroke:#A64708;stroke-width:1.6;fill:none;opacity:.75}.e-app{stroke:#2C6D60;stroke-width:1.6;fill:none;opacity:.75}</style>
+<marker id="tip" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#C9CBC3"/></marker>
+<marker id="tipa" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#A64708"/></marker>
+<rect x="0" y="0" width="1330" height="698" fill="#E9EAE5"/>
+<text class="ttl" x="60" y="74">One file at a time</text>
+<text class="sub" x="60" y="102">Above the line, what does the work. On the line, what it writes. Below, what checks it.</text>
+<line class="rule" x1="60" y1="120" x2="1270" y2="120"/>
+<text class="lane" x="60" y="150">SOFTWARE</text>
+<text class="lane" x="60" y="352">ARTEFACT ON DISK</text>
+<text class="lane" x="60" y="486">CHECK</text>
+<rect class="card" x="60" y="166" width="226" height="130" rx="2"/>
+<text class="hd" x="72" y="190">Ask and fetch</text>
+<text class="ac" x="72" y="218">gemmi, httpx, SQLite</text>
+<text class="s" x="72" y="242">8 req/s, 5 retries</text>
+<path class="a" d="M173,296 L173,316" marker-end="url(#tip)"/>
+<rect class="card" x="302" y="166" width="226" height="130" rx="2"/>
+<text class="hd" x="314" y="190">Measure</text>
+<text class="ac" x="314" y="218">FreeSASA, RDKit, SQLite</text>
+<text class="s" x="314" y="242">14 worker processes</text>
+<path class="a" d="M415,296 L415,316" marker-end="url(#tip)"/>
+<rect class="card" x="544" y="166" width="226" height="130" rx="2"/>
+<text class="hd" x="556" y="190">Score</text>
+<text class="ac" x="556" y="218">DSSP (mkdssp), fpocket,</text>
+<text class="ac" x="556" y="242">gemmi, numpy,</text>
+<text class="ac" x="556" y="266">scikit-learn, SQLite</text>
+<text class="s" x="556" y="290">sequence and structure</text>
+<path class="a" d="M657,296 L657,316" marker-end="url(#tip)"/>
+<rect class="card" x="786" y="166" width="226" height="130" rx="2"/>
+<text class="hd" x="798" y="190">Assemble and train</text>
+<text class="ac" x="798" y="218">mlx, mlx-lm, numpy,</text>
+<text class="ac" x="798" y="242">peft, RDKit,</text>
+<text class="ac" x="798" y="266">safetensors, SQLite,</text>
+<text class="s" x="798" y="290">round 15 adapter</text>
+<path class="a" d="M899,296 L899,316" marker-end="url(#tip)"/>
+<rect class="card" x="1028" y="166" width="242" height="130" rx="2"/>
+<text class="hd" x="1040" y="190">Serve</text>
+<text class="ac" x="1040" y="218">Flask, SQLite, nginx,</text>
+<text class="ac" x="1040" y="242">gunicorn, certbot</text>
+<text class="s" x="1040" y="266">Mol*, D3, Plotly.js</text>
+<path class="a" d="M1149,296 L1149,316" marker-end="url(#tip)"/>
+<rect class="band" x="60" y="318" width="1210" height="96" rx="2"/>
+<rect class="card" x="74" y="332" width="208" height="68" rx="2"/>
+<text class="n" x="86" y="356">data/raw/</text>
+<text class="n" x="86" y="378">*.cif.gz</text>
+<path class="tri" d="M298,357 L307,366 L298,375 Z"/>
+<path class="a" d="M178,414 L178,434" marker-end="url(#tip)"/>
+<rect class="card" x="316" y="332" width="208" height="68" rx="2"/>
+<text class="n" x="328" y="356">interim/bridges</text>
+<text class="n" x="328" y="378">.jsonl</text>
+<path class="tri" d="M540,357 L549,366 L540,375 Z"/>
+<path class="a" d="M420,414 L420,434" marker-end="url(#tip)"/>
+<rect class="card" x="558" y="332" width="208" height="68" rx="2"/>
+<text class="n" x="570" y="356">interim/degrons,</text>
+<text class="n" x="570" y="378">triage, lysines</text>
+<path class="tri" d="M782,357 L791,366 L782,375 Z"/>
+<path class="a" d="M662,414 L662,434" marker-end="url(#tip)"/>
+<rect class="card" x="800" y="332" width="208" height="68" rx="2"/>
+<text class="n" x="812" y="356">atlas/binman</text>
+<text class="n" x="812" y="378">.sqlite</text>
+<path class="tri" d="M1024,357 L1033,366 L1024,375 Z"/>
+<path class="a" d="M904,414 L904,434" marker-end="url(#tip)"/>
+<rect class="card" x="1042" y="332" width="214" height="68" rx="2"/>
+<text class="n" x="1054" y="356">/api/*.json</text>
+<text class="n" x="1054" y="378">and the HTML</text>
+<path class="a" d="M1149,414 L1149,434" marker-end="url(#tip)"/>
+<rect class="card2" x="60" y="436" width="226" height="126" rx="2"/>
+<text class="n" x="72" y="460">catalogue.jsonl</text>
+<text class="s" x="72" y="484">one row per entry,</text>
+<text class="s" x="72" y="508">so the fetch resumes</text>
+<text class="gd" x="72" y="532">0 failed</text>
+<rect class="card2" x="302" y="436" width="226" height="126" rx="2"/>
+<text class="n" x="314" y="460">thresholds.toml</text>
+<text class="s" x="314" y="484">every cutoff lives here,</text>
+<text class="s" x="314" y="508">never in the Python</text>
+<text class="bd" x="314" y="532">19 entries failed</text>
+<rect class="card2" x="544" y="436" width="226" height="126" rx="2"/>
+<text class="n" x="556" y="460">validate.py</text>
+<text class="s" x="556" y="484">recall against 320 curated</text>
+<text class="s" x="556" y="508">glues, published sets</text>
+<text class="gd" x="556" y="532">0.8781 vs 0.85 floor</text>
+<rect class="card2" x="786" y="436" width="226" height="126" rx="2"/>
+<text class="n" x="798" y="460">pytest</text>
+<text class="s" x="798" y="484">stage manifests, prompt</text>
+<text class="s" x="798" y="508">agreement, the schema</text>
+<text class="gd" x="798" y="532">117 test functions</text>
+<rect class="card2" x="1028" y="436" width="242" height="126" rx="2"/>
+<text class="n" x="1040" y="460">deploy/preflight.sh</text>
+<text class="s" x="1040" y="484">a warm-up request per</text>
+<text class="s" x="1040" y="508">module page on restart</text>
+<text class="gd" x="1040" y="532">206 MB, read only</text>
+<rect class="band" x="60" y="586" width="1210" height="64" rx="2"/>
+<text class="hd" x="74" y="612">The spine is the reason the build can be restarted at all</text>
+<text class="sm" x="74" y="634">No stage holds state across items. It reads the file before it and appends to the file after it.</text>
+<text class="foot" x="60" y="678">Counts read from app/static/about.json as generated 2026-10-16, from the model card and from the repository itself. Library names are parsed from the imports.</text>
+</svg>

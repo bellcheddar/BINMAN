@@ -3629,3 +3629,57 @@ not fixed in general, and the fix for round 16 is in the corpus rather than the
 model: vary the answerable explanations, and ground them in the fields the
 question actually asks for rather than in the record type alone.
 
+
+## D-094
+
+**The deck gains five full-slide schematics of the build, and every name and
+number in them is computed rather than typed.**
+
+A collaborator who does not read code asked how the parts connect. One figure
+could not carry it, so there are five, each the whole build cut a different
+way: four lanes (sources, code, calls, artefacts) crossed by the five stages;
+the stages standing on the shared toolchain; the import graph; the three
+machines and what crosses between them; and the artefacts in the order they are
+written. They go in as slides 2 to 6, full bleed, which makes the deck sixteen
+slides.
+
+`pipeline/deck_schematics.py` draws them at 1330 x 698, the slide less its
+footer strip, so each one drops on at 100 px per inch with no scaling. The SVGs
+are committed in `docs/`; the PNGs the deck embeds are rendered to
+`data/interim/deck/` with CairoSVG, which is also where slide 1's figure is now
+rasterised from `docs/workflow.svg`. `docs/deck_build.js` no longer reads
+anything out of `/tmp`, so the deck rebuilds from the repository alone.
+
+**The rule that made this worth building rather than drawing.** No count in
+these figures is typed: each is read from `app/static/about.json`,
+`models/binman-lm/training.json`, `app/static/novel_glue_series.json` or
+counted over the repository. No library name is typed against a module either:
+the CALLS lane and the import graph come from an `ast` parse of every module
+under `pipeline/`, `lm/` and `app/`, and the command-line tools are found by
+searching those same files for the binary they invoke, in modules that import
+`subprocess`. A bare string search was tried first and counted
+`fpocket_druggability`, a column name in `app/queries.py`, as a call to
+fpocket; requiring `subprocess` fixed it.
+
+**What the parse found, which is the reason to prefer it to a drawing.** Four
+dependencies are installed, credited and never called.
+
+| | claimed | actual |
+|---|---|---|
+| `plip` | "interaction typing at each half-interface", spec 3.4 and the README | no module imports or runs it; `plip_types_a` is null in all 285,996 bridge rows |
+| `openbabel` | "CIF to PDB conversion in the PLIP path" | the PLIP path does not exist |
+| `pydssp` | the documented fallback when `mkdssp` is missing | `degron_scan.py` names it in a docstring and raises `mkdssp_not_installed` instead |
+| `tenacity` | "httpx, tenacity" on slide 1 and on the About page | `common.py:Fetcher` implements its own backoff from `io.retry_attempts` |
+
+The five new figures are correct, because they are parsed. Slide 1's figure,
+the About page prose, the README's stage table and the PLIP shield are not, and
+`pipeline/build_about.py` types those names by hand. That is left as it stands
+rather than quietly edited: the choice between implementing the PLIP path and
+withdrawing the claim is Marc's, and both are one commit. `tests/
+test_deck_schematics.py::test_no_figure_names_a_library_nothing_imports` holds
+the line for the new figures in the meantime, and a second test regenerates all
+five and fails if the committed SVG has drifted from the code.
+
+**To reverse:** delete `pipeline/deck_schematics.py`, the five SVGs, the
+`SCHEMATICS` block in `docs/deck_build.js` and the test file. Slide 1 then needs
+its `workflow.png` path pointed somewhere again.

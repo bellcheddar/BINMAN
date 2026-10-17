@@ -1,5 +1,14 @@
 const pptxgen = require("pptxgenjs");
 const fs = require("fs");
+const path = require("path");
+
+// Everything the deck needs is in the repository. The figures are rasterised
+// by pipeline/deck_schematics.py, which draws them from the manifests, so
+// `pixi run python pipeline/deck_schematics.py && node docs/deck_build.js`
+// rebuilds this file from scratch on any machine.
+const FIGURES = path.join(__dirname, "..", "data", "interim", "deck");
+const OUTPUT = path.join(__dirname, "BINMAN-how-it-works.pptx");
+const figure = (name) => path.join(FIGURES, name);
 
 // Depot, the palette BINMAN's own interface uses: concrete, ink and sodium amber.
 const THEME = {
@@ -168,13 +177,56 @@ prose(s, [
   B("15,804"), T(" that no curated glue database lists."),
 ], M, 1.42, W - M * 2, 1.02, 13.5);
 
-s.addImage({ path: "/tmp/binman_deck/workflow.png", x: M, y: 2.50, w: W - M * 2, h: 3.90 });
+s.addImage({ path: figure("workflow.png"), x: M, y: 2.50, w: W - M * 2, h: 3.90 });
 
 s.addText("Four stages, left to right, then the four modules that read the result. The trained layer underneath is one small language model that does the text work and none of the arithmetic.", {
   x: M, y: 6.54, w: W - M * 2, h: 0.34, fontSize: 11, color: THEME.colors.dk2,
   italic: true, isTextBox: true, margin: 0,
 });
-s.addNotes("BINMAN is an empirical atlas. Nothing here is predicted structure: every bridge is measured in a deposited crystal or cryo-EM structure. The four stages run left to right and each writes a manifest, so the whole thing is resumable.");
+s.addNotes("BINMAN is an empirical atlas. Nothing here is predicted structure: every bridge is measured in a deposited crystal or cryo-EM structure. The four stages run left to right and each writes a manifest, so the whole thing is resumable. The next five slides take the same build apart five ways, for anyone who wants the software rather than the summary.");
+
+/* ------------------------------------------------- 2 to 6 \u00b7 the schematics */
+
+// Five full-bleed figures, each the whole build cut a different way. They are
+// drawn by pipeline/deck_schematics.py: every count is read from the manifests
+// and every library name is parsed from the imports, so neither can drift from
+// the code without the figure changing too. The image is 13.3 x 6.98 in, which
+// leaves the master's footer strip clear.
+pres.addSection({ title: "How it is wired" });
+
+const SCHEMATICS = [
+  {
+    file: "schematic_lanes.png",
+    notes: "Read down a column for one stage, or across a lane for one kind of thing. The CALLS lane is parsed out of the imports rather than written by hand, which is why it is worth trusting: a module that drops a library changes this figure at the next build. The band at the bottom is the part that makes the build survivable. Every stage appends one row per item to its manifest, so a run killed at hour nine resumes at item 90,000 rather than at item one.",
+  },
+  {
+    file: "schematic_columns.png",
+    notes: "The same five stages, with the machinery they share drawn once instead of five times. pixi pins one environment and one lock file; the thresholds live in a TOML file rather than in the Python, so no cutoff is buried in a function; the manifests make every stage resumable; the tests cover the pipeline and the serving layer in one run. The point of the rail is that these are not five scripts that happen to be in one folder.",
+  },
+  {
+    file: "schematic_imports.png",
+    notes: "This one is parsed, not drawn: every line is an import that exists in the repository. It is the honest answer to how the parts connect, and it is also the least comfortable to read, which is why it is here rather than on slide one. The shape is the useful part. SQLite and numpy are called from everywhere, mlx-lm from four places, peft from one. A library with one line into it is a library you can remove without touching the rest.",
+  },
+  {
+    file: "schematic_machines.png",
+    notes: "Where each piece actually runs. The important claim is the one on the droplet: no gemmi, no FreeSASA, no fpocket at request time. It serves a precomputed SQLite file opened read only, which is why a page comes back in about a tenth of a second on one vCPU. The four numbered crossings are the only things that move between machines, and the raw structures are not among them.",
+  },
+  {
+    file: "schematic_spine.png",
+    notes: "The same build told as the files it writes. Each stage reads the file before it and appends to the file after it, and holds no state across items. That is what makes the whole thing restartable, and it is also what makes it checkable: the check under each hop is a real file in the repository, not a promise.",
+  },
+];
+
+SCHEMATICS.forEach((figureSlide) => {
+  const slide = pres.addSlide({ masterName: "LIGHT", sectionTitle: "How it is wired" });
+  // LAYOUT_WIDE is 13.333 in across, not the 13.3 the content grid uses, so
+  // the figure is placed at the true width or it leaves a white sliver down
+  // the right edge. The height follows the 1330 x 698 canvas.
+  slide.addImage({ path: figure(figureSlide.file), x: 0, y: 0,
+                   w: 13.333, h: 6.997,
+                   objectName: figureSlide.file.replace(".png", "") });
+  slide.addNotes(figureSlide.notes);
+});
 
 /* -------------------------------------------------------------- 2 · stages */
 
@@ -549,8 +601,9 @@ s.addText("Marc C. Deller, D.Phil.  \u00b7  marc@marcdeller.com  \u00b7  binman.
 });
 s.addNotes("Offer: a half-day walkthrough of the code with the atlas open, so the numbers can be checked live rather than taken on trust.");
 
-pres.writeFile({ fileName: "/tmp/binman_deck/BINMAN-how-it-works.pptx" }).then(async () => {
-  const { applyTheme } = require("/Users/dellboy/.claude/skills/synced/23e24ebf-dbf5-47f1-965c-06fa65267e7b_29ef5fdb-4564-4200-89d5-648deef9692b/pptx/scripts/apply_theme.js");
-  await applyTheme("/tmp/binman_deck/BINMAN-how-it-works.pptx", THEME);
-  console.log("written and themed");
+pres.writeFile({ fileName: OUTPUT }).then(async () => {
+  const { applyTheme } = require(process.env.PPTX_APPLY_THEME ||
+    "/Users/dellboy/.claude/skills/synced/23e24ebf-dbf5-47f1-965c-06fa65267e7b_29ef5fdb-4564-4200-89d5-648deef9692b/pptx/scripts/apply_theme.js");
+  await applyTheme(OUTPUT, THEME);
+  console.log("written and themed: " + OUTPUT);
 });

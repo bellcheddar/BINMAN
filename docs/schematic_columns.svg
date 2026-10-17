@@ -1,0 +1,98 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1330 698" width="1330" height="698" role="img" aria-label="Five stages on one toolchain">
+<style>.ttl{fill:#15171A;font:600 31px Inter, Helvetica, Arial, sans-serif}.sub{fill:#A64708;font:italic 18px Inter, Helvetica, Arial, sans-serif}.foot{fill:#61655F;font:13px Inter, Helvetica, Arial, sans-serif}.lane{fill:#61655F;font:600 14px Inter, Helvetica, Arial, sans-serif;letter-spacing:.08em}.hd{fill:#15171A;font:600 17px Inter, Helvetica, Arial, sans-serif}.hdn{fill:#1C244B;font:600 17px Inter, Helvetica, Arial, sans-serif}.n{fill:#15171A;font:15px ui-monospace, SFMono-Regular, Menlo, monospace}.s{fill:#61655F;font:15px ui-monospace, SFMono-Regular, Menlo, monospace}.sm{fill:#61655F;font:14px Inter, Helvetica, Arial, sans-serif}.ac{fill:#A64708;font:15px ui-monospace, SFMono-Regular, Menlo, monospace}.gd{fill:#2C6D60;font:15px ui-monospace, SFMono-Regular, Menlo, monospace}.bd{fill:#A33A2A;font:15px ui-monospace, SFMono-Regular, Menlo, monospace}.card{fill:#FFFFFF;stroke:#C9CBC3;stroke-width:1.6}.card2{fill:#F7F7F4;stroke:#C9CBC3;stroke-width:1.6}.src{fill:#F6E3D3;stroke:#A64708;stroke-width:1.6;stroke-dasharray:6 4}.band{fill:#F6E3D3;stroke:#A64708;stroke-width:1.6}.a{stroke:#C9CBC3;stroke-width:1.8;fill:none}.aa{stroke:#A64708;stroke-width:1.6;fill:none}.dot{stroke:#C9CBC3;stroke-width:1.4;fill:none;stroke-dasharray:3 4}.rule{stroke:#15171A;stroke-width:1.6}.tri{fill:#C9CBC3}.e-pipeline{stroke:#C9CBC3;stroke-width:1.6;fill:none}.e-lm{stroke:#A64708;stroke-width:1.6;fill:none;opacity:.75}.e-app{stroke:#2C6D60;stroke-width:1.6;fill:none;opacity:.75}</style>
+<marker id="tip" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#C9CBC3"/></marker>
+<marker id="tipa" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#A64708"/></marker>
+<rect x="0" y="0" width="1330" height="698" fill="#E9EAE5"/>
+<text class="ttl" x="60" y="74">Five stages on one toolchain</text>
+<text class="sub" x="60" y="102">The columns run in call order. The rail underneath is shared by all of them.</text>
+<line class="rule" x1="60" y1="120" x2="1270" y2="120"/>
+<rect class="card" x="60" y="126" width="226" height="320" rx="2"/>
+<rect class="band" x="60" y="126" width="226" height="40" rx="2"/>
+<text class="hd" x="74" y="153">1 · Acquisition</text>
+<text class="n" x="74" y="192">catalogue.py</text>
+<text class="n" x="74" y="214">rcsb.py</text>
+<text class="n" x="74" y="236">structures.py</text>
+<text class="n" x="74" y="258">trim_structures.py</text>
+<line class="dot" x1="74" y1="274" x2="272" y2="274"/>
+<text class="ac" x="74" y="298">gemmi, httpx, SQLite</text>
+<text class="gd" x="74" y="392">130,391 entries</text>
+<text class="s" x="74" y="414">0 failed</text>
+<path class="a" d="M173,446 L173,502" marker-end="url(#tip)"/>
+<rect class="card" x="302" y="126" width="226" height="320" rx="2"/>
+<rect class="band" x="302" y="126" width="226" height="40" rx="2"/>
+<text class="hd" x="316" y="153">2 · Geometry</text>
+<text class="n" x="316" y="192">geometry.py</text>
+<text class="n" x="316" y="214">run_bridges.py</text>
+<text class="n" x="316" y="236">build_edges.py</text>
+<text class="n" x="316" y="258">chem_rules.py</text>
+<line class="dot" x1="316" y1="274" x2="514" y2="274"/>
+<text class="ac" x="316" y="298">FreeSASA, RDKit, SQLite</text>
+<text class="gd" x="316" y="392">285,996 bridges</text>
+<text class="bd" x="316" y="414">19 entries failed</text>
+<path class="a" d="M415,446 L415,502" marker-end="url(#tip)"/>
+<rect class="card" x="544" y="126" width="226" height="320" rx="2"/>
+<rect class="band" x="544" y="126" width="226" height="40" rx="2"/>
+<text class="hd" x="558" y="153">3 · Scan and triage</text>
+<text class="n" x="558" y="192">degron_scan.py</text>
+<text class="n" x="558" y="214">degron_predict.py</text>
+<text class="n" x="558" y="236">e3_triage.py</text>
+<text class="n" x="558" y="258">degradability.py</text>
+<line class="dot" x1="558" y1="274" x2="756" y2="274"/>
+<text class="ac" x="558" y="298">DSSP (mkdssp), fpocket,</text>
+<text class="ac" x="558" y="320">gemmi, numpy,</text>
+<text class="ac" x="558" y="342">scikit-learn, SQLite</text>
+<text class="gd" x="558" y="392">21,717 degrons</text>
+<text class="s" x="558" y="414">650 ligases, 1,650 lysines</text>
+<path class="a" d="M657,446 L657,502" marker-end="url(#tip)"/>
+<rect class="card" x="786" y="126" width="226" height="320" rx="2"/>
+<rect class="band" x="786" y="126" width="226" height="40" rx="2"/>
+<text class="hd" x="800" y="153">4 · Model</text>
+<text class="n" x="800" y="192">lm/build_corpus.py</text>
+<text class="n" x="800" y="214">lm/build_task_b.py</text>
+<text class="n" x="800" y="236">lm/train.py</text>
+<text class="n" x="800" y="258">lm/evaluate.py</text>
+<line class="dot" x1="800" y1="274" x2="998" y2="274"/>
+<text class="ac" x="800" y="298">mlx, mlx-lm, numpy,</text>
+<text class="ac" x="800" y="320">peft, RDKit,</text>
+<text class="ac" x="800" y="342">safetensors, SQLite,</text>
+<text class="ac" x="800" y="364">torch, transformers</text>
+<text class="gd" x="800" y="392">round 15, 239 min</text>
+<text class="s" x="800" y="414">rank 8 over 32 layers</text>
+<path class="a" d="M899,446 L899,502" marker-end="url(#tip)"/>
+<rect class="card" x="1028" y="126" width="242" height="320" rx="2"/>
+<rect class="band" x="1028" y="126" width="242" height="40" rx="2"/>
+<text class="hd" x="1042" y="153">5 · Store and serve</text>
+<text class="n" x="1042" y="192">build_atlas.py</text>
+<text class="n" x="1042" y="214">build_about.py</text>
+<text class="n" x="1042" y="236">app/queries.py</text>
+<text class="n" x="1042" y="258">app/db.py</text>
+<line class="dot" x1="1042" y1="274" x2="1256" y2="274"/>
+<text class="ac" x="1042" y="298">Flask, SQLite, nginx,</text>
+<text class="ac" x="1042" y="320">gunicorn, certbot</text>
+<text class="gd" x="1042" y="392">206 MB SQLite</text>
+<text class="s" x="1042" y="414">53 sources credited</text>
+<path class="a" d="M1149,446 L1149,502" marker-end="url(#tip)"/>
+<rect class="band" x="60" y="510" width="1210" height="140" rx="2"/>
+<text class="lane" x="74" y="534">SHARED BY EVERY STAGE</text>
+<rect class="card" x="74" y="546" width="222" height="90" rx="2"/>
+<text class="hd" x="86" y="570">pixi</text>
+<text class="s" x="86" y="594">conda-forge, bioconda</text>
+<text class="s" x="86" y="614">and PyPI, Python 3.11.16</text>
+<rect class="card" x="310" y="546" width="222" height="90" rx="2"/>
+<text class="hd" x="322" y="570">config/</text>
+<text class="s" x="322" y="594">tuning.toml: 14 workers</text>
+<text class="s" x="322" y="614">thresholds.toml: cutoffs</text>
+<rect class="card" x="546" y="546" width="222" height="90" rx="2"/>
+<text class="hd" x="558" y="570">data/manifests/</text>
+<text class="s" x="558" y="594">one JSONL row per item,</text>
+<text class="s" x="558" y="614">so every stage resumes</text>
+<rect class="card" x="782" y="546" width="222" height="90" rx="2"/>
+<text class="hd" x="794" y="570">pytest</text>
+<text class="s" x="794" y="594">117 test functions</text>
+<text class="s" x="794" y="614">over 14 files</text>
+<rect class="card" x="1018" y="546" width="238" height="90" rx="2"/>
+<text class="hd" x="1030" y="570">git, GitHub</text>
+<text class="s" x="1030" y="594">BUILD_LOG, PROGRESS and</text>
+<text class="s" x="1030" y="614">DECISIONS: 94 entries</text>
+<text class="foot" x="60" y="678">Counts read from app/static/about.json as generated 2026-10-16, from the model card and from the repository itself. Library names are parsed from the imports.</text>
+</svg>

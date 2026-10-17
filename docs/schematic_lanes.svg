@@ -1,0 +1,131 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1330 698" width="1330" height="698" role="img" aria-label="How the code is wired">
+<style>.ttl{fill:#15171A;font:600 31px Inter, Helvetica, Arial, sans-serif}.sub{fill:#A64708;font:italic 18px Inter, Helvetica, Arial, sans-serif}.foot{fill:#61655F;font:13px Inter, Helvetica, Arial, sans-serif}.lane{fill:#61655F;font:600 14px Inter, Helvetica, Arial, sans-serif;letter-spacing:.08em}.hd{fill:#15171A;font:600 17px Inter, Helvetica, Arial, sans-serif}.hdn{fill:#1C244B;font:600 17px Inter, Helvetica, Arial, sans-serif}.n{fill:#15171A;font:15px ui-monospace, SFMono-Regular, Menlo, monospace}.s{fill:#61655F;font:15px ui-monospace, SFMono-Regular, Menlo, monospace}.sm{fill:#61655F;font:14px Inter, Helvetica, Arial, sans-serif}.ac{fill:#A64708;font:15px ui-monospace, SFMono-Regular, Menlo, monospace}.gd{fill:#2C6D60;font:15px ui-monospace, SFMono-Regular, Menlo, monospace}.bd{fill:#A33A2A;font:15px ui-monospace, SFMono-Regular, Menlo, monospace}.card{fill:#FFFFFF;stroke:#C9CBC3;stroke-width:1.6}.card2{fill:#F7F7F4;stroke:#C9CBC3;stroke-width:1.6}.src{fill:#F6E3D3;stroke:#A64708;stroke-width:1.6;stroke-dasharray:6 4}.band{fill:#F6E3D3;stroke:#A64708;stroke-width:1.6}.a{stroke:#C9CBC3;stroke-width:1.8;fill:none}.aa{stroke:#A64708;stroke-width:1.6;fill:none}.dot{stroke:#C9CBC3;stroke-width:1.4;fill:none;stroke-dasharray:3 4}.rule{stroke:#15171A;stroke-width:1.6}.tri{fill:#C9CBC3}.e-pipeline{stroke:#C9CBC3;stroke-width:1.6;fill:none}.e-lm{stroke:#A64708;stroke-width:1.6;fill:none;opacity:.75}.e-app{stroke:#2C6D60;stroke-width:1.6;fill:none;opacity:.75}</style>
+<marker id="tip" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#C9CBC3"/></marker>
+<marker id="tipa" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#A64708"/></marker>
+<rect x="0" y="0" width="1330" height="698" fill="#E9EAE5"/>
+<text class="ttl" x="60" y="74">How the code is wired</text>
+<text class="sub" x="60" y="102">Read down a column for one stage, or across a lane for one kind of thing.</text>
+<line class="rule" x1="60" y1="120" x2="1270" y2="120"/>
+<rect class="band" x="190" y="126" width="208" height="32" rx="2"/>
+<text class="hd" x="202" y="148">1 · Acquisition</text>
+<rect class="band" x="408" y="126" width="208" height="32" rx="2"/>
+<text class="hd" x="420" y="148">2 · Geometry</text>
+<rect class="band" x="626" y="126" width="208" height="32" rx="2"/>
+<text class="hd" x="638" y="148">3 · Scan and triage</text>
+<rect class="band" x="844" y="126" width="208" height="32" rx="2"/>
+<text class="hd" x="856" y="148">4 · Model</text>
+<rect class="band" x="1062" y="126" width="208" height="32" rx="2"/>
+<text class="hd" x="1074" y="148">5 · Store and serve</text>
+<path class="tri" d="M397,135 L404,142 L397,149 Z"/>
+<path class="tri" d="M615,135 L622,142 L615,149 Z"/>
+<path class="tri" d="M833,135 L840,142 L833,149 Z"/>
+<path class="tri" d="M1051,135 L1058,142 L1051,149 Z"/>
+<text class="lane" x="60" y="196">SOURCES</text>
+<text class="lane" x="60" y="318">CODE</text>
+<text class="lane" x="60" y="446">CALLS</text>
+<text class="lane" x="60" y="554">WRITES</text>
+<rect class="src" x="190" y="168" width="208" height="82" rx="2"/>
+<text class="s" x="202" y="192">RCSB Search API v2</text>
+<text class="s" x="202" y="214">RCSB File Download</text>
+<text class="s" x="202" y="236">UniProt REST, AFDB</text>
+<rect class="card" x="190" y="260" width="208" height="126" rx="2"/>
+<text class="n" x="202" y="284">catalogue.py</text>
+<text class="n" x="202" y="306">rcsb.py</text>
+<text class="n" x="202" y="328">structures.py</text>
+<text class="n" x="202" y="350">trim_structures.py</text>
+<text class="n" x="202" y="372">common.py</text>
+<rect class="card2" x="190" y="398" width="208" height="104" rx="2"/>
+<text class="ac" x="202" y="422">gemmi, httpx, SQLite</text>
+<rect class="card" x="190" y="510" width="208" height="82" rx="2"/>
+<text class="n" x="202" y="534">data/raw/*.cif.gz</text>
+<text class="n" x="202" y="556">catalogue.jsonl</text>
+<text class="gd" x="202" y="578">130,391 entries</text>
+<path class="a" d="M294,250 L294,258" marker-end="url(#tip)"/>
+<path class="a" d="M294,386 L294,396" marker-end="url(#tip)"/>
+<path class="a" d="M294,502 L294,508" marker-end="url(#tip)"/>
+<rect class="card2" x="408" y="168" width="208" height="82" rx="2"/>
+<text class="s" x="420" y="192">cached assemblies</text>
+<text class="s" x="420" y="214">from stage 1</text>
+<text class="s" x="420" y="236">CCD definitions</text>
+<rect class="card" x="408" y="260" width="208" height="126" rx="2"/>
+<text class="n" x="420" y="284">geometry.py</text>
+<text class="n" x="420" y="306">run_bridges.py</text>
+<text class="n" x="420" y="328">build_edges.py</text>
+<text class="n" x="420" y="350">chem_rules.py</text>
+<text class="n" x="420" y="372">ccd_classes.py</text>
+<rect class="card2" x="408" y="398" width="208" height="104" rx="2"/>
+<text class="ac" x="420" y="422">FreeSASA, RDKit, SQLite</text>
+<rect class="card" x="408" y="510" width="208" height="82" rx="2"/>
+<text class="n" x="420" y="534">bridges.jsonl</text>
+<text class="n" x="420" y="556">ccd_classes.jsonl</text>
+<text class="gd" x="420" y="578">285,996 bridges</text>
+<path class="a" d="M512,250 L512,258" marker-end="url(#tip)"/>
+<path class="a" d="M512,386 L512,396" marker-end="url(#tip)"/>
+<path class="a" d="M512,502 L512,508" marker-end="url(#tip)"/>
+<rect class="src" x="626" y="168" width="208" height="82" rx="2"/>
+<text class="s" x="638" y="192">Slabicki 2025 (xls)</text>
+<text class="s" x="638" y="214">DEGRONOPEDIA, BioLiP</text>
+<text class="s" x="638" y="236">UbiBrowser, InterPro</text>
+<rect class="card" x="626" y="260" width="208" height="126" rx="2"/>
+<text class="n" x="638" y="284">degron_scan.py</text>
+<text class="n" x="638" y="306">degron_predict.py</text>
+<text class="n" x="638" y="328">e3_triage.py</text>
+<text class="n" x="638" y="350">degradability.py</text>
+<text class="n" x="638" y="372">zinc_finger_scan.py</text>
+<rect class="card2" x="626" y="398" width="208" height="104" rx="2"/>
+<text class="ac" x="638" y="422">DSSP (mkdssp), fpocket,</text>
+<text class="ac" x="638" y="444">gemmi, numpy,</text>
+<text class="ac" x="638" y="466">scikit-learn, SQLite</text>
+<rect class="card" x="626" y="510" width="208" height="82" rx="2"/>
+<text class="n" x="638" y="534">degrons.jsonl</text>
+<text class="n" x="638" y="556">ligase_triage.jsonl</text>
+<text class="gd" x="638" y="578">21,717 degrons</text>
+<path class="a" d="M730,250 L730,258" marker-end="url(#tip)"/>
+<path class="a" d="M730,386 L730,396" marker-end="url(#tip)"/>
+<path class="a" d="M730,502 L730,508" marker-end="url(#tip)"/>
+<rect class="src" x="844" y="168" width="208" height="82" rx="2"/>
+<text class="s" x="856" y="192">Qwen2.5-3B-Instruct</text>
+<text class="s" x="856" y="214">4-bit, from the Hub</text>
+<text class="s" x="856" y="236">the atlas itself</text>
+<rect class="card" x="844" y="260" width="208" height="126" rx="2"/>
+<text class="n" x="856" y="284">lm/build_corpus.py</text>
+<text class="n" x="856" y="306">lm/build_task_b.py</text>
+<text class="n" x="856" y="328">lm/train.py</text>
+<text class="n" x="856" y="350">lm/evaluate.py</text>
+<text class="n" x="856" y="372">lm/export_hf.py</text>
+<rect class="card2" x="844" y="398" width="208" height="104" rx="2"/>
+<text class="ac" x="856" y="422">mlx, mlx-lm, numpy,</text>
+<text class="ac" x="856" y="444">peft, RDKit,</text>
+<text class="ac" x="856" y="466">safetensors, SQLite,</text>
+<text class="ac" x="856" y="488">torch, transformers</text>
+<rect class="card" x="844" y="510" width="208" height="82" rx="2"/>
+<text class="n" x="856" y="534">corpus/*.jsonl</text>
+<text class="n" x="856" y="556">adapters/*.safetensors</text>
+<text class="gd" x="856" y="578">round 15, 239 min</text>
+<path class="a" d="M948,250 L948,258" marker-end="url(#tip)"/>
+<path class="a" d="M948,386 L948,396" marker-end="url(#tip)"/>
+<path class="a" d="M948,502 L948,508" marker-end="url(#tip)"/>
+<rect class="card2" x="1062" y="168" width="208" height="82" rx="2"/>
+<text class="s" x="1074" y="192">nothing is fetched</text>
+<text class="s" x="1074" y="214">at request time:</text>
+<text class="s" x="1074" y="236">the atlas is enough</text>
+<rect class="card" x="1062" y="260" width="208" height="126" rx="2"/>
+<text class="n" x="1074" y="284">build_atlas.py</text>
+<text class="n" x="1074" y="306">build_about.py</text>
+<text class="n" x="1074" y="328">app/queries.py</text>
+<text class="n" x="1074" y="350">app/db.py</text>
+<text class="n" x="1074" y="372">app/routes/api.py</text>
+<rect class="card2" x="1062" y="398" width="208" height="104" rx="2"/>
+<text class="ac" x="1074" y="422">Flask, SQLite</text>
+<rect class="card" x="1062" y="510" width="208" height="82" rx="2"/>
+<text class="n" x="1074" y="534">binman.sqlite</text>
+<text class="n" x="1074" y="556">/api/*.json</text>
+<text class="gd" x="1074" y="578">206 MB SQLite</text>
+<path class="a" d="M1166,250 L1166,258" marker-end="url(#tip)"/>
+<path class="a" d="M1166,386 L1166,396" marker-end="url(#tip)"/>
+<path class="a" d="M1166,502 L1166,508" marker-end="url(#tip)"/>
+<rect class="band" x="190" y="604" width="1080" height="46" rx="2"/>
+<text class="hd" x="204" y="626">Every stage appends one row per item to data/manifests/&lt;stage&gt;.jsonl</text>
+<text class="sm" x="204" y="644">So a killed run resumes from the manifest, and a failure is a recorded row rather than an absence.</text>
+<text class="foot" x="60" y="678">Counts read from app/static/about.json as generated 2026-10-16, from the model card and from the repository itself. Library names are parsed from the imports.</text>
+</svg>
